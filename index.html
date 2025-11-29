@@ -1,638 +1,1157 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AC Elite | Assetto Corsa Simracing Community</title>
-  <meta name="description" content="AC Elite is an Assetto Corsa simracing community running a weekly track-rotation server in the Tatuus FA01, with voting on Discord and Top 10 leaderboards for every track." />
-  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-</head>
-<body class="bg-slate-950 text-slate-100 font-sans">
-  <header class="relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-950 to-black border-b border-slate-800">
-    <div class="absolute inset-0 pointer-events-none opacity-40" aria-hidden="true">
-      <div class="absolute -left-32 -top-32 h-72 w-72 rounded-full bg-blue-500/20 blur-3xl"></div>
-      <div class="absolute -right-32 top-32 h-72 w-72 rounded-full bg-amber-500/20 blur-3xl"></div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AC Elite - Simracing Community</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      .font-racing {
+        font-family: "Orbitron", sans-serif;
+      }
+      .font-body {
+        font-family: "Inter", sans-serif;
+      }
+      .gold-gradient {
+        background: linear-gradient(
+          135deg,
+          #d4af37 0%,
+          #f4e076 50%,
+          #d4af37 100%
+        );
+      }
+      .blue-gradient {
+        background: linear-gradient(
+          135deg,
+          #0c1929 0%,
+          #1e3a5f 50%,
+          #0c1929 100%
+        );
+      }
+      .glow {
+        box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+      }
+      .top1 {
+        background: linear-gradient(
+          90deg,
+          rgba(255, 215, 0, 0.2) 0%,
+          transparent 100%
+        );
+      }
+      .top2 {
+        background: linear-gradient(
+          90deg,
+          rgba(192, 192, 192, 0.2) 0%,
+          transparent 100%
+        );
+      }
+      .top3 {
+        background: linear-gradient(
+          90deg,
+          rgba(205, 127, 50, 0.2) 0%,
+          transparent 100%
+        );
+      }
+    </style>
+  </head>
+  <body class="font-body bg-slate-950 text-white min-h-screen">
+    <!-- Navigation -->
+    <nav class="blue-gradient border-b border-amber-500/30 sticky top-0 z-50">
+      <div class="max-w-7xl mx-auto px-4 py-4">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div
+              class="w-12 h-12 gold-gradient rounded-lg flex items-center justify-center glow"
+            >
+              <span class="font-racing font-black text-slate-900 text-xl"
+                >AC</span
+              >
+            </div>
+            <div>
+              <h1 class="font-racing text-2xl font-bold text-amber-400">
+                AC ELITE
+              </h1>
+              <p class="text-xs text-slate-400">Tatuus FA01 Racing League</p>
+            </div>
+          </div>
+          <div class="flex gap-2">
+            <button
+              onclick="showPage('stats')"
+              id="nav-stats"
+              class="nav-btn px-4 py-2 rounded-lg font-semibold transition-all hover:bg-amber-500/20 text-amber-400 border border-amber-500/50"
+            >
+              📊 Stats
+            </button>
+            <button
+              onclick="showPage('leaderboard')"
+              id="nav-leaderboard"
+              class="nav-btn px-4 py-2 rounded-lg font-semibold transition-all hover:bg-amber-500/20 text-slate-400 border border-slate-700"
+            >
+              🏆 Leaderboard
+            </button>
+            <button
+              onclick="showPage('shop')"
+              id="nav-shop"
+              class="nav-btn px-4 py-2 rounded-lg font-semibold transition-all hover:bg-amber-500/20 text-slate-400 border border-slate-700"
+            >
+              🛒 Setup Shop
+            </button>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Hero Banner -->
+    <div class="blue-gradient py-8 border-b border-amber-500/20">
+      <div class="max-w-7xl mx-auto px-4 text-center">
+        <p class="text-slate-400 mb-2">
+          Weekly Track Rotation • Vote on Discord • Compete for Glory
+        </p>
+        <div
+          class="inline-flex items-center gap-2 bg-slate-800/50 px-4 py-2 rounded-full border border-slate-700"
+        >
+          <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+          <span class="text-sm text-slate-300"
+            >Server Online • Data synced via FTP</span
+          >
+        </div>
+      </div>
     </div>
-    <div class="relative mx-auto max-w-6xl px-4 py-6 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <div class="h-11 w-11 flex items-center justify-center rounded-lg bg-slate-900/80 border border-amber-400/70 shadow-[0_0_25px_rgba(251,191,36,0.6)]">
-          <span class="text-xl font-black tracking-tight text-blue-300">AC</span>
+
+    <!-- Stats Page -->
+    <div id="page-stats" class="page max-w-7xl mx-auto px-4 py-8">
+      <h2 class="font-racing text-3xl font-bold text-amber-400 mb-6">
+        Your Statistics
+      </h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <!-- Stat Cards -->
+        <div
+          class="bg-slate-900 border border-slate-800 rounded-xl p-6 hover:border-amber-500/50 transition-all"
+        >
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-slate-400 text-sm">Total Races</span>
+            <span class="text-2xl">🏁</span>
+          </div>
+          <p class="font-racing text-4xl font-bold text-white">247</p>
+          <p class="text-green-400 text-sm mt-1">+12 this week</p>
         </div>
-        <div>
-          <h1 class="text-2xl md:text-3xl font-black tracking-tight uppercase">
-            <span class="text-slate-50">AC</span>
-            <span class="text-amber-400"> Elite</span>
-          </h1>
-          <p class="text-xs md:text-sm text-slate-400 uppercase tracking-[0.2em]">Assetto Corsa · Track Rotation League</p>
+
+        <div
+          class="bg-slate-900 border border-slate-800 rounded-xl p-6 hover:border-amber-500/50 transition-all"
+        >
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-slate-400 text-sm">Wins</span>
+            <span class="text-2xl">🥇</span>
+          </div>
+          <p class="font-racing text-4xl font-bold text-amber-400">34</p>
+          <p class="text-slate-500 text-sm mt-1">13.7% win rate</p>
         </div>
-      </div>
-      <nav class="hidden md:flex items-center gap-6 text-sm font-medium text-slate-200">
-        <a href="#about" class="hover:text-amber-300 transition-colors">About</a>
-        <a href="#format" class="hover:text-amber-300 transition-colors">Race Format</a>
-        <a href="#leaderboard" class="hover:text-amber-300 transition-colors">Leaderboards</a>
-        <a href="#join" class="inline-flex items-center gap-2 rounded-full border border-amber-400/70 bg-amber-500/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-amber-200 hover:bg-amber-500/20 transition-colors">
-          Join Discord
-          <span class="inline-block h-1 w-1 rounded-full bg-amber-300"></span>
-        </a>
-      </nav>
-    </div>
 
-    <section class="relative mx-auto max-w-6xl px-4 pb-12 pt-2 grid gap-10 md:grid-cols-[minmax(0,3fr)_minmax(0,2.5fr)] items-center">
-      <div class="space-y-6">
-        <p class="inline-flex items-center gap-2 rounded-full border border-emerald-400/40 bg-emerald-500/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-emerald-200">
-          Weekly Track Rotation · Tatuus FA01 Only
-        </p>
-        <h2 class="text-3xl md:text-4xl lg:text-5xl font-black tracking-tight leading-tight">
-          Community-driven
-          <span class="text-cyan-400"> Assetto Corsa</span>
-          racing — one car, new track every week.
-        </h2>
-        <p class="text-sm md:text-base text-slate-300 max-w-xl">
-          AC Elite is a clean, fast-paced simracing community focused on the
-          Tatuus FA01. Vote each week on Discord for the next circuit, jump on
-          the rotation server, and chase the Top 10 on every track we race.
-        </p>
-        <div class="flex flex-wrap gap-3 items-center">
-          <a href="#join" class="inline-flex items-center justify-center rounded-lg bg-cyan-500 px-4 py-2 text-sm font-semibold text-slate-950 shadow-lg shadow-cyan-500/40 hover:bg-cyan-400 transition-colors">
-            Join the Grid
-          </a>
-          <a href="#leaderboard" class="inline-flex items-center justify-center rounded-lg border border-slate-700 px-4 py-2 text-sm font-semibold text-slate-100 hover:bg-slate-900/80 transition-colors">
-            View Track Leaderboards
-          </a>
+        <div
+          class="bg-slate-900 border border-slate-800 rounded-xl p-6 hover:border-amber-500/50 transition-all"
+        >
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-slate-400 text-sm">Podiums</span>
+            <span class="text-2xl">🏆</span>
+          </div>
+          <p class="font-racing text-4xl font-bold text-white">89</p>
+          <p class="text-slate-500 text-sm mt-1">36% podium rate</p>
         </div>
-        <dl class="grid grid-cols-3 gap-4 max-w-md text-xs md:text-sm">
-          <div>
-            <dt class="text-slate-400">Car</dt>
-            <dd class="font-semibold text-slate-100">Tatuus FA01</dd>
-          </div>
-          <div>
-            <dt class="text-slate-400">Schedule</dt>
-            <dd class="font-semibold text-slate-100">Weekly rotation</dd>
-          </div>
-          <div>
-            <dt class="text-slate-400">Platform</dt>
-            <dd class="font-semibold text-slate-100">Assetto Corsa (PC)</dd>
-          </div>
-        </dl>
-      </div>
 
-      <div class="relative">
-        <div class="absolute inset-0 rounded-3xl bg-gradient-to-br from-cyan-500/30 via-slate-900 to-emerald-500/20 opacity-60 blur-3xl" aria-hidden="true"></div>
-        <div class="relative rounded-3xl border border-slate-700/70 bg-slate-900/80 p-4 shadow-[0_0_35px_rgba(15,23,42,0.9)]">
-          <div class="flex items-center justify-between mb-3">
-            <div class="flex items-center gap-2 text-xs text-slate-300">
-              <span class="inline-flex h-6 w-6 items-center justify-center rounded bg-slate-800 text-[11px] font-bold text-cyan-300">FA</span>
-              <span>Tatuus FA01 · Server Status</span>
-            </div>
-            <span id="server-status-pill" class="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 px-2 py-0.5 text-[11px] font-semibold text-emerald-300 border border-emerald-400/50">
-              <span class="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-              Live
-            </span>
+        <div
+          class="bg-slate-900 border border-slate-800 rounded-xl p-6 hover:border-amber-500/50 transition-all"
+        >
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-slate-400 text-sm">Balance</span>
+            <span class="text-2xl">💰</span>
           </div>
-
-          <div class="relative overflow-hidden rounded-2xl border border-slate-700 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
-            <div class="absolute inset-0 opacity-60 bg-[radial-gradient(circle_at_20%_0,rgba(56,189,248,0.3),transparent_55%),radial-gradient(circle_at_80%_100%,rgba(244,63,94,0.25),transparent_55%)]" aria-hidden="true"></div>
-            <div class="relative p-4 space-y-3">
-              <div class="flex items-center justify-between text-[11px] text-slate-300">
-                <div class="space-y-0.5">
-                  <div class="font-semibold uppercase tracking-[0.25em] text-xs text-slate-400">This Week</div>
-                  <div id="current-track" class="text-base font-semibold text-slate-50">Imola</div>
-                  <div id="current-layout" class="text-[11px] text-slate-400">Autodromo Enzo e Dino Ferrari</div>
-                </div>
-                <div class="text-right">
-                  <div class="text-[11px] uppercase tracking-[0.2em] text-slate-400">Next Vote</div>
-                  <div id="next-vote-countdown" class="text-sm font-semibold text-cyan-300">Sun · 20:00 CET</div>
-                  <div class="mt-1 inline-flex items-center gap-1 rounded-full bg-slate-900/80 px-2 py-0.5 text-[10px] text-slate-300">
-                    <span class="inline-block h-1.5 w-1.5 rounded-full bg-cyan-400"></span>
-                    Discord Poll
-                  </div>
-                </div>
-              </div>
-
-              <div class="border-t border-slate-800 pt-3 flex flex-col gap-3">
-                <div class="flex items-center gap-3 text-[11px] text-slate-300">
-                  <div class="flex-1">
-                    <div class="flex justify-between mb-1">
-                      <span>Server Activity</span>
-                      <span id="server-population-label" class="font-semibold text-cyan-300">High</span>
-                    </div>
-                    <div class="h-1.5 w-full rounded-full bg-slate-800 overflow-hidden">
-                      <div id="server-population-bar" class="h-1.5 rounded-full bg-gradient-to-r from-emerald-400 via-cyan-400 to-rose-400" style="width: 78%;"></div>
-                    </div>
-                  </div>
-                  <div class="w-px h-8 bg-slate-800"></div>
-                  <div class="flex flex-col items-end gap-0.5 text-[11px]">
-                    <span class="text-slate-400">Online</span>
-                    <span id="server-online-count" class="font-semibold text-slate-50">18/24</span>
-                    <span class="text-[10px] text-slate-500">EU · MR A/B</span>
-                  </div>
-                </div>
-
-                <div class="grid grid-cols-3 gap-2 text-[11px]">
-                  <div class="rounded-lg border border-slate-800 bg-slate-950/80 p-2">
-                    <div class="text-slate-400">Conditions</div>
-                    <div id="server-conditions" class="font-semibold text-slate-100">Clear · 19:00</div>
-                  </div>
-                  <div class="rounded-lg border border-slate-800 bg-slate-950/80 p-2">
-                    <div class="text-slate-400">Best Lap</div>
-                    <div id="server-best-lap" class="font-semibold text-emerald-300">1:39.842</div>
-                  </div>
-                  <div class="rounded-lg border border-slate-800 bg-slate-950/80 p-2">
-                    <div class="text-slate-400">Record Holder</div>
-                    <div id="server-best-driver" class="font-semibold text-slate-100 truncate">AC_Storm</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-        </div>
-      </div>
-    </section>
-  </header>
-
-  <main class="mx-auto max-w-6xl px-4 py-10 space-y-16">
-    <section id="about" class="grid gap-10 md:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] items-start">
-      <div class="space-y-4">
-        <h2 class="text-2xl md:text-3xl font-bold tracking-tight">What is AC Elite?</h2>
-        <p class="text-sm md:text-base text-slate-300">
-          AC Elite is a community for drivers who love close, consistent, open-wheel
-          racing in <span class="font-semibold text-slate-100">Assetto Corsa</span>.
-          Instead of constantly changing cars and rules, we keep one constant:
-          the <span class="text-cyan-300 font-semibold">Tatuus FA01</span>.
-        </p>
-        <p class="text-sm md:text-base text-slate-300">
-          Every week, the community votes on the next track in a Discord poll.
-          The winning track becomes the focus for the week on our rotation
-          server, complete with a permanent <span class="font-semibold">Top 10
-          leaderboard</span> that stays in our history.
-        </p>
-        <div class="grid gap-4 sm:grid-cols-3 text-xs md:text-sm">
-          <div class="rounded-xl border border-slate-800 bg-slate-900/70 p-4">
-            <div class="text-slate-400 mb-1">Driving Style</div>
-            <div class="font-semibold text-slate-100">Clean & competitive</div>
-            <p class="mt-1 text-slate-400">Blue flags, racecraft, and respect first.</p>
-          </div>
-          <div class="rounded-xl border border-slate-800 bg-slate-900/70 p-4">
-            <div class="text-slate-400 mb-1">Region</div>
-            <div class="font-semibold text-slate-100">EU-focused</div>
-            <p class="mt-1 text-slate-400">Server located in Europe with global drivers.</p>
-          </div>
-          <div class="rounded-xl border border-slate-800 bg-slate-900/70 p-4">
-            <div class="text-slate-400 mb-1">Skill Level</div>
-            <div class="font-semibold text-slate-100">From rookie to alien</div>
-            <p class="mt-1 text-slate-400">If you race fair, you fit in.</p>
-          </div>
+          <p class="font-racing text-4xl font-bold text-green-400">$12,450</p>
+          <p class="text-green-400 text-sm mt-1">+$850 last race</p>
         </div>
       </div>
 
-      <div class="rounded-2xl border border-slate-800 bg-slate-900/70 p-4 md:p-5 space-y-4">
-        <h3 class="text-sm font-semibold text-slate-200 flex items-center gap-2">
-          <span class="inline-flex h-6 w-6 items-center justify-center rounded bg-slate-800 text-[11px] font-bold text-cyan-300">FA</span>
-          Tatuus FA01 Focus
-        </h3>
-        <p class="text-xs md:text-sm text-slate-300">
-          Lightweight, responsive, and perfect for learning racecraft and car
-          control. Keeping one car means every lap you do on any track
-          improves you everywhere.
-        </p>
-        <ul class="space-y-1.5 text-xs text-slate-300">
-          <li class="flex items-start gap-2"><span class="mt-1 h-1 w-1 rounded-full bg-cyan-400"></span> Open-wheel single seater with aero but still forgiving.</li>
-          <li class="flex items-start gap-2"><span class="mt-1 h-1 w-1 rounded-full bg-cyan-400"></span> Ideal for both new simracers and seasoned league drivers.</li>
-          <li class="flex items-start gap-2"><span class="mt-1 h-1 w-1 rounded-full bg-cyan-400"></span> Shared setups and driving tips in Discord.</li>
-        </ul>
-        <div class="rounded-xl border border-cyan-500/40 bg-cyan-500/10 p-3 text-[11px] text-cyan-100">
-          Tip: keep a dedicated FA01 setup folder per track. Our Discord has
-          a setup-sharing channel so you never start from zero.
-        </div>
-      </div>
-    </section>
-
-    <section id="format" class="space-y-6">
-      <div class="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <h2 class="text-2xl md:text-3xl font-bold tracking-tight">How the rotation works</h2>
-          <p class="mt-2 text-sm md:text-base text-slate-300 max-w-2xl">
-            One car, many circuits. Every week the track changes based on a
-            community vote on Discord. Sessions run daily with practice,
-            qualifying, and short races so you can drop in anytime.
-          </p>
-        </div>
-      </div>
-
-      <div class="grid gap-4 md:grid-cols-3 text-xs md:text-sm">
-        <div class="rounded-xl border border-slate-800 bg-slate-900/70 p-4 flex flex-col gap-2">
-          <div class="text-slate-400">1. Vote</div>
-          <div class="font-semibold text-slate-100">Discord track poll</div>
-          <p class="text-slate-300">Poll opens mid-week. Suggest tracks, discuss combos, and vote for next week's circuit.</p>
-        </div>
-        <div class="rounded-xl border border-slate-800 bg-slate-900/70 p-4 flex flex-col gap-2">
-          <div class="text-slate-400">2. Race</div>
-          <div class="font-semibold text-slate-100">Rotation server</div>
-          <p class="text-slate-300">Once the track is set, the server runs that combo all week with practice & race cycles.</p>
-        </div>
-        <div class="rounded-xl border border-slate-800 bg-slate-900/70 p-4 flex flex-col gap-2">
-          <div class="text-slate-400">3. Record</div>
-          <div class="font-semibold text-slate-100">Top 10 per track</div>
-          <p class="text-slate-300">Fastest clean laps are saved into our track history leaderboard for bragging rights.</p>
-        </div>
-      </div>
-    </section>
-
-    <section id="leaderboard" class="space-y-6">
-      <div class="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <h2 class="text-2xl md:text-3xl font-bold tracking-tight">Track Leaderboards</h2>
-          <p class="mt-2 text-sm md:text-base text-slate-300 max-w-2xl">
-            Browse the fastest clean laps set on our AC Elite server. Use the
-            filters to view a specific circuit and see who holds the Top 10 in
-            the Tatuus FA01.
-          </p>
-        </div>
-        <div class="flex flex-wrap gap-2 text-xs text-slate-300">
-          <span class="inline-flex items-center gap-1 rounded-full border border-emerald-400/40 bg-emerald-500/10 px-2 py-1">
-            <span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
-            Validated laps only
-          </span>
-          <span class="inline-flex items-center gap-1 rounded-full border border-slate-700 bg-slate-900 px-2 py-1">
-            <span class="h-1.5 w-1.5 rounded-full bg-cyan-400"></span>
-            Car: Tatuus FA01
-          </span>
-        </div>
-      </div>
-
-      <div class="rounded-2xl border border-slate-800 bg-slate-900/70 p-4 md:p-5 space-y-4">
-        <div class="grid gap-4 md:grid-cols-[minmax(0,2.2fr)_minmax(0,3fr)] items-stretch">
-          <!-- Track visual card -->
-          <div class="relative overflow-hidden rounded-xl border border-slate-800 bg-slate-950/80">
-            <div id="track-image" class="h-40 md:h-full bg-cover bg-center transition-transform duration-700 will-change-transform"></div>
-            <div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/40 to-transparent"></div>
-            <div class="absolute inset-x-0 bottom-0 p-3 md:p-4 flex flex-col gap-1 text-xs md:text-sm">
-              <div class="flex items-center justify-between gap-2">
-                <div>
-                  <div id="track-name-label" class="text-sm md:text-base font-semibold text-slate-50"></div>
-                  <div id="track-meta" class="text-[11px] text-slate-300"></div>
-                </div>
-                <div class="flex flex-col items-end gap-1 text-[10px] md:text-[11px]">
-                  <span class="inline-flex items-center gap-1 rounded-full border border-amber-400/60 bg-amber-500/20 px-2 py-0.5 text-amber-100">
-                    <span class="h-1.5 w-1.5 rounded-full bg-amber-300"></span>
-                    Tatuus FA01
-                  </span>
-                  <span id="track-difficulty" class="text-slate-300"></span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Filters + table -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Detailed Stats -->
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-6">
+          <h3 class="font-racing text-xl font-bold text-amber-400 mb-4">
+            Performance Stats
+          </h3>
           <div class="space-y-4">
-            <div class="flex flex-wrap gap-3 items-center justify-between">
-              <div class="flex flex-wrap gap-3 items-center">
-                <label class="text-xs md:text-sm text-slate-300 flex items-center gap-2">
-                  Track
-                  <select id="track-select" class="bg-slate-950 border border-slate-700 text-xs md:text-sm rounded-lg px-2 py-1 text-slate-100 focus:outline-none focus:border-blue-400">
-                  </select>
-                </label>
-
-                <label class="text-xs md:text-sm text-slate-300 flex items-center gap-2">
-                  Search driver
-                  <input id="driver-search" type="text" placeholder="Name or tag" class="bg-slate-950 border border-slate-700 text-xs md:text-sm rounded-lg px-2 py-1 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-blue-400" />
-                </label>
-              </div>
-
-              <div class="flex flex-wrap gap-2 items-center text-[11px] text-slate-300">
-                <span id="selected-track-info" class="text-slate-400"></span>
-              </div>
+            <div
+              class="flex justify-between items-center py-3 border-b border-slate-800"
+            >
+              <span class="text-slate-400">Fastest Lap</span>
+              <span class="font-mono text-white font-bold">1:28.347</span>
             </div>
-
-            <div class="overflow-x-auto rounded-xl border border-slate-800 bg-slate-950/80 shadow-[0_0_25px_rgba(56,189,248,0.12)]">
-              <table class="min-w-full text-xs md:text-sm">
-                <thead class="bg-gradient-to-r from-slate-900/90 via-slate-900 to-slate-900/90 text-slate-300">
-                  <tr>
-                    <th class="px-3 py-2 text-left font-medium">#</th>
-                    <th class="px-3 py-2 text-left font-medium">Driver</th>
-                    <th class="px-3 py-2 text-left font-medium">Time</th>
-                    <th class="px-3 py-2 text-left font-medium">Delta</th>
-                    <th class="px-3 py-2 text-left font-medium">Date</th>
-                    <th class="px-3 py-2 text-left font-medium">Split</th>
-                  </tr>
-                </thead>
-                <tbody id="leaderboard-body" class="divide-y divide-slate-900/80"></tbody>
-              </table>
+            <div
+              class="flex justify-between items-center py-3 border-b border-slate-800"
+            >
+              <span class="text-slate-400">Average Position</span>
+              <span class="font-mono text-amber-400 font-bold">4.2</span>
             </div>
+            <div
+              class="flex justify-between items-center py-3 border-b border-slate-800"
+            >
+              <span class="text-slate-400">Laps Completed</span>
+              <span class="font-mono text-white font-bold">3,847</span>
+            </div>
+            <div
+              class="flex justify-between items-center py-3 border-b border-slate-800"
+            >
+              <span class="text-slate-400">Total Distance</span>
+              <span class="font-mono text-white font-bold">14,285 km</span>
+            </div>
+            <div class="flex justify-between items-center py-3">
+              <span class="text-slate-400">Time on Track</span>
+              <span class="font-mono text-white font-bold">127h 34m</span>
+            </div>
+          </div>
+        </div>
 
-            <div id="leaderboard-empty" class="hidden rounded-lg border border-dashed border-slate-700 bg-slate-950/70 px-4 py-3 text-xs text-slate-400">
-              No leaderboard data for this track yet. Be the first to set a time on the AC Elite server.
+        <!-- Incidents -->
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-6">
+          <h3 class="font-racing text-xl font-bold text-amber-400 mb-4">
+            Incidents & Penalties
+          </h3>
+          <div class="space-y-4">
+            <div
+              class="flex justify-between items-center py-3 border-b border-slate-800"
+            >
+              <span class="text-slate-400">Total Crashes</span>
+              <span class="font-mono text-red-400 font-bold">23</span>
+            </div>
+            <div
+              class="flex justify-between items-center py-3 border-b border-slate-800"
+            >
+              <span class="text-slate-400">Collisions</span>
+              <span class="font-mono text-orange-400 font-bold">41</span>
+            </div>
+            <div
+              class="flex justify-between items-center py-3 border-b border-slate-800"
+            >
+              <span class="text-slate-400">Track Limits</span>
+              <span class="font-mono text-yellow-400 font-bold">156</span>
+            </div>
+            <div
+              class="flex justify-between items-center py-3 border-b border-slate-800"
+            >
+              <span class="text-slate-400">Penalties Received</span>
+              <span class="font-mono text-red-400 font-bold">8</span>
+            </div>
+            <div class="flex justify-between items-center py-3">
+              <span class="text-slate-400">Safety Rating</span>
+              <span class="font-mono text-green-400 font-bold">A (94%)</span>
             </div>
           </div>
         </div>
       </div>
-    </section>
 
-    <section id="join" class="space-y-6">
-      <div class="grid gap-8 md:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] items-center">
-        <div class="space-y-4">
-          <h2 class="text-2xl md:text-3xl font-bold tracking-tight">Join AC Elite</h2>
-          <p class="text-sm md:text-base text-slate-300 max-w-xl">
-            All coordination happens on Discord: track voting, event
-            announcements, setup sharing, and voice chat during races. Hop in,
-            grab the server details, and say hi.
-          </p>
-          <ul class="space-y-2 text-xs md:text-sm text-slate-300">
-            <li class="flex items-start gap-2"><span class="mt-1 h-1 w-1 rounded-full bg-cyan-400"></span> Weekly track poll with suggestions channel.</li>
-            <li class="flex items-start gap-2"><span class="mt-1 h-1 w-1 rounded-full bg-cyan-400"></span> Text channels for setups, replays, and race reports.</li>
-            <li class="flex items-start gap-2"><span class="mt-1 h-1 w-1 rounded-full bg-cyan-400"></span> Voice lobbies for practice, qualifying, and races.</li>
-          </ul>
-          <div class="flex flex-wrap gap-3 items-center">
-            <a href="#" class="inline-flex items-center justify-center rounded-lg bg-indigo-500 px-4 py-2 text-sm font-semibold text-slate-50 shadow-lg shadow-indigo-500/40 hover:bg-indigo-400 transition-colors">
-              Open Discord Invite
-            </a>
-            <span class="text-xs text-slate-400">Replace this button with your real invite link.</span>
-          </div>
+      <!-- Recent Activity -->
+      <div class="mt-6 bg-slate-900 border border-slate-800 rounded-xl p-6">
+        <h3 class="font-racing text-xl font-bold text-amber-400 mb-4">
+          Recent Activity
+        </h3>
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <thead>
+              <tr
+                class="text-left text-slate-400 text-sm border-b border-slate-800"
+              >
+                <th class="pb-3 pr-4">Date</th>
+                <th class="pb-3 pr-4">Track</th>
+                <th class="pb-3 pr-4">Position</th>
+                <th class="pb-3 pr-4">Best Lap</th>
+                <th class="pb-3">Earnings</th>
+              </tr>
+            </thead>
+            <tbody class="text-sm">
+              <tr class="border-b border-slate-800/50">
+                <td class="py-3 pr-4 text-slate-400">2024-01-15</td>
+                <td class="py-3 pr-4">Spa-Francorchamps</td>
+                <td class="py-3 pr-4">
+                  <span class="bg-amber-500/20 text-amber-400 px-2 py-1 rounded"
+                    >P1</span
+                  >
+                </td>
+                <td class="py-3 pr-4 font-mono">2:14.832</td>
+                <td class="py-3 text-green-400">+$500</td>
+              </tr>
+              <tr class="border-b border-slate-800/50">
+                <td class="py-3 pr-4 text-slate-400">2024-01-14</td>
+                <td class="py-3 pr-4">Zandvoort</td>
+                <td class="py-3 pr-4">
+                  <span class="bg-slate-700 text-slate-300 px-2 py-1 rounded"
+                    >P3</span
+                  >
+                </td>
+                <td class="py-3 pr-4 font-mono">1:28.567</td>
+                <td class="py-3 text-green-400">+$200</td>
+              </tr>
+              <tr class="border-b border-slate-800/50">
+                <td class="py-3 pr-4 text-slate-400">2024-01-13</td>
+                <td class="py-3 pr-4">Silverstone</td>
+                <td class="py-3 pr-4">
+                  <span class="bg-slate-700 text-slate-300 px-2 py-1 rounded"
+                    >P7</span
+                  >
+                </td>
+                <td class="py-3 pr-4 font-mono">1:48.234</td>
+                <td class="py-3 text-green-400">+$50</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-
-        <div class="rounded-2xl border border-slate-800 bg-slate-900/70 p-4 md:p-5 space-y-3 text-xs md:text-sm text-slate-300">
-          <h3 class="text-sm font-semibold text-slate-100">Server Checklist</h3>
-          <ul class="space-y-2">
-            <li class="flex items-start gap-2">
-              <span class="mt-1 inline-flex h-3 w-3 items-center justify-center rounded-full border border-emerald-400/60 bg-emerald-500/10">
-                <span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
-              </span>
-              <span>
-                <span class="font-semibold">Required:</span> Assetto Corsa (PC, Steam) and basic online experience.
-              </span>
-            </li>
-            <li class="flex items-start gap-2">
-              <span class="mt-1 inline-flex h-3 w-3 items-center justify-center rounded-full border border-slate-500/60 bg-slate-800/50">
-                <span class="h-1.5 w-1.5 rounded-full bg-slate-300"></span>
-              </span>
-              <span>
-                <span class="font-semibold">Recommended:</span> Wheel & pedals and a microphone for voice chat.
-              </span>
-            </li>
-            <li class="flex items-start gap-2">
-              <span class="mt-1 inline-flex h-3 w-3 items-center justify-center rounded-full border border-cyan-400/60 bg-cyan-500/10">
-                <span class="h-1.5 w-1.5 rounded-full bg-cyan-400"></span>
-              </span>
-              <span>
-                <span class="font-semibold">Nice to have:</span> Content Manager, Custom Shaders Patch, and track mods.
-              </span>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <footer class="border-t border-slate-800 bg-slate-950/95 mt-10">
-    <div class="mx-auto max-w-6xl px-4 py-5 flex flex-wrap items-center justify-between gap-4 text-[11px] md:text-xs text-slate-500">
-      <div>
-        © <span id="year"></span> AC Elite · Community Assetto Corsa racing with the Tatuus FA01.
-      </div>
-      <div class="flex flex-wrap gap-3 items-center">
-        <span>Not affiliated with Kunos Simulazioni.</span>
-        <a href="#join" class="text-cyan-400 hover:text-cyan-300">Join the Discord</a>
       </div>
     </div>
-  </footer>
 
-  <script>
-    const trackData = {
-      "Zandvoort": {
-        location: "Netherlands",
-        layout: "GP",
-        lengthKm: 4.259,
-        difficulty: "Technical · flowing",
-        image: "https://images.pexels.com/photos/1402787/pexels-photo-1402787.jpeg?auto=compress&cs=tinysrgb&w=800",
-        laps: [
-          { driver: "AC_Storm", time: "1:32.410", date: "2025-02-02", split: "+0.000" },
-          { driver: "Nova", time: "1:32.522", date: "2025-02-02", split: "+0.112" },
-          { driver: "Helix", time: "1:32.700", date: "2025-02-03", split: "+0.290" },
-          { driver: "SlipStream", time: "1:32.845", date: "2025-02-03", split: "+0.435" },
-          { driver: "Lumy", time: "1:33.010", date: "2025-02-04", split: "+0.600" },
-          { driver: "Chicane", time: "1:33.099", date: "2025-02-04", split: "+0.689" },
-          { driver: "Delta", time: "1:33.144", date: "2025-02-05", split: "+0.734" },
-          { driver: "Mint", time: "1:33.201", date: "2025-02-05", split: "+0.791" },
-          { driver: "GridGhost", time: "1:33.315", date: "2025-02-06", split: "+0.905" },
-          { driver: "AC_Rookie", time: "1:33.508", date: "2025-02-06", split: "+1.098" }
-        ]
-      },
-      "Spa-Francorchamps": {
-        location: "Belgium",
-        layout: "GP",
-        lengthKm: 7.004,
-        difficulty: "High-speed · demanding",
-        image: "https://images.pexels.com/photos/1402788/pexels-photo-1402788.jpeg?auto=compress&cs=tinysrgb&w=800",
-        laps: [
-          { driver: "Nova", time: "2:15.410", date: "2025-01-18", split: "+0.000" },
-          { driver: "AC_Storm", time: "2:15.533", date: "2025-01-18", split: "+0.123" },
-          { driver: "Helix", time: "2:15.712", date: "2025-01-19", split: "+0.302" },
-          { driver: "SlipStream", time: "2:15.845", date: "2025-01-19", split: "+0.435" },
-          { driver: "Lumy", time: "2:16.004", date: "2025-01-20", split: "+0.594" },
-          { driver: "Chicane", time: "2:16.122", date: "2025-01-20", split: "+0.712" },
-          { driver: "Delta", time: "2:16.240", date: "2025-01-21", split: "+0.830" },
-          { driver: "Mint", time: "2:16.305", date: "2025-01-21", split: "+0.895" },
-          { driver: "GridGhost", time: "2:16.399", date: "2025-01-22", split: "+0.989" },
-          { driver: "AC_Rookie", time: "2:16.755", date: "2025-01-22", split: "+1.345" }
-        ]
-      },
-      "Mugello": {
-        location: "Italy",
-        layout: "GP",
-        lengthKm: 5.245,
-        difficulty: "Fast · technical",
-        image: "https://images.pexels.com/photos/11538930/pexels-photo-11538930.jpeg?auto=compress&cs=tinysrgb&w=800",
-        laps: [
-          { driver: "Helix", time: "1:41.922", date: "2024-12-10", split: "+0.000" },
-          { driver: "Nova", time: "1:42.004", date: "2024-12-10", split: "+0.082" },
-          { driver: "AC_Storm", time: "1:42.030", date: "2024-12-11", split: "+0.108" },
-          { driver: "SlipStream", time: "1:42.115", date: "2024-12-11", split: "+0.193" },
-          { driver: "Lumy", time: "1:42.408", date: "2024-12-12", split: "+0.486" },
-          { driver: "Chicane", time: "1:42.501", date: "2024-12-12", split: "+0.579" },
-          { driver: "Delta", time: "1:42.633", date: "2024-12-13", split: "+0.711" },
-          { driver: "Mint", time: "1:42.718", date: "2024-12-13", split: "+0.796" },
-          { driver: "GridGhost", time: "1:42.851", date: "2024-12-14", split: "+0.929" },
-          { driver: "AC_Rookie", time: "1:43.120", date: "2024-12-14", split: "+1.198" }
-        ]
-      },
-      "Silverstone": {
-        location: "United Kingdom",
-        layout: "GP",
-        lengthKm: 5.891,
-        difficulty: "Fast · high commitment",
-        image: "https://images.pexels.com/photos/1402789/pexels-photo-1402789.jpeg?auto=compress&cs=tinysrgb&w=800",
-        laps: [
-          { driver: "Nova", time: "1:47.401", date: "2025-01-05", split: "+0.000" },
-          { driver: "AC_Storm", time: "1:47.533", date: "2025-01-05", split: "+0.132" },
-          { driver: "Helix", time: "1:47.701", date: "2025-01-06", split: "+0.300" },
-          { driver: "SlipStream", time: "1:47.814", date: "2025-01-06", split: "+0.413" },
-          { driver: "Lumy", time: "1:47.990", date: "2025-01-07", split: "+0.589" },
-          { driver: "Chicane", time: "1:48.044", date: "2025-01-07", split: "+0.643" },
-          { driver: "Delta", time: "1:48.111", date: "2025-01-08", split: "+0.710" },
-          { driver: "Mint", time: "1:48.205", date: "2025-01-08", split: "+0.804" },
-          { driver: "GridGhost", time: "1:48.299", date: "2025-01-09", split: "+0.898" },
-          { driver: "AC_Rookie", time: "1:48.622", date: "2025-01-09", split: "+1.221" }
-        ]
-      }
-    };
+    <!-- Leaderboard Page -->
+    <div id="page-leaderboard" class="page hidden max-w-7xl mx-auto px-4 py-8">
+      <h2 class="font-racing text-3xl font-bold text-amber-400 mb-6">
+        Leaderboard
+      </h2>
 
-    const trackSelect = document.getElementById('track-select');
-    const driverSearchInput = document.getElementById('driver-search');
-    const leaderboardBody = document.getElementById('leaderboard-body');
-    const leaderboardEmpty = document.getElementById('leaderboard-empty');
-    const selectedTrackInfo = document.getElementById('selected-track-info');
-    const currentTrackEl = document.getElementById('current-track');
-    const currentLayoutEl = document.getElementById('current-layout');
-    const trackImageEl = document.getElementById('track-image');
-    const trackNameLabelEl = document.getElementById('track-name-label');
-    const trackMetaEl = document.getElementById('track-meta');
-    const trackDifficultyEl = document.getElementById('track-difficulty');
+      <!-- Track Filter -->
+      <div class="mb-6 flex flex-wrap gap-2">
+        <button
+          onclick="filterTrack('all')"
+          class="track-btn active px-4 py-2 rounded-lg font-semibold bg-amber-500 text-slate-900"
+          data-track="all"
+        >
+          All Tracks
+        </button>
+        <button
+          onclick="filterTrack('spa')"
+          class="track-btn px-4 py-2 rounded-lg font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700"
+          data-track="spa"
+        >
+          Spa-Francorchamps
+        </button>
+        <button
+          onclick="filterTrack('zandvoort')"
+          class="track-btn px-4 py-2 rounded-lg font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700"
+          data-track="zandvoort"
+        >
+          Zandvoort
+        </button>
+        <button
+          onclick="filterTrack('silverstone')"
+          class="track-btn px-4 py-2 rounded-lg font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700"
+          data-track="silverstone"
+        >
+          Silverstone
+        </button>
+        <button
+          onclick="filterTrack('monza')"
+          class="track-btn px-4 py-2 rounded-lg font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700"
+          data-track="monza"
+        >
+          Monza
+        </button>
+        <button
+          onclick="filterTrack('imola')"
+          class="track-btn px-4 py-2 rounded-lg font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700"
+          data-track="imola"
+        >
+          Imola
+        </button>
+      </div>
 
-    for (const trackName of Object.keys(trackData)) {
-      const opt = document.createElement('option');
-      opt.value = trackName;
-      opt.textContent = trackName;
-      trackSelect.appendChild(opt);
-    }
+      <!-- Leaderboard Table -->
+      <div
+        class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden"
+      >
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <thead>
+              <tr class="text-left text-slate-400 text-sm bg-slate-800/50">
+                <th class="py-4 px-4">Pos</th>
+                <th class="py-4 px-4">Driver</th>
+                <th class="py-4 px-4">Track</th>
+                <th class="py-4 px-4">Best Lap</th>
+                <th class="py-4 px-4">Gap</th>
+                <th class="py-4 px-4">Date</th>
+              </tr>
+            </thead>
+            <tbody id="leaderboard-body">
+              <!-- Populated by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
 
-    const defaultTrack = 'Zandvoort';
-    trackSelect.value = defaultTrack;
+      <!-- Pagination -->
+      <div class="mt-6 flex justify-center gap-2" id="pagination">
+        <!-- Populated by JS -->
+      </div>
+    </div>
 
-    function renderTrackInfo(name) {
-      const t = trackData[name];
-      if (!t) return;
-      selectedTrackInfo.textContent = `${name} · ${t.layout} · ${t.lengthKm.toFixed(3)} km · ${t.location} · ${t.difficulty}`;
+    <!-- Setup Shop Page -->
+    <div id="page-shop" class="page hidden max-w-7xl mx-auto px-4 py-8">
+      <h2 class="font-racing text-3xl font-bold text-amber-400 mb-2">
+        Setup Shop
+      </h2>
+      <p class="text-slate-400 mb-6">
+        Premium Tatuus FA01 setups for every track in rotation
+      </p>
 
-      if (trackImageEl && t.image) {
-        trackImageEl.style.backgroundImage = `url(${t.image})`;
-        trackImageEl.style.transform = 'scale(1.04)';
-        setTimeout(() => {
-          trackImageEl.style.transform = 'scale(1)';
-        }, 50);
-      }
-      if (trackNameLabelEl) {
-        trackNameLabelEl.textContent = name;
-      }
-      if (trackMetaEl) {
-        trackMetaEl.textContent = `${t.layout} · ${t.lengthKm.toFixed(3)} km · ${t.location}`;
-      }
-      if (trackDifficultyEl) {
-        trackDifficultyEl.textContent = t.difficulty;
-      }
+      <!-- Track Filter -->
+      <div class="mb-6 flex flex-wrap gap-2">
+        <button
+          onclick="filterShop('all')"
+          class="shop-btn active px-4 py-2 rounded-lg font-semibold bg-amber-500 text-slate-900"
+          data-track="all"
+        >
+          All Tracks
+        </button>
+        <button
+          onclick="filterShop('spa')"
+          class="shop-btn px-4 py-2 rounded-lg font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700"
+          data-track="spa"
+        >
+          Spa
+        </button>
+        <button
+          onclick="filterShop('zandvoort')"
+          class="shop-btn px-4 py-2 rounded-lg font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700"
+          data-track="zandvoort"
+        >
+          Zandvoort
+        </button>
+        <button
+          onclick="filterShop('silverstone')"
+          class="shop-btn px-4 py-2 rounded-lg font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700"
+          data-track="silverstone"
+        >
+          Silverstone
+        </button>
+        <button
+          onclick="filterShop('monza')"
+          class="shop-btn px-4 py-2 rounded-lg font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700"
+          data-track="monza"
+        >
+          Monza
+        </button>
+        <button
+          onclick="filterShop('imola')"
+          class="shop-btn px-4 py-2 rounded-lg font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700"
+          data-track="imola"
+        >
+          Imola
+        </button>
+      </div>
 
-      if (currentTrackEl && currentLayoutEl && name === defaultTrack) {
-        currentTrackEl.textContent = name;
-        currentLayoutEl.textContent = t.layout;
-      }
-    }
+      <!-- Setup Grid -->
+      <div
+        id="shop-grid"
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+      >
+        <!-- Populated by JS -->
+      </div>
+    </div>
 
-    function renderLeaderboard() {
-      const trackName = trackSelect.value;
-      const search = driverSearchInput.value.trim().toLowerCase();
-      const track = trackData[trackName];
+    <!-- Footer -->
+    <footer class="border-t border-slate-800 mt-12 py-8">
+      <div class="max-w-7xl mx-auto px-4 text-center">
+        <div class="flex items-center justify-center gap-3 mb-4">
+          <div
+            class="w-8 h-8 gold-gradient rounded-lg flex items-center justify-center"
+          >
+            <span class="font-racing font-black text-slate-900 text-sm"
+              >AC</span
+            >
+          </div>
+          <span class="font-racing text-lg text-amber-400">AC ELITE</span>
+        </div>
+        <p class="text-slate-500 text-sm">
+          Vote for next week's track on Discord • Tatuus FA01 Racing League
+        </p>
+        <p class="text-slate-600 text-xs mt-2">© 2024 AC Elite Community</p>
+      </div>
+    </footer>
 
-      leaderboardBody.innerHTML = '';
+    <script>
+      // Sample data
+      const leaderboardData = [
+        {
+          pos: 1,
+          driver: "MaxSpeed_Pro",
+          track: "spa",
+          time: "2:14.123",
+          gap: "-",
+          date: "2024-01-15",
+        },
+        {
+          pos: 2,
+          driver: "RacerX_Elite",
+          track: "spa",
+          time: "2:14.456",
+          gap: "+0.333",
+          date: "2024-01-15",
+        },
+        {
+          pos: 3,
+          driver: "ThunderBolt99",
+          track: "spa",
+          time: "2:14.789",
+          gap: "+0.666",
+          date: "2024-01-14",
+        },
+        {
+          pos: 4,
+          driver: "SpeedDemon_AC",
+          track: "spa",
+          time: "2:15.012",
+          gap: "+0.889",
+          date: "2024-01-14",
+        },
+        {
+          pos: 5,
+          driver: "GhostRider_7",
+          track: "spa",
+          time: "2:15.234",
+          gap: "+1.111",
+          date: "2024-01-13",
+        },
+        {
+          pos: 6,
+          driver: "ApexHunter",
+          track: "spa",
+          time: "2:15.567",
+          gap: "+1.444",
+          date: "2024-01-13",
+        },
+        {
+          pos: 7,
+          driver: "NitroKing",
+          track: "spa",
+          time: "2:15.890",
+          gap: "+1.767",
+          date: "2024-01-12",
+        },
+        {
+          pos: 8,
+          driver: "DriftMaster",
+          track: "spa",
+          time: "2:16.123",
+          gap: "+2.000",
+          date: "2024-01-12",
+        },
+        {
+          pos: 9,
+          driver: "TrackStar_44",
+          track: "spa",
+          time: "2:16.456",
+          gap: "+2.333",
+          date: "2024-01-11",
+        },
+        {
+          pos: 10,
+          driver: "FastLane_Pro",
+          track: "spa",
+          time: "2:16.789",
+          gap: "+2.666",
+          date: "2024-01-11",
+        },
+        {
+          pos: 11,
+          driver: "RacingAce",
+          track: "spa",
+          time: "2:17.012",
+          gap: "+2.889",
+          date: "2024-01-10",
+        },
+        {
+          pos: 12,
+          driver: "SprintKing",
+          track: "spa",
+          time: "2:17.345",
+          gap: "+3.222",
+          date: "2024-01-10",
+        },
+        {
+          pos: 1,
+          driver: "ZandvoortKing",
+          track: "zandvoort",
+          time: "1:27.543",
+          gap: "-",
+          date: "2024-01-15",
+        },
+        {
+          pos: 2,
+          driver: "DutchRacer",
+          track: "zandvoort",
+          time: "1:27.876",
+          gap: "+0.333",
+          date: "2024-01-15",
+        },
+        {
+          pos: 3,
+          driver: "OrangeArmy",
+          track: "zandvoort",
+          time: "1:28.109",
+          gap: "+0.566",
+          date: "2024-01-14",
+        },
+        {
+          pos: 4,
+          driver: "MaxSpeed_Pro",
+          track: "zandvoort",
+          time: "1:28.432",
+          gap: "+0.889",
+          date: "2024-01-14",
+        },
+        {
+          pos: 5,
+          driver: "BankingMaster",
+          track: "zandvoort",
+          time: "1:28.765",
+          gap: "+1.222",
+          date: "2024-01-13",
+        },
+        {
+          pos: 6,
+          driver: "ApexHunter",
+          track: "zandvoort",
+          time: "1:29.098",
+          gap: "+1.555",
+          date: "2024-01-13",
+        },
+        {
+          pos: 7,
+          driver: "RacerX_Elite",
+          track: "zandvoort",
+          time: "1:29.431",
+          gap: "+1.888",
+          date: "2024-01-12",
+        },
+        {
+          pos: 8,
+          driver: "ThunderBolt99",
+          track: "zandvoort",
+          time: "1:29.764",
+          gap: "+2.221",
+          date: "2024-01-12",
+        },
+        {
+          pos: 9,
+          driver: "GhostRider_7",
+          track: "zandvoort",
+          time: "1:30.097",
+          gap: "+2.554",
+          date: "2024-01-11",
+        },
+        {
+          pos: 10,
+          driver: "NitroKing",
+          track: "zandvoort",
+          time: "1:30.430",
+          gap: "+2.887",
+          date: "2024-01-11",
+        },
+        {
+          pos: 11,
+          driver: "DriftMaster",
+          track: "zandvoort",
+          time: "1:30.763",
+          gap: "+3.220",
+          date: "2024-01-10",
+        },
+        {
+          pos: 1,
+          driver: "BritishRacer",
+          track: "silverstone",
+          time: "1:47.234",
+          gap: "-",
+          date: "2024-01-15",
+        },
+        {
+          pos: 2,
+          driver: "MaxSpeed_Pro",
+          track: "silverstone",
+          time: "1:47.567",
+          gap: "+0.333",
+          date: "2024-01-15",
+        },
+        {
+          pos: 3,
+          driver: "StoneMaster",
+          track: "silverstone",
+          time: "1:47.890",
+          gap: "+0.656",
+          date: "2024-01-14",
+        },
+        {
+          pos: 4,
+          driver: "RacerX_Elite",
+          track: "silverstone",
+          time: "1:48.123",
+          gap: "+0.889",
+          date: "2024-01-14",
+        },
+        {
+          pos: 5,
+          driver: "ApexHunter",
+          track: "silverstone",
+          time: "1:48.456",
+          gap: "+1.222",
+          date: "2024-01-13",
+        },
+        {
+          pos: 6,
+          driver: "ThunderBolt99",
+          track: "silverstone",
+          time: "1:48.789",
+          gap: "+1.555",
+          date: "2024-01-13",
+        },
+        {
+          pos: 7,
+          driver: "CopseKing",
+          track: "silverstone",
+          time: "1:49.012",
+          gap: "+1.778",
+          date: "2024-01-12",
+        },
+        {
+          pos: 8,
+          driver: "MaggotsMaster",
+          track: "silverstone",
+          time: "1:49.345",
+          gap: "+2.111",
+          date: "2024-01-12",
+        },
+        {
+          pos: 9,
+          driver: "GhostRider_7",
+          track: "silverstone",
+          time: "1:49.678",
+          gap: "+2.444",
+          date: "2024-01-11",
+        },
+        {
+          pos: 10,
+          driver: "NitroKing",
+          track: "silverstone",
+          time: "1:50.011",
+          gap: "+2.777",
+          date: "2024-01-11",
+        },
+        {
+          pos: 1,
+          driver: "ItalianSpeed",
+          track: "monza",
+          time: "1:42.123",
+          gap: "-",
+          date: "2024-01-15",
+        },
+        {
+          pos: 2,
+          driver: "MaxSpeed_Pro",
+          track: "monza",
+          time: "1:42.456",
+          gap: "+0.333",
+          date: "2024-01-15",
+        },
+        {
+          pos: 3,
+          driver: "ParabolicaPro",
+          track: "monza",
+          time: "1:42.789",
+          gap: "+0.666",
+          date: "2024-01-14",
+        },
+        {
+          pos: 4,
+          driver: "RacerX_Elite",
+          track: "monza",
+          time: "1:43.012",
+          gap: "+0.889",
+          date: "2024-01-14",
+        },
+        {
+          pos: 5,
+          driver: "TempleSpeed",
+          track: "monza",
+          time: "1:43.345",
+          gap: "+1.222",
+          date: "2024-01-13",
+        },
+        {
+          pos: 1,
+          driver: "ImolaKing",
+          track: "imola",
+          time: "1:35.234",
+          gap: "-",
+          date: "2024-01-15",
+        },
+        {
+          pos: 2,
+          driver: "SennaFan",
+          track: "imola",
+          time: "1:35.567",
+          gap: "+0.333",
+          date: "2024-01-15",
+        },
+        {
+          pos: 3,
+          driver: "MaxSpeed_Pro",
+          track: "imola",
+          time: "1:35.890",
+          gap: "+0.656",
+          date: "2024-01-14",
+        },
+        {
+          pos: 4,
+          driver: "TosaCorner",
+          track: "imola",
+          time: "1:36.123",
+          gap: "+0.889",
+          date: "2024-01-14",
+        },
+        {
+          pos: 5,
+          driver: "RacerX_Elite",
+          track: "imola",
+          time: "1:36.456",
+          gap: "+1.222",
+          date: "2024-01-13",
+        },
+      ];
 
-      if (!track || !track.laps || track.laps.length === 0) {
-        leaderboardEmpty.classList.remove('hidden');
-        return;
-      } else {
-        leaderboardEmpty.classList.add('hidden');
-      }
+      const setups = [
+        {
+          id: 1,
+          track: "spa",
+          name: "Spa Quali Beast",
+          author: "MaxSpeed_Pro",
+          rating: 4.9,
+          price: 500,
+          description:
+            "Ultimate qualifying setup for Spa. Low downforce, maximum speed through Eau Rouge.",
+        },
+        {
+          id: 2,
+          track: "spa",
+          name: "Spa Race Setup",
+          author: "RacerX_Elite",
+          rating: 4.7,
+          price: 450,
+          description:
+            "Balanced race setup with good tire preservation for long stints.",
+        },
+        {
+          id: 3,
+          track: "zandvoort",
+          name: "Zandvoort Banking Special",
+          author: "DutchRacer",
+          rating: 4.8,
+          price: 550,
+          description:
+            "Optimized for the banked corners. High downforce configuration.",
+        },
+        {
+          id: 4,
+          track: "zandvoort",
+          name: "Zandvoort All-Rounder",
+          author: "OrangeArmy",
+          rating: 4.5,
+          price: 400,
+          description:
+            "Great balance for both quali and race at the Dutch GP circuit.",
+        },
+        {
+          id: 5,
+          track: "silverstone",
+          name: "Silverstone Fast Sectors",
+          author: "BritishRacer",
+          rating: 4.9,
+          price: 600,
+          description:
+            "Maggots-Becketts monster. Built for the high-speed sections.",
+        },
+        {
+          id: 6,
+          track: "silverstone",
+          name: "Silverstone Stable",
+          author: "StoneMaster",
+          rating: 4.6,
+          price: 450,
+          description:
+            "Predictable handling through all conditions. Great for consistency.",
+        },
+        {
+          id: 7,
+          track: "monza",
+          name: "Monza Speedtrap King",
+          author: "ItalianSpeed",
+          rating: 4.8,
+          price: 500,
+          description:
+            "Lowest drag setup. Top speeds over 310 km/h guaranteed.",
+        },
+        {
+          id: 8,
+          track: "monza",
+          name: "Monza Race Pace",
+          author: "ParabolicaPro",
+          rating: 4.6,
+          price: 400,
+          description:
+            "Slightly more downforce for better race pace and overtaking.",
+        },
+        {
+          id: 9,
+          track: "imola",
+          name: "Imola Technical Master",
+          author: "ImolaKing",
+          rating: 4.7,
+          price: 550,
+          description:
+            "Perfect for the technical layout. Great traction out of slow corners.",
+        },
+        {
+          id: 10,
+          track: "imola",
+          name: "Imola Aggressive",
+          author: "SennaFan",
+          rating: 4.5,
+          price: 450,
+          description:
+            "For drivers who like an oversteery balance through the chicanes.",
+        },
+      ];
 
-      let laps = track.laps;
-      if (search) {
-        laps = laps.filter(l => l.driver.toLowerCase().includes(search));
-      }
+      let currentTrackFilter = "all";
+      let currentShopFilter = "all";
+      let currentPage = 1;
+      const itemsPerPage = 10;
 
-      if (laps.length === 0) {
-        leaderboardEmpty.textContent = 'No drivers match that search on this track yet.';
-        leaderboardEmpty.classList.remove('hidden');
-        return;
-      } else {
-        leaderboardEmpty.textContent = 'No leaderboard data for this track yet. Be the first to set a time on the AC Elite server.';
-      }
+      function showPage(page) {
+        document
+          .querySelectorAll(".page")
+          .forEach((p) => p.classList.add("hidden"));
+        document.getElementById(`page-${page}`).classList.remove("hidden");
 
-      laps.forEach((lap, index) => {
-        const tr = document.createElement('tr');
-        const isP1 = index === 0;
-
-        if (isP1) {
-          tr.className = 'bg-gradient-to-r from-emerald-500/10 via-cyan-500/10 to-transparent';
-        } else if (index < 3) {
-          tr.className = 'bg-slate-900/40';
-        }
-
-        const cells = [
-          { content: index + 1, extra: index < 3 ? 'font-semibold text-slate-50' : 'text-slate-300' },
-          { content: lap.driver, extra: 'font-medium text-slate-100' },
-          { content: lap.time, extra: 'font-mono text-emerald-300' },
-          { content: lap.split, extra: index === 0 ? 'text-slate-400' : 'text-rose-300 font-mono' },
-          { content: lap.date, extra: 'text-slate-400' },
-          { content: index < 3 ? 'Split A' : 'Split B', extra: 'text-slate-300' }
-        ];
-
-        cells.forEach((cell, i) => {
-          const td = document.createElement('td');
-          td.className = `px-3 py-2 whitespace-nowrap ${cell.extra}`;
-          td.textContent = cell.content;
-          tr.appendChild(td);
+        document.querySelectorAll(".nav-btn").forEach((btn) => {
+          btn.classList.remove("text-amber-400", "border-amber-500/50");
+          btn.classList.add("text-slate-400", "border-slate-700");
         });
+        document
+          .getElementById(`nav-${page}`)
+          .classList.remove("text-slate-400", "border-slate-700");
+        document
+          .getElementById(`nav-${page}`)
+          .classList.add("text-amber-400", "border-amber-500/50");
 
-        leaderboardBody.appendChild(tr);
-      });
-    }
-
-    trackSelect.addEventListener('change', () => {
-      renderTrackInfo(trackSelect.value);
-      renderLeaderboard();
-    });
-
-    driverSearchInput.addEventListener('input', () => {
-      renderLeaderboard();
-    });
-
-    renderTrackInfo(defaultTrack);
-    renderLeaderboard();
-
-    const yearEl = document.getElementById('year');
-    if (yearEl) {
-      yearEl.textContent = new Date().getFullYear();
-    }
-
-    const nextVoteCountdownEl = document.getElementById('next-vote-countdown');
-    if (nextVoteCountdownEl) {
-      function formatCountdown() {
-        const now = new Date();
-        const day = now.getDay();
-        const diffToSunday = (7 - day) % 7;
-        const target = new Date(now);
-        target.setDate(now.getDate() + diffToSunday);
-        target.setHours(20, 0, 0, 0);
-        if (target < now) {
-          target.setDate(target.getDate() + 7);
-        }
-        const diffMs = target - now;
-        const totalSec = Math.floor(diffMs / 1000);
-        const days = Math.floor(totalSec / 86400);
-        const hours = Math.floor((totalSec % 86400) / 3600);
-        const minutes = Math.floor((totalSec % 3600) / 60);
-        if (days > 0) {
-          return `${days}d ${hours}h ${minutes}m`;
-        }
-        if (hours > 0) {
-          return `${hours}h ${minutes}m`;
-        }
-        return `${minutes}m`;
+        if (page === "leaderboard") renderLeaderboard();
+        if (page === "shop") renderShop();
       }
 
-      function updateCountdown() {
-        nextVoteCountdownEl.textContent = formatCountdown();
+      function filterTrack(track) {
+        currentTrackFilter = track;
+        currentPage = 1;
+        document.querySelectorAll(".track-btn").forEach((btn) => {
+          btn.classList.remove("bg-amber-500", "text-slate-900");
+          btn.classList.add("bg-slate-800", "text-slate-300");
+        });
+        document
+          .querySelector(`.track-btn[data-track="${track}"]`)
+          .classList.remove("bg-slate-800", "text-slate-300");
+        document
+          .querySelector(`.track-btn[data-track="${track}"]`)
+          .classList.add("bg-amber-500", "text-slate-900");
+        renderLeaderboard();
       }
 
-      updateCountdown();
-      setInterval(updateCountdown, 60000);
-    }
-  </script>
-</body>
+      function filterShop(track) {
+        currentShopFilter = track;
+        document.querySelectorAll(".shop-btn").forEach((btn) => {
+          btn.classList.remove("bg-amber-500", "text-slate-900");
+          btn.classList.add("bg-slate-800", "text-slate-300");
+        });
+        document
+          .querySelector(`.shop-btn[data-track="${track}"]`)
+          .classList.remove("bg-slate-800", "text-slate-300");
+        document
+          .querySelector(`.shop-btn[data-track="${track}"]`)
+          .classList.add("bg-amber-500", "text-slate-900");
+        renderShop();
+      }
+
+      function renderLeaderboard() {
+        const filtered =
+          currentTrackFilter === "all"
+            ? leaderboardData
+            : leaderboardData.filter(
+                (item) => item.track === currentTrackFilter
+              );
+
+        const totalPages = Math.ceil(filtered.length / itemsPerPage);
+        const start = (currentPage - 1) * itemsPerPage;
+        const paginated = filtered.slice(start, start + itemsPerPage);
+
+        const trackNames = {
+          spa: "Spa-Francorchamps",
+          zandvoort: "Zandvoort",
+          silverstone: "Silverstone",
+          monza: "Monza",
+          imola: "Imola",
+        };
+
+        const tbody = document.getElementById("leaderboard-body");
+        tbody.innerHTML = paginated
+          .map((item) => {
+            let rowClass = "";
+            let posClass = "bg-slate-700 text-slate-300";
+
+            if (item.pos === 1) {
+              rowClass = "top1 border-l-4 border-l-yellow-400";
+              posClass = "bg-yellow-500 text-slate-900 font-bold";
+            } else if (item.pos === 2) {
+              rowClass = "top2 border-l-4 border-l-slate-400";
+              posClass = "bg-slate-400 text-slate-900 font-bold";
+            } else if (item.pos === 3) {
+              rowClass = "top3 border-l-4 border-l-amber-600";
+              posClass = "bg-amber-600 text-slate-900 font-bold";
+            } else if (item.pos <= 10) {
+              rowClass = "bg-blue-950/30 border-l-4 border-l-blue-500";
+              posClass = "bg-blue-600 text-white";
+            }
+
+            return `
+                    <tr class="border-b border-slate-800/50 hover:bg-slate-800/50 transition-all ${rowClass}">
+                        <td class="py-3 px-4"><span class="px-2 py-1 rounded ${posClass}">${
+              item.pos
+            }</span></td>
+                        <td class="py-3 px-4 font-semibold">${item.driver}</td>
+                        <td class="py-3 px-4 text-slate-400">${
+                          trackNames[item.track]
+                        }</td>
+                        <td class="py-3 px-4 font-mono text-amber-400 font-bold">${
+                          item.time
+                        }</td>
+                        <td class="py-3 px-4 font-mono text-slate-400">${
+                          item.gap
+                        }</td>
+                        <td class="py-3 px-4 text-slate-500">${item.date}</td>
+                    </tr>
+                `;
+          })
+          .join("");
+
+        // Pagination
+        const pagination = document.getElementById("pagination");
+        if (totalPages > 1) {
+          pagination.innerHTML = `
+                    <button onclick="goToPage(${currentPage - 1})" ${
+            currentPage === 1 ? "disabled" : ""
+          } 
+                        class="px-3 py-2 rounded bg-slate-800 text-slate-300 hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed">←</button>
+                    ${Array.from(
+                      { length: totalPages },
+                      (_, i) => `
+                        <button onclick="goToPage(${i + 1})" 
+                            class="px-3 py-2 rounded ${
+                              currentPage === i + 1
+                                ? "bg-amber-500 text-slate-900"
+                                : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+                            }">${i + 1}</button>
+                    `
+                    ).join("")}
+                    <button onclick="goToPage(${currentPage + 1})" ${
+            currentPage === totalPages ? "disabled" : ""
+          } 
+                        class="px-3 py-2 rounded bg-slate-800 text-slate-300 hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed">→</button>
+                `;
+        } else {
+          pagination.innerHTML = "";
+        }
+      }
+
+      function goToPage(page) {
+        const filtered =
+          currentTrackFilter === "all"
+            ? leaderboardData
+            : leaderboardData.filter(
+                (item) => item.track === currentTrackFilter
+              );
+        const totalPages = Math.ceil(filtered.length / itemsPerPage);
+
+        if (page >= 1 && page <= totalPages) {
+          currentPage = page;
+          renderLeaderboard();
+        }
+      }
+
+      function renderShop() {
+        const filtered =
+          currentShopFilter === "all"
+            ? setups
+            : setups.filter((item) => item.track === currentShopFilter);
+
+        const trackNames = {
+          spa: "Spa-Francorchamps",
+          zandvoort: "Zandvoort",
+          silverstone: "Silverstone",
+          monza: "Monza",
+          imola: "Imola",
+        };
+
+        const grid = document.getElementById("shop-grid");
+        grid.innerHTML = filtered
+          .map(
+            (setup) => `
+                <div class="bg-slate-900 border border-slate-800 rounded-xl p-6 hover:border-amber-500/50 transition-all group">
+                    <div class="flex items-start justify-between mb-3">
+                        <span class="text-xs bg-blue-900/50 text-blue-300 px-2 py-1 rounded">${
+                          trackNames[setup.track]
+                        }</span>
+                        <div class="flex items-center gap-1 text-amber-400">
+                            <span>★</span>
+                            <span class="text-sm">${setup.rating}</span>
+                        </div>
+                    </div>
+                    <h3 class="font-racing text-lg font-bold text-white mb-1 group-hover:text-amber-400 transition-colors">${
+                      setup.name
+                    }</h3>
+                    <p class="text-slate-500 text-sm mb-3">by ${
+                      setup.author
+                    }</p>
+                    <p class="text-slate-400 text-sm mb-4">${
+                      setup.description
+                    }</p>
+                    <div class="flex items-center justify-between">
+                        <span class="font-racing text-xl font-bold text-green-400">$${
+                          setup.price
+                        }</span>
+                        <a href="#" onclick="buySetup(${
+                          setup.id
+                        }); return false;" 
+                           class="gold-gradient text-slate-900 font-bold px-4 py-2 rounded-lg hover:opacity-90 transition-opacity glow">
+                            Buy Setup
+                        </a>
+                    </div>
+                </div>
+            `
+          )
+          .join("");
+      }
+
+      function buySetup(id) {
+        const setup = setups.find((s) => s.id === id);
+        alert(
+          `Redirecting to purchase: ${setup.name}\nPrice: $${setup.price}\n\nIn production, this would link to your payment system.`
+        );
+      }
+
+      // Initialize
+      renderLeaderboard();
+      renderShop();
+    </script>
+  </body>
 </html>
