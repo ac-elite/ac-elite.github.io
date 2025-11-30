@@ -1,5 +1,8 @@
 name: Sync KMR Data
 
+permissions:
+  contents: write
+
 on:
   # Run every 5 minutes
   schedule:
