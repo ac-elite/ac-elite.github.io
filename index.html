@@ -509,6 +509,10 @@
         white-space: nowrap;
       }
 
+      #stat-km.stat-value {
+        font-size: clamp(1.4rem, 2vw, 2.2rem);
+      }
+
       /* Quick stats (Total Drivers, Active Tracks, etc.) */
       .stat-quick-value {
         font-size: 1.75rem;
@@ -1362,15 +1366,6 @@
         <div
           class="flex items-center justify-center gap-3 sm:gap-4 mb-4 sm:mb-6"
         >
-          <div
-            class="logo-container w-8 h-8 sm:w-10 sm:h-10 min-w-[32px] sm:min-w-[40px]"
-          >
-            <img
-              src="logo.png"
-              alt="AC Elite"
-              onerror="this.parentElement.innerHTML='<div class=\'w-full h-full gold-gradient flex items-center justify-center rounded-lg\'><span class=\'font-racing font-black text-[#0a1628] text-xs sm:text-sm\'>AC</span></div>'"
-            />
-          </div>
           <span class="font-racing text-lg sm:text-xl text-amber-400"
             >AC ELITE</span
           >
