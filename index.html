@@ -1222,6 +1222,7 @@
       const setups = [
         {
           id: 1,
+          image: "tatuus.png",
           track: "ks_barcelona_layout_moto",
           name: "Carter 38.272 Moto Q",
           author: "CarterReza",
@@ -1683,39 +1684,49 @@
         grid.innerHTML = filtered
           .map(
             (setup) => `
-                <div class="glass-card rounded-2xl p-6 group">
-                    <div class="flex items-start justify-between mb-4">
-                        <span class="text-xs bg-blue-500/20 text-blue-300 px-3 py-1.5 rounded-lg font-medium">${getTrackDisplayName(
-                          setup.track
-                        )}</span>
-                        <div class="flex items-center gap-1.5 text-amber-400">
-                            <span>★</span>
-                            <span class="text-sm font-medium">${
-                              setup.rating
-                            }</span>
-                        </div>
-                    </div>
-                    <h3 class="font-racing text-lg font-bold text-white mb-2 group-hover:text-amber-400 transition-colors">${escapeHtml(
-                      setup.name
-                    )}</h3>
-                    <p class="text-slate-500 text-sm mb-3">by ${escapeHtml(
-                      setup.author
-                    )}</p>
-                    <p class="text-slate-400 text-sm mb-6 leading-relaxed">${escapeHtml(
-                      setup.description
-                    )}</p>
-                    <div class="flex items-center justify-between pt-4 border-t border-white/5">
-                        <span class="font-racing text-2xl font-bold text-emerald-400">$${
-                          setup.price
-                        }</span>
-                        <button onclick="buySetup(${
-                          setup.id
-                        })" class="btn-gold px-5 py-2.5 rounded-xl text-sm">
-                            Buy Setup
-                        </button>
-                    </div>
+        <div class="glass-card rounded-2xl p-6 group">
+            <div class="flex items-start justify-between mb-4">
+                <span class="text-xs bg-blue-500/20 text-blue-300 px-3 py-1.5 rounded-lg font-medium">
+                    ${getTrackDisplayName(setup.track)}
+                </span>
+
+                <div class="flex items-center gap-1.5 text-amber-400 text-sm">
+                    <span>★</span>
+                    <span>${setup.rating}</span>
                 </div>
-            `
+            </div>
+
+            ${
+              setup.image
+                ? `<div class="w-full flex justify-center mb-4">
+                      <img src="${setup.image}"
+                           alt="Car"
+                           class="h-14 md:h-16 object-contain opacity-90 drop-shadow-[0_0_8px_rgba(0,0,0,0.4)]
+                                  transition-transform duration-300 group-hover:scale-105" />
+                   </div>`
+                : ""
+            }
+
+            <h3 class="font-racing text-lg font-bold text-white mb-2 group-hover:text-amber-400 transition-colors">
+              ${escapeHtml(setup.name)}
+            </h3>
+
+            <p class="text-slate-500 text-sm mb-3">by ${escapeHtml(
+              setup.author
+            )}</p>
+            <p class="text-slate-400 text-sm mb-6 leading-relaxed">${escapeHtml(
+              setup.description
+            )}</p>
+
+            <div class="flex items-center justify-between pt-4 border-t border-white/5">
+                <span class="font-racing text-2xl font-bold text-emerald-400">$${
+                  setup.price
+                }</span>
+                <button onclick="buySetup(${setup.id})"
+                        class="btn-gold px-5 py-2.5 rounded-xl text-sm">Buy Setup</button>
+            </div>
+        </div>
+    `
           )
           .join("");
 
