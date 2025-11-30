@@ -504,9 +504,26 @@
       }
 
       .stat-value {
-        font-size: clamp(1.6rem, 2.2vw, 3rem) !important;
+        font-size: clamp(1.6rem, 2.3vw, 2.6rem);
         line-height: 1.1;
-        white-space: nowrap; /* alles op 1 regel houden, ook "km" */
+        white-space: nowrap;
+      }
+
+      /* Quick stats (Total Drivers, Active Tracks, etc.) */
+      .stat-quick-value {
+        font-size: 1.75rem;
+      }
+
+      @media (min-width: 1024px) {
+        .stat-quick-value {
+          font-size: 2.5rem;
+        }
+      }
+
+      @media (min-width: 1280px) {
+        .stat-quick-value {
+          font-size: 3rem;
+        }
       }
 
       /* ==================== Responsive Breakpoints ==================== */
@@ -887,7 +904,10 @@
         class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mb-6 sm:mb-10"
       >
         <div class="stat-card text-center">
-          <p class="font-racing text-amber-400 mb-1 sm:mb-2" id="total-drivers">
+          <p
+            class="stat-quick-value font-racing text-amber-400 mb-1 sm:mb-2"
+            id="total-drivers"
+          >
             -
           </p>
           <p class="text-slate-400 text-xs sm:text-sm font-medium">
@@ -895,7 +915,10 @@
           </p>
         </div>
         <div class="stat-card text-center">
-          <p class="font-racing text-blue-400 mb-1 sm:mb-2" id="total-tracks">
+          <p
+            class="stat-quick-value font-racing text-blue-400 mb-1 sm:mb-2"
+            id="total-tracks"
+          >
             -
           </p>
           <p class="text-slate-400 text-xs sm:text-sm font-medium">
@@ -903,7 +926,10 @@
           </p>
         </div>
         <div class="stat-card text-center">
-          <p class="font-racing text-emerald-400 mb-1 sm:mb-2" id="total-laps">
+          <p
+            class="stat-quick-value font-racing text-emerald-400 mb-1 sm:mb-2"
+            id="total-laps"
+          >
             -
           </p>
           <p class="text-slate-400 text-xs sm:text-sm font-medium">
@@ -911,7 +937,10 @@
           </p>
         </div>
         <div class="stat-card text-center">
-          <p class="font-racing text-purple-400 mb-1 sm:mb-2" id="total-km">
+          <p
+            class="stat-quick-value font-racing text-purple-400 mb-1 sm:mb-2"
+            id="total-km"
+          >
             -
           </p>
           <p class="text-slate-400 text-xs sm:text-sm font-medium">
