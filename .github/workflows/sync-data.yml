@@ -1,0 +1,133 @@
+name: Sync KMR Data
+
+on:
+  # Run every 5 minutes
+  schedule:
+    - cron: "*/5 * * * *"
+
+  # Allow manual trigger
+  workflow_dispatch:
+
+  # Also run on push to main (for initial setup)
+  push:
+    branches: [main]
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        run: npm install basic-ftp
+
+      - name: Fetch data from FTP
+        env:
+          FTP_HOST: ${{ secrets.FTP_HOST }}
+          FTP_USER: ${{ secrets.FTP_USER }}
+          FTP_PASS: ${{ secrets.FTP_PASS }}
+        run: |
+          node << 'EOF'
+          const ftp = require('basic-ftp');
+          const fs = require('fs');
+          const path = require('path');
+
+          async function syncData() {
+              const client = new ftp.Client();
+              client.ftp.verbose = false;
+              
+              // Ensure data directory exists
+              const dataDir = path.join(process.cwd(), 'data');
+              if (!fs.existsSync(dataDir)) {
+                  fs.mkdirSync(dataDir, { recursive: true });
+              }
+              
+              try {
+                  console.log('Connecting to FTP server...');
+                  await client.access({
+                      host: process.env.FTP_HOST,
+                      user: process.env.FTP_USER,
+                      password: process.env.FTP_PASS,
+                      secure: false
+                  });
+                  
+                  console.log('Connected! Downloading files...');
+                  
+                  // Download rank.json
+                  try {
+                      await client.downloadTo(
+                          path.join(dataDir, 'rank.json'),
+                          'kissmyrank/rank.json'
+                      );
+                      console.log('✓ Downloaded rank.json');
+                  } catch (err) {
+                      console.error('✗ Failed to download rank.json:', err.message);
+                  }
+                  
+                  // Download leaderboard.json
+                  try {
+                      await client.downloadTo(
+                          path.join(dataDir, 'leaderboard.json'),
+                          'kissmyrank/leaderboard.json'
+                      );
+                      console.log('✓ Downloaded leaderboard.json');
+                  } catch (err) {
+                      console.error('✗ Failed to download leaderboard.json:', err.message);
+                  }
+                  
+                  // Create metadata file with sync timestamp
+                  const metadata = {
+                      lastSync: new Date().toISOString(),
+                      status: 'success'
+                  };
+                  fs.writeFileSync(
+                      path.join(dataDir, 'metadata.json'),
+                      JSON.stringify(metadata, null, 2)
+                  );
+                  console.log('✓ Created metadata.json');
+                  
+              } catch (err) {
+                  console.error('FTP connection failed:', err.message);
+                  
+                  // Create error metadata
+                  const metadata = {
+                      lastSync: new Date().toISOString(),
+                      status: 'error',
+                      error: err.message
+                  };
+                  fs.writeFileSync(
+                      path.join(dataDir, 'metadata.json'),
+                      JSON.stringify(metadata, null, 2)
+                  );
+                  
+                  process.exit(1);
+              } finally {
+                  client.close();
+              }
+              
+              console.log('Sync completed!');
+          }
+
+          syncData();
+          EOF
+
+      - name: Commit and push changes
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add data/
+
+          # Only commit if there are changes
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "🔄 Sync KMR data - $(date -u +'%Y-%m-%d %H:%M:%S UTC')"
+            git push
+          fi
