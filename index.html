@@ -1218,67 +1218,14 @@
       const setups = [
         {
           id: 1,
-          track: "ks_zandvoort",
-          name: "Zandvoort Banking Special",
-          author: "MaxSpeed_Pro",
-          rating: 4.9,
-          price: 550,
-          description:
-            "Optimized for the banked corners. High downforce for maximum grip.",
-        },
-        {
-          id: 2,
-          track: "ks_zandvoort",
-          name: "Zandvoort All-Rounder",
-          author: "DutchRacer",
-          rating: 4.7,
-          price: 400,
-          description: "Great balance for both quali and race.",
-        },
-        {
-          id: 3,
-          track: "spa",
-          name: "Spa Quali Beast",
-          author: "SpaKing_Pro",
-          rating: 4.9,
-          price: 600,
-          description: "Low downforce, maximum speed through Eau Rouge.",
-        },
-        {
-          id: 4,
-          track: "spa",
-          name: "Spa Race Setup",
-          author: "RacerX_Elite",
-          rating: 4.7,
-          price: 450,
-          description: "Balanced setup with good tire preservation.",
-        },
-        {
-          id: 5,
-          track: "ks_silverstone",
-          name: "Silverstone Fast Sectors",
-          author: "BritishRacer",
-          rating: 4.9,
-          price: 600,
-          description: "Built for the high-speed Maggots-Becketts section.",
-        },
-        {
-          id: 6,
-          track: "ks_monza66",
-          name: "Monza Speedtrap King",
-          author: "ItalianSpeed",
-          rating: 4.8,
-          price: 500,
-          description: "Lowest drag setup. 310+ km/h guaranteed.",
-        },
-        {
-          id: 7,
-          track: "imola",
-          name: "Imola Technical Master",
-          author: "ImolaKing",
-          rating: 4.7,
-          price: 550,
-          description: "Great traction out of slow corners.",
+          track: "ks_barcelona_layout_moto",
+          name: "Carter 38.272 Moto Q",
+          author: "CarterReza",
+          rating: 3.0,
+          price: 5,
+          description: "Quali setup for Moto layout.",
+          file: "setups/Carter 38.272 Moto Q.ini",
+          paypalUrl: "https://www.sandbox.paypal.com/checkoutnow?token=FAKE123",
         },
       ];
 
@@ -1780,9 +1727,17 @@
 
       function buySetup(id) {
         const setup = setups.find((s) => s.id === id);
-        alert(
-          `Redirecting to purchase: ${setup.name}\nPrice: $${setup.price}\n\nThis would connect to your payment system.`
-        );
+        if (!setup) return;
+
+        if (setup.paypalUrl) {
+          // Mock / echte PayPal checkout
+          window.open(setup.paypalUrl, "_blank");
+        } else if (setup.file) {
+          // fallback: directe download (alleen handig voor testen)
+          window.open(setup.file, "_blank");
+        } else {
+          alert("No payment link configured yet.");
+        }
       }
 
       function showComingSoon() {
