@@ -9,7 +9,6 @@
       content="AC Elite | Track your stats, compete on leaderboards, and join the community."
     />
     <link rel="icon" type="image/png" href="logo.png" />
-
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap"
@@ -17,6 +16,7 @@
     />
 
     <style>
+      /* ==================== CSS Variables ==================== */
       :root {
         --gold-primary: #d4af37;
         --gold-light: #f4e076;
@@ -26,13 +26,16 @@
         --blue-light: #1a3a5c;
       }
 
+      /* ==================== Base Styles ==================== */
       * {
+        box-sizing: border-box;
         scrollbar-width: thin;
         scrollbar-color: var(--gold-primary) var(--blue-dark);
       }
 
       *::-webkit-scrollbar {
         width: 8px;
+        height: 8px;
       }
 
       *::-webkit-scrollbar-track {
@@ -44,14 +47,28 @@
         border-radius: 4px;
       }
 
+      body {
+        font-family: "Inter", sans-serif;
+        background: #0a1628;
+        color: white;
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+
+      /* ==================== Typography ==================== */
       .font-racing {
         font-family: "Orbitron", sans-serif;
       }
+
       .font-body {
         font-family: "Inter", sans-serif;
       }
 
-      /* Gradients */
+      .text-glow {
+        text-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+      }
+
+      /* ==================== Gradients ==================== */
       .gold-gradient {
         background: linear-gradient(
           135deg,
@@ -72,6 +89,7 @@
         );
       }
 
+      /* ==================== Glass Effects ==================== */
       .glass {
         background: rgba(15, 35, 65, 0.6);
         backdrop-filter: blur(20px);
@@ -98,7 +116,7 @@
           0 0 30px rgba(212, 175, 55, 0.1);
       }
 
-      /* Glows */
+      /* ==================== Glow Effects ==================== */
       .glow-gold {
         box-shadow: 0 0 20px rgba(212, 175, 55, 0.3),
           0 0 40px rgba(212, 175, 55, 0.1);
@@ -109,11 +127,7 @@
           0 0 60px rgba(212, 175, 55, 0.2);
       }
 
-      .text-glow {
-        text-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
-      }
-
-      /* Leaderboard positions */
+      /* ==================== Leaderboard Position Styles ==================== */
       .top1 {
         background: linear-gradient(
           90deg,
@@ -122,6 +136,7 @@
         );
         border-left: 4px solid #ffd700;
       }
+
       .top2 {
         background: linear-gradient(
           90deg,
@@ -130,6 +145,7 @@
         );
         border-left: 4px solid #c0c0c0;
       }
+
       .top3 {
         background: linear-gradient(
           90deg,
@@ -138,6 +154,7 @@
         );
         border-left: 4px solid #cd7f32;
       }
+
       .top10 {
         background: linear-gradient(
           90deg,
@@ -147,7 +164,7 @@
         border-left: 4px solid #3b82f6;
       }
 
-      /* Licences (voor later, maar styles mogen blijven) */
+      /* ==================== Licence Badges ==================== */
       .licence-platinum {
         background: linear-gradient(
           135deg,
@@ -157,6 +174,7 @@
         );
         box-shadow: 0 0 15px rgba(229, 228, 226, 0.3);
       }
+
       .licence-gold {
         background: linear-gradient(
           135deg,
@@ -168,6 +186,7 @@
         );
         box-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
       }
+
       .licence-silver {
         background: linear-gradient(
           135deg,
@@ -178,6 +197,7 @@
         );
         box-shadow: 0 0 15px rgba(192, 192, 192, 0.3);
       }
+
       .licence-bronze {
         background: linear-gradient(
           135deg,
@@ -189,10 +209,11 @@
         box-shadow: 0 0 15px rgba(205, 127, 50, 0.3);
       }
 
-      /* Autocomplete */
+      /* ==================== Autocomplete ==================== */
       .autocomplete-container {
         position: relative;
       }
+
       .autocomplete-results {
         position: absolute;
         top: calc(100% + 4px);
@@ -202,39 +223,47 @@
         backdrop-filter: blur(20px);
         border: 1px solid rgba(212, 175, 55, 0.2);
         border-radius: 12px;
-        max-height: 320px;
+        max-height: 280px;
         overflow-y: auto;
         z-index: 50;
         display: none;
         box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
       }
+
       .autocomplete-results.show {
         display: block;
       }
+
       .autocomplete-item {
-        padding: 14px 18px;
+        padding: 12px 16px;
         cursor: pointer;
         border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         transition: all 0.2s ease;
       }
-      .autocomplete-item:hover {
+
+      .autocomplete-item:hover,
+      .autocomplete-item:focus {
         background: rgba(212, 175, 55, 0.1);
       }
+
       .autocomplete-item:last-child {
         border-bottom: none;
       }
+
       .autocomplete-name {
         font-weight: 600;
         color: #fff;
         margin-bottom: 2px;
       }
+
       .autocomplete-guid {
-        font-size: 0.75rem;
+        font-size: 0.7rem;
         color: #64748b;
         font-family: monospace;
+        word-break: break-all;
       }
 
-      /* Buttons */
+      /* ==================== Buttons ==================== */
       .btn-gold {
         background: linear-gradient(
           135deg,
@@ -253,6 +282,10 @@
         box-shadow: 0 8px 25px rgba(212, 175, 55, 0.5);
       }
 
+      .btn-gold:active {
+        transform: translateY(0);
+      }
+
       .btn-ghost {
         background: transparent;
         border: 1px solid rgba(212, 175, 55, 0.3);
@@ -268,60 +301,6 @@
       .btn-ghost.active {
         background: rgba(212, 175, 55, 0.15);
         border-color: #d4af37;
-      }
-
-      /* Stat cards */
-      .stat-card {
-        background: linear-gradient(
-          135deg,
-          rgba(15, 35, 65, 0.6) 0%,
-          rgba(10, 22, 40, 0.8) 100%
-        );
-        border: 1px solid rgba(255, 255, 255, 0.05);
-        border-radius: 16px;
-        padding: 24px;
-        transition: all 0.3s ease;
-      }
-
-      .stat-card:hover {
-        border-color: rgba(212, 175, 55, 0.3);
-        transform: translateY(-4px);
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
-      }
-
-      /* Input fields */
-      .input-modern {
-        background: rgba(15, 35, 65, 0.6);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 12px;
-        padding: 16px 20px;
-        color: #fff;
-        transition: all 0.3s ease;
-        font-size: 16px;
-      }
-
-      .input-modern:focus {
-        outline: none;
-        border-color: #d4af37;
-        box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
-      }
-
-      .input-modern::placeholder {
-        color: rgba(255, 255, 255, 0.4);
-      }
-
-      .btn-disabled {
-        background: transparent;
-        border: 1px solid rgba(148, 163, 184, 0.5);
-        color: #64748b;
-        cursor: not-allowed;
-        opacity: 0.6;
-        transition: all 0.3s ease;
-      }
-
-      .btn-disabled:hover {
-        background: transparent;
-        border-color: rgba(148, 163, 184, 0.7);
       }
 
       .btn-discord {
@@ -347,7 +326,108 @@
         background: rgba(15, 23, 42, 0.6);
       }
 
-      /* Animations */
+      /* ==================== Stat Cards ==================== */
+      .stat-card {
+        background: linear-gradient(
+          135deg,
+          rgba(15, 35, 65, 0.6) 0%,
+          rgba(10, 22, 40, 0.8) 100%
+        );
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 16px;
+        padding: 20px;
+        transition: all 0.3s ease;
+      }
+
+      .stat-card:hover {
+        border-color: rgba(212, 175, 55, 0.3);
+        transform: translateY(-4px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+      }
+
+      /* ==================== Form Elements ==================== */
+      .input-modern {
+        background: rgba(15, 35, 65, 0.6);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        padding: 14px 16px;
+        color: #fff;
+        transition: all 0.3s ease;
+        font-size: 16px; /* Prevents zoom on iOS */
+        width: 100%;
+      }
+
+      .input-modern:focus {
+        outline: none;
+        border-color: #d4af37;
+        box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+      }
+
+      .input-modern::placeholder {
+        color: rgba(255, 255, 255, 0.4);
+      }
+
+      /* ==================== Logo Container ==================== */
+      .logo-container {
+        width: 44px;
+        height: 44px;
+        min-width: 44px;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+        border: 2px solid rgba(212, 175, 55, 0.3);
+      }
+
+      .logo-container img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      /* ==================== Hero Pattern ==================== */
+      .hero-pattern {
+        background-image: radial-gradient(
+            circle at 20% 50%,
+            rgba(212, 175, 55, 0.03) 0%,
+            transparent 50%
+          ),
+          radial-gradient(
+            circle at 80% 50%,
+            rgba(59, 130, 246, 0.03) 0%,
+            transparent 50%
+          ),
+          radial-gradient(
+            circle at 50% 100%,
+            rgba(212, 175, 55, 0.05) 0%,
+            transparent 50%
+          );
+      }
+
+      /* ==================== Table Styles ==================== */
+      .table-modern {
+        border-collapse: separate;
+        border-spacing: 0;
+        width: 100%;
+      }
+
+      .table-modern th {
+        background: rgba(15, 35, 65, 0.8);
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.7rem;
+        letter-spacing: 0.05em;
+        white-space: nowrap;
+      }
+
+      .table-modern tbody tr {
+        transition: all 0.2s ease;
+      }
+
+      .table-modern tbody tr:hover {
+        background: rgba(212, 175, 55, 0.05);
+      }
+
+      /* ==================== Animations ==================== */
       @keyframes float {
         0%,
         100% {
@@ -368,15 +448,6 @@
         }
       }
 
-      @keyframes shimmer {
-        0% {
-          background-position: -200% center;
-        }
-        100% {
-          background-position: 200% center;
-        }
-      }
-
       .animate-float {
         animation: float 6s ease-in-out infinite;
       }
@@ -385,63 +456,7 @@
         animation: pulse-glow 2s ease-in-out infinite;
       }
 
-      .hero-pattern {
-        background-image: radial-gradient(
-            circle at 20% 50%,
-            rgba(212, 175, 55, 0.03) 0%,
-            transparent 50%
-          ),
-          radial-gradient(
-            circle at 80% 50%,
-            rgba(59, 130, 246, 0.03) 0%,
-            transparent 50%
-          ),
-          radial-gradient(
-            circle at 50% 100%,
-            rgba(212, 175, 55, 0.05) 0%,
-            transparent 50%
-          );
-      }
-
-      /* Table styling */
-      .table-modern {
-        border-collapse: separate;
-        border-spacing: 0;
-      }
-
-      .table-modern th {
-        background: rgba(15, 35, 65, 0.8);
-        font-weight: 600;
-        text-transform: uppercase;
-        font-size: 0.75rem;
-        letter-spacing: 0.05em;
-      }
-
-      .table-modern tbody tr {
-        transition: all 0.2s ease;
-      }
-
-      .table-modern tbody tr:hover {
-        background: rgba(212, 175, 55, 0.05);
-      }
-
-      /* Logo styling */
-      .logo-container {
-        width: 48px;
-        height: 48px;
-        border-radius: 12px;
-        overflow: hidden;
-        box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
-        border: 2px solid rgba(212, 175, 55, 0.3);
-      }
-
-      .logo-container img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-      }
-
-      /* Page transitions */
+      /* ==================== Page Transitions ==================== */
       .page {
         opacity: 1;
         transition: opacity 0.3s ease;
@@ -450,15 +465,201 @@
       .page.hidden {
         display: none;
       }
+
+      /* ==================== Mobile Navigation ==================== */
+      .mobile-menu {
+        display: none;
+      }
+
+      .mobile-menu.open {
+        display: flex;
+      }
+
+      .hamburger {
+        display: none;
+        flex-direction: column;
+        gap: 5px;
+        cursor: pointer;
+        padding: 8px;
+        z-index: 60;
+      }
+
+      .hamburger span {
+        width: 24px;
+        height: 2px;
+        background: #d4af37;
+        transition: all 0.3s ease;
+      }
+
+      .hamburger.open span:nth-child(1) {
+        transform: rotate(45deg) translate(5px, 5px);
+      }
+
+      .hamburger.open span:nth-child(2) {
+        opacity: 0;
+      }
+
+      .hamburger.open span:nth-child(3) {
+        transform: rotate(-45deg) translate(5px, -5px);
+      }
+
+      /* ==================== Responsive Breakpoints ==================== */
+
+      /* Mobile: up to 639px */
+      @media (max-width: 639px) {
+        .hamburger {
+          display: flex;
+        }
+
+        .desktop-nav {
+          display: none;
+        }
+
+        .mobile-menu {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(10, 22, 40, 0.98);
+          backdrop-filter: blur(20px);
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 16px;
+          z-index: 55;
+          padding: 20px;
+        }
+
+        .mobile-menu .nav-btn,
+        .mobile-menu .btn-discord {
+          width: 100%;
+          max-width: 280px;
+          text-align: center;
+          padding: 16px 24px;
+          font-size: 1rem;
+        }
+
+        .logo-container {
+          width: 40px;
+          height: 40px;
+          min-width: 40px;
+        }
+
+        .stat-card {
+          padding: 16px;
+        }
+
+        .stat-card p:first-of-type {
+          font-size: 1.75rem !important;
+        }
+
+        .glass-card {
+          padding: 16px;
+        }
+
+        .table-modern th,
+        .table-modern td {
+          padding: 12px 10px;
+          font-size: 0.8rem;
+        }
+
+        .table-modern .font-mono {
+          font-size: 0.85rem;
+        }
+
+        /* Hide gap column on mobile */
+        .table-modern th:nth-child(4),
+        .table-modern td:nth-child(4) {
+          display: none;
+        }
+
+        .track-btn,
+        .shop-btn {
+          padding: 10px 14px;
+          font-size: 0.75rem;
+        }
+
+        #shop-password-modal .glass-card {
+          margin: 16px;
+          padding: 20px;
+        }
+      }
+
+      /* Tablet: 640px to 1023px */
+      @media (min-width: 640px) and (max-width: 1023px) {
+        .stat-card p:first-of-type {
+          font-size: 2rem !important;
+        }
+
+        .nav-btn {
+          padding: 10px 16px;
+          font-size: 0.875rem;
+        }
+      }
+
+      /* Large screens: 1024px and up */
+      @media (min-width: 1024px) {
+        .stat-card {
+          padding: 24px;
+        }
+
+        .stat-card p:first-of-type {
+          font-size: 2.5rem !important;
+        }
+
+        .glass-card {
+          padding: 24px;
+        }
+      }
+
+      /* Extra large screens: 1280px and up */
+      @media (min-width: 1280px) {
+        .stat-card p:first-of-type {
+          font-size: 3rem !important;
+        }
+      }
+
+      /* Touch device optimizations */
+      @media (hover: none) and (pointer: coarse) {
+        .glass-card:hover {
+          transform: none;
+        }
+
+        .stat-card:hover {
+          transform: none;
+        }
+
+        .btn-gold:hover {
+          transform: none;
+        }
+
+        .autocomplete-item {
+          padding: 16px;
+        }
+      }
+
+      /* Reduce motion for accessibility */
+      @media (prefers-reduced-motion: reduce) {
+        .animate-float,
+        .animate-pulse-glow {
+          animation: none;
+        }
+
+        * {
+          transition-duration: 0.01ms !important;
+        }
+      }
     </style>
   </head>
-  <body class="font-body bg-[#0a1628] text-white min-h-screen">
+
+  <body class="font-body">
     <!-- Navigation -->
     <nav class="glass border-b border-amber-500/20 sticky top-0 z-50">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4">
         <div class="flex items-center justify-between">
           <!-- Logo & Brand -->
-          <div class="flex items-center gap-4">
+          <div class="flex items-center gap-3">
             <div class="logo-container animate-pulse-glow">
               <img
                 src="logo.png"
@@ -468,50 +669,95 @@
             </div>
             <div>
               <h1
-                class="font-racing text-xl sm:text-2xl font-bold text-amber-400 text-glow"
+                class="font-racing text-lg sm:text-xl lg:text-2xl font-bold text-amber-400 text-glow"
               >
                 AC ELITE
               </h1>
-              <p class="text-xs text-slate-400 hidden sm:block">
-                Simracing community
+              <p class="text-[10px] sm:text-xs text-slate-400 hidden sm:block">
+                Simracing Community
               </p>
             </div>
           </div>
 
-          <!-- Navigation Buttons -->
-          <div class="flex gap-2 sm:gap-3 items-center">
+          <!-- Desktop Navigation -->
+          <div class="desktop-nav hidden sm:flex gap-2 lg:gap-3 items-center">
             <a
               href="https://discord.gg/d2EbxGYBbj"
               target="_blank"
-              class="btn-discord px-3 sm:px-5 py-2.5 rounded-xl font-semibold text-sm sm:text-base flex items-center gap-2"
+              rel="noopener noreferrer"
+              class="btn-discord px-3 lg:px-5 py-2 lg:py-2.5 rounded-xl font-semibold text-sm flex items-center gap-2"
             >
-              💬 Join Discord
+              <span>💬</span>
+              <span class="hidden lg:inline">Join </span>Discord
             </a>
             <button
               onclick="showPage('stats')"
               id="nav-stats"
-              class="nav-btn btn-ghost active px-3 sm:px-5 py-2.5 rounded-xl font-semibold text-sm sm:text-base"
+              class="nav-btn btn-ghost active px-3 lg:px-5 py-2 lg:py-2.5 rounded-xl font-semibold text-sm"
             >
-              <span class="hidden sm:inline">📊 </span>Stats
+              <span class="hidden lg:inline">📊 </span>Stats
             </button>
-
             <button
               onclick="showPage('leaderboard')"
               id="nav-leaderboard"
-              class="nav-btn btn-ghost px-3 sm:px-5 py-2.5 rounded-xl font-semibold text-sm sm:text-base"
+              class="nav-btn btn-ghost px-3 lg:px-5 py-2 lg:py-2.5 rounded-xl font-semibold text-sm"
             >
-              <span class="hidden sm:inline">🏆 </span>Leaderboard
+              <span class="hidden lg:inline">🏆 </span>Leaderboard
             </button>
-
             <button
               onclick="handleShopClick()"
               id="nav-shop"
-              class="nav-btn btn-locked px-3 sm:px-5 py-2.5 rounded-xl font-semibold text-sm sm:text-base"
+              class="nav-btn btn-locked px-3 lg:px-5 py-2 lg:py-2.5 rounded-xl font-semibold text-sm"
             >
-              <span class="hidden sm:inline">🛠️ </span>Setups
+              <span class="hidden lg:inline">🛠️ </span>Setups
             </button>
           </div>
+
+          <!-- Mobile Hamburger -->
+          <div
+            class="hamburger sm:hidden"
+            id="hamburger"
+            onclick="toggleMobileMenu()"
+          >
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
         </div>
+      </div>
+
+      <!-- Mobile Menu -->
+      <div class="mobile-menu" id="mobile-menu">
+        <a
+          href="https://discord.gg/d2EbxGYBbj"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="btn-discord px-5 py-3 rounded-xl font-semibold text-base flex items-center justify-center gap-2"
+          onclick="closeMobileMenu()"
+        >
+          💬 Join Discord
+        </a>
+        <button
+          onclick="showPage('stats'); closeMobileMenu();"
+          class="nav-btn btn-ghost active px-5 py-3 rounded-xl font-semibold text-base"
+          id="mobile-nav-stats"
+        >
+          📊 Stats
+        </button>
+        <button
+          onclick="showPage('leaderboard'); closeMobileMenu();"
+          class="nav-btn btn-ghost px-5 py-3 rounded-xl font-semibold text-base"
+          id="mobile-nav-leaderboard"
+        >
+          🏆 Leaderboard
+        </button>
+        <button
+          onclick="handleShopClick(); closeMobileMenu();"
+          class="nav-btn btn-locked px-5 py-3 rounded-xl font-semibold text-base"
+          id="mobile-nav-shop"
+        >
+          🛠️ Setups
+        </button>
       </div>
     </nav>
 
@@ -520,8 +766,8 @@
       id="loading-overlay"
       class="fixed inset-0 bg-[#0a1628]/95 z-[100] flex items-center justify-center"
     >
-      <div class="text-center">
-        <div class="relative w-20 h-20 mx-auto mb-6">
+      <div class="text-center px-4">
+        <div class="relative w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-6">
           <div
             class="absolute inset-0 border-4 border-amber-500/20 rounded-full"
           ></div>
@@ -533,7 +779,7 @@
             style="animation-direction: reverse; animation-duration: 1.5s"
           ></div>
         </div>
-        <p class="font-racing text-amber-400 text-xl text-glow mb-2">
+        <p class="font-racing text-amber-400 text-lg sm:text-xl text-glow mb-2">
           Loading Data
         </p>
         <p class="text-slate-500 text-sm" id="loading-status">
@@ -543,14 +789,14 @@
     </div>
 
     <!-- Hero Banner -->
-    <div class="hero-pattern py-10 border-b border-amber-500/10">
+    <div class="hero-pattern py-6 sm:py-10 border-b border-amber-500/10">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 text-center">
-        <p class="text-slate-400 mb-4 text-sm sm:text-base">
+        <p class="text-slate-400 mb-4 text-xs sm:text-sm lg:text-base">
           Weekly Track Rotation • Vote on Discord • Compete for Glory
         </p>
         <div
           id="data-status"
-          class="inline-flex items-center gap-3 glass px-5 py-2.5 rounded-full"
+          class="inline-flex items-center gap-3 glass px-4 sm:px-5 py-2 sm:py-2.5 rounded-full"
         >
           <span class="relative flex h-2.5 w-2.5">
             <span
@@ -560,44 +806,51 @@
               class="relative inline-flex rounded-full h-2.5 w-2.5 bg-yellow-500"
             ></span>
           </span>
-          <span class="text-sm text-yellow-300">Connecting...</span>
+          <span class="text-xs sm:text-sm text-yellow-300">Connecting...</span>
         </div>
       </div>
     </div>
 
     <!-- Stats Page -->
-    <div id="page-stats" class="page max-w-7xl mx-auto px-4 sm:px-6 py-10">
+    <div
+      id="page-stats"
+      class="page max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-10"
+    >
       <!-- Header -->
-      <div class="mb-10">
+      <div class="mb-6 sm:mb-10">
         <h2
-          class="font-racing text-3xl sm:text-4xl font-bold text-amber-400 text-glow mb-2"
+          class="font-racing text-2xl sm:text-3xl lg:text-4xl font-bold text-amber-400 text-glow mb-2"
         >
           Driver Statistics
         </h2>
-        <p class="text-slate-400">
+        <p class="text-slate-400 text-sm sm:text-base">
           Search for any driver to view their complete racing profile
         </p>
       </div>
 
       <!-- Search Box -->
-      <div class="glass-card rounded-2xl p-6 sm:p-8 mb-8">
-        <div class="flex flex-col sm:flex-row gap-4 items-stretch sm:items-end">
+      <div class="glass-card rounded-2xl p-4 sm:p-6 lg:p-8 mb-6 sm:mb-8">
+        <div
+          class="flex flex-col sm:flex-row gap-3 sm:gap-4 items-stretch sm:items-end"
+        >
           <div class="flex-1 autocomplete-container">
-            <label class="block text-slate-300 text-sm font-medium mb-3"
-              >Search Driver</label
+            <label
+              class="block text-slate-300 text-sm font-medium mb-2 sm:mb-3"
             >
+              Search Driver
+            </label>
             <input
               type="text"
               id="driver-search"
               placeholder="Enter driver name or Steam64 ID..."
-              class="input-modern w-full"
+              class="input-modern"
               autocomplete="off"
             />
             <div id="autocomplete-results" class="autocomplete-results"></div>
           </div>
           <button
             onclick="searchDriver()"
-            class="btn-gold px-8 py-4 rounded-xl text-base flex items-center justify-center gap-2"
+            class="btn-gold px-6 sm:px-8 py-3 sm:py-4 rounded-xl text-sm sm:text-base flex items-center justify-center gap-2"
           >
             <svg
               class="w-5 h-5"
@@ -620,73 +873,70 @@
       <!-- Quick Stats -->
       <div
         id="quick-stats"
-        class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-10"
+        class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mb-6 sm:mb-10"
       >
         <div class="stat-card text-center">
-          <p
-            class="text-4xl sm:text-5xl font-racing text-amber-400 mb-2"
-            id="total-drivers"
-          >
+          <p class="font-racing text-amber-400 mb-1 sm:mb-2" id="total-drivers">
             -
           </p>
-          <p class="text-slate-400 text-sm font-medium">Total Drivers</p>
+          <p class="text-slate-400 text-xs sm:text-sm font-medium">
+            Total Drivers
+          </p>
         </div>
         <div class="stat-card text-center">
-          <p
-            class="text-4xl sm:text-5xl font-racing text-blue-400 mb-2"
-            id="total-tracks"
-          >
+          <p class="font-racing text-blue-400 mb-1 sm:mb-2" id="total-tracks">
             -
           </p>
-          <p class="text-slate-400 text-sm font-medium">Active Tracks</p>
+          <p class="text-slate-400 text-xs sm:text-sm font-medium">
+            Active Tracks
+          </p>
         </div>
         <div class="stat-card text-center">
-          <p
-            class="text-4xl sm:text-5xl font-racing text-emerald-400 mb-2"
-            id="total-laps"
-          >
+          <p class="font-racing text-emerald-400 mb-1 sm:mb-2" id="total-laps">
             -
           </p>
-          <p class="text-slate-400 text-sm font-medium">Total Lap Times</p>
+          <p class="text-slate-400 text-xs sm:text-sm font-medium">
+            Total Lap Times
+          </p>
         </div>
         <div class="stat-card text-center">
-          <p
-            class="text-4xl sm:text-5xl font-racing text-purple-400 mb-2"
-            id="total-km"
-          >
+          <p class="font-racing text-purple-400 mb-1 sm:mb-2" id="total-km">
             -
           </p>
-          <p class="text-slate-400 text-sm font-medium">Total KM Driven</p>
+          <p class="text-slate-400 text-xs sm:text-sm font-medium">
+            Total KM Driven
+          </p>
         </div>
       </div>
 
       <!-- Driver Stats Display -->
       <div id="driver-stats" class="hidden">
         <!-- Driver Header Card -->
-        <div class="glass-card rounded-2xl p-6 sm:p-8 mb-6">
+        <div class="glass-card rounded-2xl p-4 sm:p-6 lg:p-8 mb-4 sm:mb-6">
           <div
             class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
           >
-            <div>
+            <div class="min-w-0 flex-1">
               <h3
                 id="driver-name"
-                class="font-racing text-2xl sm:text-3xl font-bold text-white mb-1"
+                class="font-racing text-xl sm:text-2xl lg:text-3xl font-bold text-white mb-1 truncate"
               >
                 Driver Name
               </h3>
-              <p id="driver-guid" class="text-slate-500 text-sm font-mono">
+              <p
+                id="driver-guid"
+                class="text-slate-500 text-xs sm:text-sm font-mono break-all"
+              >
                 GUID: 76561198000000000
               </p>
             </div>
-
-            <!-- Favorite track blok rechts -->
-            <div class="mt-3 sm:mt-0 sm:text-right">
+            <div class="w-full sm:w-auto sm:text-right">
               <p class="text-slate-500 text-xs uppercase tracking-wider">
                 Favorite Track
               </p>
               <p
                 id="driver-fav-track"
-                class="font-racing text-lg sm:text-xl text-amber-400"
+                class="font-racing text-base sm:text-lg lg:text-xl text-amber-400"
               >
                 -
               </p>
@@ -698,107 +948,120 @@
         </div>
 
         <!-- Main Stats Grid -->
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
+        <div
+          class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mb-6 sm:mb-8"
+        >
           <div class="stat-card">
-            <div class="flex items-center justify-between mb-4">
-              <span class="text-slate-400 text-sm font-medium">Balance</span>
-              <span class="text-2xl">💰</span>
+            <div class="flex items-center justify-between mb-3 sm:mb-4">
+              <span class="text-slate-400 text-xs sm:text-sm font-medium"
+                >Balance</span
+              >
+              <span class="text-xl sm:text-2xl">💰</span>
             </div>
             <p
               id="stat-points"
-              class="font-racing text-3xl sm:text-4xl font-bold text-emerald-400"
+              class="font-racing text-2xl sm:text-3xl lg:text-4xl font-bold text-emerald-400"
             >
               $0
             </p>
-            <p class="text-slate-500 text-xs mt-2">Total earnings</p>
+            <p class="text-slate-500 text-[10px] sm:text-xs mt-1 sm:mt-2">
+              Total earnings
+            </p>
           </div>
-
           <div class="stat-card">
-            <div class="flex items-center justify-between mb-4">
-              <span class="text-slate-400 text-sm font-medium">Wins</span>
-              <span class="text-2xl">🥇</span>
+            <div class="flex items-center justify-between mb-3 sm:mb-4">
+              <span class="text-slate-400 text-xs sm:text-sm font-medium"
+                >Wins</span
+              >
+              <span class="text-xl sm:text-2xl">🥇</span>
             </div>
             <p
               id="stat-wins"
-              class="font-racing text-3xl sm:text-4xl font-bold text-amber-400"
+              class="font-racing text-2xl sm:text-3xl lg:text-4xl font-bold text-amber-400"
             >
               0
             </p>
           </div>
-
           <div class="stat-card">
-            <div class="flex items-center justify-between mb-4">
-              <span class="text-slate-400 text-sm font-medium">Podiums</span>
-              <span class="text-2xl">🏆</span>
+            <div class="flex items-center justify-between mb-3 sm:mb-4">
+              <span class="text-slate-400 text-xs sm:text-sm font-medium"
+                >Podiums</span
+              >
+              <span class="text-xl sm:text-2xl">🏆</span>
             </div>
             <p
               id="stat-podiums"
-              class="font-racing text-3xl sm:text-4xl font-bold text-white"
+              class="font-racing text-2xl sm:text-3xl lg:text-4xl font-bold text-white"
             >
               0
             </p>
           </div>
-
           <div class="stat-card">
-            <div class="flex items-center justify-between mb-4">
-              <span class="text-slate-400 text-sm font-medium">Distance</span>
-              <span class="text-2xl">🛣️</span>
+            <div class="flex items-center justify-between mb-3 sm:mb-4">
+              <span class="text-slate-400 text-xs sm:text-sm font-medium"
+                >Distance</span
+              >
+              <span class="text-xl sm:text-2xl">🛣️</span>
             </div>
             <p
               id="stat-km"
-              class="font-racing text-3xl sm:text-4xl font-bold text-blue-400"
+              class="font-racing text-2xl sm:text-3xl lg:text-4xl font-bold text-blue-400"
             >
               0 km
             </p>
-            <p class="text-slate-500 text-xs mt-2">Total driven</p>
+            <p class="text-slate-500 text-[10px] sm:text-xs mt-1 sm:mt-2">
+              Total driven
+            </p>
           </div>
         </div>
 
         <!-- Detailed Stats -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <div
+          class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8"
+        >
           <!-- Performance Stats -->
-          <div class="glass-card rounded-2xl p-6">
+          <div class="glass-card rounded-2xl p-4 sm:p-6">
             <h3
-              class="font-racing text-xl font-bold text-amber-400 mb-6 flex items-center gap-3"
+              class="font-racing text-lg sm:text-xl font-bold text-amber-400 mb-4 sm:mb-6 flex items-center gap-3"
             >
-              <span class="text-2xl">🏁</span> Performance
+              <span class="text-xl sm:text-2xl">🏁</span> Performance
             </h3>
-            <div class="space-y-4">
+            <div class="space-y-3 sm:space-y-4">
               <div
-                class="flex justify-between items-center py-3 border-b border-white/5"
+                class="flex justify-between items-center py-2 sm:py-3 border-b border-white/5"
               >
-                <span class="text-slate-400">Pole Positions</span>
+                <span class="text-slate-400 text-sm">Pole Positions</span>
                 <span
                   id="stat-poles"
-                  class="font-mono text-amber-400 font-bold text-lg"
+                  class="font-mono text-amber-400 font-bold text-base sm:text-lg"
                   >0</span
                 >
               </div>
               <div
-                class="flex justify-between items-center py-3 border-b border-white/5"
+                class="flex justify-between items-center py-2 sm:py-3 border-b border-white/5"
               >
-                <span class="text-slate-400">Fastest Laps</span>
+                <span class="text-slate-400 text-sm">Fastest Laps</span>
                 <span
                   id="stat-flaps"
-                  class="font-mono text-purple-400 font-bold text-lg"
+                  class="font-mono text-purple-400 font-bold text-base sm:text-lg"
                   >0</span
                 >
               </div>
               <div
-                class="flex justify-between items-center py-3 border-b border-white/5"
+                class="flex justify-between items-center py-2 sm:py-3 border-b border-white/5"
               >
-                <span class="text-slate-400">Unique Tracks Driven</span>
+                <span class="text-slate-400 text-sm">Unique Tracks</span>
                 <span
                   id="stat-sessions"
-                  class="font-mono text-white font-bold text-lg"
+                  class="font-mono text-white font-bold text-base sm:text-lg"
                   >0</span
                 >
               </div>
-              <div class="flex justify-between items-center py-3">
-                <span class="text-slate-400">Laps Completed</span>
+              <div class="flex justify-between items-center py-2 sm:py-3">
+                <span class="text-slate-400 text-sm">Laps Completed</span>
                 <span
                   id="stat-laps"
-                  class="font-mono text-white font-bold text-lg"
+                  class="font-mono text-white font-bold text-base sm:text-lg"
                   >0</span
                 >
               </div>
@@ -806,48 +1069,48 @@
           </div>
 
           <!-- Safety Stats -->
-          <div class="glass-card rounded-2xl p-6">
+          <div class="glass-card rounded-2xl p-4 sm:p-6">
             <h3
-              class="font-racing text-xl font-bold text-amber-400 mb-6 flex items-center gap-3"
+              class="font-racing text-lg sm:text-xl font-bold text-amber-400 mb-4 sm:mb-6 flex items-center gap-3"
             >
-              <span class="text-2xl">⚠️</span> Safety Rating
+              <span class="text-xl sm:text-2xl">⚠️</span> Safety Rating
             </h3>
-            <div class="space-y-4">
+            <div class="space-y-3 sm:space-y-4">
               <div
-                class="flex justify-between items-center py-3 border-b border-white/5"
+                class="flex justify-between items-center py-2 sm:py-3 border-b border-white/5"
               >
-                <span class="text-slate-400">Total Crashes</span>
+                <span class="text-slate-400 text-sm">Total Crashes</span>
                 <span
                   id="stat-crashes"
-                  class="font-mono text-red-400 font-bold text-lg"
+                  class="font-mono text-red-400 font-bold text-base sm:text-lg"
                   >0</span
                 >
               </div>
               <div
-                class="flex justify-between items-center py-3 border-b border-white/5"
+                class="flex justify-between items-center py-2 sm:py-3 border-b border-white/5"
               >
-                <span class="text-slate-400">Crashes / 100km</span>
+                <span class="text-slate-400 text-sm">Crashes / 100km</span>
                 <span
                   id="stat-cr100"
-                  class="font-mono text-orange-400 font-bold text-lg"
+                  class="font-mono text-orange-400 font-bold text-base sm:text-lg"
                   >0.00</span
                 >
               </div>
               <div
-                class="flex justify-between items-center py-3 border-b border-white/5"
+                class="flex justify-between items-center py-2 sm:py-3 border-b border-white/5"
               >
-                <span class="text-slate-400">Infractions</span>
+                <span class="text-slate-400 text-sm">Infractions</span>
                 <span
                   id="stat-infr"
-                  class="font-mono text-yellow-400 font-bold text-lg"
+                  class="font-mono text-yellow-400 font-bold text-base sm:text-lg"
                   >0</span
                 >
               </div>
-              <div class="flex justify-between items-center py-3">
-                <span class="text-slate-400">Infractions / 100km</span>
+              <div class="flex justify-between items-center py-2 sm:py-3">
+                <span class="text-slate-400 text-sm">Infractions / 100km</span>
                 <span
                   id="stat-infr100"
-                  class="font-mono text-yellow-400 font-bold text-lg"
+                  class="font-mono text-yellow-400 font-bold text-base sm:text-lg"
                   >0.00</span
                 >
               </div>
@@ -857,14 +1120,14 @@
       </div>
 
       <!-- No Driver State -->
-      <div id="no-driver" class="text-center py-20">
-        <div class="text-7xl mb-6 animate-float">🔍</div>
-        <h3 class="font-racing text-2xl text-slate-300 mb-3">
+      <div id="no-driver" class="text-center py-12 sm:py-20">
+        <div class="text-5xl sm:text-7xl mb-4 sm:mb-6 animate-float">🔍</div>
+        <h3 class="font-racing text-xl sm:text-2xl text-slate-300 mb-2 sm:mb-3">
           Search for a Driver
         </h3>
-        <p class="text-slate-500 max-w-md mx-auto">
+        <p class="text-slate-500 max-w-md mx-auto text-sm sm:text-base px-4">
           Enter a driver name or Steam64 ID above to view their complete racing
-          statistics and licence status.
+          statistics.
         </p>
       </div>
     </div>
@@ -872,23 +1135,23 @@
     <!-- Leaderboard Page -->
     <div
       id="page-leaderboard"
-      class="page hidden max-w-7xl mx-auto px-4 sm:px-6 py-10"
+      class="page hidden max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-10"
     >
       <!-- Header -->
-      <div class="mb-10">
+      <div class="mb-6 sm:mb-10">
         <h2
-          class="font-racing text-3xl sm:text-4xl font-bold text-amber-400 text-glow mb-2"
+          class="font-racing text-2xl sm:text-3xl lg:text-4xl font-bold text-amber-400 text-glow mb-2"
         >
           🏆 Leaderboard
         </h2>
-        <p class="text-slate-400">
+        <p class="text-slate-400 text-sm sm:text-base">
           Best lap times for Tatuus FA01 across all tracks
         </p>
       </div>
 
       <!-- Track Selection -->
-      <div class="glass-card rounded-2xl p-6 mb-6">
-        <label class="block text-slate-300 text-sm font-medium mb-4"
+      <div class="glass-card rounded-2xl p-4 sm:p-6 mb-4 sm:mb-6">
+        <label class="block text-slate-300 text-sm font-medium mb-3 sm:mb-4"
           >Select Track</label
         >
         <div class="flex flex-wrap gap-2" id="track-buttons">
@@ -898,14 +1161,18 @@
 
       <!-- Track Info Bar -->
       <div
-        class="glass-card rounded-xl px-6 py-4 mb-6 flex flex-wrap items-center justify-between gap-4"
+        class="glass-card rounded-xl px-4 sm:px-6 py-3 sm:py-4 mb-4 sm:mb-6 flex flex-wrap items-center justify-between gap-3 sm:gap-4"
       >
-        <div class="flex items-center gap-6">
+        <div class="flex items-center gap-4 sm:gap-6">
           <div>
-            <span class="text-slate-500 text-xs uppercase tracking-wider"
+            <span
+              class="text-slate-500 text-[10px] sm:text-xs uppercase tracking-wider"
               >Track</span
             >
-            <p id="current-track" class="font-racing text-amber-400 text-lg">
+            <p
+              id="current-track"
+              class="font-racing text-amber-400 text-sm sm:text-lg"
+            >
               -
             </p>
           </div>
@@ -914,27 +1181,29 @@
             <span class="text-slate-500 text-xs uppercase tracking-wider"
               >Car</span
             >
-            <p class="font-mono text-white">tatuusfa1</p>
+            <p class="font-mono text-white text-sm">tatuusfa1</p>
           </div>
         </div>
         <div class="flex items-center gap-2">
-          <span class="text-slate-500 text-sm">Entries:</span>
-          <span id="entry-count" class="font-racing text-emerald-400 text-xl"
+          <span class="text-slate-500 text-xs sm:text-sm">Entries:</span>
+          <span
+            id="entry-count"
+            class="font-racing text-emerald-400 text-lg sm:text-xl"
             >0</span
           >
         </div>
       </div>
 
       <!-- Leaderboard Table -->
-      <div class="glass-card rounded-2xl overflow-hidden mb-6">
+      <div class="glass-card rounded-2xl overflow-hidden mb-4 sm:mb-6">
         <div class="overflow-x-auto">
           <table class="table-modern w-full">
             <thead>
               <tr class="text-left text-slate-400">
-                <th class="py-5 px-6 w-20">Pos</th>
-                <th class="py-5 px-6">Driver</th>
-                <th class="py-5 px-6">Lap Time</th>
-                <th class="py-5 px-6">Gap</th>
+                <th class="py-4 sm:py-5 px-3 sm:px-6 w-16 sm:w-20">Pos</th>
+                <th class="py-4 sm:py-5 px-3 sm:px-6">Driver</th>
+                <th class="py-4 sm:py-5 px-3 sm:px-6">Lap Time</th>
+                <th class="py-4 sm:py-5 px-3 sm:px-6">Gap</th>
               </tr>
             </thead>
             <tbody id="leaderboard-body" class="text-slate-300">
@@ -945,39 +1214,39 @@
       </div>
 
       <!-- Pagination -->
-      <div class="flex justify-center gap-2" id="pagination">
+      <div class="flex justify-center gap-1 sm:gap-2 flex-wrap" id="pagination">
         <!-- Populated by JS -->
       </div>
 
       <!-- No Data State -->
-      <div id="no-leaderboard" class="hidden text-center py-20">
-        <div class="text-7xl mb-6 animate-float">📊</div>
-        <h3 class="font-racing text-2xl text-slate-300 mb-3">
+      <div id="no-leaderboard" class="hidden text-center py-12 sm:py-20">
+        <div class="text-5xl sm:text-7xl mb-4 sm:mb-6 animate-float">📊</div>
+        <h3 class="font-racing text-xl sm:text-2xl text-slate-300 mb-2 sm:mb-3">
           No Lap Times Yet
         </h3>
-        <p class="text-slate-500">
+        <p class="text-slate-500 text-sm sm:text-base">
           Select a track above to view the leaderboard
         </p>
       </div>
     </div>
 
-    <!-- Setup Shop Page (hidden / future) -->
+    <!-- Setup Shop Page -->
     <div
       id="page-shop"
-      class="page hidden max-w-7xl mx-auto px-4 sm:px-6 py-10"
+      class="page hidden max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-10"
     >
-      <div class="mb-10">
+      <div class="mb-6 sm:mb-10">
         <h2
-          class="font-racing text-3xl sm:text-4xl font-bold text-amber-400 text-glow mb-2"
+          class="font-racing text-2xl sm:text-3xl lg:text-4xl font-bold text-amber-400 text-glow mb-2"
         >
           🛒 Setup Shop
         </h2>
-        <p class="text-slate-400">
+        <p class="text-slate-400 text-sm sm:text-base">
           Premium Tatuus FA01 setups crafted by top drivers
         </p>
       </div>
 
-      <div class="glass-card rounded-2xl p-6 mb-8">
+      <div class="glass-card rounded-2xl p-4 sm:p-6 mb-6 sm:mb-8">
         <div class="flex flex-wrap gap-2" id="shop-track-buttons">
           <!-- Populated by JS -->
         </div>
@@ -985,7 +1254,7 @@
 
       <div
         id="shop-grid"
-        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+        class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6"
       >
         <!-- Populated by JS -->
       </div>
@@ -994,28 +1263,25 @@
     <!-- Shop Password Modal -->
     <div
       id="shop-password-modal"
-      class="fixed inset-0 z-[90] hidden bg-black/70 backdrop-blur flex items-center justify-center"
+      class="fixed inset-0 z-[90] hidden bg-black/70 backdrop-blur-sm flex items-center justify-center p-4"
     >
-      <div
-        class="glass-card max-w-md w-full mx-4 rounded-2xl p-6 sm:p-8 relative"
-      >
-        <!-- Close button -->
+      <div class="glass-card max-w-md w-full rounded-2xl p-5 sm:p-8 relative">
         <button
           type="button"
-          class="absolute top-3 right-3 text-slate-500 hover:text-slate-300 text-xl"
+          class="absolute top-3 right-3 text-slate-500 hover:text-slate-300 text-xl p-2"
           onclick="closeShopModal()"
           aria-label="Close"
         >
           ✕
         </button>
-
-        <h3 class="font-racing text-2xl font-bold text-amber-400 mb-2">
+        <h3
+          class="font-racing text-xl sm:text-2xl font-bold text-amber-400 mb-2"
+        >
           Unlock Setup Shop
         </h3>
         <p class="text-slate-400 text-sm mb-4">
           Enter the password to access the setup shop.
         </p>
-
         <label
           for="shop-password-input"
           class="block text-slate-300 text-sm font-medium mb-2"
@@ -1026,12 +1292,11 @@
           type="password"
           class="input-modern w-full mb-3"
           placeholder="••••••••"
+          onkeydown="if(event.key==='Enter')unlockShopFromModal()"
         />
-
         <p id="shop-password-error" class="text-sm text-red-400 mb-4 hidden">
           Incorrect password. Please try again.
         </p>
-
         <div class="flex justify-end gap-3 mt-2">
           <button
             type="button"
@@ -1052,19 +1317,25 @@
     </div>
 
     <!-- Footer -->
-    <footer class="border-t border-white/5 mt-16 py-10">
+    <footer class="border-t border-white/5 mt-10 sm:mt-16 py-8 sm:py-10">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 text-center">
-        <div class="flex items-center justify-center gap-4 mb-6">
-          <div class="logo-container w-10 h-10">
+        <div
+          class="flex items-center justify-center gap-3 sm:gap-4 mb-4 sm:mb-6"
+        >
+          <div
+            class="logo-container w-8 h-8 sm:w-10 sm:h-10 min-w-[32px] sm:min-w-[40px]"
+          >
             <img
               src="logo.png"
               alt="AC Elite"
-              onerror="this.parentElement.innerHTML='<div class=\'w-full h-full gold-gradient flex items-center justify-center rounded-lg\'><span class=\'font-racing font-black text-[#0a1628] text-sm\'>AC</span></div>'"
+              onerror="this.parentElement.innerHTML='<div class=\'w-full h-full gold-gradient flex items-center justify-center rounded-lg\'><span class=\'font-racing font-black text-[#0a1628] text-xs sm:text-sm\'>AC</span></div>'"
             />
           </div>
-          <span class="font-racing text-xl text-amber-400">AC ELITE</span>
+          <span class="font-racing text-lg sm:text-xl text-amber-400"
+            >AC ELITE</span
+          >
         </div>
-        <p class="text-slate-500 text-sm mb-2">
+        <p class="text-slate-500 text-xs sm:text-sm mb-2">
           Vote for next week's track on Discord • discord.gg/d2EbxGYBbj
         </p>
         <p class="text-slate-600 text-xs" id="last-sync">
@@ -1074,78 +1345,110 @@
     </footer>
 
     <script>
-      /* ===================== CONFIGURATION ===================== */
-
+      /* ==================== Configuration ==================== */
       const DATA_BASE_URL = "./data";
       const CAR = "tatuusfa1";
+      const SHOP_PASSWORD = "ac-elite-shop";
+      const ITEMS_PER_PAGE = 15;
 
+      /* ==================== State Variables ==================== */
       let leaderboardData = {};
       let rankData = [];
       let metadata = {};
       let dataLoaded = false;
-
-      const SHOP_PASSWORD = "ac-elite-shop";
       let shopUnlocked = false;
+      let currentTrack = null;
+      let currentPage = 1;
+      let currentShopFilter = "all";
 
+      // Check for saved shop unlock state
       try {
         shopUnlocked = localStorage.getItem("acelite_shop_unlocked") === "1";
       } catch (e) {
         shopUnlocked = false;
       }
 
-      function openShopModal() {
-        const modal = document.getElementById("shop-password-modal");
-        const input = document.getElementById("shop-password-input");
-        const error = document.getElementById("shop-password-error");
+      /* ==================== Track Name Mappings ==================== */
+      const trackNames = {
+        ks_barcelona_layout_gp: "Barcelona - GP",
+        ks_barcelona_layout_moto: "Barcelona - Moto",
+        ks_black_cat_county_layout_short: "Black Cat County - Short",
+        ks_brands_hatch_gp: "Brands Hatch - GP",
+        imola_: "Imola",
+        ks_laguna_seca_: "Laguna Seca",
+        magione_: "Magione",
+        monza_: "Monza",
+        ks_monza66_junior: "Monza 1966 - Junior",
+        ks_monza66_road: "Monza 1966 - Road",
+        mugello_: "Mugello",
+        ks_nordschleife_nordschleife: "Nordschleife",
+        ks_nordschleife_endurance: "Nordschleife Endurance",
+        ks_nurburgring_layout_gp_a: "Nürburgring GP",
+        ks_nurburgring_layout_gp_b: "Nürburgring GP - GT",
+        ks_red_bull_ring_layout_gp: "Red Bull Ring - GP",
+        ks_silverstone_gp: "Silverstone - GP",
+        ks_silverstone_national: "Silverstone - National",
+        spa_: "Spa",
+        ks_vallelunga_extended_circuit: "Vallelunga",
+        ks_zandvoort_: "Zandvoort",
+      };
 
-        if (!modal || !input) return;
+      /* ==================== Setup Shop Data ==================== */
+      const setups = [
+        {
+          id: 1,
+          image: "tatuus.png",
+          track: "ks_barcelona_layout_moto",
+          name: "Carter 38.272 Moto Q",
+          author: "CarterReza",
+          rating: 3.0,
+          price: 5,
+          description: "Quali setup for Moto layout.",
+          file: "setups/Carter 38.272 Moto Q.ini",
+          paypalUrl: "https://www.sandbox.paypal.com/checkoutnow?token=FAKE123",
+        },
+      ];
 
-        modal.classList.remove("hidden");
-        error?.classList.add("hidden");
-        input.value = "";
-        setTimeout(() => input.focus(), 50);
+      /* ==================== Utility Functions ==================== */
+      function getTrackDisplayName(trackId) {
+        return (
+          trackNames[trackId] || trackId.replace(/_/g, " ").replace(/-/g, " ")
+        );
       }
 
-      function closeShopModal() {
-        const modal = document.getElementById("shop-password-modal");
-        if (!modal) return;
-        modal.classList.add("hidden");
+      function formatLaptime(ms) {
+        const min = Math.floor(ms / 60000);
+        const sec = ((ms / 1000) % 60).toFixed(3).padStart(6, "0");
+        return `${min}:${sec}`;
       }
 
-      function unlockShopFromModal() {
-        const input = document.getElementById("shop-password-input");
-        const error = document.getElementById("shop-password-error");
-        const value = (input?.value || "").trim();
-
-        if (value === SHOP_PASSWORD) {
-          shopUnlocked = true;
-          try {
-            localStorage.setItem("acelite_shop_unlocked", "1");
-          } catch (e) {}
-
-          // nav-knop upgraden
-          const btn = document.getElementById("nav-shop");
-          if (btn) {
-            btn.classList.remove("btn-locked");
-            btn.classList.add("btn-ghost", "active");
-          }
-
-          closeShopModal();
-          showPage("shop");
-        } else {
-          if (error) {
-            error.textContent = "Incorrect password. Please try again.";
-            error.classList.remove("hidden");
-          }
-          if (input) {
-            input.value = "";
-            input.focus();
-          }
-        }
+      function calculateGap(fastestLap, currentLap) {
+        if (fastestLap === currentLap) return "-";
+        return `+${((currentLap - fastestLap) / 1000).toFixed(3)}`;
       }
 
-      /* ===================== DATA FETCHING ===================== */
+      function escapeHtml(text) {
+        const div = document.createElement("div");
+        div.textContent = text;
+        return div.innerHTML;
+      }
 
+      function getTimeAgo(dateString) {
+        if (!dateString) return "Synced recently";
+        const now = new Date();
+        const date = new Date(dateString);
+        const seconds = Math.floor((now - date) / 1000);
+
+        if (seconds < 60) return "Synced just now";
+        if (seconds < 120) return "Synced 1 min ago";
+        if (seconds < 3600) return `Synced ${Math.floor(seconds / 60)} min ago`;
+        if (seconds < 7200) return "Synced 1 hour ago";
+        if (seconds < 86400)
+          return `Synced ${Math.floor(seconds / 3600)} hours ago`;
+        return `Synced ${Math.floor(seconds / 86400)} days ago`;
+      }
+
+      /* ==================== Data Fetching ==================== */
       async function fetchJSON(filename) {
         const url = `${DATA_BASE_URL}/${filename}?t=${Date.now()}`;
         const response = await fetch(url);
@@ -1165,17 +1468,11 @@
               fetchJSON("metadata.json"),
             ]);
 
-          if (rankResult.status === "fulfilled") {
-            rankData = rankResult.value;
-          }
-
-          if (leaderboardResult.status === "fulfilled") {
+          if (rankResult.status === "fulfilled") rankData = rankResult.value;
+          if (leaderboardResult.status === "fulfilled")
             leaderboardData = leaderboardResult.value;
-          }
-
-          if (metadataResult.status === "fulfilled") {
+          if (metadataResult.status === "fulfilled")
             metadata = metadataResult.value;
-          }
 
           dataLoaded =
             rankData.length > 0 || Object.keys(leaderboardData).length > 0;
@@ -1208,42 +1505,26 @@
         if (success) {
           const timeAgo = getTimeAgo(metadata.lastSync);
           status.innerHTML = `
-                    <span class="relative flex h-2.5 w-2.5">
-                        <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
-                    </span>
-                    <span class="text-sm text-slate-300">${timeAgo}</span>
-                `;
+          <span class="relative flex h-2.5 w-2.5">
+            <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+          </span>
+          <span class="text-xs sm:text-sm text-slate-300">${timeAgo}</span>
+        `;
         } else {
           status.innerHTML = `
-                    <span class="relative flex h-2.5 w-2.5">
-                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                        <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
-                    </span>
-                    <span class="text-sm text-red-300">Failed to load data</span>
-                `;
+          <span class="relative flex h-2.5 w-2.5">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
+          </span>
+          <span class="text-xs sm:text-sm text-red-300">Failed to load data</span>
+        `;
         }
-      }
-
-      function getTimeAgo(dateString) {
-        if (!dateString) return "Synced recently";
-
-        const now = new Date();
-        const date = new Date(dateString);
-        const seconds = Math.floor((now - date) / 1000);
-
-        if (seconds < 60) return "Synced just now";
-        if (seconds < 120) return "Synced 1 min ago";
-        if (seconds < 3600) return `Synced ${Math.floor(seconds / 60)} min ago`;
-        if (seconds < 7200) return "Synced 1 hour ago";
-        if (seconds < 86400)
-          return `Synced ${Math.floor(seconds / 3600)} hours ago`;
-        return `Synced ${Math.floor(seconds / 86400)} days ago`;
       }
 
       function updateLastSync() {
         if (metadata.lastSync) {
           const timeAgo = getTimeAgo(metadata.lastSync);
-          document.getElementById("last-sync").textContent = `${timeAgo}`;
+          document.getElementById("last-sync").textContent = timeAgo;
         }
       }
 
@@ -1270,186 +1551,136 @@
           Math.round(totalKm).toLocaleString();
       }
 
-      /* ===================== TRACK NAMES ===================== */
+      /* ==================== Mobile Navigation ==================== */
+      function toggleMobileMenu() {
+        const menu = document.getElementById("mobile-menu");
+        const hamburger = document.getElementById("hamburger");
+        const isOpen = menu.classList.contains("open");
 
-      const trackNames = {
-        ks_barcelona_layout_gp: "Barcelona - GP",
-        ks_barcelona_layout_moto: "Barcelona - Moto",
-        ks_black_cat_county_layout_short: "Black Cat County - Short",
-        ks_brands_hatch_gp: "Brands Hatch - GP",
-        imola_: "Imola",
-        ks_laguna_seca_: "Laguna Seca",
-        magione_: "Magione",
-        monza_: "Monza",
-        ks_monza66_junior: "Monza 1966 - Junior Course",
-        ks_monza66_road: "Monza 1966 - Road Course",
-        mugello_: "Mugello",
-        ks_nordschleife_nordschleife: "Nordschleife",
-        ks_nordschleife_endurance: "Nordschleife Endurance",
-        ks_nurburgring_layout_gp_a: "Nürburgring GP",
-        ks_nurburgring_layout_gp_b: "Nürburgring GP - GT",
-        ks_red_bull_ring_layout_gp: "Red Bull Ring - GP",
-        ks_silverstone_gp: "Silverstone - GP",
-        ks_silverstone_national: "Silverstone - National",
-        spa_: "Spa",
-        ks_vallelunga_extended_circuit: "Vallelunga",
-        ks_zandvoort_: "Zandvoort",
-      };
-
-      function getTrackDisplayName(trackId) {
-        return (
-          trackNames[trackId] || trackId.replace(/_/g, " ").replace(/-/g, " ")
-        );
+        menu.classList.toggle("open", !isOpen);
+        hamburger.classList.toggle("open", !isOpen);
+        document.body.style.overflow = isOpen ? "" : "hidden";
       }
 
-      /* ===================== SETUP SHOP ===================== */
-
-      const setups = [
-        {
-          id: 1,
-          image: "tatuus.png",
-          track: "ks_barcelona_layout_moto",
-          name: "Carter 38.272 Moto Q",
-          author: "CarterReza",
-          rating: 3.0,
-          price: 5,
-          description: "Quali setup for Moto layout.",
-          file: "setups/Carter 38.272 Moto Q.ini",
-          paypalUrl: "https://www.sandbox.paypal.com/checkoutnow?token=FAKE123",
-        },
-      ];
-
-      /* ===================== SCORE CALCULATION (for later) ===================== */
-
-      function calculateScore(d) {
-        const km = Math.max(1, d.kilometers ?? 0);
-        const crashes = d.crashes ?? d.collisions ?? 0;
-        const infr = d.infr ?? 0;
-
-        const cr_per_100km = km > 0 ? crashes / (km / 100) : 0;
-        const infr_per_100km = km > 0 ? infr / (km / 100) : 0;
-
-        const winRate = (d.wins ?? 0) / (km / 1000);
-        const podiumRate = (d.podiums ?? 0) / (km / 1000);
-        const poleRate = (d.poles ?? 0) / (km / 1000);
-        const flapRate = (d.flaps ?? 0) / (km / 1000);
-        const enduranceBonus = Math.log10(km);
-
-        return (
-          winRate * 30 +
-          podiumRate * 20 +
-          poleRate * 15 +
-          flapRate * 12 +
-          enduranceBonus * 10 +
-          (d.points ?? 0) * 0.05 -
-          infr * 1.5 -
-          crashes * 2.0 -
-          infr_per_100km * 25 -
-          cr_per_100km * 30
-        );
+      function closeMobileMenu() {
+        const menu = document.getElementById("mobile-menu");
+        const hamburger = document.getElementById("hamburger");
+        menu.classList.remove("open");
+        hamburger.classList.remove("open");
+        document.body.style.overflow = "";
       }
 
-      function getLicence(score) {
-        if (score >= 700)
-          return { name: "Platinum Licence", class: "licence-platinum" };
-        if (score >= 500)
-          return { name: "Gold Licence", class: "licence-gold" };
-        if (score >= 200)
-          return { name: "Silver Licence", class: "licence-silver" };
-        return { name: "Bronze Licence", class: "licence-bronze" };
-      }
-
-      function formatLaptime(ms) {
-        const min = Math.floor(ms / 60000);
-        const sec = ((ms / 1000) % 60).toFixed(3).padStart(6, "0");
-        return `${min}:${sec}`;
-      }
-
-      function calculateGap(fastestLap, currentLap) {
-        if (fastestLap === currentLap) return "-";
-        return `+${((currentLap - fastestLap) / 1000).toFixed(3)}`;
-      }
-
-      function escapeHtml(text) {
-        const div = document.createElement("div");
-        div.textContent = text;
-        return div.innerHTML;
-      }
-
-      /* ===================== NAVIGATION ===================== */
-
-      let currentTrack = null;
-      let currentPage = 1;
-      const itemsPerPage = 15;
-      let currentShopFilter = "all";
-
-      function handleShopClick() {
-        // Als al unlocked: gewoon naar de shop
-        if (shopUnlocked) {
-          showPage("shop");
-          return;
-        }
-
-        // Vraag om wachtwoord
-        const input = prompt("Enter setup shop password:");
-
-        if (input === null) {
-          // gebruiker drukte op Annuleren
-          return;
-        }
-
-        if (input === SHOP_PASSWORD) {
-          shopUnlocked = true;
-          try {
-            localStorage.setItem("acelite_shop_unlocked", "1");
-          } catch (e) {}
-
-          // knop visueel upgraden van locked naar normale nav-btn
-          const btn = document.getElementById("nav-shop");
-          if (btn) {
-            btn.classList.remove("btn-locked");
-            btn.classList.add("btn-ghost", "active");
-          }
-
-          showPage("shop");
-          alert("Setup shop unlocked! 🎉");
-        } else {
-          alert("Incorrect password.");
-        }
-      }
-
+      /* ==================== Page Navigation ==================== */
       function showPage(page) {
-        // voorkomen dat iemand direct via JS naar shop gaat als 'ie locked is
+        // Prevent direct shop access when locked
         if (page === "shop" && !shopUnlocked) {
           openShopModal();
           return;
         }
 
+        // Hide all pages
         document
           .querySelectorAll(".page")
           .forEach((p) => p.classList.add("hidden"));
         document.getElementById(`page-${page}`).classList.remove("hidden");
 
-        document.querySelectorAll(".nav-btn").forEach((btn) => {
-          btn.classList.remove("active");
-        });
+        // Update navigation buttons
+        document
+          .querySelectorAll(".nav-btn")
+          .forEach((btn) => btn.classList.remove("active"));
 
-        const nav = document.getElementById(`nav-${page}`);
-        if (nav && !nav.classList.contains("btn-disabled")) {
-          nav.classList.add("active");
+        const desktopNav = document.getElementById(`nav-${page}`);
+        const mobileNav = document.getElementById(`mobile-nav-${page}`);
+
+        if (desktopNav && !desktopNav.classList.contains("btn-locked")) {
+          desktopNav.classList.add("active");
+        }
+        if (mobileNav && !mobileNav.classList.contains("btn-locked")) {
+          mobileNav.classList.add("active");
         }
 
+        // Initialize page-specific content
         if (page === "leaderboard") {
           renderTrackButtons();
           if (!currentTrack && Object.keys(leaderboardData).length > 0) {
             selectTrack(Object.keys(leaderboardData)[0]);
           }
         }
-        if (page === "shop") renderShop();
+
+        if (page === "shop") {
+          renderShopTrackButtons();
+          renderShop();
+        }
+
+        // Scroll to top
+        window.scrollTo(0, 0);
       }
 
-      /* ===================== AUTOCOMPLETE ===================== */
+      /* ==================== Shop Modal ==================== */
+      function openShopModal() {
+        const modal = document.getElementById("shop-password-modal");
+        const input = document.getElementById("shop-password-input");
+        const error = document.getElementById("shop-password-error");
 
+        if (!modal || !input) return;
+
+        modal.classList.remove("hidden");
+        error?.classList.add("hidden");
+        input.value = "";
+        setTimeout(() => input.focus(), 50);
+      }
+
+      function closeShopModal() {
+        const modal = document.getElementById("shop-password-modal");
+        if (modal) modal.classList.add("hidden");
+      }
+
+      function unlockShopFromModal() {
+        const input = document.getElementById("shop-password-input");
+        const error = document.getElementById("shop-password-error");
+        const value = (input?.value || "").trim();
+
+        if (value === SHOP_PASSWORD) {
+          shopUnlocked = true;
+          try {
+            localStorage.setItem("acelite_shop_unlocked", "1");
+          } catch (e) {}
+
+          updateShopButtonState();
+          closeShopModal();
+          showPage("shop");
+        } else {
+          if (error) {
+            error.textContent = "Incorrect password. Please try again.";
+            error.classList.remove("hidden");
+          }
+          if (input) {
+            input.value = "";
+            input.focus();
+          }
+        }
+      }
+
+      function handleShopClick() {
+        if (shopUnlocked) {
+          showPage("shop");
+        } else {
+          openShopModal();
+        }
+      }
+
+      function updateShopButtonState() {
+        const buttons = ["nav-shop", "mobile-nav-shop"];
+        buttons.forEach((id) => {
+          const btn = document.getElementById(id);
+          if (btn && shopUnlocked) {
+            btn.classList.remove("btn-locked");
+            btn.classList.add("btn-ghost");
+          }
+        });
+      }
+
+      /* ==================== Autocomplete ==================== */
       const searchInput = document.getElementById("driver-search");
       const autocompleteResults = document.getElementById(
         "autocomplete-results"
@@ -1472,6 +1703,7 @@
                 d.name.toLowerCase().includes(query) || d.guid.includes(query)
             )
             .slice(0, 8);
+
           if (matches.length === 0) {
             autocompleteResults.classList.remove("show");
             return;
@@ -1480,17 +1712,14 @@
           autocompleteResults.innerHTML = matches
             .map(
               (d) => `
-                    <div class="autocomplete-item" onclick="selectDriver('${
-                      d.guid
-                    }')">
-                        <div class="autocomplete-name">${escapeHtml(
-                          d.name
-                        )}</div>
-                        <div class="autocomplete-guid">${d.guid}</div>
-                    </div>
-                `
+            <div class="autocomplete-item" onclick="selectDriver('${d.guid}')">
+              <div class="autocomplete-name">${escapeHtml(d.name)}</div>
+              <div class="autocomplete-guid">${d.guid}</div>
+            </div>
+          `
             )
             .join("");
+
           autocompleteResults.classList.add("show");
         }, 150);
       });
@@ -1501,9 +1730,11 @@
           searchDriver();
         }
       });
+
       document.addEventListener("click", (e) => {
-        if (!e.target.closest(".autocomplete-container"))
+        if (!e.target.closest(".autocomplete-container")) {
           autocompleteResults.classList.remove("show");
+        }
       });
 
       function selectDriver(guid) {
@@ -1515,8 +1746,7 @@
         }
       }
 
-      /* ===================== STATS PAGE ===================== */
-
+      /* ==================== Stats Page ==================== */
       function searchDriver() {
         const query = document
           .getElementById("driver-search")
@@ -1532,14 +1762,15 @@
           document.getElementById("driver-stats").classList.add("hidden");
           document.getElementById("no-driver").classList.remove("hidden");
           document.getElementById("no-driver").innerHTML = `
-                    <div class="text-7xl mb-6">❌</div>
-                    <h3 class="font-racing text-2xl text-slate-300 mb-3">Driver Not Found</h3>
-                    <p class="text-slate-500 max-w-md mx-auto">No driver matches "${escapeHtml(
-                      query
-                    )}". Try a different search term.</p>
-                `;
+          <div class="text-5xl sm:text-7xl mb-4 sm:mb-6">❌</div>
+          <h3 class="font-racing text-xl sm:text-2xl text-slate-300 mb-2 sm:mb-3">Driver Not Found</h3>
+          <p class="text-slate-500 max-w-md mx-auto text-sm sm:text-base px-4">No driver matches "${escapeHtml(
+            query
+          )}". Try a different search term.</p>
+        `;
           return;
         }
+
         displayDriverStats(driver);
       }
 
@@ -1549,7 +1780,7 @@
 
         const km = driver.kilometers || 0;
 
-        // Total laps
+        // Calculate total laps
         let totalLaps = 0;
         if (typeof driver.laps === "number") {
           totalLaps = driver.laps;
@@ -1562,7 +1793,7 @@
           });
         }
 
-        // Sessions = aantal tracks met entries
+        // Count unique tracks
         let sessions = 0;
         if (driver.leaderboard && typeof driver.leaderboard === "object") {
           sessions = Object.keys(driver.leaderboard).length;
@@ -1570,20 +1801,18 @@
 
         const crashes = driver.crashes ?? driver.collisions ?? 0;
         const infr = driver.infr ?? 0;
-
         const crPer100 = km > 0 ? crashes / (km / 100) : 0;
         const infrPer100 = km > 0 ? infr / (km / 100) : 0;
 
-        // Header
+        // Update header
         document.getElementById("driver-name").textContent = driver.name;
         document.getElementById(
           "driver-guid"
         ).textContent = `GUID: ${driver.guid}`;
 
-        // Favorite track bepalen (meest gereden track voor deze auto)
+        // Find favorite track
         let favTrackId = null;
         let favTrackLaps = 0;
-
         if (driver.leaderboard && typeof driver.leaderboard === "object") {
           for (const [trackId, trackObj] of Object.entries(
             driver.leaderboard
@@ -1591,7 +1820,6 @@
             const carStats = trackObj[CAR];
             const laps =
               carStats && typeof carStats.laps === "number" ? carStats.laps : 0;
-
             if (laps > favTrackLaps) {
               favTrackLaps = laps;
               favTrackId = trackId;
@@ -1601,7 +1829,6 @@
 
         const favNameEl = document.getElementById("driver-fav-track");
         const favLapsEl = document.getElementById("driver-fav-laps");
-
         if (favTrackId && favNameEl && favLapsEl) {
           favNameEl.textContent = getTrackDisplayName(favTrackId);
           favLapsEl.textContent = `${favTrackLaps.toLocaleString()} laps driven`;
@@ -1610,51 +1837,49 @@
           favLapsEl.textContent = "Set a lap time to get one!";
         }
 
-        // Main stats
+        // Update stats
         document.getElementById("stat-points").textContent = `$${(
           driver.points || 0
         ).toLocaleString()}`;
-
         document.getElementById("stat-wins").textContent = driver.wins || 0;
         document.getElementById("stat-podiums").textContent =
           driver.podiums || 0;
-
         document.getElementById("stat-km").textContent = `${km.toFixed(1)} km`;
-
         document.getElementById("stat-poles").textContent = driver.poles || 0;
         document.getElementById("stat-flaps").textContent = driver.flaps || 0;
-
         document.getElementById("stat-sessions").textContent = sessions;
         document.getElementById("stat-laps").textContent =
           totalLaps.toLocaleString();
-
         document.getElementById("stat-crashes").textContent = crashes;
         document.getElementById("stat-cr100").textContent = crPer100.toFixed(2);
-
         document.getElementById("stat-infr").textContent = infr;
         document.getElementById("stat-infr100").textContent =
           infrPer100.toFixed(2);
       }
 
-      /* ===================== LEADERBOARD ===================== */
-
+      /* ==================== Leaderboard Page ==================== */
       function renderTrackButtons() {
         const container = document.getElementById("track-buttons");
         const tracks = Object.keys(leaderboardData).sort();
+
         if (tracks.length === 0) {
           container.innerHTML =
-            '<p class="text-slate-500">No tracks available</p>';
+            '<p class="text-slate-500 text-sm">No tracks available</p>';
           return;
         }
+
         container.innerHTML = tracks
           .map(
             (track) => `
-                <button onclick="selectTrack('${track}')" class="track-btn btn-ghost px-4 py-2.5 rounded-xl font-semibold text-sm transition-all ${
+          <button
+            onclick="selectTrack('${track}')"
+            class="track-btn btn-ghost px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl font-semibold text-xs sm:text-sm transition-all ${
               currentTrack === track
                 ? "active !bg-amber-500/20 !border-amber-500 !text-amber-400"
                 : ""
-            }">${getTrackDisplayName(track)}</button>
-            `
+            }"
+          >${getTrackDisplayName(track)}</button>
+        `
           )
           .join("");
       }
@@ -1680,16 +1905,24 @@
 
         const carData = leaderboardData[currentTrack][CAR] || [];
         const sorted = [...carData].sort((a, b) => a.laptime - b.laptime);
+
         document.getElementById("entry-count").textContent = sorted.length;
 
-        const totalPages = Math.ceil(sorted.length / itemsPerPage);
-        const start = (currentPage - 1) * itemsPerPage;
-        const paginated = sorted.slice(start, start + itemsPerPage);
+        const totalPages = Math.ceil(sorted.length / ITEMS_PER_PAGE);
+        const start = (currentPage - 1) * ITEMS_PER_PAGE;
+        const paginated = sorted.slice(start, start + ITEMS_PER_PAGE);
         const fastestLap = sorted.length > 0 ? sorted[0].laptime : 0;
 
         const tbody = document.getElementById("leaderboard-body");
+
         if (sorted.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="4" class="py-12 text-center text-slate-500">No lap times recorded for ${CAR} on this track</td></tr>`;
+          tbody.innerHTML = `
+          <tr>
+            <td colspan="4" class="py-12 text-center text-slate-500 text-sm">
+              No lap times recorded for ${CAR} on this track
+            </td>
+          </tr>
+        `;
           document.getElementById("pagination").innerHTML = "";
           return;
         }
@@ -1700,6 +1933,7 @@
             let rowClass = "",
               posClass = "bg-slate-700/50 text-slate-300",
               medal = "";
+
             if (pos === 1) {
               rowClass = "top1";
               posClass = "bg-yellow-500 text-slate-900 font-bold";
@@ -1717,46 +1951,66 @@
               posClass = "bg-blue-600 text-white";
             }
 
-            return `<tr class="border-b border-white/5 ${rowClass} cursor-pointer hover:bg-white/5"
-                      onclick="openDriverFromLeaderboard('${
-                        entry.guid || ""
-                      }')">
-                    <td class="py-4 px-6"><span class="px-3 py-1.5 rounded-lg text-sm ${posClass}">${pos}</span></td>
-                    <td class="py-4 px-6 font-semibold">${escapeHtml(
-                      entry.name?.slice(0, 30) || "Unknown"
-                    )}${medal}</td>
-                    <td class="py-4 px-6 font-mono text-amber-400 font-bold text-lg">${formatLaptime(
-                      entry.laptime
-                    )}</td>
-                    <td class="py-4 px-6 font-mono text-slate-500">${calculateGap(
-                      fastestLap,
-                      entry.laptime
-                    )}</td>
-                </tr>`;
+            return `
+            <tr class="border-b border-white/5 ${rowClass} cursor-pointer hover:bg-white/5" onclick="openDriverFromLeaderboard('${
+              entry.guid || ""
+            }')">
+              <td class="py-3 sm:py-4 px-3 sm:px-6">
+                <span class="px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-xs sm:text-sm ${posClass}">${pos}</span>
+              </td>
+              <td class="py-3 sm:py-4 px-3 sm:px-6 font-semibold text-sm">${escapeHtml(
+                entry.name?.slice(0, 25) || "Unknown"
+              )}${medal}</td>
+              <td class="py-3 sm:py-4 px-3 sm:px-6 font-mono text-amber-400 font-bold text-sm sm:text-lg">${formatLaptime(
+                entry.laptime
+              )}</td>
+              <td class="py-3 sm:py-4 px-3 sm:px-6 font-mono text-slate-500 text-sm">${calculateGap(
+                fastestLap,
+                entry.laptime
+              )}</td>
+            </tr>
+          `;
           })
           .join("");
 
+        // Render pagination
         const pagination = document.getElementById("pagination");
         if (totalPages > 1) {
-          let html = `<button onclick="goToPage(${currentPage - 1})" ${
-            currentPage === 1 ? "disabled" : ""
-          } class="btn-ghost px-4 py-2 rounded-xl disabled:opacity-30 disabled:cursor-not-allowed">←</button>`;
+          let html = `
+          <button 
+            onclick="goToPage(${currentPage - 1})" 
+            ${currentPage === 1 ? "disabled" : ""} 
+            class="btn-ghost px-3 sm:px-4 py-2 rounded-xl disabled:opacity-30 disabled:cursor-not-allowed text-sm"
+          >←</button>
+        `;
+
           for (let i = 1; i <= totalPages; i++) {
             if (
               i === 1 ||
               i === totalPages ||
               (i >= currentPage - 1 && i <= currentPage + 1)
             ) {
-              html += `<button onclick="goToPage(${i})" class="${
-                currentPage === i ? "btn-gold" : "btn-ghost"
-              } px-4 py-2 rounded-xl">${i}</button>`;
+              html += `
+              <button 
+                onclick="goToPage(${i})" 
+                class="${
+                  currentPage === i ? "btn-gold" : "btn-ghost"
+                } px-3 sm:px-4 py-2 rounded-xl text-sm"
+              >${i}</button>
+            `;
             } else if (i === currentPage - 2 || i === currentPage + 2) {
               html += `<span class="px-2 text-slate-600">...</span>`;
             }
           }
-          html += `<button onclick="goToPage(${currentPage + 1})" ${
-            currentPage === totalPages ? "disabled" : ""
-          } class="btn-ghost px-4 py-2 rounded-xl disabled:opacity-30 disabled:cursor-not-allowed">→</button>`;
+
+          html += `
+          <button 
+            onclick="goToPage(${currentPage + 1})" 
+            ${currentPage === totalPages ? "disabled" : ""} 
+            class="btn-ghost px-3 sm:px-4 py-2 rounded-xl disabled:opacity-30 disabled:cursor-not-allowed text-sm"
+          >→</button>
+        `;
+
           pagination.innerHTML = html;
         } else {
           pagination.innerHTML = "";
@@ -1765,7 +2019,7 @@
 
       function goToPage(page) {
         const carData = leaderboardData[currentTrack]?.[CAR] || [];
-        const totalPages = Math.ceil(carData.length / itemsPerPage);
+        const totalPages = Math.ceil(carData.length / ITEMS_PER_PAGE);
         if (page >= 1 && page <= totalPages) {
           currentPage = page;
           renderLeaderboard();
@@ -1776,46 +2030,41 @@
         if (!guid) return;
         const driver = rankData.find((d) => d.guid === guid);
         if (!driver) return;
+
         showPage("stats");
         const searchInput = document.getElementById("driver-search");
-        if (searchInput) {
-          searchInput.value = driver.name;
-        }
+        if (searchInput) searchInput.value = driver.name;
         displayDriverStats(driver);
       }
 
-      /* ===================== SHOP ===================== */
-
+      /* ==================== Shop Page ==================== */
       function renderShopTrackButtons() {
         const container = document.getElementById("shop-track-buttons");
         if (!container) return;
 
-        // Unieke track IDs uit de setups
         const tracks = Array.from(new Set(setups.map((s) => s.track))).sort();
 
-        // Start met "All Tracks"
         let html = `
-         <button
-           onclick="filterShop('all')"
-            class="shop-btn btn-gold px-5 py-2.5 rounded-xl font-semibold text-sm"
-            data-track="all"
-         >
-           All Tracks
-         </button>
-       `;
+        <button 
+          onclick="filterShop('all')" 
+          class="shop-btn ${
+            currentShopFilter === "all" ? "btn-gold" : "btn-ghost"
+          } px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl font-semibold text-xs sm:text-sm" 
+          data-track="all"
+        >All Tracks</button>
+      `;
 
-        // Voor elke track een knop
         html += tracks
           .map(
             (track) => `
-        <button
-          onclick="filterShop('${track}')"
-          class="shop-btn btn-ghost px-5 py-2.5 rounded-xl font-semibold text-sm"
-          data-track="${track}"
-        >
-          ${getTrackDisplayName(track)}
-        </button>
-      `
+          <button 
+            onclick="filterShop('${track}')" 
+            class="shop-btn ${
+              currentShopFilter === track ? "btn-gold" : "btn-ghost"
+            } px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl font-semibold text-xs sm:text-sm" 
+            data-track="${track}"
+          >${getTrackDisplayName(track)}</button>
+        `
           )
           .join("");
 
@@ -1824,17 +2073,7 @@
 
       function filterShop(track) {
         currentShopFilter = track;
-        document.querySelectorAll(".shop-btn").forEach((btn) => {
-          btn.classList.remove("btn-gold");
-          btn.classList.add("btn-ghost");
-        });
-        const activeBtn = document.querySelector(
-          `.shop-btn[data-track="${track}"]`
-        );
-        if (activeBtn) {
-          activeBtn.classList.remove("btn-ghost");
-          activeBtn.classList.add("btn-gold");
-        }
+        renderShopTrackButtons();
         renderShop();
       }
 
@@ -1843,64 +2082,70 @@
           currentShopFilter === "all"
             ? setups
             : setups.filter((item) => item.track === currentShopFilter);
+
         const grid = document.getElementById("shop-grid");
-        grid.innerHTML = filtered
-          .map(
-            (setup) => `
-        <div class="glass-card rounded-2xl p-6 group">
-            <div class="flex items-start justify-between mb-4">
-                <span class="text-xs bg-blue-500/20 text-blue-300 px-3 py-1.5 rounded-lg font-medium">
-                    ${getTrackDisplayName(setup.track)}
-                </span>
-
-                <div class="flex items-center gap-1.5 text-amber-400 text-sm">
-                    <span>★</span>
-                    <span>${setup.rating}</span>
-                </div>
-            </div>
-
-            ${
-              setup.image
-                ? `<div class="w-full flex justify-center mb-4">
-                      <img src="${setup.image}"
-                           alt="Car"
-                           class="h-14 md:h-16 object-contain opacity-90 drop-shadow-[0_0_8px_rgba(0,0,0,0.4)]
-                                  transition-transform duration-300 group-hover:scale-105" />
-                   </div>`
-                : ""
-            }
-
-            <h3 class="font-racing text-lg font-bold text-white mb-2 group-hover:text-amber-400 transition-colors">
-              ${escapeHtml(setup.name)}
-            </h3>
-
-            <p class="text-slate-500 text-sm mb-3">by ${escapeHtml(
-              setup.author
-            )}</p>
-            <p class="text-slate-400 text-sm mb-6 leading-relaxed">${escapeHtml(
-              setup.description
-            )}</p>
-
-            <div class="flex items-center justify-between pt-4 border-t border-white/5">
-                <span class="font-racing text-2xl font-bold text-emerald-400">$${
-                  setup.price
-                }</span>
-                <button onclick="buySetup(${setup.id})"
-                        class="btn-gold px-5 py-2.5 rounded-xl text-sm">Buy Setup</button>
-            </div>
-        </div>
-    `
-          )
-          .join("");
 
         if (filtered.length === 0) {
           grid.innerHTML = `
-                    <div class="col-span-full text-center py-16">
-                        <div class="text-5xl mb-4">🔧</div>
-                        <p class="text-slate-400">No setups available for this track yet</p>
-                    </div>
-                `;
+          <div class="col-span-full text-center py-12 sm:py-16">
+            <div class="text-4xl sm:text-5xl mb-4">🔧</div>
+            <p class="text-slate-400 text-sm sm:text-base">No setups available for this track yet</p>
+          </div>
+        `;
+          return;
         }
+
+        grid.innerHTML = filtered
+          .map(
+            (setup) => `
+          <div class="glass-card rounded-2xl p-4 sm:p-6 group">
+            <div class="flex items-start justify-between mb-3 sm:mb-4">
+              <span class="text-[10px] sm:text-xs bg-blue-500/20 text-blue-300 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg font-medium">
+                ${getTrackDisplayName(setup.track)}
+              </span>
+              <div class="flex items-center gap-1 sm:gap-1.5 text-amber-400 text-xs sm:text-sm">
+                <span>★</span>
+                <span>${setup.rating}</span>
+              </div>
+            </div>
+            
+            ${
+              setup.image
+                ? `
+              <div class="w-full flex justify-center mb-3 sm:mb-4">
+                <img 
+                  src="${setup.image}" 
+                  alt="Car" 
+                  class="h-12 sm:h-14 lg:h-16 object-contain opacity-90 drop-shadow-[0_0_8px_rgba(0,0,0,0.4)] transition-transform duration-300 group-hover:scale-105" 
+                />
+              </div>
+            `
+                : ""
+            }
+            
+            <h3 class="font-racing text-base sm:text-lg font-bold text-white mb-1 sm:mb-2 group-hover:text-amber-400 transition-colors">
+              ${escapeHtml(setup.name)}
+            </h3>
+            <p class="text-slate-500 text-xs sm:text-sm mb-2 sm:mb-3">by ${escapeHtml(
+              setup.author
+            )}</p>
+            <p class="text-slate-400 text-xs sm:text-sm mb-4 sm:mb-6 leading-relaxed">${escapeHtml(
+              setup.description
+            )}</p>
+            
+            <div class="flex items-center justify-between pt-3 sm:pt-4 border-t border-white/5">
+              <span class="font-racing text-xl sm:text-2xl font-bold text-emerald-400">$${
+                setup.price
+              }</span>
+              <button 
+                onclick="buySetup(${setup.id})" 
+                class="btn-gold px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm"
+              >Buy Setup</button>
+            </div>
+          </div>
+        `
+          )
+          .join("");
       }
 
       function buySetup(id) {
@@ -1908,51 +2153,45 @@
         if (!setup) return;
 
         if (setup.paypalUrl) {
-          // Mock / echte PayPal checkout
           window.open(setup.paypalUrl, "_blank");
         } else if (setup.file) {
-          // fallback: directe download (alleen handig voor testen)
           window.open(setup.file, "_blank");
         } else {
           alert("No payment link configured yet.");
         }
       }
 
-      function showComingSoon() {
-        alert("Setups are coming soon! The shop is currently locked.");
-      }
-
-      /* ===================== INIT ===================== */
-
+      /* ==================== Initialization ==================== */
       document.addEventListener("DOMContentLoaded", async () => {
         await loadAllData();
-        renderShop();
 
-        // Als shop al eerder unlocked is in deze browser: knop meteen normaal tonen
+        // Update shop button if already unlocked
         if (shopUnlocked) {
-          const btn = document.getElementById("nav-shop");
-          if (btn) {
-            btn.classList.remove("btn-locked");
-            btn.classList.add("btn-ghost");
-          }
+          updateShopButtonState();
         }
 
-        // ESC sluit de modal
+        // Keyboard shortcuts
         document.addEventListener("keydown", (e) => {
           if (e.key === "Escape") {
             closeShopModal();
+            closeMobileMenu();
           }
         });
 
-        // Klik op achtergrond sluit de modal
+        // Close modal on backdrop click
         const modal = document.getElementById("shop-password-modal");
         if (modal) {
           modal.addEventListener("click", (e) => {
-            if (e.target === modal) {
-              closeShopModal();
-            }
+            if (e.target === modal) closeShopModal();
           });
         }
+
+        // Handle resize to close mobile menu on larger screens
+        window.addEventListener("resize", () => {
+          if (window.innerWidth >= 640) {
+            closeMobileMenu();
+          }
+        });
       });
     </script>
   </body>
