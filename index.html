@@ -503,6 +503,12 @@
         transform: rotate(-45deg) translate(5px, -5px);
       }
 
+      .stat-value {
+        font-size: clamp(1.6rem, 2.2vw, 3rem) !important;
+        line-height: 1.1;
+        white-space: nowrap; /* alles op 1 regel houden, ook "km" */
+      }
+
       /* ==================== Responsive Breakpoints ==================== */
 
       /* Mobile: up to 639px */
@@ -555,9 +561,9 @@
           padding: 16px;
         }
 
-        .stat-card p:first-of-type {
+        /* .stat-card p:first-of-type {
           font-size: 1.75rem !important;
-        }
+        } */
 
         .glass-card {
           padding: 16px;
@@ -593,9 +599,9 @@
 
       /* Tablet: 640px to 1023px */
       @media (min-width: 640px) and (max-width: 1023px) {
-        .stat-card p:first-of-type {
+        /* .stat-card p:first-of-type {
           font-size: 2rem !important;
-        }
+        } */
 
         .nav-btn {
           padding: 10px 16px;
@@ -609,9 +615,9 @@
           padding: 24px;
         }
 
-        .stat-card p:first-of-type {
+        /* .stat-card p:first-of-type {
           font-size: 2.5rem !important;
-        }
+        } */
 
         .glass-card {
           padding: 24px;
@@ -620,9 +626,9 @@
 
       /* Extra large screens: 1280px and up */
       @media (min-width: 1280px) {
-        .stat-card p:first-of-type {
+        /* .stat-card p:first-of-type {
           font-size: 3rem !important;
-        }
+        } */
       }
 
       /* Touch device optimizations */
@@ -965,7 +971,7 @@
             </div>
             <p
               id="stat-points"
-              class="font-racing text-2xl sm:text-3xl lg:text-4xl font-bold text-emerald-400"
+              class="stat-value font-racing font-bold text-emerald-400"
             >
               $0
             </p>
@@ -982,7 +988,7 @@
             </div>
             <p
               id="stat-wins"
-              class="font-racing text-2xl sm:text-3xl lg:text-4xl font-bold text-amber-400"
+              class="stat-value font-racing font-bold text-amber-400"
             >
               0
             </p>
@@ -996,7 +1002,7 @@
             </div>
             <p
               id="stat-podiums"
-              class="font-racing text-2xl sm:text-3xl lg:text-4xl font-bold text-white"
+              class="stat-value font-racing font-bold text-white"
             >
               0
             </p>
@@ -1010,7 +1016,7 @@
             </div>
             <p
               id="stat-km"
-              class="font-racing text-2xl sm:text-3xl lg:text-4xl font-bold text-blue-400"
+              class="stat-value font-racing font-bold text-blue-400"
             >
               0 km
             </p>
