@@ -1829,16 +1829,21 @@
           "driver-guid"
         ).textContent = `GUID: ${driver.guid}`;
 
-        // Find favorite track
+        // Find favorite track - FIXED VERSION
         let favTrackId = null;
         let favTrackLaps = 0;
         if (driver.leaderboard && typeof driver.leaderboard === "object") {
-          for (const [trackId, trackObj] of Object.entries(
-            driver.leaderboard
-          )) {
+          const trackEntries = Object.entries(driver.leaderboard);
+
+          for (const [trackId, trackObj] of trackEntries) {
+            if (!trackObj || typeof trackObj !== "object") continue;
+
             const carStats = trackObj[CAR];
-            const laps =
-              carStats && typeof carStats.laps === "number" ? carStats.laps : 0;
+            if (!carStats || typeof carStats !== "object") continue;
+
+            const laps = typeof carStats.laps === "number" ? carStats.laps : 0;
+
+            // Use > to find the track with the MOST laps
             if (laps > favTrackLaps) {
               favTrackLaps = laps;
               favTrackId = trackId;
