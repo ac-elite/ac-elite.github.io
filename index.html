@@ -4,37 +4,116 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AC Elite - Simracing Community</title>
+    <meta
+      name="description"
+      content="AC Elite - Premium Tatuus FA01 Racing League. Track your stats, compete on leaderboards, and join the community."
+    />
+    <link rel="icon" type="image/png" href="logo.png" />
+
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link
-      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap"
       rel="stylesheet"
     />
+
     <style>
+      :root {
+        --gold-primary: #d4af37;
+        --gold-light: #f4e076;
+        --gold-dark: #b8960c;
+        --blue-dark: #0a1628;
+        --blue-medium: #0f2341;
+        --blue-light: #1a3a5c;
+      }
+
+      * {
+        scrollbar-width: thin;
+        scrollbar-color: var(--gold-primary) var(--blue-dark);
+      }
+
+      *::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      *::-webkit-scrollbar-track {
+        background: var(--blue-dark);
+      }
+
+      *::-webkit-scrollbar-thumb {
+        background: var(--gold-primary);
+        border-radius: 4px;
+      }
+
       .font-racing {
         font-family: "Orbitron", sans-serif;
       }
       .font-body {
         font-family: "Inter", sans-serif;
       }
+
+      /* Gradients */
       .gold-gradient {
         background: linear-gradient(
           135deg,
-          #d4af37 0%,
+          #b8960c 0%,
+          #d4af37 25%,
           #f4e076 50%,
-          #d4af37 100%
+          #d4af37 75%,
+          #b8960c 100%
         );
       }
+
       .blue-gradient {
         background: linear-gradient(
-          135deg,
-          #0c1929 0%,
-          #1e3a5f 50%,
-          #0c1929 100%
+          180deg,
+          #0a1628 0%,
+          #0f2341 50%,
+          #0a1628 100%
         );
       }
-      .glow {
-        box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+
+      .glass {
+        background: rgba(15, 35, 65, 0.6);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(212, 175, 55, 0.1);
       }
+
+      .glass-card {
+        background: linear-gradient(
+          135deg,
+          rgba(15, 35, 65, 0.8) 0%,
+          rgba(10, 22, 40, 0.9) 100%
+        );
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(212, 175, 55, 0.15);
+        transition: all 0.3s ease;
+      }
+
+      .glass-card:hover {
+        border-color: rgba(212, 175, 55, 0.4);
+        transform: translateY(-2px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3),
+          0 0 30px rgba(212, 175, 55, 0.1);
+      }
+
+      /* Glows */
+      .glow-gold {
+        box-shadow: 0 0 20px rgba(212, 175, 55, 0.3),
+          0 0 40px rgba(212, 175, 55, 0.1);
+      }
+
+      .glow-gold-strong {
+        box-shadow: 0 0 30px rgba(212, 175, 55, 0.5),
+          0 0 60px rgba(212, 175, 55, 0.2);
+      }
+
+      .text-glow {
+        text-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+      }
+
+      /* Leaderboard positions */
       .top1 {
         background: linear-gradient(
           90deg,
@@ -46,7 +125,7 @@
       .top2 {
         background: linear-gradient(
           90deg,
-          rgba(192, 192, 192, 0.15) 0%,
+          rgba(192, 192, 192, 0.12) 0%,
           transparent 100%
         );
         border-left: 4px solid #c0c0c0;
@@ -54,7 +133,7 @@
       .top3 {
         background: linear-gradient(
           90deg,
-          rgba(205, 127, 50, 0.15) 0%,
+          rgba(205, 127, 50, 0.12) 0%,
           transparent 100%
         );
         border-left: 4px solid #cd7f32;
@@ -62,70 +141,84 @@
       .top10 {
         background: linear-gradient(
           90deg,
-          rgba(59, 130, 246, 0.1) 0%,
+          rgba(59, 130, 246, 0.08) 0%,
           transparent 100%
         );
         border-left: 4px solid #3b82f6;
       }
+
+      /* Licences */
       .licence-platinum {
         background: linear-gradient(
           135deg,
           #e5e4e2 0%,
-          #a0a0a0 50%,
+          #a8a8a8 50%,
           #e5e4e2 100%
         );
+        box-shadow: 0 0 15px rgba(229, 228, 226, 0.3);
       }
       .licence-gold {
         background: linear-gradient(
           135deg,
-          #d4af37 0%,
+          #b8960c 0%,
+          #d4af37 25%,
           #f4e076 50%,
-          #d4af37 100%
+          #d4af37 75%,
+          #b8960c 100%
         );
+        box-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
       }
       .licence-silver {
         background: linear-gradient(
           135deg,
-          #c0c0c0 0%,
-          #e8e8e8 50%,
+          #a0a0a0 0%,
+          #c0c0c0 50%,
+          #e0e0e0 75%,
           #c0c0c0 100%
         );
+        box-shadow: 0 0 15px rgba(192, 192, 192, 0.3);
       }
       .licence-bronze {
         background: linear-gradient(
           135deg,
-          #cd7f32 0%,
-          #e6a86c 50%,
+          #8b5a2b 0%,
+          #cd7f32 50%,
+          #daa06d 75%,
           #cd7f32 100%
         );
+        box-shadow: 0 0 15px rgba(205, 127, 50, 0.3);
       }
 
+      /* Autocomplete */
       .autocomplete-container {
         position: relative;
       }
       .autocomplete-results {
         position: absolute;
-        top: 100%;
+        top: calc(100% + 4px);
         left: 0;
         right: 0;
-        background: #1e293b;
-        border: 1px solid #334155;
-        border-radius: 0.5rem;
-        max-height: 300px;
+        background: rgba(15, 35, 65, 0.95);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(212, 175, 55, 0.2);
+        border-radius: 12px;
+        max-height: 320px;
         overflow-y: auto;
         z-index: 50;
         display: none;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
       }
       .autocomplete-results.show {
         display: block;
       }
       .autocomplete-item {
-        padding: 0.75rem 1rem;
+        padding: 14px 18px;
         cursor: pointer;
-        border-bottom: 1px solid #334155;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        transition: all 0.2s ease;
       }
       .autocomplete-item:hover {
-        background: #334155;
+        background: rgba(212, 175, 55, 0.1);
       }
       .autocomplete-item:last-child {
         border-bottom: none;
@@ -133,55 +226,244 @@
       .autocomplete-name {
         font-weight: 600;
         color: #fff;
+        margin-bottom: 2px;
       }
       .autocomplete-guid {
         font-size: 0.75rem;
         color: #64748b;
         font-family: monospace;
       }
+
+      /* Buttons */
+      .btn-gold {
+        background: linear-gradient(
+          135deg,
+          #b8960c 0%,
+          #d4af37 50%,
+          #f4e076 100%
+        );
+        color: #0a1628;
+        font-weight: 700;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+      }
+
+      .btn-gold:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(212, 175, 55, 0.5);
+      }
+
+      .btn-ghost {
+        background: transparent;
+        border: 1px solid rgba(212, 175, 55, 0.3);
+        color: #d4af37;
+        transition: all 0.3s ease;
+      }
+
+      .btn-ghost:hover {
+        background: rgba(212, 175, 55, 0.1);
+        border-color: rgba(212, 175, 55, 0.6);
+      }
+
+      .btn-ghost.active {
+        background: rgba(212, 175, 55, 0.15);
+        border-color: #d4af37;
+      }
+
+      /* Stat cards */
+      .stat-card {
+        background: linear-gradient(
+          135deg,
+          rgba(15, 35, 65, 0.6) 0%,
+          rgba(10, 22, 40, 0.8) 100%
+        );
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 16px;
+        padding: 24px;
+        transition: all 0.3s ease;
+      }
+
+      .stat-card:hover {
+        border-color: rgba(212, 175, 55, 0.3);
+        transform: translateY(-4px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+      }
+
+      /* Input fields */
+      .input-modern {
+        background: rgba(15, 35, 65, 0.6);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        padding: 16px 20px;
+        color: #fff;
+        transition: all 0.3s ease;
+        font-size: 16px;
+      }
+
+      .input-modern:focus {
+        outline: none;
+        border-color: #d4af37;
+        box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+      }
+
+      .input-modern::placeholder {
+        color: rgba(255, 255, 255, 0.4);
+      }
+
+      /* Animations */
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-10px);
+        }
+      }
+
+      @keyframes pulse-glow {
+        0%,
+        100% {
+          box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+        }
+        50% {
+          box-shadow: 0 0 40px rgba(212, 175, 55, 0.6);
+        }
+      }
+
+      @keyframes shimmer {
+        0% {
+          background-position: -200% center;
+        }
+        100% {
+          background-position: 200% center;
+        }
+      }
+
+      .animate-float {
+        animation: float 6s ease-in-out infinite;
+      }
+
+      .animate-pulse-glow {
+        animation: pulse-glow 2s ease-in-out infinite;
+      }
+
+      /* Hero pattern */
+      .hero-pattern {
+        background-image: radial-gradient(
+            circle at 20% 50%,
+            rgba(212, 175, 55, 0.03) 0%,
+            transparent 50%
+          ),
+          radial-gradient(
+            circle at 80% 50%,
+            rgba(59, 130, 246, 0.03) 0%,
+            transparent 50%
+          ),
+          radial-gradient(
+            circle at 50% 100%,
+            rgba(212, 175, 55, 0.05) 0%,
+            transparent 50%
+          );
+      }
+
+      /* Table styling */
+      .table-modern {
+        border-collapse: separate;
+        border-spacing: 0;
+      }
+
+      .table-modern th {
+        background: rgba(15, 35, 65, 0.8);
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.05em;
+      }
+
+      .table-modern tbody tr {
+        transition: all 0.2s ease;
+      }
+
+      .table-modern tbody tr:hover {
+        background: rgba(212, 175, 55, 0.05);
+      }
+
+      /* Logo styling */
+      .logo-container {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+        border: 2px solid rgba(212, 175, 55, 0.3);
+      }
+
+      .logo-container img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      /* Page transitions */
+      .page {
+        opacity: 1;
+        transition: opacity 0.3s ease;
+      }
+
+      .page.hidden {
+        display: none;
+      }
     </style>
   </head>
-  <body class="font-body bg-slate-950 text-white min-h-screen">
+  <body class="font-body bg-[#0a1628] text-white min-h-screen">
     <!-- Navigation -->
-    <nav class="blue-gradient border-b border-amber-500/30 sticky top-0 z-50">
-      <div class="max-w-7xl mx-auto px-4 py-4">
+    <nav class="glass border-b border-amber-500/20 sticky top-0 z-50">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4">
         <div class="flex items-center justify-between">
-          <div class="flex items-center gap-3">
-            <div
-              class="w-12 h-12 gold-gradient rounded-lg flex items-center justify-center glow"
-            >
-              <span class="font-racing font-black text-slate-900 text-xl"
-                >AC</span
-              >
+          <!-- Logo & Brand -->
+          <div class="flex items-center gap-4">
+            <div class="logo-container animate-pulse-glow">
+              <img
+                src="logo.png"
+                alt="AC Elite Logo"
+                onerror="this.parentElement.innerHTML='<div class=\'w-full h-full gold-gradient flex items-center justify-center\'><span class=\'font-racing font-black text-[#0a1628] text-lg\'>AC</span></div>'"
+              />
             </div>
             <div>
-              <h1 class="font-racing text-2xl font-bold text-amber-400">
+              <h1
+                class="font-racing text-xl sm:text-2xl font-bold text-amber-400 text-glow"
+              >
                 AC ELITE
               </h1>
-              <p class="text-xs text-slate-400">Tatuus FA01 Racing League</p>
+              <p class="text-xs text-slate-400 hidden sm:block">
+                Tatuus FA01 Racing League
+              </p>
             </div>
           </div>
-          <div class="flex gap-2 flex-wrap">
+
+          <!-- Navigation Buttons -->
+          <div class="flex gap-2 sm:gap-3">
             <button
               onclick="showPage('stats')"
               id="nav-stats"
-              class="nav-btn px-4 py-2 rounded-lg font-semibold transition-all hover:bg-amber-500/20 text-amber-400 border border-amber-500/50"
+              class="nav-btn btn-ghost active px-3 sm:px-5 py-2.5 rounded-xl font-semibold text-sm sm:text-base"
             >
-              📊 Stats
+              <span class="hidden sm:inline">📊 </span>Stats
             </button>
             <button
               onclick="showPage('leaderboard')"
               id="nav-leaderboard"
-              class="nav-btn px-4 py-2 rounded-lg font-semibold transition-all hover:bg-amber-500/20 text-slate-400 border border-slate-700"
+              class="nav-btn btn-ghost px-3 sm:px-5 py-2.5 rounded-xl font-semibold text-sm sm:text-base"
             >
-              🏆 Leaderboard
+              <span class="hidden sm:inline">🏆 </span>Leaderboard
             </button>
             <button
               onclick="showPage('shop')"
               id="nav-shop"
-              class="nav-btn px-4 py-2 rounded-lg font-semibold transition-all hover:bg-amber-500/20 text-slate-400 border border-slate-700"
+              class="nav-btn btn-ghost px-3 sm:px-5 py-2.5 rounded-xl font-semibold text-sm sm:text-base"
             >
-              🛒 Setup Shop
+              <span class="hidden sm:inline">🛒 </span>Shop
             </button>
           </div>
         </div>
@@ -191,111 +473,165 @@
     <!-- Loading Overlay -->
     <div
       id="loading-overlay"
-      class="fixed inset-0 bg-slate-950/90 z-[100] flex items-center justify-center"
+      class="fixed inset-0 bg-[#0a1628]/95 z-[100] flex items-center justify-center"
     >
       <div class="text-center">
-        <div
-          class="w-16 h-16 border-4 border-amber-500/30 border-t-amber-500 rounded-full animate-spin mb-4 mx-auto"
-        ></div>
-        <p class="font-racing text-amber-400 text-xl">Loading Data...</p>
-        <p class="text-slate-500 text-sm mt-2" id="loading-status">
-          Fetching from GitHub...
+        <div class="relative w-20 h-20 mx-auto mb-6">
+          <div
+            class="absolute inset-0 border-4 border-amber-500/20 rounded-full"
+          ></div>
+          <div
+            class="absolute inset-0 border-4 border-transparent border-t-amber-500 rounded-full animate-spin"
+          ></div>
+          <div
+            class="absolute inset-2 border-4 border-transparent border-t-amber-400 rounded-full animate-spin"
+            style="animation-direction: reverse; animation-duration: 1.5s"
+          ></div>
+        </div>
+        <p class="font-racing text-amber-400 text-xl text-glow mb-2">
+          Loading Data
+        </p>
+        <p class="text-slate-500 text-sm" id="loading-status">
+          Connecting to server...
         </p>
       </div>
     </div>
 
     <!-- Hero Banner -->
-    <div class="blue-gradient py-8 border-b border-amber-500/20">
-      <div class="max-w-7xl mx-auto px-4 text-center">
-        <p class="text-slate-400 mb-2">
+    <div class="hero-pattern py-10 border-b border-amber-500/10">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 text-center">
+        <p class="text-slate-400 mb-4 text-sm sm:text-base">
           Weekly Track Rotation • Vote on Discord • Compete for Glory
         </p>
         <div
           id="data-status"
-          class="inline-flex items-center gap-2 bg-slate-800/50 px-4 py-2 rounded-full border border-slate-700"
+          class="inline-flex items-center gap-3 glass px-5 py-2.5 rounded-full"
         >
-          <span class="w-2 h-2 bg-yellow-500 rounded-full animate-pulse"></span>
-          <span class="text-sm text-yellow-300">Loading...</span>
+          <span class="relative flex h-2.5 w-2.5">
+            <span
+              class="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"
+            ></span>
+            <span
+              class="relative inline-flex rounded-full h-2.5 w-2.5 bg-yellow-500"
+            ></span>
+          </span>
+          <span class="text-sm text-yellow-300">Connecting...</span>
         </div>
       </div>
     </div>
 
     <!-- Stats Page -->
-    <div id="page-stats" class="page max-w-7xl mx-auto px-4 py-8">
-      <div class="mb-8">
-        <h2 class="font-racing text-3xl font-bold text-amber-400 mb-4">
+    <div id="page-stats" class="page max-w-7xl mx-auto px-4 sm:px-6 py-10">
+      <!-- Header -->
+      <div class="mb-10">
+        <h2
+          class="font-racing text-3xl sm:text-4xl font-bold text-amber-400 text-glow mb-2"
+        >
           Driver Statistics
         </h2>
-        <div class="flex gap-4 items-end flex-wrap">
-          <div class="flex-1 min-w-[250px] autocomplete-container">
-            <label class="block text-slate-400 text-sm mb-2"
-              >Search Driver (Steam Name or GUID)</label
+        <p class="text-slate-400">
+          Search for any driver to view their complete racing profile
+        </p>
+      </div>
+
+      <!-- Search Box -->
+      <div class="glass-card rounded-2xl p-6 sm:p-8 mb-8">
+        <div class="flex flex-col sm:flex-row gap-4 items-stretch sm:items-end">
+          <div class="flex-1 autocomplete-container">
+            <label class="block text-slate-300 text-sm font-medium mb-3"
+              >Search Driver</label
             >
             <input
               type="text"
               id="driver-search"
-              placeholder="Start typing driver name..."
-              class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 text-white focus:border-amber-500 focus:outline-none"
+              placeholder="Enter driver name or Steam64 ID..."
+              class="input-modern w-full"
               autocomplete="off"
             />
             <div id="autocomplete-results" class="autocomplete-results"></div>
           </div>
           <button
             onclick="searchDriver()"
-            class="gold-gradient text-slate-900 font-bold px-6 py-3 rounded-lg hover:opacity-90 transition-opacity glow"
+            class="btn-gold px-8 py-4 rounded-xl text-base flex items-center justify-center gap-2"
           >
-            🔍 Search
+            <svg
+              class="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              ></path>
+            </svg>
+            Search
           </button>
-        </div>
-
-        <div
-          id="quick-stats"
-          class="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4"
-        >
-          <div
-            class="bg-slate-900/50 border border-slate-800 rounded-lg p-4 text-center"
-          >
-            <p class="text-3xl font-racing text-amber-400" id="total-drivers">
-              -
-            </p>
-            <p class="text-slate-500 text-sm">Total Drivers</p>
-          </div>
-          <div
-            class="bg-slate-900/50 border border-slate-800 rounded-lg p-4 text-center"
-          >
-            <p class="text-3xl font-racing text-blue-400" id="total-tracks">
-              -
-            </p>
-            <p class="text-slate-500 text-sm">Active Tracks</p>
-          </div>
-          <div
-            class="bg-slate-900/50 border border-slate-800 rounded-lg p-4 text-center"
-          >
-            <p class="text-3xl font-racing text-green-400" id="total-laps">-</p>
-            <p class="text-slate-500 text-sm">Total Lap Times</p>
-          </div>
-          <div
-            class="bg-slate-900/50 border border-slate-800 rounded-lg p-4 text-center"
-          >
-            <p class="text-3xl font-racing text-purple-400" id="total-km">-</p>
-            <p class="text-slate-500 text-sm">Total KM Driven</p>
-          </div>
         </div>
       </div>
 
+      <!-- Quick Stats -->
+      <div
+        id="quick-stats"
+        class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-10"
+      >
+        <div class="stat-card text-center">
+          <p
+            class="text-4xl sm:text-5xl font-racing text-amber-400 mb-2"
+            id="total-drivers"
+          >
+            -
+          </p>
+          <p class="text-slate-400 text-sm font-medium">Total Drivers</p>
+        </div>
+        <div class="stat-card text-center">
+          <p
+            class="text-4xl sm:text-5xl font-racing text-blue-400 mb-2"
+            id="total-tracks"
+          >
+            -
+          </p>
+          <p class="text-slate-400 text-sm font-medium">Active Tracks</p>
+        </div>
+        <div class="stat-card text-center">
+          <p
+            class="text-4xl sm:text-5xl font-racing text-emerald-400 mb-2"
+            id="total-laps"
+          >
+            -
+          </p>
+          <p class="text-slate-400 text-sm font-medium">Total Lap Times</p>
+        </div>
+        <div class="stat-card text-center">
+          <p
+            class="text-4xl sm:text-5xl font-racing text-purple-400 mb-2"
+            id="total-km"
+          >
+            -
+          </p>
+          <p class="text-slate-400 text-sm font-medium">Total KM Driven</p>
+        </div>
+      </div>
+
+      <!-- Driver Stats Display -->
       <div id="driver-stats" class="hidden">
-        <div class="bg-slate-900 border border-slate-800 rounded-xl p-6 mb-6">
-          <div class="flex items-center justify-between flex-wrap gap-4">
-            <div class="flex items-center gap-4">
+        <!-- Driver Header Card -->
+        <div class="glass-card rounded-2xl p-6 sm:p-8 mb-6">
+          <div
+            class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6"
+          >
+            <div class="flex items-center gap-5">
               <div
-                class="w-16 h-16 bg-slate-800 rounded-full flex items-center justify-center text-3xl"
+                class="w-20 h-20 rounded-2xl bg-gradient-to-br from-amber-500/20 to-blue-500/20 flex items-center justify-center text-4xl border border-amber-500/20"
               >
                 🏎️
               </div>
               <div>
                 <h3
                   id="driver-name"
-                  class="font-racing text-2xl font-bold text-white"
+                  class="font-racing text-2xl sm:text-3xl font-bold text-white mb-1"
                 >
                   Driver Name
                 </h3>
@@ -304,10 +640,10 @@
                 </p>
               </div>
             </div>
-            <div class="text-right">
+            <div class="flex flex-col items-start sm:items-end gap-2">
               <div
                 id="driver-licence"
-                class="licence-gold text-slate-900 font-bold px-4 py-2 rounded-lg inline-block mb-2"
+                class="licence-gold text-slate-900 font-bold px-5 py-2 rounded-xl text-sm"
               >
                 Gold Licence
               </div>
@@ -318,150 +654,163 @@
           </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <div
-            class="bg-slate-900 border border-slate-800 rounded-xl p-6 hover:border-amber-500/50 transition-all"
-          >
-            <div class="flex items-center justify-between mb-2">
-              <span class="text-slate-400 text-sm">Balance</span
-              ><span class="text-2xl">💰</span>
+        <!-- Main Stats Grid -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
+          <div class="stat-card">
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-slate-400 text-sm font-medium">Balance</span>
+              <span class="text-2xl">💰</span>
             </div>
             <p
               id="stat-points"
-              class="font-racing text-4xl font-bold text-green-400"
+              class="font-racing text-3xl sm:text-4xl font-bold text-emerald-400"
             >
               $0
             </p>
-            <p class="text-slate-500 text-sm mt-1">Total earnings</p>
+            <p class="text-slate-500 text-xs mt-2">Total earnings</p>
           </div>
-          <div
-            class="bg-slate-900 border border-slate-800 rounded-xl p-6 hover:border-amber-500/50 transition-all"
-          >
-            <div class="flex items-center justify-between mb-2">
-              <span class="text-slate-400 text-sm">Wins</span
-              ><span class="text-2xl">🥇</span>
+
+          <div class="stat-card">
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-slate-400 text-sm font-medium">Wins</span>
+              <span class="text-2xl">🥇</span>
             </div>
             <p
               id="stat-wins"
-              class="font-racing text-4xl font-bold text-amber-400"
+              class="font-racing text-3xl sm:text-4xl font-bold text-amber-400"
             >
               0
             </p>
-            <p id="stat-winrate" class="text-slate-500 text-sm mt-1">
+            <p id="stat-winrate" class="text-slate-500 text-xs mt-2">
               0% win rate
             </p>
           </div>
-          <div
-            class="bg-slate-900 border border-slate-800 rounded-xl p-6 hover:border-amber-500/50 transition-all"
-          >
-            <div class="flex items-center justify-between mb-2">
-              <span class="text-slate-400 text-sm">Podiums</span
-              ><span class="text-2xl">🏆</span>
+
+          <div class="stat-card">
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-slate-400 text-sm font-medium">Podiums</span>
+              <span class="text-2xl">🏆</span>
             </div>
             <p
               id="stat-podiums"
-              class="font-racing text-4xl font-bold text-white"
+              class="font-racing text-3xl sm:text-4xl font-bold text-white"
             >
               0
             </p>
-            <p id="stat-podiumrate" class="text-slate-500 text-sm mt-1">
+            <p id="stat-podiumrate" class="text-slate-500 text-xs mt-2">
               0% podium rate
             </p>
           </div>
-          <div
-            class="bg-slate-900 border border-slate-800 rounded-xl p-6 hover:border-amber-500/50 transition-all"
-          >
-            <div class="flex items-center justify-between mb-2">
-              <span class="text-slate-400 text-sm">Distance</span
-              ><span class="text-2xl">🛣️</span>
+
+          <div class="stat-card">
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-slate-400 text-sm font-medium">Distance</span>
+              <span class="text-2xl">🛣️</span>
             </div>
             <p
               id="stat-km"
-              class="font-racing text-4xl font-bold text-blue-400"
+              class="font-racing text-3xl sm:text-4xl font-bold text-blue-400"
             >
               0 km
             </p>
-            <p class="text-slate-500 text-sm mt-1">Total driven</p>
+            <p class="text-slate-500 text-xs mt-2">Total driven</p>
           </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div class="bg-slate-900 border border-slate-800 rounded-xl p-6">
-            <h3 class="font-racing text-xl font-bold text-amber-400 mb-4">
-              🏁 Performance Stats
+        <!-- Detailed Stats -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          <!-- Performance Stats -->
+          <div class="glass-card rounded-2xl p-6">
+            <h3
+              class="font-racing text-xl font-bold text-amber-400 mb-6 flex items-center gap-3"
+            >
+              <span class="text-2xl">🏁</span> Performance
             </h3>
             <div class="space-y-4">
               <div
-                class="flex justify-between items-center py-3 border-b border-slate-800"
+                class="flex justify-between items-center py-3 border-b border-white/5"
               >
                 <span class="text-slate-400">Pole Positions</span>
-                <span id="stat-poles" class="font-mono text-amber-400 font-bold"
+                <span
+                  id="stat-poles"
+                  class="font-mono text-amber-400 font-bold text-lg"
                   >0</span
                 >
               </div>
               <div
-                class="flex justify-between items-center py-3 border-b border-slate-800"
+                class="flex justify-between items-center py-3 border-b border-white/5"
               >
                 <span class="text-slate-400">Fastest Laps</span>
                 <span
                   id="stat-flaps"
-                  class="font-mono text-purple-400 font-bold"
+                  class="font-mono text-purple-400 font-bold text-lg"
                   >0</span
                 >
               </div>
               <div
-                class="flex justify-between items-center py-3 border-b border-slate-800"
+                class="flex justify-between items-center py-3 border-b border-white/5"
               >
                 <span class="text-slate-400">Races Completed</span>
-                <span id="stat-races" class="font-mono text-white font-bold"
+                <span
+                  id="stat-races"
+                  class="font-mono text-white font-bold text-lg"
                   >0</span
                 >
               </div>
               <div class="flex justify-between items-center py-3">
                 <span class="text-slate-400">Laps Completed</span>
-                <span id="stat-laps" class="font-mono text-white font-bold"
+                <span
+                  id="stat-laps"
+                  class="font-mono text-white font-bold text-lg"
                   >0</span
                 >
               </div>
             </div>
           </div>
 
-          <div class="bg-slate-900 border border-slate-800 rounded-xl p-6">
-            <h3 class="font-racing text-xl font-bold text-amber-400 mb-4">
-              ⚠️ Incidents & Safety
+          <!-- Safety Stats -->
+          <div class="glass-card rounded-2xl p-6">
+            <h3
+              class="font-racing text-xl font-bold text-amber-400 mb-6 flex items-center gap-3"
+            >
+              <span class="text-2xl">⚠️</span> Safety Rating
             </h3>
             <div class="space-y-4">
               <div
-                class="flex justify-between items-center py-3 border-b border-slate-800"
+                class="flex justify-between items-center py-3 border-b border-white/5"
               >
                 <span class="text-slate-400">Total Crashes</span>
-                <span id="stat-crashes" class="font-mono text-red-400 font-bold"
+                <span
+                  id="stat-crashes"
+                  class="font-mono text-red-400 font-bold text-lg"
                   >0</span
                 >
               </div>
               <div
-                class="flex justify-between items-center py-3 border-b border-slate-800"
+                class="flex justify-between items-center py-3 border-b border-white/5"
               >
-                <span class="text-slate-400">Crashes per 100km</span>
+                <span class="text-slate-400">Crashes / 100km</span>
                 <span
                   id="stat-cr100"
-                  class="font-mono text-orange-400 font-bold"
+                  class="font-mono text-orange-400 font-bold text-lg"
                   >0.00</span
                 >
               </div>
               <div
-                class="flex justify-between items-center py-3 border-b border-slate-800"
+                class="flex justify-between items-center py-3 border-b border-white/5"
               >
                 <span class="text-slate-400">Infractions</span>
-                <span id="stat-infr" class="font-mono text-yellow-400 font-bold"
+                <span
+                  id="stat-infr"
+                  class="font-mono text-yellow-400 font-bold text-lg"
                   >0</span
                 >
               </div>
               <div class="flex justify-between items-center py-3">
-                <span class="text-slate-400">Infractions per 100km</span>
+                <span class="text-slate-400">Infractions / 100km</span>
                 <span
                   id="stat-infr100"
-                  class="font-mono text-yellow-400 font-bold"
+                  class="font-mono text-yellow-400 font-bold text-lg"
                   >0.00</span
                 >
               </div>
@@ -469,46 +818,49 @@
           </div>
         </div>
 
-        <div class="mt-6 bg-slate-900 border border-slate-800 rounded-xl p-6">
-          <h3 class="font-racing text-xl font-bold text-amber-400 mb-4">
-            📜 Licence System
+        <!-- Licence Info -->
+        <div class="glass-card rounded-2xl p-6">
+          <h3
+            class="font-racing text-xl font-bold text-amber-400 mb-6 flex items-center gap-3"
+          >
+            <span class="text-2xl">📜</span> Licence Tiers
           </h3>
           <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div
-              class="text-center p-4 rounded-lg bg-slate-800/50 border border-slate-700"
+              class="text-center p-5 rounded-xl bg-white/5 border border-white/5 hover:border-amber-500/30 transition-all"
             >
               <div
-                class="licence-platinum text-slate-900 font-bold px-3 py-1 rounded inline-block mb-2 text-sm"
+                class="licence-platinum text-slate-900 font-bold px-4 py-1.5 rounded-lg inline-block mb-3 text-sm"
               >
                 Platinum
               </div>
               <p class="text-slate-400 text-sm">Score ≥ 700</p>
             </div>
             <div
-              class="text-center p-4 rounded-lg bg-slate-800/50 border border-slate-700"
+              class="text-center p-5 rounded-xl bg-white/5 border border-white/5 hover:border-amber-500/30 transition-all"
             >
               <div
-                class="licence-gold text-slate-900 font-bold px-3 py-1 rounded inline-block mb-2 text-sm"
+                class="licence-gold text-slate-900 font-bold px-4 py-1.5 rounded-lg inline-block mb-3 text-sm"
               >
                 Gold
               </div>
               <p class="text-slate-400 text-sm">Score ≥ 500</p>
             </div>
             <div
-              class="text-center p-4 rounded-lg bg-slate-800/50 border border-slate-700"
+              class="text-center p-5 rounded-xl bg-white/5 border border-white/5 hover:border-amber-500/30 transition-all"
             >
               <div
-                class="licence-silver text-slate-900 font-bold px-3 py-1 rounded inline-block mb-2 text-sm"
+                class="licence-silver text-slate-900 font-bold px-4 py-1.5 rounded-lg inline-block mb-3 text-sm"
               >
                 Silver
               </div>
               <p class="text-slate-400 text-sm">Score ≥ 200</p>
             </div>
             <div
-              class="text-center p-4 rounded-lg bg-slate-800/50 border border-slate-700"
+              class="text-center p-5 rounded-xl bg-white/5 border border-white/5 hover:border-amber-500/30 transition-all"
             >
               <div
-                class="licence-bronze text-slate-900 font-bold px-3 py-1 rounded inline-block mb-2 text-sm"
+                class="licence-bronze text-slate-900 font-bold px-4 py-1.5 rounded-lg inline-block mb-3 text-sm"
               >
                 Bronze
               </div>
@@ -518,156 +870,202 @@
         </div>
       </div>
 
-      <div id="no-driver" class="text-center py-16">
-        <div class="text-6xl mb-4">🔍</div>
-        <h3 class="font-racing text-xl text-slate-400 mb-2">
-          Search for a driver
+      <!-- No Driver State -->
+      <div id="no-driver" class="text-center py-20">
+        <div class="text-7xl mb-6 animate-float">🔍</div>
+        <h3 class="font-racing text-2xl text-slate-300 mb-3">
+          Search for a Driver
         </h3>
-        <p class="text-slate-500">
-          Enter a driver name or Steam64 ID to view their statistics
+        <p class="text-slate-500 max-w-md mx-auto">
+          Enter a driver name or Steam64 ID above to view their complete racing
+          statistics and licence status.
         </p>
       </div>
     </div>
 
     <!-- Leaderboard Page -->
-    <div id="page-leaderboard" class="page hidden max-w-7xl mx-auto px-4 py-8">
-      <h2 class="font-racing text-3xl font-bold text-amber-400 mb-2">
-        🏆 KMR Leaderboard
-      </h2>
-      <p class="text-slate-400 mb-6">
-        Track times for Tatuus FA01 • Data synced from KissMyRank
-      </p>
-
-      <div class="mb-6">
-        <label class="block text-slate-400 text-sm mb-2">Select Track</label>
-        <div class="flex flex-wrap gap-2" id="track-buttons"></div>
+    <div
+      id="page-leaderboard"
+      class="page hidden max-w-7xl mx-auto px-4 sm:px-6 py-10"
+    >
+      <!-- Header -->
+      <div class="mb-10">
+        <h2
+          class="font-racing text-3xl sm:text-4xl font-bold text-amber-400 text-glow mb-2"
+        >
+          🏆 Leaderboard
+        </h2>
+        <p class="text-slate-400">
+          Best lap times for Tatuus FA01 across all tracks
+        </p>
       </div>
 
+      <!-- Track Selection -->
+      <div class="glass-card rounded-2xl p-6 mb-6">
+        <label class="block text-slate-300 text-sm font-medium mb-4"
+          >Select Track</label
+        >
+        <div class="flex flex-wrap gap-2" id="track-buttons">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Track Info Bar -->
       <div
-        class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-3 mb-6 flex items-center justify-between flex-wrap gap-2"
+        class="glass-card rounded-xl px-6 py-4 mb-6 flex flex-wrap items-center justify-between gap-4"
       >
-        <div>
-          <span class="text-slate-400 text-sm">Current Track:</span>
-          <span id="current-track" class="font-racing text-amber-400 ml-2"
-            >-</span
+        <div class="flex items-center gap-6">
+          <div>
+            <span class="text-slate-500 text-xs uppercase tracking-wider"
+              >Track</span
+            >
+            <p id="current-track" class="font-racing text-amber-400 text-lg">
+              -
+            </p>
+          </div>
+          <div class="hidden sm:block w-px h-10 bg-white/10"></div>
+          <div class="hidden sm:block">
+            <span class="text-slate-500 text-xs uppercase tracking-wider"
+              >Car</span
+            >
+            <p class="font-mono text-white">tatuusfa1</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-slate-500 text-sm">Entries:</span>
+          <span id="entry-count" class="font-racing text-emerald-400 text-xl"
+            >0</span
           >
         </div>
-        <div>
-          <span class="text-slate-400 text-sm">Car:</span>
-          <span class="font-mono text-white ml-2">tatuusfa1</span>
-        </div>
-        <div>
-          <span class="text-slate-400 text-sm">Entries:</span>
-          <span id="entry-count" class="font-mono text-green-400 ml-2">0</span>
-        </div>
       </div>
 
-      <div
-        class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden"
-      >
+      <!-- Leaderboard Table -->
+      <div class="glass-card rounded-2xl overflow-hidden mb-6">
         <div class="overflow-x-auto">
-          <table class="w-full">
+          <table class="table-modern w-full">
             <thead>
-              <tr class="text-left text-slate-400 text-sm bg-slate-800/50">
-                <th class="py-4 px-4 w-16">Pos</th>
-                <th class="py-4 px-4">Driver</th>
-                <th class="py-4 px-4">Lap Time</th>
-                <th class="py-4 px-4">Gap</th>
+              <tr class="text-left text-slate-400">
+                <th class="py-5 px-6 w-20">Pos</th>
+                <th class="py-5 px-6">Driver</th>
+                <th class="py-5 px-6">Lap Time</th>
+                <th class="py-5 px-6">Gap</th>
               </tr>
             </thead>
-            <tbody id="leaderboard-body"></tbody>
+            <tbody id="leaderboard-body" class="text-slate-300">
+              <!-- Populated by JS -->
+            </tbody>
           </table>
         </div>
       </div>
 
-      <div class="mt-6 flex justify-center gap-2" id="pagination"></div>
+      <!-- Pagination -->
+      <div class="flex justify-center gap-2" id="pagination">
+        <!-- Populated by JS -->
+      </div>
 
-      <div id="no-leaderboard" class="hidden text-center py-16">
-        <div class="text-6xl mb-4">📊</div>
-        <h3 class="font-racing text-xl text-slate-400 mb-2">
-          No lap times recorded
+      <!-- No Data State -->
+      <div id="no-leaderboard" class="hidden text-center py-20">
+        <div class="text-7xl mb-6 animate-float">📊</div>
+        <h3 class="font-racing text-2xl text-slate-300 mb-3">
+          No Lap Times Yet
         </h3>
-        <p class="text-slate-500">Select a track to view the leaderboard</p>
+        <p class="text-slate-500">
+          Select a track above to view the leaderboard
+        </p>
       </div>
     </div>
 
     <!-- Setup Shop Page -->
-    <div id="page-shop" class="page hidden max-w-7xl mx-auto px-4 py-8">
-      <h2 class="font-racing text-3xl font-bold text-amber-400 mb-2">
-        🛒 Setup Shop
-      </h2>
-      <p class="text-slate-400 mb-6">
-        Premium Tatuus FA01 setups for every track in rotation
-      </p>
-
-      <div class="mb-6 flex flex-wrap gap-2">
-        <button
-          onclick="filterShop('all')"
-          class="shop-btn active px-4 py-2 rounded-lg font-semibold bg-amber-500 text-slate-900"
-          data-track="all"
+    <div
+      id="page-shop"
+      class="page hidden max-w-7xl mx-auto px-4 sm:px-6 py-10"
+    >
+      <!-- Header -->
+      <div class="mb-10">
+        <h2
+          class="font-racing text-3xl sm:text-4xl font-bold text-amber-400 text-glow mb-2"
         >
-          All Tracks
-        </button>
-        <button
-          onclick="filterShop('ks_zandvoort')"
-          class="shop-btn px-4 py-2 rounded-lg font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700"
-          data-track="ks_zandvoort"
-        >
-          Zandvoort
-        </button>
-        <button
-          onclick="filterShop('spa')"
-          class="shop-btn px-4 py-2 rounded-lg font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700"
-          data-track="spa"
-        >
-          Spa
-        </button>
-        <button
-          onclick="filterShop('ks_silverstone')"
-          class="shop-btn px-4 py-2 rounded-lg font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700"
-          data-track="ks_silverstone"
-        >
-          Silverstone
-        </button>
-        <button
-          onclick="filterShop('ks_monza66')"
-          class="shop-btn px-4 py-2 rounded-lg font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700"
-          data-track="ks_monza66"
-        >
-          Monza
-        </button>
-        <button
-          onclick="filterShop('imola')"
-          class="shop-btn px-4 py-2 rounded-lg font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700"
-          data-track="imola"
-        >
-          Imola
-        </button>
+          🛒 Setup Shop
+        </h2>
+        <p class="text-slate-400">
+          Premium Tatuus FA01 setups crafted by top drivers
+        </p>
       </div>
 
+      <!-- Track Filter -->
+      <div class="glass-card rounded-2xl p-6 mb-8">
+        <div class="flex flex-wrap gap-2">
+          <button
+            onclick="filterShop('all')"
+            class="shop-btn btn-gold px-5 py-2.5 rounded-xl font-semibold text-sm"
+            data-track="all"
+          >
+            All Tracks
+          </button>
+          <button
+            onclick="filterShop('ks_zandvoort')"
+            class="shop-btn btn-ghost px-5 py-2.5 rounded-xl font-semibold text-sm"
+            data-track="ks_zandvoort"
+          >
+            Zandvoort
+          </button>
+          <button
+            onclick="filterShop('spa')"
+            class="shop-btn btn-ghost px-5 py-2.5 rounded-xl font-semibold text-sm"
+            data-track="spa"
+          >
+            Spa
+          </button>
+          <button
+            onclick="filterShop('ks_silverstone')"
+            class="shop-btn btn-ghost px-5 py-2.5 rounded-xl font-semibold text-sm"
+            data-track="ks_silverstone"
+          >
+            Silverstone
+          </button>
+          <button
+            onclick="filterShop('ks_monza66')"
+            class="shop-btn btn-ghost px-5 py-2.5 rounded-xl font-semibold text-sm"
+            data-track="ks_monza66"
+          >
+            Monza
+          </button>
+          <button
+            onclick="filterShop('imola')"
+            class="shop-btn btn-ghost px-5 py-2.5 rounded-xl font-semibold text-sm"
+            data-track="imola"
+          >
+            Imola
+          </button>
+        </div>
+      </div>
+
+      <!-- Setup Grid -->
       <div
         id="shop-grid"
         class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-      ></div>
+      >
+        <!-- Populated by JS -->
+      </div>
     </div>
 
     <!-- Footer -->
-    <footer class="border-t border-slate-800 mt-12 py-8">
-      <div class="max-w-7xl mx-auto px-4 text-center">
-        <div class="flex items-center justify-center gap-3 mb-4">
-          <div
-            class="w-8 h-8 gold-gradient rounded-lg flex items-center justify-center"
-          >
-            <span class="font-racing font-black text-slate-900 text-sm"
-              >AC</span
-            >
+    <footer class="border-t border-white/5 mt-16 py-10">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 text-center">
+        <div class="flex items-center justify-center gap-4 mb-6">
+          <div class="logo-container w-10 h-10">
+            <img
+              src="logo.png"
+              alt="AC Elite"
+              onerror="this.parentElement.innerHTML='<div class=\'w-full h-full gold-gradient flex items-center justify-center rounded-lg\'><span class=\'font-racing font-black text-[#0a1628] text-sm\'>AC</span></div>'"
+            />
           </div>
-          <span class="font-racing text-lg text-amber-400">AC ELITE</span>
+          <span class="font-racing text-xl text-amber-400">AC ELITE</span>
         </div>
-        <p class="text-slate-500 text-sm">
+        <p class="text-slate-500 text-sm mb-2">
           Vote for next week's track on Discord • Tatuus FA01 Racing League
         </p>
-        <p class="text-slate-600 text-xs mt-2" id="last-sync">
+        <p class="text-slate-600 text-xs" id="last-sync">
           Data synced via GitHub Actions
         </p>
       </div>
@@ -676,14 +1074,8 @@
     <script>
       /* ===================== CONFIGURATION ===================== */
 
-      // Base URL for data files - UPDATE THIS with your GitHub username and repo name!
-      const GITHUB_USER = "xstellaa10";
-      const GITHUB_REPO = "xstellaa10.github.io";
-      const DATA_BASE_URL = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/data`;
-
-      // Alternative: If using GitHub Pages, you can use relative paths
-      // const DATA_BASE_URL = "./data";
-
+      // Data URL - uses relative path for GitHub Pages
+      const DATA_BASE_URL = "./data";
       const CAR = "tatuusfa1";
 
       let leaderboardData = {};
@@ -694,7 +1086,7 @@
       /* ===================== DATA FETCHING ===================== */
 
       async function fetchJSON(filename) {
-        const url = `${DATA_BASE_URL}/${filename}?t=${Date.now()}`; // Cache bust
+        const url = `${DATA_BASE_URL}/${filename}?t=${Date.now()}`;
         const response = await fetch(url);
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         return response.json();
@@ -702,10 +1094,9 @@
 
       async function loadAllData() {
         showLoading(true);
-        updateLoadingStatus("Fetching data from GitHub...");
+        updateLoadingStatus("Fetching race data...");
 
         try {
-          // Fetch all data in parallel
           const [rankResult, leaderboardResult, metadataResult] =
             await Promise.allSettled([
               fetchJSON("rank.json"),
@@ -715,21 +1106,14 @@
 
           if (rankResult.status === "fulfilled") {
             rankData = rankResult.value;
-            console.log("[DATA] Rank loaded:", rankData.length, "drivers");
           }
 
           if (leaderboardResult.status === "fulfilled") {
             leaderboardData = leaderboardResult.value;
-            console.log(
-              "[DATA] Leaderboard loaded:",
-              Object.keys(leaderboardData).length,
-              "tracks"
-            );
           }
 
           if (metadataResult.status === "fulfilled") {
             metadata = metadataResult.value;
-            console.log("[DATA] Metadata loaded:", metadata);
           }
 
           dataLoaded =
@@ -761,21 +1145,46 @@
       function updateDataStatus(success) {
         const status = document.getElementById("data-status");
         if (success) {
-          status.innerHTML =
-            '<span class="w-2 h-2 bg-green-500 rounded-full"></span><span class="text-sm text-slate-300">Live Data • Synced via GitHub</span>';
+          const timeAgo = getTimeAgo(metadata.lastSync);
+          status.innerHTML = `
+                    <span class="relative flex h-2.5 w-2.5">
+                        <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                    </span>
+                    <span class="text-sm text-slate-300">${timeAgo} • Auto-sync every 5 min</span>
+                `;
         } else {
-          status.innerHTML =
-            '<span class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span><span class="text-sm text-red-300">Failed to load data</span>';
+          status.innerHTML = `
+                    <span class="relative flex h-2.5 w-2.5">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
+                    </span>
+                    <span class="text-sm text-red-300">Failed to load data</span>
+                `;
         }
+      }
+
+      function getTimeAgo(dateString) {
+        if (!dateString) return "Synced recently";
+
+        const now = new Date();
+        const date = new Date(dateString);
+        const seconds = Math.floor((now - date) / 1000);
+
+        if (seconds < 60) return "Synced just now";
+        if (seconds < 120) return "Synced 1 min ago";
+        if (seconds < 3600) return `Synced ${Math.floor(seconds / 60)} min ago`;
+        if (seconds < 7200) return "Synced 1 hour ago";
+        if (seconds < 86400)
+          return `Synced ${Math.floor(seconds / 3600)} hours ago`;
+        return `Synced ${Math.floor(seconds / 86400)} days ago`;
       }
 
       function updateLastSync() {
         if (metadata.lastSync) {
-          const date = new Date(metadata.lastSync);
-          const formatted = date.toLocaleString();
+          const timeAgo = getTimeAgo(metadata.lastSync);
           document.getElementById(
             "last-sync"
-          ).textContent = `Last synced: ${formatted}`;
+          ).textContent = `${timeAgo} • Auto-sync every 5 minutes`;
         }
       }
 
@@ -834,7 +1243,8 @@
           author: "MaxSpeed_Pro",
           rating: 4.9,
           price: 550,
-          description: "Optimized for the banked corners.",
+          description:
+            "Optimized for the banked corners. High downforce for maximum grip.",
         },
         {
           id: 2,
@@ -843,7 +1253,7 @@
           author: "DutchRacer",
           rating: 4.7,
           price: 400,
-          description: "Great balance for quali and race.",
+          description: "Great balance for both quali and race.",
         },
         {
           id: 3,
@@ -852,7 +1262,7 @@
           author: "SpaKing_Pro",
           rating: 4.9,
           price: 600,
-          description: "Low downforce, max speed through Eau Rouge.",
+          description: "Low downforce, maximum speed through Eau Rouge.",
         },
         {
           id: 4,
@@ -870,7 +1280,7 @@
           author: "BritishRacer",
           rating: 4.9,
           price: 600,
-          description: "Built for the high-speed sections.",
+          description: "Built for the high-speed Maggots-Becketts section.",
         },
         {
           id: 6,
@@ -956,15 +1366,9 @@
         document.getElementById(`page-${page}`).classList.remove("hidden");
 
         document.querySelectorAll(".nav-btn").forEach((btn) => {
-          btn.classList.remove("text-amber-400", "border-amber-500/50");
-          btn.classList.add("text-slate-400", "border-slate-700");
+          btn.classList.remove("active");
         });
-        document
-          .getElementById(`nav-${page}`)
-          .classList.remove("text-slate-400", "border-slate-700");
-        document
-          .getElementById(`nav-${page}`)
-          .classList.add("text-amber-400", "border-amber-500/50");
+        document.getElementById(`nav-${page}`).classList.add("active");
 
         if (page === "leaderboard") {
           renderTrackButtons();
@@ -1058,11 +1462,13 @@
         if (!driver) {
           document.getElementById("driver-stats").classList.add("hidden");
           document.getElementById("no-driver").classList.remove("hidden");
-          document.getElementById(
-            "no-driver"
-          ).innerHTML = `<div class="text-6xl mb-4">❌</div><h3 class="font-racing text-xl text-slate-400 mb-2">Driver not found</h3><p class="text-slate-500">No driver matches "${escapeHtml(
-            query
-          )}"</p>`;
+          document.getElementById("no-driver").innerHTML = `
+                    <div class="text-7xl mb-6">❌</div>
+                    <h3 class="font-racing text-2xl text-slate-300 mb-3">Driver Not Found</h3>
+                    <p class="text-slate-500 max-w-md mx-auto">No driver matches "${escapeHtml(
+                      query
+                    )}". Try a different search term.</p>
+                `;
           return;
         }
         displayDriverStats(driver);
@@ -1087,7 +1493,7 @@
         document.getElementById("driver-licence").textContent = licence.name;
         document.getElementById(
           "driver-licence"
-        ).className = `${licence.class} text-slate-900 font-bold px-4 py-2 rounded-lg inline-block mb-2`;
+        ).className = `${licence.class} text-slate-900 font-bold px-5 py-2 rounded-xl text-sm`;
         document.getElementById(
           "driver-score"
         ).textContent = `Score: ${score.toFixed(2)}`;
@@ -1136,10 +1542,10 @@
         container.innerHTML = tracks
           .map(
             (track) => `
-                <button onclick="selectTrack('${track}')" class="track-btn px-4 py-2 rounded-lg font-semibold transition-all ${
+                <button onclick="selectTrack('${track}')" class="track-btn btn-ghost px-4 py-2.5 rounded-xl font-semibold text-sm transition-all ${
               currentTrack === track
-                ? "bg-amber-500 text-slate-900"
-                : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+                ? "active !bg-amber-500/20 !border-amber-500 !text-amber-400"
+                : ""
             }">${getTrackDisplayName(track)}</button>
             `
           )
@@ -1176,7 +1582,7 @@
 
         const tbody = document.getElementById("leaderboard-body");
         if (sorted.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="4" class="py-8 text-center text-slate-500">No lap times recorded for ${CAR} on this track</td></tr>`;
+          tbody.innerHTML = `<tr><td colspan="4" class="py-12 text-center text-slate-500">No lap times recorded for ${CAR} on this track</td></tr>`;
           document.getElementById("pagination").innerHTML = "";
           return;
         }
@@ -1185,7 +1591,7 @@
           .map((entry, index) => {
             const pos = start + index + 1;
             let rowClass = "",
-              posClass = "bg-slate-700 text-slate-300",
+              posClass = "bg-slate-700/50 text-slate-300",
               medal = "";
             if (pos === 1) {
               rowClass = "top1";
@@ -1204,15 +1610,15 @@
               posClass = "bg-blue-600 text-white";
             }
 
-            return `<tr class="border-b border-slate-800/50 hover:bg-slate-800/30 transition-all ${rowClass}">
-                    <td class="py-3 px-4"><span class="px-2 py-1 rounded text-sm ${posClass}">${pos}</span></td>
-                    <td class="py-3 px-4 font-semibold">${escapeHtml(
+            return `<tr class="border-b border-white/5 ${rowClass}">
+                    <td class="py-4 px-6"><span class="px-3 py-1.5 rounded-lg text-sm ${posClass}">${pos}</span></td>
+                    <td class="py-4 px-6 font-semibold">${escapeHtml(
                       entry.name?.slice(0, 30) || "Unknown"
                     )}${medal}</td>
-                    <td class="py-3 px-4 font-mono text-amber-400 font-bold">${formatLaptime(
+                    <td class="py-4 px-6 font-mono text-amber-400 font-bold text-lg">${formatLaptime(
                       entry.laptime
                     )}</td>
-                    <td class="py-3 px-4 font-mono text-slate-400">${calculateGap(
+                    <td class="py-4 px-6 font-mono text-slate-500">${calculateGap(
                       fastestLap,
                       entry.laptime
                     )}</td>
@@ -1224,25 +1630,23 @@
         if (totalPages > 1) {
           let html = `<button onclick="goToPage(${currentPage - 1})" ${
             currentPage === 1 ? "disabled" : ""
-          } class="px-3 py-2 rounded bg-slate-800 text-slate-300 hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed">←</button>`;
+          } class="btn-ghost px-4 py-2 rounded-xl disabled:opacity-30 disabled:cursor-not-allowed">←</button>`;
           for (let i = 1; i <= totalPages; i++) {
             if (
               i === 1 ||
               i === totalPages ||
               (i >= currentPage - 1 && i <= currentPage + 1)
             ) {
-              html += `<button onclick="goToPage(${i})" class="px-3 py-2 rounded ${
-                currentPage === i
-                  ? "bg-amber-500 text-slate-900"
-                  : "bg-slate-800 text-slate-300 hover:bg-slate-700"
-              }">${i}</button>`;
+              html += `<button onclick="goToPage(${i})" class="${
+                currentPage === i ? "btn-gold" : "btn-ghost"
+              } px-4 py-2 rounded-xl">${i}</button>`;
             } else if (i === currentPage - 2 || i === currentPage + 2) {
-              html += `<span class="px-2 text-slate-500">...</span>`;
+              html += `<span class="px-2 text-slate-600">...</span>`;
             }
           }
           html += `<button onclick="goToPage(${currentPage + 1})" ${
             currentPage === totalPages ? "disabled" : ""
-          } class="px-3 py-2 rounded bg-slate-800 text-slate-300 hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed">→</button>`;
+          } class="btn-ghost px-4 py-2 rounded-xl disabled:opacity-30 disabled:cursor-not-allowed">→</button>`;
           pagination.innerHTML = html;
         } else {
           pagination.innerHTML = "";
@@ -1263,15 +1667,16 @@
       function filterShop(track) {
         currentShopFilter = track;
         document.querySelectorAll(".shop-btn").forEach((btn) => {
-          btn.classList.remove("bg-amber-500", "text-slate-900");
-          btn.classList.add("bg-slate-800", "text-slate-300");
+          btn.classList.remove("btn-gold");
+          btn.classList.add("btn-ghost");
         });
-        document
-          .querySelector(`.shop-btn[data-track="${track}"]`)
-          ?.classList.remove("bg-slate-800", "text-slate-300");
-        document
-          .querySelector(`.shop-btn[data-track="${track}"]`)
-          ?.classList.add("bg-amber-500", "text-slate-900");
+        const activeBtn = document.querySelector(
+          `.shop-btn[data-track="${track}"]`
+        );
+        if (activeBtn) {
+          activeBtn.classList.remove("btn-ghost");
+          activeBtn.classList.add("btn-gold");
+        }
         renderShop();
       }
 
@@ -1284,31 +1689,36 @@
         grid.innerHTML = filtered
           .map(
             (setup) => `
-                <div class="bg-slate-900 border border-slate-800 rounded-xl p-6 hover:border-amber-500/50 transition-all group">
-                    <div class="flex items-start justify-between mb-3">
-                        <span class="text-xs bg-blue-900/50 text-blue-300 px-2 py-1 rounded">${getTrackDisplayName(
+                <div class="glass-card rounded-2xl p-6 group">
+                    <div class="flex items-start justify-between mb-4">
+                        <span class="text-xs bg-blue-500/20 text-blue-300 px-3 py-1.5 rounded-lg font-medium">${getTrackDisplayName(
                           setup.track
                         )}</span>
-                        <div class="flex items-center gap-1 text-amber-400"><span>★</span><span class="text-sm">${
-                          setup.rating
-                        }</span></div>
+                        <div class="flex items-center gap-1.5 text-amber-400">
+                            <span>★</span>
+                            <span class="text-sm font-medium">${
+                              setup.rating
+                            }</span>
+                        </div>
                     </div>
-                    <h3 class="font-racing text-lg font-bold text-white mb-1 group-hover:text-amber-400 transition-colors">${escapeHtml(
+                    <h3 class="font-racing text-lg font-bold text-white mb-2 group-hover:text-amber-400 transition-colors">${escapeHtml(
                       setup.name
                     )}</h3>
                     <p class="text-slate-500 text-sm mb-3">by ${escapeHtml(
                       setup.author
                     )}</p>
-                    <p class="text-slate-400 text-sm mb-4">${escapeHtml(
+                    <p class="text-slate-400 text-sm mb-6 leading-relaxed">${escapeHtml(
                       setup.description
                     )}</p>
-                    <div class="flex items-center justify-between">
-                        <span class="font-racing text-xl font-bold text-green-400">$${
+                    <div class="flex items-center justify-between pt-4 border-t border-white/5">
+                        <span class="font-racing text-2xl font-bold text-emerald-400">$${
                           setup.price
                         }</span>
-                        <a href="#" onclick="buySetup(${
+                        <button onclick="buySetup(${
                           setup.id
-                        }); return false;" class="gold-gradient text-slate-900 font-bold px-4 py-2 rounded-lg hover:opacity-90 transition-opacity glow">Buy Setup</a>
+                        })" class="btn-gold px-5 py-2.5 rounded-xl text-sm">
+                            Buy Setup
+                        </button>
                     </div>
                 </div>
             `
@@ -1316,13 +1726,20 @@
           .join("");
 
         if (filtered.length === 0) {
-          grid.innerHTML = `<div class="col-span-full text-center py-12"><div class="text-4xl mb-3">🔧</div><p class="text-slate-400">No setups available for this track yet</p></div>`;
+          grid.innerHTML = `
+                    <div class="col-span-full text-center py-16">
+                        <div class="text-5xl mb-4">🔧</div>
+                        <p class="text-slate-400">No setups available for this track yet</p>
+                    </div>
+                `;
         }
       }
 
       function buySetup(id) {
         const setup = setups.find((s) => s.id === id);
-        alert(`Redirecting to purchase: ${setup.name}\nPrice: $${setup.price}`);
+        alert(
+          `Redirecting to purchase: ${setup.name}\nPrice: $${setup.price}\n\nThis would connect to your payment system.`
+        );
       }
 
       /* ===================== INIT ===================== */
