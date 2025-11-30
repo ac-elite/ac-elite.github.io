@@ -312,8 +312,8 @@
 
       .btn-disabled {
         background: transparent;
-        border: 1px solid rgba(148, 163, 184, 0.5); /* slate-400-ish */
-        color: #64748b; /* slate-500-ish */
+        border: 1px solid rgba(148, 163, 184, 0.5);
+        color: #64748b;
         cursor: not-allowed;
         opacity: 0.6;
         transition: all 0.3s ease;
@@ -633,31 +633,25 @@
         <!-- Driver Header Card -->
         <div class="glass-card rounded-2xl p-6 sm:p-8 mb-6">
           <div
-            class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6"
+            class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
           >
-            <div class="flex items-center gap-5">
-              <div
-                class="w-20 h-20 rounded-2xl bg-gradient-to-br from-amber-500/20 to-blue-500/20 flex items-center justify-center text-4xl border border-amber-500/20"
+            <div>
+              <h3
+                id="driver-name"
+                class="font-racing text-2xl sm:text-3xl font-bold text-white mb-1"
               >
-                🏎️
-              </div>
-              <div>
-                <h3
-                  id="driver-name"
-                  class="font-racing text-2xl sm:text-3xl font-bold text-white mb-1"
-                >
-                  Driver Name
-                </h3>
-                <p id="driver-guid" class="text-slate-500 text-sm font-mono">
-                  GUID: 76561198000000000
-                </p>
-              </div>
+                Driver Name
+              </h3>
+              <p id="driver-guid" class="text-slate-500 text-sm font-mono">
+                GUID: 76561198000000000
+              </p>
             </div>
-            <div
-              class="flex flex-col items-start sm:items-end gap-1 text-slate-400 text-sm"
+            <p
+              id="driver-summary"
+              class="text-slate-400 text-sm sm:text-base mt-3 sm:mt-0"
             >
-              <p id="driver-summary">Select a driver to view stats</p>
-            </div>
+              Select a driver to view stats
+            </p>
           </div>
         </div>
 
@@ -688,9 +682,6 @@
             >
               0
             </p>
-            <p id="stat-winrate" class="text-slate-500 text-xs mt-2">
-              0% win rate
-            </p>
           </div>
 
           <div class="stat-card">
@@ -703,9 +694,6 @@
               class="font-racing text-3xl sm:text-4xl font-bold text-white"
             >
               0
-            </p>
-            <p id="stat-podiumrate" class="text-slate-500 text-xs mt-2">
-              0% podium rate
             </p>
           </div>
 
@@ -757,9 +745,9 @@
               <div
                 class="flex justify-between items-center py-3 border-b border-white/5"
               >
-                <span class="text-slate-400">Races Completed</span>
+                <span class="text-slate-400">Sessions Driven</span>
                 <span
-                  id="stat-races"
+                  id="stat-sessions"
                   class="font-mono text-white font-bold text-lg"
                   >0</span
                 >
@@ -931,12 +919,11 @@
       </div>
     </div>
 
-    <!-- Setup Shop Page -->
+    <!-- Setup Shop Page (hidden / future) -->
     <div
       id="page-shop"
       class="page hidden max-w-7xl mx-auto px-4 sm:px-6 py-10"
     >
-      <!-- Header -->
       <div class="mb-10">
         <h2
           class="font-racing text-3xl sm:text-4xl font-bold text-amber-400 text-glow mb-2"
@@ -948,7 +935,6 @@
         </p>
       </div>
 
-      <!-- Track Filter -->
       <div class="glass-card rounded-2xl p-6 mb-8">
         <div class="flex flex-wrap gap-2">
           <button
@@ -996,7 +982,6 @@
         </div>
       </div>
 
-      <!-- Setup Grid -->
       <div
         id="shop-grid"
         class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
@@ -1030,7 +1015,6 @@
     <script>
       /* ===================== CONFIGURATION ===================== */
 
-      // Data URL - uses relative path for GitHub Pages
       const DATA_BASE_URL = "./data";
       const CAR = "tatuusfa1";
 
@@ -1268,7 +1252,7 @@
         },
       ];
 
-      /* ===================== SCORE CALCULATION (voor later) ===================== */
+      /* ===================== SCORE CALCULATION (for later) ===================== */
 
       function calculateScore(d) {
         const km = Math.max(1, d.kilometers ?? 0);
@@ -1341,7 +1325,10 @@
         document.querySelectorAll(".nav-btn").forEach((btn) => {
           btn.classList.remove("active");
         });
-        document.getElementById(`nav-${page}`).classList.add("active");
+        const nav = document.getElementById(`nav-${page}`);
+        if (nav && !nav.classList.contains("btn-disabled")) {
+          nav.classList.add("active");
+        }
 
         if (page === "leaderboard") {
           renderTrackButtons();
@@ -1453,7 +1440,7 @@
 
         const km = driver.kilometers || 0;
 
-        // Total laps uit driver.leaderboard -> [track][CAR].laps
+        // Total laps
         let totalLaps = 0;
         if (typeof driver.laps === "number") {
           totalLaps = driver.laps;
@@ -1466,16 +1453,17 @@
           });
         }
 
+        // Sessions = aantal tracks met entries
+        let sessions = 0;
+        if (driver.leaderboard && typeof driver.leaderboard === "object") {
+          sessions = Object.keys(driver.leaderboard).length;
+        }
+
         const crashes = driver.crashes ?? driver.collisions ?? 0;
         const infr = driver.infr ?? 0;
 
         const crPer100 = km > 0 ? crashes / (km / 100) : 0;
         const infrPer100 = km > 0 ? infr / (km / 100) : 0;
-
-        const races = driver.races || 0;
-        const winRate = races > 0 ? ((driver.wins || 0) / races) * 100 : 0;
-        const podiumRate =
-          races > 0 ? ((driver.podiums || 0) / races) * 100 : 0;
 
         // Header
         document.getElementById("driver-name").textContent = driver.name;
@@ -1487,7 +1475,7 @@
         if (summaryEl) {
           summaryEl.textContent = `Wins: ${driver.wins || 0} • Podiums: ${
             driver.podiums || 0
-          } • Distance: ${km.toFixed(1)} km`;
+          } • Sessions: ${sessions} • Distance: ${km.toFixed(1)} km`;
         }
 
         // Main stats
@@ -1496,22 +1484,15 @@
         ).toLocaleString()}`;
 
         document.getElementById("stat-wins").textContent = driver.wins || 0;
-        document.getElementById(
-          "stat-winrate"
-        ).textContent = `${winRate.toFixed(1)}% win rate`;
-
         document.getElementById("stat-podiums").textContent =
           driver.podiums || 0;
-        document.getElementById(
-          "stat-podiumrate"
-        ).textContent = `${podiumRate.toFixed(1)}% podium rate`;
 
         document.getElementById("stat-km").textContent = `${km.toFixed(1)} km`;
 
         document.getElementById("stat-poles").textContent = driver.poles || 0;
         document.getElementById("stat-flaps").textContent = driver.flaps || 0;
 
-        document.getElementById("stat-races").textContent = races;
+        document.getElementById("stat-sessions").textContent = sessions;
         document.getElementById("stat-laps").textContent =
           totalLaps.toLocaleString();
 
