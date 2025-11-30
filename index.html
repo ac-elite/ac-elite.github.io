@@ -666,12 +666,22 @@
                 GUID: 76561198000000000
               </p>
             </div>
-            <p
-              id="driver-summary"
-              class="text-slate-400 text-sm sm:text-base mt-3 sm:mt-0"
-            >
-              Select a driver to view stats
-            </p>
+
+            <!-- Favorite track blok rechts -->
+            <div class="mt-3 sm:mt-0 sm:text-right">
+              <p class="text-slate-500 text-xs uppercase tracking-wider">
+                Favorite Track
+              </p>
+              <p
+                id="driver-fav-track"
+                class="font-racing text-lg sm:text-xl text-amber-400"
+              >
+                -
+              </p>
+              <p id="driver-fav-laps" class="text-slate-500 text-xs mt-1">
+                No laps recorded yet
+              </p>
+            </div>
           </div>
         </div>
 
@@ -765,7 +775,7 @@
               <div
                 class="flex justify-between items-center py-3 border-b border-white/5"
               >
-                <span class="text-slate-400">Sessions Driven</span>
+                <span class="text-slate-400">Unique Tracks Driven</span>
                 <span
                   id="stat-sessions"
                   class="font-mono text-white font-bold text-lg"
@@ -1491,11 +1501,34 @@
           "driver-guid"
         ).textContent = `GUID: ${driver.guid}`;
 
-        const summaryEl = document.getElementById("driver-summary");
-        if (summaryEl) {
-          summaryEl.textContent = `Wins: ${driver.wins || 0} • Podiums: ${
-            driver.podiums || 0
-          } • Sessions: ${sessions} • Distance: ${km.toFixed(1)} km`;
+        // Favorite track bepalen (meest gereden track voor deze auto)
+        let favTrackId = null;
+        let favTrackLaps = 0;
+
+        if (driver.leaderboard && typeof driver.leaderboard === "object") {
+          for (const [trackId, trackObj] of Object.entries(
+            driver.leaderboard
+          )) {
+            const carStats = trackObj[CAR];
+            const laps =
+              carStats && typeof carStats.laps === "number" ? carStats.laps : 0;
+
+            if (laps > favTrackLaps) {
+              favTrackLaps = laps;
+              favTrackId = trackId;
+            }
+          }
+        }
+
+        const favNameEl = document.getElementById("driver-fav-track");
+        const favLapsEl = document.getElementById("driver-fav-laps");
+
+        if (favTrackId && favNameEl && favLapsEl) {
+          favNameEl.textContent = getTrackDisplayName(favTrackId);
+          favLapsEl.textContent = `${favTrackLaps.toLocaleString()} laps driven`;
+        } else if (favNameEl && favLapsEl) {
+          favNameEl.textContent = "No favorite track yet";
+          favLapsEl.textContent = "Set a lap time to get one!";
         }
 
         // Main stats
