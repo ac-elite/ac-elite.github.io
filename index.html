@@ -324,6 +324,17 @@
         border-color: rgba(148, 163, 184, 0.7);
       }
 
+      .btn-discord {
+        background: #5865f2;
+        color: white;
+        box-shadow: 0 4px 15px rgba(88, 101, 242, 0.4);
+      }
+      .btn-discord:hover {
+        background: #4752c4;
+        box-shadow: 0 6px 20px rgba(88, 101, 242, 0.6);
+        transform: translateY(-2px);
+      }
+
       /* Animations */
       @keyframes float {
         0%,
@@ -456,7 +467,14 @@
           </div>
 
           <!-- Navigation Buttons -->
-          <div class="flex gap-2 sm:gap-3">
+          <div class="flex gap-2 sm:gap-3 items-center">
+            <a
+              href="https://discord.gg/d2EbxGYBbj"
+              target="_blank"
+              class="btn-discord px-3 sm:px-5 py-2.5 rounded-xl font-semibold text-sm sm:text-base flex items-center gap-2"
+            >
+              💬 Join Discord
+            </a>
             <button
               onclick="showPage('stats')"
               id="nav-stats"
@@ -464,6 +482,7 @@
             >
               <span class="hidden sm:inline">📊 </span>Stats
             </button>
+
             <button
               onclick="showPage('leaderboard')"
               id="nav-leaderboard"
@@ -471,6 +490,7 @@
             >
               <span class="hidden sm:inline">🏆 </span>Leaderboard
             </button>
+
             <button
               onclick="showComingSoon()"
               id="nav-shop"
