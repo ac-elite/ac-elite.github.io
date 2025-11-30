@@ -329,10 +329,22 @@
         color: white;
         box-shadow: 0 4px 15px rgba(88, 101, 242, 0.4);
       }
+
       .btn-discord:hover {
         background: #4752c4;
         box-shadow: 0 6px 20px rgba(88, 101, 242, 0.6);
         transform: translateY(-2px);
+      }
+
+      .btn-locked {
+        background: transparent;
+        border: 1px dashed rgba(148, 163, 184, 0.7);
+        color: #64748b;
+        opacity: 0.8;
+      }
+
+      .btn-locked:hover {
+        background: rgba(15, 23, 42, 0.6);
       }
 
       /* Animations */
@@ -492,15 +504,11 @@
             </button>
 
             <button
-              onclick="showPage('shop')"
+              onclick="handleShopClick()"
               id="nav-shop"
-              class="nav-btn btn-ghost px-3 sm:px-5 py-2.5 rounded-xl font-semibold text-sm sm:text-base"
+              class="nav-btn btn-locked px-3 sm:px-5 py-2.5 rounded-xl font-semibold text-sm sm:text-base"
             >
               <span class="hidden sm:inline">🛠️ </span>Setups
-              <span
-                class="ml-1 text-[10px] bg-amber-500/20 text-amber-400 px-1.5 py-0.5 rounded"
-                >beta</span
-              >
             </button>
           </div>
         </div>
@@ -970,49 +978,8 @@
       </div>
 
       <div class="glass-card rounded-2xl p-6 mb-8">
-        <div class="flex flex-wrap gap-2">
-          <button
-            onclick="filterShop('all')"
-            class="shop-btn btn-gold px-5 py-2.5 rounded-xl font-semibold text-sm"
-            data-track="all"
-          >
-            All Tracks
-          </button>
-          <button
-            onclick="filterShop('ks_zandvoort')"
-            class="shop-btn btn-ghost px-5 py-2.5 rounded-xl font-semibold text-sm"
-            data-track="ks_zandvoort"
-          >
-            Zandvoort
-          </button>
-          <button
-            onclick="filterShop('spa')"
-            class="shop-btn btn-ghost px-5 py-2.5 rounded-xl font-semibold text-sm"
-            data-track="spa"
-          >
-            Spa
-          </button>
-          <button
-            onclick="filterShop('ks_silverstone')"
-            class="shop-btn btn-ghost px-5 py-2.5 rounded-xl font-semibold text-sm"
-            data-track="ks_silverstone"
-          >
-            Silverstone
-          </button>
-          <button
-            onclick="filterShop('ks_monza66')"
-            class="shop-btn btn-ghost px-5 py-2.5 rounded-xl font-semibold text-sm"
-            data-track="ks_monza66"
-          >
-            Monza
-          </button>
-          <button
-            onclick="filterShop('imola')"
-            class="shop-btn btn-ghost px-5 py-2.5 rounded-xl font-semibold text-sm"
-            data-track="imola"
-          >
-            Imola
-          </button>
+        <div class="flex flex-wrap gap-2" id="shop-track-buttons">
+          <!-- Populated by JS -->
         </div>
       </div>
 
@@ -1021,6 +988,66 @@
         class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
       >
         <!-- Populated by JS -->
+      </div>
+    </div>
+
+    <!-- Shop Password Modal -->
+    <div
+      id="shop-password-modal"
+      class="fixed inset-0 z-[90] hidden bg-black/70 backdrop-blur flex items-center justify-center"
+    >
+      <div
+        class="glass-card max-w-md w-full mx-4 rounded-2xl p-6 sm:p-8 relative"
+      >
+        <!-- Close button -->
+        <button
+          type="button"
+          class="absolute top-3 right-3 text-slate-500 hover:text-slate-300 text-xl"
+          onclick="closeShopModal()"
+          aria-label="Close"
+        >
+          ✕
+        </button>
+
+        <h3 class="font-racing text-2xl font-bold text-amber-400 mb-2">
+          Unlock Setup Shop
+        </h3>
+        <p class="text-slate-400 text-sm mb-4">
+          Enter the password to access the setup shop.
+        </p>
+
+        <label
+          for="shop-password-input"
+          class="block text-slate-300 text-sm font-medium mb-2"
+          >Password</label
+        >
+        <input
+          id="shop-password-input"
+          type="password"
+          class="input-modern w-full mb-3"
+          placeholder="••••••••"
+        />
+
+        <p id="shop-password-error" class="text-sm text-red-400 mb-4 hidden">
+          Incorrect password. Please try again.
+        </p>
+
+        <div class="flex justify-end gap-3 mt-2">
+          <button
+            type="button"
+            class="btn-ghost px-4 py-2.5 rounded-xl text-sm"
+            onclick="closeShopModal()"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            class="btn-gold px-5 py-2.5 rounded-xl text-sm"
+            onclick="unlockShopFromModal()"
+          >
+            Unlock
+          </button>
+        </div>
       </div>
     </div>
 
@@ -1056,6 +1083,66 @@
       let rankData = [];
       let metadata = {};
       let dataLoaded = false;
+
+      const SHOP_PASSWORD = "ac-elite-shop";
+      let shopUnlocked = false;
+
+      try {
+        shopUnlocked = localStorage.getItem("acelite_shop_unlocked") === "1";
+      } catch (e) {
+        shopUnlocked = false;
+      }
+
+      function openShopModal() {
+        const modal = document.getElementById("shop-password-modal");
+        const input = document.getElementById("shop-password-input");
+        const error = document.getElementById("shop-password-error");
+
+        if (!modal || !input) return;
+
+        modal.classList.remove("hidden");
+        error?.classList.add("hidden");
+        input.value = "";
+        setTimeout(() => input.focus(), 50);
+      }
+
+      function closeShopModal() {
+        const modal = document.getElementById("shop-password-modal");
+        if (!modal) return;
+        modal.classList.add("hidden");
+      }
+
+      function unlockShopFromModal() {
+        const input = document.getElementById("shop-password-input");
+        const error = document.getElementById("shop-password-error");
+        const value = (input?.value || "").trim();
+
+        if (value === SHOP_PASSWORD) {
+          shopUnlocked = true;
+          try {
+            localStorage.setItem("acelite_shop_unlocked", "1");
+          } catch (e) {}
+
+          // nav-knop upgraden
+          const btn = document.getElementById("nav-shop");
+          if (btn) {
+            btn.classList.remove("btn-locked");
+            btn.classList.add("btn-ghost", "active");
+          }
+
+          closeShopModal();
+          showPage("shop");
+        } else {
+          if (error) {
+            error.textContent = "Incorrect password. Please try again.";
+            error.classList.remove("hidden");
+          }
+          if (input) {
+            input.value = "";
+            input.focus();
+          }
+        }
+      }
 
       /* ===================== DATA FETCHING ===================== */
 
@@ -1156,9 +1243,7 @@
       function updateLastSync() {
         if (metadata.lastSync) {
           const timeAgo = getTimeAgo(metadata.lastSync);
-          document.getElementById(
-            "last-sync"
-          ).textContent = `${timeAgo} • Auto-sync every 5 minutes`;
+          document.getElementById("last-sync").textContent = `${timeAgo}`;
         }
       }
 
@@ -1298,7 +1383,48 @@
       const itemsPerPage = 15;
       let currentShopFilter = "all";
 
+      function handleShopClick() {
+        // Als al unlocked: gewoon naar de shop
+        if (shopUnlocked) {
+          showPage("shop");
+          return;
+        }
+
+        // Vraag om wachtwoord
+        const input = prompt("Enter setup shop password:");
+
+        if (input === null) {
+          // gebruiker drukte op Annuleren
+          return;
+        }
+
+        if (input === SHOP_PASSWORD) {
+          shopUnlocked = true;
+          try {
+            localStorage.setItem("acelite_shop_unlocked", "1");
+          } catch (e) {}
+
+          // knop visueel upgraden van locked naar normale nav-btn
+          const btn = document.getElementById("nav-shop");
+          if (btn) {
+            btn.classList.remove("btn-locked");
+            btn.classList.add("btn-ghost", "active");
+          }
+
+          showPage("shop");
+          alert("Setup shop unlocked! 🎉");
+        } else {
+          alert("Incorrect password.");
+        }
+      }
+
       function showPage(page) {
+        // voorkomen dat iemand direct via JS naar shop gaat als 'ie locked is
+        if (page === "shop" && !shopUnlocked) {
+          openShopModal();
+          return;
+        }
+
         document
           .querySelectorAll(".page")
           .forEach((p) => p.classList.add("hidden"));
@@ -1307,6 +1433,7 @@
         document.querySelectorAll(".nav-btn").forEach((btn) => {
           btn.classList.remove("active");
         });
+
         const nav = document.getElementById(`nav-${page}`);
         if (nav && !nav.classList.contains("btn-disabled")) {
           nav.classList.add("active");
@@ -1659,6 +1786,42 @@
 
       /* ===================== SHOP ===================== */
 
+      function renderShopTrackButtons() {
+        const container = document.getElementById("shop-track-buttons");
+        if (!container) return;
+
+        // Unieke track IDs uit de setups
+        const tracks = Array.from(new Set(setups.map((s) => s.track))).sort();
+
+        // Start met "All Tracks"
+        let html = `
+         <button
+           onclick="filterShop('all')"
+            class="shop-btn btn-gold px-5 py-2.5 rounded-xl font-semibold text-sm"
+            data-track="all"
+         >
+           All Tracks
+         </button>
+       `;
+
+        // Voor elke track een knop
+        html += tracks
+          .map(
+            (track) => `
+        <button
+          onclick="filterShop('${track}')"
+          class="shop-btn btn-ghost px-5 py-2.5 rounded-xl font-semibold text-sm"
+          data-track="${track}"
+        >
+          ${getTrackDisplayName(track)}
+        </button>
+      `
+          )
+          .join("");
+
+        container.innerHTML = html;
+      }
+
       function filterShop(track) {
         currentShopFilter = track;
         document.querySelectorAll(".shop-btn").forEach((btn) => {
@@ -1764,6 +1927,32 @@
       document.addEventListener("DOMContentLoaded", async () => {
         await loadAllData();
         renderShop();
+
+        // Als shop al eerder unlocked is in deze browser: knop meteen normaal tonen
+        if (shopUnlocked) {
+          const btn = document.getElementById("nav-shop");
+          if (btn) {
+            btn.classList.remove("btn-locked");
+            btn.classList.add("btn-ghost");
+          }
+        }
+
+        // ESC sluit de modal
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "Escape") {
+            closeShopModal();
+          }
+        });
+
+        // Klik op achtergrond sluit de modal
+        const modal = document.getElementById("shop-password-modal");
+        if (modal) {
+          modal.addEventListener("click", (e) => {
+            if (e.target === modal) {
+              closeShopModal();
+            }
+          });
+        }
       });
     </script>
   </body>
