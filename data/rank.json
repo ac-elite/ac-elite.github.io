@@ -108,8 +108,8 @@
  {
   "guid": "76561198828350593",
   "name": "Grimlord",
-  "points": 3281.294,
-  "kilometers": 15405.5,
+  "points": 3282.957,
+  "kilometers": 15437.4,
   "collisions": 363,
   "leaderboard": {
    "ks_zandvoort_": {
@@ -199,12 +199,12 @@
    "ks_barcelona_layout_moto": {
     "tatuusfa1": {
      "laptime": 100191,
-     "laps": 11,
-     "ts": 1764369973650
+     "laps": 15,
+     "ts": 1764515161209
     }
    }
   },
-  "last_seen": 1764514616587,
+  "last_seen": 1764515346744,
   "wins": 87,
   "podiums": 247,
   "poles": 71,
@@ -744,8 +744,8 @@
  {
   "guid": "76561198028779531",
   "name": "Subinator",
-  "points": 1485.554,
-  "kilometers": 7136.4,
+  "points": 1492.953,
+  "kilometers": 7164.3,
   "collisions": 110,
   "leaderboard": {
    "ks_zandvoort_": {
@@ -814,14 +814,14 @@
    "ks_barcelona_layout_moto": {
     "tatuusfa1": {
      "laptime": 100284,
-     "laps": 107,
-     "ts": 1764514479002
+     "laps": 112,
+     "ts": 1764515255352
     }
    }
   },
-  "last_seen": 1764514616587,
-  "wins": 82,
-  "podiums": 122,
+  "last_seen": 1764515346744,
+  "wins": 83,
+  "podiums": 123,
   "poles": 39,
   "flaps": 38,
   "infr": 12
@@ -1246,9 +1246,9 @@
  {
   "guid": "76561198999518018",
   "name": "David O.",
-  "points": 1067.52,
-  "kilometers": 6803.9,
-  "collisions": 65,
+  "points": 1069.101,
+  "kilometers": 6828.4,
+  "collisions": 66,
   "leaderboard": {
    "ks_zandvoort_": {
     "tatuusfa1": {
@@ -1295,12 +1295,12 @@
    "ks_barcelona_layout_moto": {
     "tatuusfa1": {
      "laptime": 98917,
-     "laps": 194,
-     "ts": 1764514408979
+     "laps": 198,
+     "ts": 1764515168784
     }
    }
   },
-  "last_seen": 1764514616587,
+  "last_seen": 1764515346744,
   "wins": 44,
   "podiums": 92,
   "poles": 25,
@@ -4701,11 +4701,40 @@
   "infr": 3
  },
  {
+  "guid": "76561198161331106",
+  "name": "G",
+  "points": 289.791,
+  "kilometers": 1925.6,
+  "collisions": 117,
+  "leaderboard": {
+   "imola_": {
+    "tatuusfa1": {
+     "laptime": 106102,
+     "laps": 1,
+     "ts": 1761247943877
+    }
+   },
+   "spa_": {
+    "tatuusfa1": {
+     "laptime": 138499,
+     "laps": 94,
+     "ts": 1761784688449
+    }
+   }
+  },
+  "last_seen": 1761852736185,
+  "wins": 9,
+  "podiums": 18,
+  "poles": 9,
+  "flaps": 9,
+  "infr": 2
+ },
+ {
   "guid": "76561199442944100",
   "name": "Jamal alabyte",
-  "points": 290.26599999999996,
-  "kilometers": 9050.3,
-  "collisions": 480,
+  "points": 288.04499999999996,
+  "kilometers": 9073.5,
+  "collisions": 486,
   "leaderboard": {
    "ks_zandvoort_": {
     "tatuusfa1": {
@@ -4787,46 +4816,17 @@
    "ks_barcelona_layout_moto": {
     "tatuusfa1": {
      "laptime": 101106,
-     "laps": 25,
-     "ts": 1764514560201
+     "laps": 27,
+     "ts": 1764514967572
     }
    }
   },
-  "last_seen": 1764514616587,
+  "last_seen": 1764515287111,
   "wins": 10,
   "podiums": 38,
   "poles": 6,
   "flaps": 5,
   "infr": 47
- },
- {
-  "guid": "76561198161331106",
-  "name": "G",
-  "points": 289.791,
-  "kilometers": 1925.6,
-  "collisions": 117,
-  "leaderboard": {
-   "imola_": {
-    "tatuusfa1": {
-     "laptime": 106102,
-     "laps": 1,
-     "ts": 1761247943877
-    }
-   },
-   "spa_": {
-    "tatuusfa1": {
-     "laptime": 138499,
-     "laps": 94,
-     "ts": 1761784688449
-    }
-   }
-  },
-  "last_seen": 1761852736185,
-  "wins": 9,
-  "podiums": 18,
-  "poles": 9,
-  "flaps": 9,
-  "infr": 2
  },
  {
   "guid": "76561198203278019",
@@ -117820,6 +117820,28 @@
   "infr": 0
  },
  {
+  "guid": "76561197965940962",
+  "name": "dean0",
+  "points": 33.172000000000004,
+  "kilometers": 63.6,
+  "collisions": 6,
+  "leaderboard": {
+   "ks_barcelona_layout_moto": {
+    "tatuusfa1": {
+     "laptime": 102247,
+     "laps": 7,
+     "ts": 1764514865326
+    }
+   }
+  },
+  "last_seen": 1764514975819,
+  "wins": 0,
+  "podiums": 0,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 1
+ },
+ {
   "guid": "76561199071242958",
   "name": "Matias Porto",
   "points": 33.17,
@@ -122099,28 +122121,6 @@
    }
   },
   "last_seen": 1760264982194,
-  "wins": 0,
-  "podiums": 0,
-  "poles": 0,
-  "flaps": 0,
-  "infr": 1
- },
- {
-  "guid": "76561197965940962",
-  "name": "dean0",
-  "points": 32.781000000000006,
-  "kilometers": 50.1,
-  "collisions": 5,
-  "leaderboard": {
-   "ks_barcelona_layout_moto": {
-    "tatuusfa1": {
-     "laptime": 102371,
-     "laps": 6,
-     "ts": 1764514504602
-    }
-   }
-  },
-  "last_seen": 1764514616587,
   "wins": 0,
   "podiums": 0,
   "poles": 0,
