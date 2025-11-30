@@ -521,14 +521,18 @@
           left: 0;
           right: 0;
           bottom: 0;
-          background: rgba(10, 22, 40, 0.98);
+          background: #0a1628;
           backdrop-filter: blur(20px);
           flex-direction: column;
           align-items: center;
-          justify-content: center;
+          justify-content: flex-start;
+          padding-top: 100px;
           gap: 16px;
           z-index: 55;
-          padding: 20px;
+          padding-left: 20px;
+          padding-right: 20px;
+          padding-bottom: 20px;
+          overflow-y: auto;
         }
 
         .mobile-menu .nav-btn,
@@ -1361,13 +1365,6 @@
       let currentPage = 1;
       let currentShopFilter = "all";
 
-      // Check for saved shop unlock state
-      try {
-        shopUnlocked = localStorage.getItem("acelite_shop_unlocked") === "1";
-      } catch (e) {
-        shopUnlocked = false;
-      }
-
       /* ==================== Track Name Mappings ==================== */
       const trackNames = {
         ks_barcelona_layout_gp: "Barcelona - GP",
@@ -1559,7 +1556,6 @@
 
         menu.classList.toggle("open", !isOpen);
         hamburger.classList.toggle("open", !isOpen);
-        document.body.style.overflow = isOpen ? "" : "hidden";
       }
 
       function closeMobileMenu() {
@@ -1567,7 +1563,6 @@
         const hamburger = document.getElementById("hamburger");
         menu.classList.remove("open");
         hamburger.classList.remove("open");
-        document.body.style.overflow = "";
       }
 
       /* ==================== Page Navigation ==================== */
@@ -1642,9 +1637,6 @@
 
         if (value === SHOP_PASSWORD) {
           shopUnlocked = true;
-          try {
-            localStorage.setItem("acelite_shop_unlocked", "1");
-          } catch (e) {}
 
           updateShopButtonState();
           closeShopModal();
