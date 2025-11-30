@@ -339,6 +339,18 @@
         transition: all 0.3s ease;
       }
 
+      .stat-card {
+        min-height: 180px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+
+      .stat-card p:first-of-type {
+        font-size: clamp(1.6rem, 5vw, 2.8rem) !important;
+        line-height: 1.1;
+      }
+
       .stat-card:hover {
         border-color: rgba(212, 175, 55, 0.3);
         transform: translateY(-4px);
@@ -965,7 +977,7 @@
             </div>
             <p
               id="stat-points"
-              class="font-racing text-2xl sm:text-3xl lg:text-4xl font-bold text-emerald-400"
+              class="stat-value font-racing font-bold text-emerald-400"
             >
               $0
             </p>
@@ -982,7 +994,7 @@
             </div>
             <p
               id="stat-wins"
-              class="font-racing text-2xl sm:text-3xl lg:text-4xl font-bold text-amber-400"
+              class="stat-value font-racing font-bold text-amber-400"
             >
               0
             </p>
@@ -996,7 +1008,7 @@
             </div>
             <p
               id="stat-podiums"
-              class="font-racing text-2xl sm:text-3xl lg:text-4xl font-bold text-white"
+              class="stat-value font-racing font-bold text-white"
             >
               0
             </p>
@@ -1010,7 +1022,7 @@
             </div>
             <p
               id="stat-km"
-              class="font-racing text-2xl sm:text-3xl lg:text-4xl font-bold text-blue-400"
+              class="stat-value font-racing font-bold text-blue-400"
             >
               0 km
             </p>
