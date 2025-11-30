@@ -345,24 +345,6 @@
         box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
       }
 
-      .stat-scale-wrapper {
-        width: 100%;
-        display: inline-block;
-        white-space: nowrap;
-        transform-origin: left center;
-      }
-
-      .stat-value {
-        display: inline-block;
-        font-size: 2.6rem;
-        font-family: "Orbitron", sans-serif;
-        font-weight: 700;
-        white-space: nowrap;
-      }
-
-      .stat-unit-inlin
-
-
       /* ==================== Form Elements ==================== */
       .input-modern {
         background: rgba(15, 35, 65, 0.6);
@@ -981,11 +963,12 @@
               >
               <span class="text-xl sm:text-2xl">💰</span>
             </div>
-            <div class="stat-scale-wrapper" id="stat-points-wrap">
-              <span id="stat-points" class="stat-value text-emerald-400"
-                >$0</span
-              >
-            </div>
+            <p
+              id="stat-points"
+              class="font-racing text-2xl sm:text-3xl lg:text-4xl font-bold text-emerald-400"
+            >
+              $0
+            </p>
             <p class="text-slate-500 text-[10px] sm:text-xs mt-1 sm:mt-2">
               Total earnings
             </p>
@@ -997,9 +980,12 @@
               >
               <span class="text-xl sm:text-2xl">🥇</span>
             </div>
-            <div class="stat-scale-wrapper" id="stat-wins-wrap">
-              <span id="stat-wins" class="stat-value text-amber-400">0</span>
-            </div>
+            <p
+              id="stat-wins"
+              class="font-racing text-2xl sm:text-3xl lg:text-4xl font-bold text-amber-400"
+            >
+              0
+            </p>
           </div>
           <div class="stat-card">
             <div class="flex items-center justify-between mb-3 sm:mb-4">
@@ -1008,9 +994,12 @@
               >
               <span class="text-xl sm:text-2xl">🏆</span>
             </div>
-            <div class="stat-scale-wrapper" id="stat-podiums-wrap">
-              <span id="stat-podiums" class="stat-value text-white">0</span>
-            </div>
+            <p
+              id="stat-podiums"
+              class="font-racing text-2xl sm:text-3xl lg:text-4xl font-bold text-white"
+            >
+              0
+            </p>
           </div>
           <div class="stat-card">
             <div class="flex items-center justify-between mb-3 sm:mb-4">
@@ -1019,12 +1008,12 @@
               >
               <span class="text-xl sm:text-2xl">🛣️</span>
             </div>
-            <div class="stat-scale-wrapper" id="stat-km-wrap">
-              <span id="stat-km-number" class="stat-value text-blue-400"
-                >0</span
-              >
-              <span class="stat-unit-inline">km</span>
-            </div>
+            <p
+              id="stat-km"
+              class="font-racing text-2xl sm:text-3xl lg:text-4xl font-bold text-blue-400"
+            >
+              0 km
+            </p>
             <p class="text-slate-500 text-[10px] sm:text-xs mt-1 sm:mt-2">
               Total driven
             </p>
@@ -1419,23 +1408,6 @@
       ];
 
       /* ==================== Utility Functions ==================== */
-      function autoScaleStat(id) {
-        const wrapper = document.getElementById(id);
-
-        if (!wrapper) return;
-
-        // Reset transform (anders stapelt schaal zich op)
-        wrapper.style.transform = "scale(1)";
-
-        const parentWidth = wrapper.parentElement.clientWidth;
-        const contentWidth = wrapper.scrollWidth;
-
-        if (contentWidth > parentWidth) {
-          const scale = parentWidth / contentWidth;
-          wrapper.style.transform = `scale(${scale})`;
-        }
-      }
-
       function getTrackDisplayName(trackId) {
         return (
           trackNames[trackId] || trackId.replace(/_/g, " ").replace(/-/g, " ")
@@ -1865,7 +1837,7 @@
         document.getElementById("stat-wins").textContent = driver.wins || 0;
         document.getElementById("stat-podiums").textContent =
           driver.podiums || 0;
-        document.getElementById("stat-km-number").textContent = km.toFixed(1);
+        document.getElementById("stat-km").textContent = `${km.toFixed(1)} km`;
         document.getElementById("stat-poles").textContent = driver.poles || 0;
         document.getElementById("stat-flaps").textContent = driver.flaps || 0;
         document.getElementById("stat-sessions").textContent = sessions;
@@ -1876,10 +1848,6 @@
         document.getElementById("stat-infr").textContent = infr;
         document.getElementById("stat-infr100").textContent =
           infrPer100.toFixed(2);
-        autoScaleStat("stat-points-wrap");
-        autoScaleStat("stat-wins-wrap");
-        autoScaleStat("stat-podiums-wrap");
-        autoScaleStat("stat-km-wrap");
       }
 
       /* ==================== Leaderboard Page ==================== */
