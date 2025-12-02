@@ -1607,40 +1607,43 @@
 
         if (!bestLaps.length) {
           tbody.innerHTML = `
-      <tr>
-        <td colspan="5" class="py-6 text-center text-slate-500 text-sm">
-          No lap times recorded yet for this driver.
-        </td>
-      </tr>
-     `;
+            <tr>
+              <td colspan="5" class="py-6 text-center text-slate-500 text-sm">
+                No lap times recorded yet for this driver.
+              </td>
+            </tr>
+          `;
           return;
         }
 
         tbody.innerHTML = bestLaps
           .map(
             (item) => `
-      <tr class="border-b border-white/5">
-        <td class="py-3 sm:py-4 px-3 sm:px-6">
-          ${escapeHtml(getTrackDisplayName(item.trackId))}
-        </td>
+            <tr 
+              class="border-b border-white/5 cursor-pointer hover:bg-white/5"
+              onclick="openTrackFromDriver('${item.trackId}')"
+            >
+              <td class="py-3 sm:py-4 px-3 sm:px-6">
+                ${escapeHtml(getTrackDisplayName(item.trackId))}
+              </td>
 
-        <td class="py-3 sm:py-4 px-3 sm:px-6 font-mono text-amber-400 font-semibold">
-          ${formatLaptime(item.bestLap)}
-        </td>
+              <td class="py-3 sm:py-4 px-3 sm:px-6 font-mono text-amber-400 font-semibold">
+                ${formatLaptime(item.bestLap)}
+              </td>
 
-        <td class="py-3 sm:py-4 px-3 sm:px-6 font-mono text-slate-400">
-          ${item.gapToP1 === 0 ? "—" : "+" + item.gapToP1.toFixed(3)}
-        </td>
+              <td class="py-3 sm:py-4 px-3 sm:px-6 font-mono text-slate-400">
+                ${item.gapToP1 === 0 ? "—" : "+" + item.gapToP1.toFixed(3)}
+              </td>
 
-        <td class="py-3 sm:py-4 px-3 sm:px-6 font-mono text-blue-400 font-semibold">
-          ${item.laps.toLocaleString()}
-        </td>
+              <td class="py-3 sm:py-4 px-3 sm:px-6 font-mono text-blue-400 font-semibold">
+                ${item.laps.toLocaleString()}
+              </td>
 
-        <td class="py-3 sm:py-4 px-3 sm:px-6 font-semibold">
-          ${item.pos ? "P" + item.pos : "—"}
-        </td>
-      </tr>
-      `
+              <td class="py-3 sm:py-4 px-3 sm:px-6 font-semibold">
+                ${item.pos ? "P" + item.pos : "—"}
+              </td>
+            </tr>
+          `
           )
           .join("");
       }
@@ -2255,6 +2258,15 @@
         const searchInput = document.getElementById("driver-search");
         if (searchInput) searchInput.value = driver.name;
         displayDriverStats(driver);
+      }
+
+      function openTrackFromDriver(trackId) {
+        if (!trackId || !leaderboardData[trackId]) return;
+
+        // Eerst naar de leaderboard-pagina
+        showPage("leaderboard");
+        // Dan de juiste track selecteren
+        selectTrack(trackId);
       }
 
       /* ==================== Shop Page ==================== */
