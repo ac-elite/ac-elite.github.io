@@ -1156,6 +1156,32 @@
               </div>
             </div>
           </div>
+          <!-- Best Laps per Track -->
+          <div class="glass-card rounded-2xl p-4 sm:p-6 mb-6 sm:mb-8">
+            <h3
+              class="font-racing text-lg sm:text-xl font-bold text-amber-400 mb-4 sm:mb-6 flex items-center gap-3"
+            >
+              <span class="text-xl sm:text-2xl">⏱️</span> Best Laps per Track
+            </h3>
+            <div class="overflow-x-auto">
+              <table class="table-modern w-full text-sm">
+                <thead>
+                  <tr class="text-left text-slate-400">
+                    <th class="py-3 sm:py-4 px-3 sm:px-6">Track</th>
+                    <th class="py-3 sm:py-4 px-3 sm:px-6">Best Lap</th>
+                    <th class="py-3 sm:py-4 px-3 sm:px-6">Overall Pos</th>
+                  </tr>
+                </thead>
+                <tbody id="driver-best-laps-body">
+                  <tr>
+                    <td colspan="3" class="py-6 text-center text-slate-500">
+                      No lap times recorded yet for this driver.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -1455,6 +1481,94 @@
         const div = document.createElement("div");
         div.textContent = text;
         return div.innerHTML;
+      }
+
+      function getDriverBestLaps(driver) {
+        const results = [];
+
+        if (!driver.leaderboard || typeof driver.leaderboard !== "object") {
+          return results;
+        }
+
+        // Voor elke track waar deze driver iets heeft gedaan
+        for (const [trackId, trackObj] of Object.entries(driver.leaderboard)) {
+          if (!trackObj || typeof trackObj !== "object") continue;
+
+          // Pak de leaderboard entries voor deze track en auto
+          const carEntries = leaderboardData[trackId]?.[CAR];
+          if (!Array.isArray(carEntries) || carEntries.length === 0) continue;
+
+          // Filter alleen laps van deze driver
+          const driverEntries = carEntries.filter(
+            (e) => e.guid === driver.guid
+          );
+          if (driverEntries.length === 0) continue;
+
+          // Beste lap van deze driver op deze track
+          const bestEntry = driverEntries.reduce((best, current) =>
+            current.laptime < best.laptime ? current : best
+          );
+
+          // Overall positie op de track bepalen
+          const sortedAll = [...carEntries].sort(
+            (a, b) => a.laptime - b.laptime
+          );
+          const overallIndex = sortedAll.findIndex(
+            (e) => e.guid === driver.guid && e.laptime === bestEntry.laptime
+          );
+          const overallPos = overallIndex >= 0 ? overallIndex + 1 : null;
+
+          results.push({
+            trackId,
+            bestLap: bestEntry.laptime,
+            pos: overallPos,
+          });
+        }
+
+        // Sorteren op snelste tijd eerst
+        results.sort((a, b) => a.bestLap - b.bestLap);
+
+        return results;
+      }
+
+      function renderDriverBestLaps(driver) {
+        const tbody = document.getElementById("driver-best-laps-body");
+        if (!tbody) return;
+
+        const bestLaps = getDriverBestLaps(driver);
+
+        if (!bestLaps.length) {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="3" class="py-6 text-center text-slate-500 text-sm">
+                No lap times recorded yet for this driver.
+              </td>
+            </tr>
+          `;
+          return;
+        }
+
+        tbody.innerHTML = bestLaps
+          .map(
+            (item) => `
+            <tr class="border-b border-white/5">
+              <td class="py-3 sm:py-4 px-3 sm:px-6">
+                ${escapeHtml(getTrackDisplayName(item.trackId))}
+              </td>
+              <td class="py-3 sm:py-4 px-3 sm:px-6 font-mono text-amber-400 font-semibold">
+                ${formatLaptime(item.bestLap)}
+              </td>
+              <td class="py-3 sm:py-4 px-3 sm:px-6">
+                ${
+                  item.pos
+                    ? `P${item.pos}`
+                    : '<span class="text-slate-500 text-xs">—</span>'
+                }
+              </td>
+            </tr>
+          `
+          )
+          .join("");
       }
 
       function getTimeAgo(dateString) {
@@ -1879,6 +1993,14 @@
         document.getElementById("stat-infr").textContent = infr;
         document.getElementById("stat-infr100").textContent =
           infrPer100.toFixed(2);
+        document.getElementById("stat-crashes").textContent = crashes;
+        document.getElementById("stat-cr100").textContent = crPer100.toFixed(2);
+        document.getElementById("stat-infr").textContent = infr;
+        document.getElementById("stat-infr100").textContent =
+          infrPer100.toFixed(2);
+
+        // Nieuw: tabel met beste laps per track
+        renderDriverBestLaps(driver);
       }
 
       /* ==================== Leaderboard Page ==================== */
@@ -2001,9 +2123,9 @@
         const pagination = document.getElementById("pagination");
         if (totalPages > 1) {
           let html = `
-          <button 
-            onclick="goToPage(${currentPage - 1})" 
-            ${currentPage === 1 ? "disabled" : ""} 
+          <button
+            onclick="goToPage(${currentPage - 1})"
+            ${currentPage === 1 ? "disabled" : ""}
             class="btn-ghost px-3 sm:px-4 py-2 rounded-xl disabled:opacity-30 disabled:cursor-not-allowed text-sm"
           >←</button>
         `;
@@ -2015,8 +2137,8 @@
               (i >= currentPage - 1 && i <= currentPage + 1)
             ) {
               html += `
-              <button 
-                onclick="goToPage(${i})" 
+              <button
+                onclick="goToPage(${i})"
                 class="${
                   currentPage === i ? "btn-gold" : "btn-ghost"
                 } px-3 sm:px-4 py-2 rounded-xl text-sm"
@@ -2028,9 +2150,9 @@
           }
 
           html += `
-          <button 
-            onclick="goToPage(${currentPage + 1})" 
-            ${currentPage === totalPages ? "disabled" : ""} 
+          <button
+            onclick="goToPage(${currentPage + 1})"
+            ${currentPage === totalPages ? "disabled" : ""}
             class="btn-ghost px-3 sm:px-4 py-2 rounded-xl disabled:opacity-30 disabled:cursor-not-allowed text-sm"
           >→</button>
         `;
@@ -2069,11 +2191,11 @@
         const tracks = Array.from(new Set(setups.map((s) => s.track))).sort();
 
         let html = `
-        <button 
-          onclick="filterShop('all')" 
+        <button
+          onclick="filterShop('all')"
           class="shop-btn ${
             currentShopFilter === "all" ? "btn-gold" : "btn-ghost"
-          } px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl font-semibold text-xs sm:text-sm" 
+          } px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl font-semibold text-xs sm:text-sm"
           data-track="all"
         >All Tracks</button>
       `;
@@ -2081,11 +2203,11 @@
         html += tracks
           .map(
             (track) => `
-          <button 
-            onclick="filterShop('${track}')" 
+          <button
+            onclick="filterShop('${track}')"
             class="shop-btn ${
               currentShopFilter === track ? "btn-gold" : "btn-ghost"
-            } px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl font-semibold text-xs sm:text-sm" 
+            } px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl font-semibold text-xs sm:text-sm"
             data-track="${track}"
           >${getTrackDisplayName(track)}</button>
         `
@@ -2132,21 +2254,21 @@
                 <span>${setup.rating}</span>
               </div>
             </div>
-            
+
             ${
               setup.image
                 ? `
               <div class="w-full flex justify-center mb-3 sm:mb-4">
-                <img 
-                  src="${setup.image}" 
-                  alt="Car" 
-                  class="h-12 sm:h-14 lg:h-16 object-contain opacity-90 drop-shadow-[0_0_8px_rgba(0,0,0,0.4)] transition-transform duration-300 group-hover:scale-105" 
+                <img
+                  src="${setup.image}"
+                  alt="Car"
+                  class="h-12 sm:h-14 lg:h-16 object-contain opacity-90 drop-shadow-[0_0_8px_rgba(0,0,0,0.4)] transition-transform duration-300 group-hover:scale-105"
                 />
               </div>
             `
                 : ""
             }
-            
+
             <h3 class="font-racing text-base sm:text-lg font-bold text-white mb-1 sm:mb-2 group-hover:text-amber-400 transition-colors">
               ${escapeHtml(setup.name)}
             </h3>
@@ -2156,13 +2278,13 @@
             <p class="text-slate-400 text-xs sm:text-sm mb-4 sm:mb-6 leading-relaxed">${escapeHtml(
               setup.description
             )}</p>
-            
+
             <div class="flex items-center justify-between pt-3 sm:pt-4 border-t border-white/5">
               <span class="font-racing text-xl sm:text-2xl font-bold text-emerald-400">$${
                 setup.price
               }</span>
-              <button 
-                onclick="buySetup(${setup.id})" 
+              <button
+                onclick="buySetup(${setup.id})"
                 class="btn-gold px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm"
               >Buy Setup</button>
             </div>
