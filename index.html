@@ -1171,13 +1171,15 @@
                   <tr class="text-left text-slate-400">
                     <th class="py-3 sm:py-4 px-3 sm:px-6">Track</th>
                     <th class="py-3 sm:py-4 px-3 sm:px-6">Best Lap</th>
+                    <th class="py-3 sm:py-4 px-3 sm:px-6">Gap to P1</th>
+                    <th class="py-3 sm:py-4 px-3 sm:px-6">Laps</th>
                     <th class="py-3 sm:py-4 px-3 sm:px-6">Overall Pos</th>
                   </tr>
                 </thead>
 
                 <tbody id="driver-best-laps-body">
                   <tr>
-                    <td colspan="3" class="py-6 text-center text-slate-500">
+                    <td colspan="5" class="py-6 text-center text-slate-500">
                       No lap times recorded yet for this driver.
                     </td>
                   </tr>
@@ -1534,6 +1536,69 @@
         return results;
       }
 
+      function getDriverBestLaps(driver) {
+        const results = [];
+
+        if (!driver.leaderboard || typeof driver.leaderboard !== "object") {
+          return results;
+        }
+
+        for (const [trackId, trackObj] of Object.entries(driver.leaderboard)) {
+          if (!trackObj || typeof trackObj !== "object") continue;
+
+          // alle laps op de track (voor dit car)
+          const allEntries = leaderboardData[trackId]?.[CAR];
+          if (!Array.isArray(allEntries) || allEntries.length === 0) continue;
+
+          // laps van deze driver
+          const driverEntries = allEntries.filter(
+            (e) => e.guid === driver.guid
+          );
+          if (!driverEntries.length) continue;
+
+          // beste lap van deze driver
+          const bestEntry = driverEntries.reduce((a, b) =>
+            b.laptime < a.laptime ? b : a
+          );
+
+          // overall sorted list
+          const sortedAll = [...allEntries].sort(
+            (a, b) => a.laptime - b.laptime
+          );
+
+          // positie
+          const overallIndex = sortedAll.findIndex(
+            (e) => e.guid === driver.guid && e.laptime === bestEntry.laptime
+          );
+
+          // p1 lap voor gap berekening
+          const p1Lap = sortedAll[0]?.laptime || bestEntry.laptime;
+          const gapToP1 =
+            bestEntry.laptime === p1Lap
+              ? 0
+              : (bestEntry.laptime - p1Lap) / 1000;
+
+          // aantal laps (belangrijk!)
+          const lapsDriven =
+            trackObj[CAR]?.laps !== undefined
+              ? trackObj[CAR].laps
+              : driverEntries.length;
+
+          results.push({
+            trackId,
+            bestLap: bestEntry.laptime,
+            gapToP1,
+            laps: lapsDriven,
+            pos: overallIndex >= 0 ? overallIndex + 1 : null,
+          });
+        }
+
+        // sorteer op beste lap
+        results.sort((a, b) => a.bestLap - b.bestLap);
+
+        return results;
+      }
+
       function renderDriverBestLaps(driver) {
         const tbody = document.getElementById("driver-best-laps-body");
         if (!tbody) return;
@@ -1542,34 +1607,40 @@
 
         if (!bestLaps.length) {
           tbody.innerHTML = `
-            <tr>
-              <td colspan="3" class="py-6 text-center text-slate-500 text-sm">
-                No lap times recorded yet for this driver.
-              </td>
-            </tr>
-          `;
+      <tr>
+        <td colspan="5" class="py-6 text-center text-slate-500 text-sm">
+          No lap times recorded yet for this driver.
+        </td>
+      </tr>
+     `;
           return;
         }
 
         tbody.innerHTML = bestLaps
           .map(
             (item) => `
-            <tr class="border-b border-white/5">
-              <td class="py-3 sm:py-4 px-3 sm:px-6">
-                ${escapeHtml(getTrackDisplayName(item.trackId))}
-              </td>
-              <td class="py-3 sm:py-4 px-3 sm:px-6 font-mono text-amber-400 font-semibold">
-                ${formatLaptime(item.bestLap)}
-              </td>
-              <td class="py-3 sm:py-4 px-3 sm:px-6">
-                ${
-                  item.pos
-                    ? `P${item.pos}`
-                    : '<span class="text-slate-500 text-xs">—</span>'
-                }
-              </td>
-            </tr>
-          `
+      <tr class="border-b border-white/5">
+        <td class="py-3 sm:py-4 px-3 sm:px-6">
+          ${escapeHtml(getTrackDisplayName(item.trackId))}
+        </td>
+
+        <td class="py-3 sm:py-4 px-3 sm:px-6 font-mono text-amber-400 font-semibold">
+          ${formatLaptime(item.bestLap)}
+        </td>
+
+        <td class="py-3 sm:py-4 px-3 sm:px-6 font-mono text-slate-400">
+          ${item.gapToP1 === 0 ? "—" : "+" + item.gapToP1.toFixed(3)}
+        </td>
+
+        <td class="py-3 sm:py-4 px-3 sm:px-6 font-mono text-blue-400 font-semibold">
+          ${item.laps.toLocaleString()}
+        </td>
+
+        <td class="py-3 sm:py-4 px-3 sm:px-6 font-semibold">
+          ${item.pos ? "P" + item.pos : "—"}
+        </td>
+      </tr>
+      `
           )
           .join("");
       }
