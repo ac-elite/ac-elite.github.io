@@ -1055,7 +1055,7 @@
           </div>
         </div>
 
-        <!-- Detailed Stats -->
+        <!-- Detailed Stats + Best Laps -->
         <div
           class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8"
         >
@@ -1156,13 +1156,15 @@
               </div>
             </div>
           </div>
-          <!-- Best Laps per Track -->
-          <div class="glass-card rounded-2xl p-4 sm:p-6 mb-6 sm:mb-8">
+
+          <!-- Best Laps per Track – FULL WIDTH -->
+          <div class="glass-card rounded-2xl p-4 sm:p-6 lg:col-span-2">
             <h3
               class="font-racing text-lg sm:text-xl font-bold text-amber-400 mb-4 sm:mb-6 flex items-center gap-3"
             >
               <span class="text-xl sm:text-2xl">⏱️</span> Best Laps per Track
             </h3>
+
             <div class="overflow-x-auto">
               <table class="table-modern w-full text-sm">
                 <thead>
@@ -1172,6 +1174,7 @@
                     <th class="py-3 sm:py-4 px-3 sm:px-6">Overall Pos</th>
                   </tr>
                 </thead>
+
                 <tbody id="driver-best-laps-body">
                   <tr>
                     <td colspan="3" class="py-6 text-center text-slate-500">
