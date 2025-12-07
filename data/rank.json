@@ -1558,15 +1558,15 @@
  {
   "guid": "76561198873100812",
   "name": "RP Sam Cool 44",
-  "points": 902.113,
-  "kilometers": 6959.2,
-  "collisions": 196,
+  "points": 902.573,
+  "kilometers": 7023.2,
+  "collisions": 197,
   "leaderboard": {
    "mugello_": {
     "tatuusfa1": {
-     "laptime": 104739,
-     "laps": 102,
-     "ts": 1765080830324
+     "laptime": 104646,
+     "laps": 107,
+     "ts": 1765082221335
     }
    },
    "ks_barcelona_layout_gp": {
@@ -1647,7 +1647,7 @@
     }
    }
   },
-  "last_seen": 1765080902464,
+  "last_seen": 1765082372466,
   "wins": 36,
   "podiums": 53,
   "poles": 38,
@@ -123147,28 +123147,6 @@
   "infr": 0
  },
  {
-  "guid": "76561199822185918",
-  "name": "Ferzegas",
-  "points": 34.518,
-  "kilometers": 185,
-  "collisions": 39,
-  "leaderboard": {
-   "mugello_": {
-    "tatuusfa1": {
-     "laptime": 111911,
-     "laps": 11,
-     "ts": 1765080871873
-    }
-   }
-  },
-  "last_seen": 1765080902464,
-  "wins": 0,
-  "podiums": 1,
-  "poles": 0,
-  "flaps": 0,
-  "infr": 3
- },
- {
   "guid": "76561199559638150",
   "name": "Juan Posadas",
   "points": 34.516,
@@ -125843,6 +125821,28 @@
   "poles": 0,
   "flaps": 0,
   "infr": 0
+ },
+ {
+  "guid": "76561199822185918",
+  "name": "Ferzegas",
+  "points": 34.088,
+  "kilometers": 202.5,
+  "collisions": 43,
+  "leaderboard": {
+   "mugello_": {
+    "tatuusfa1": {
+     "laptime": 111911,
+     "laps": 11,
+     "ts": 1765080871873
+    }
+   }
+  },
+  "last_seen": 1765081479334,
+  "wins": 0,
+  "podiums": 1,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 3
  },
  {
   "guid": "76561199420907044",
