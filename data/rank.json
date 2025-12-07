@@ -9629,6 +9629,36 @@
   "infr": 13
  },
  {
+  "guid": "76561198064240048",
+  "name": "BiP",
+  "points": 131.379,
+  "kilometers": 567.6,
+  "collisions": 32,
+  "leaderboard": {
+   "mugello_": {
+    "tatuusfa1": {
+     "laptime": 106712,
+     "laps": 68,
+     "ts": 1765145932125
+    }
+   },
+   "ks_brands_hatch_gp": {
+    "tatuusfa1": {
+     "laptime": 84864,
+     "laps": 9,
+     "ts": 1765147405375
+    }
+   }
+  },
+  "last_seen": 1765147437186,
+  "wins": 1,
+  "podiums": 4,
+  "poles": 0,
+  "flaps": 1,
+  "infr": 0,
+  "lang": "it"
+ },
+ {
   "guid": "76561198115388104",
   "name": "guidoparrini",
   "points": 130.84400000000002,
@@ -10214,36 +10244,6 @@
   "poles": 1,
   "flaps": 1,
   "infr": 15
- },
- {
-  "guid": "76561198064240048",
-  "name": "BiP",
-  "points": 123.066,
-  "kilometers": 544.2,
-  "collisions": 32,
-  "leaderboard": {
-   "mugello_": {
-    "tatuusfa1": {
-     "laptime": 106712,
-     "laps": 68,
-     "ts": 1765145932125
-    }
-   },
-   "ks_brands_hatch_gp": {
-    "tatuusfa1": {
-     "laptime": 86125,
-     "laps": 4,
-     "ts": 1765146762935
-    }
-   }
-  },
-  "last_seen": 1765146814073,
-  "wins": 0,
-  "podiums": 3,
-  "poles": 0,
-  "flaps": 0,
-  "infr": 0,
-  "lang": "it"
  },
  {
   "guid": "76561198105230733",
@@ -15698,7 +15698,7 @@
   "guid": "76561198796455498",
   "name": "Xzeph",
   "points": 82.283,
-  "kilometers": 3324.9,
+  "kilometers": 3328.8,
   "collisions": 374,
   "leaderboard": {
    "ks_silverstone_gp": {
@@ -15751,7 +15751,7 @@
     }
    }
   },
-  "last_seen": 1765146814073,
+  "last_seen": 1765147062968,
   "wins": 2,
   "podiums": 9,
   "poles": 2,
