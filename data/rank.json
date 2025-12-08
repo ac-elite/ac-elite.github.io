@@ -426,9 +426,9 @@
  {
   "guid": "76561198093128155",
   "name": "GREG Coulard",
-  "points": 2184.407,
-  "kilometers": 11824.9,
-  "collisions": 306,
+  "points": 2184.558,
+  "kilometers": 11836.4,
+  "collisions": 307,
   "leaderboard": {
    "ks_zandvoort_": {
     "tatuusfa1": {
@@ -461,8 +461,8 @@
    "ks_brands_hatch_gp": {
     "tatuusfa1": {
      "laptime": 80505,
-     "laps": 140,
-     "ts": 1765207742886
+     "laps": 142,
+     "ts": 1765208509616
     }
    },
    "ks_nurburgring_layout_gp_b": {
@@ -522,10 +522,10 @@
     }
    }
   },
-  "last_seen": 1765207834174,
+  "last_seen": 1765208551060,
   "wins": 91,
   "podiums": 166,
-  "poles": 46,
+  "poles": 47,
   "flaps": 70,
   "infr": 23
  },
@@ -744,8 +744,8 @@
  {
   "guid": "76561198028779531",
   "name": "Subinator",
-  "points": 1584.686,
-  "kilometers": 7750.4,
+  "points": 1589.47,
+  "kilometers": 7769.9,
   "collisions": 122,
   "leaderboard": {
    "ks_zandvoort_": {
@@ -820,13 +820,13 @@
    },
    "ks_brands_hatch_gp": {
     "tatuusfa1": {
-     "laptime": 83205,
-     "laps": 3,
-     "ts": 1765207620939
+     "laptime": 82333,
+     "laps": 7,
+     "ts": 1765208478358
     }
    }
   },
-  "last_seen": 1765207834174,
+  "last_seen": 1765208551060,
   "wins": 87,
   "podiums": 131,
   "poles": 42,
@@ -1048,9 +1048,9 @@
  {
   "guid": "76561198999518018",
   "name": "David O.",
-  "points": 1307.915,
-  "kilometers": 8014.9,
-  "collisions": 106,
+  "points": 1307.041,
+  "kilometers": 8022.3,
+  "collisions": 107,
   "leaderboard": {
    "ks_zandvoort_": {
     "tatuusfa1": {
@@ -1076,8 +1076,8 @@
    "ks_brands_hatch_gp": {
     "tatuusfa1": {
      "laptime": 80296,
-     "laps": 171,
-     "ts": 1765207164743
+     "laps": 172,
+     "ts": 1765208271396
     }
    },
    "ks_nurburgring_layout_gp_b": {
@@ -1109,7 +1109,7 @@
     }
    }
   },
-  "last_seen": 1765207834174,
+  "last_seen": 1765208375767,
   "wins": 48,
   "podiums": 108,
   "poles": 34,
@@ -27230,28 +27230,6 @@
   "infr": 1
  },
  {
-  "guid": "76561199142355032",
-  "name": "Isaac X",
-  "points": 61.964,
-  "kilometers": 257.6,
-  "collisions": 39,
-  "leaderboard": {
-   "mugello_": {
-    "tatuusfa1": {
-     "laptime": 109725,
-     "laps": 30,
-     "ts": 1764879603581
-    }
-   }
-  },
-  "last_seen": 1764879885627,
-  "wins": 1,
-  "podiums": 1,
-  "poles": 0,
-  "flaps": 0,
-  "infr": 3
- },
- {
   "guid": "76561198054163017",
   "name": "NMW",
   "points": 61.855000000000004,
@@ -27853,6 +27831,28 @@
   "poles": 0,
   "flaps": 0,
   "infr": 0
+ },
+ {
+  "guid": "76561199142355032",
+  "name": "Isaac X",
+  "points": 61.403000000000006,
+  "kilometers": 258.9,
+  "collisions": 41,
+  "leaderboard": {
+   "mugello_": {
+    "tatuusfa1": {
+     "laptime": 109725,
+     "laps": 30,
+     "ts": 1764879603581
+    }
+   }
+  },
+  "last_seen": 1765208551060,
+  "wins": 1,
+  "podiums": 1,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 3
  },
  {
   "guid": "76561198133802299",
