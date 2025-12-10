@@ -1,8 +1,8 @@
 [
  {
   "guid": "76561198025621442",
-  "name": "DIEnamic",
-  "points": 7101.1759999999995,
+  "name": "DIENamic",
+  "points": 7101.176,
   "kilometers": 30128.9,
   "collisions": 956,
   "leaderboard": {
@@ -98,7 +98,7 @@
     }
    }
   },
-  "last_seen": 1765134861967,
+  "last_seen": 1765385586288,
   "wins": 255,
   "podiums": 536,
   "poles": 47,
@@ -942,9 +942,9 @@
  {
   "guid": "76561198273504643",
   "name": "Alexander",
-  "points": 1472.5800000000002,
-  "kilometers": 14225.6,
-  "collisions": 290,
+  "points": 1473.611,
+  "kilometers": 14240.2,
+  "collisions": 292,
   "leaderboard": {
    "ks_zandvoort_": {
     "tatuusfa1": {
@@ -977,8 +977,8 @@
    "ks_brands_hatch_gp": {
     "tatuusfa1": {
      "laptime": 79781,
-     "laps": 62,
-     "ts": 1765384166142
+     "laps": 65,
+     "ts": 1765384682727
     }
    },
    "ks_nurburgring_layout_gp_b": {
@@ -1038,7 +1038,7 @@
     }
    }
   },
-  "last_seen": 1765384220200,
+  "last_seen": 1765384948599,
   "wins": 60,
   "podiums": 88,
   "poles": 120,
@@ -35417,6 +35417,35 @@
   "infr": 0
  },
  {
+  "guid": "76561198120550767",
+  "name": "Achim",
+  "points": 56.938,
+  "kilometers": 66.1,
+  "collisions": 0,
+  "leaderboard": {
+   "imola_": {
+    "tatuusfa1": {
+     "laptime": 106179,
+     "laps": 2,
+     "ts": 1761321301566
+    }
+   },
+   "ks_brands_hatch_gp": {
+    "tatuusfa1": {
+     "laptime": 81142,
+     "laps": 6,
+     "ts": 1765384683086
+    }
+   }
+  },
+  "last_seen": 1765384968157,
+  "wins": 1,
+  "podiums": 2,
+  "poles": 0,
+  "flaps": 1,
+  "infr": 0
+ },
+ {
   "guid": "76561199100244190",
   "name": "Lesnare",
   "points": 56.925000000000004,
@@ -43178,35 +43207,6 @@
   "podiums": 0,
   "poles": 0,
   "flaps": 0,
-  "infr": 0
- },
- {
-  "guid": "76561198120550767",
-  "name": "Achim",
-  "points": 53.715,
-  "kilometers": 42.6,
-  "collisions": 0,
-  "leaderboard": {
-   "imola_": {
-    "tatuusfa1": {
-     "laptime": 106179,
-     "laps": 2,
-     "ts": 1761321301566
-    }
-   },
-   "ks_brands_hatch_gp": {
-    "tatuusfa1": {
-     "laptime": 81142,
-     "laps": 3,
-     "ts": 1765383353031
-    }
-   }
-  },
-  "last_seen": 1765384220200,
-  "wins": 0,
-  "podiums": 1,
-  "poles": 0,
-  "flaps": 1,
   "infr": 0
  },
  {
