@@ -2,9 +2,9 @@
  {
   "guid": "76561198025621442",
   "name": "DIENamic",
-  "points": 7109.451,
-  "kilometers": 30183.6,
-  "collisions": 959,
+  "points": 7109.48,
+  "kilometers": 30187,
+  "collisions": 960,
   "leaderboard": {
    "ks_zandvoort_": {
     "tatuusfa1": {
@@ -37,8 +37,8 @@
    "ks_brands_hatch_gp": {
     "tatuusfa1": {
      "laptime": 81074,
-     "laps": 261,
-     "ts": 1765387791668
+     "laps": 263,
+     "ts": 1765388422817
     }
    },
    "ks_nurburgring_layout_gp_b": {
@@ -98,7 +98,7 @@
     }
    }
   },
-  "last_seen": 1765387882321,
+  "last_seen": 1765388598197,
   "wins": 256,
   "podiums": 537,
   "poles": 47,
@@ -942,8 +942,8 @@
  {
   "guid": "76561198273504643",
   "name": "Alexander",
-  "points": 1473.3,
-  "kilometers": 14257.1,
+  "points": 1474.242,
+  "kilometers": 14276,
   "collisions": 295,
   "leaderboard": {
    "ks_zandvoort_": {
@@ -977,8 +977,8 @@
    "ks_brands_hatch_gp": {
     "tatuusfa1": {
      "laptime": 79765,
-     "laps": 67,
-     "ts": 1765387178201
+     "laps": 70,
+     "ts": 1765388414234
     }
    },
    "ks_nurburgring_layout_gp_b": {
@@ -1038,7 +1038,7 @@
     }
    }
   },
-  "last_seen": 1765387882321,
+  "last_seen": 1765388598197,
   "wins": 60,
   "podiums": 88,
   "poles": 120,
@@ -2820,9 +2820,9 @@
  {
   "guid": "76561198065243121",
   "name": "MisterFlappy",
-  "points": 637.119,
-  "kilometers": 9074.8,
-  "collisions": 517,
+  "points": 634.6020000000001,
+  "kilometers": 9086.4,
+  "collisions": 518,
   "leaderboard": {
    "mugello_": {
     "tatuusfa1": {
@@ -2909,7 +2909,7 @@
     }
    }
   },
-  "last_seen": 1765387882321,
+  "last_seen": 1765388598197,
   "wins": 39,
   "podiums": 85,
   "poles": 8,
@@ -3019,9 +3019,9 @@
  {
   "guid": "76561198868504121",
   "name": "Dre Mano",
-  "points": 516.497,
-  "kilometers": 6853.1,
-  "collisions": 349,
+  "points": 516.1260000000001,
+  "kilometers": 6855.8,
+  "collisions": 350,
   "leaderboard": {
    "ks_zandvoort_": {
     "tatuusfa1": {
@@ -3054,8 +3054,8 @@
    "ks_brands_hatch_gp": {
     "tatuusfa1": {
      "laptime": 80404,
-     "laps": 104,
-     "ts": 1759094833238
+     "laps": 105,
+     "ts": 1765388544873
     }
    },
    "ks_nurburgring_layout_gp_b": {
@@ -3108,7 +3108,7 @@
     }
    }
   },
-  "last_seen": 1765112007070,
+  "last_seen": 1765388598197,
   "wins": 27,
   "podiums": 61,
   "poles": 14,
@@ -30597,6 +30597,28 @@
   "infr": 0
  },
  {
+  "guid": "76561199203074017",
+  "name": "Bagguett",
+  "points": 59.874,
+  "kilometers": 21.4,
+  "collisions": 3,
+  "leaderboard": {
+   "ks_brands_hatch_gp": {
+    "tatuusfa1": {
+     "laptime": 79918,
+     "laps": 3,
+     "ts": 1765388289987
+    }
+   }
+  },
+  "last_seen": 1765388598197,
+  "wins": 0,
+  "podiums": 1,
+  "poles": 1,
+  "flaps": 1,
+  "infr": 0
+ },
+ {
   "guid": "76561198843228437",
   "name": "Flippedd",
   "points": 59.827,
@@ -38928,28 +38950,6 @@
   "poles": 1,
   "flaps": 0,
   "infr": 4
- },
- {
-  "guid": "76561199203074017",
-  "name": "Bagguett",
-  "points": 55.587,
-  "kilometers": 11.1,
-  "collisions": 3,
-  "leaderboard": {
-   "ks_brands_hatch_gp": {
-    "tatuusfa1": {
-     "laptime": 80613,
-     "laps": 1,
-     "ts": 1765387687887
-    }
-   }
-  },
-  "last_seen": 1765387882321,
-  "wins": 0,
-  "podiums": 1,
-  "poles": 0,
-  "flaps": 1,
-  "infr": 0
  },
  {
   "guid": "76561198329633314",
@@ -220643,21 +220643,6 @@
   "infr": 1
  },
  {
-  "guid": "76561199830715417",
-  "name": "kendy",
-  "points": 24.689,
-  "kilometers": 0.1,
-  "collisions": 1,
-  "leaderboard": {
-  },
-  "last_seen": 1757878424541,
-  "wins": 0,
-  "podiums": 0,
-  "poles": 0,
-  "flaps": 0,
-  "infr": 4
- },
- {
   "guid": "76561198957785304",
   "name": "SrTulazo",
   "points": 24.677999999999997,
@@ -231296,6 +231281,21 @@
   "poles": 0,
   "flaps": 0,
   "infr": 0
+ },
+ {
+  "guid": "76561199830715417",
+  "name": "kendy",
+  "points": 22.177,
+  "kilometers": 4.5,
+  "collisions": 3,
+  "leaderboard": {
+  },
+  "last_seen": 1765388598197,
+  "wins": 0,
+  "podiums": 0,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 4
  },
  {
   "guid": "76561198815425209",
