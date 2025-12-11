@@ -4785,7 +4785,7 @@
  {
   "guid": "76561198858822043",
   "name": "isi",
-  "points": 347.60400000000004,
+  "points": 347.604,
   "kilometers": 5459.7,
   "collisions": 918,
   "leaderboard": {
@@ -4839,7 +4839,7 @@
     }
    }
   },
-  "last_seen": 1765316695258,
+  "last_seen": 1765480784325,
   "wins": 3,
   "podiums": 15,
   "poles": 1,
@@ -8885,6 +8885,49 @@
   "infr": 16
  },
  {
+  "guid": "76561198399478476",
+  "name": "SimiThePro",
+  "points": 155.776,
+  "kilometers": 885.4,
+  "collisions": 78,
+  "leaderboard": {
+   "ks_zandvoort_": {
+    "tatuusfa1": {
+     "laptime": 94877,
+     "laps": 61,
+     "ts": 1763230237291
+    }
+   },
+   "ks_barcelona_layout_moto": {
+    "tatuusfa1": {
+     "laptime": 100426,
+     "laps": 6,
+     "ts": 1764104221461
+    }
+   },
+   "mugello_": {
+    "tatuusfa1": {
+     "laptime": 106083,
+     "laps": 32,
+     "ts": 1764868695464
+    }
+   },
+   "ks_brands_hatch_gp": {
+    "tatuusfa1": {
+     "laptime": 81415,
+     "laps": 2,
+     "ts": 1765480429916
+    }
+   }
+  },
+  "last_seen": 1765480630946,
+  "wins": 1,
+  "podiums": 5,
+  "poles": 4,
+  "flaps": 4,
+  "infr": 1
+ },
+ {
   "guid": "76561197978760481",
   "name": "Ryoka",
   "points": 154.229,
@@ -9041,49 +9084,6 @@
   "poles": 1,
   "flaps": 2,
   "infr": 12
- },
- {
-  "guid": "76561198399478476",
-  "name": "SimiThePro",
-  "points": 151.943,
-  "kilometers": 883.3,
-  "collisions": 76,
-  "leaderboard": {
-   "ks_zandvoort_": {
-    "tatuusfa1": {
-     "laptime": 94877,
-     "laps": 61,
-     "ts": 1763230237291
-    }
-   },
-   "ks_barcelona_layout_moto": {
-    "tatuusfa1": {
-     "laptime": 100426,
-     "laps": 6,
-     "ts": 1764104221461
-    }
-   },
-   "mugello_": {
-    "tatuusfa1": {
-     "laptime": 106083,
-     "laps": 32,
-     "ts": 1764868695464
-    }
-   },
-   "ks_brands_hatch_gp": {
-    "tatuusfa1": {
-     "laptime": 84155,
-     "laps": 1,
-     "ts": 1765477946595
-    }
-   }
-  },
-  "last_seen": 1765480067367,
-  "wins": 1,
-  "podiums": 5,
-  "poles": 4,
-  "flaps": 4,
-  "infr": 1
  },
  {
   "guid": "76561198040945489",
