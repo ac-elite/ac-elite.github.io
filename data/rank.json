@@ -214,9 +214,9 @@
  {
   "guid": "76561198328304798",
   "name": "CarterReza",
-  "points": 2600.9069999999997,
-  "kilometers": 21433,
-  "collisions": 210,
+  "points": 2608.3459999999995,
+  "kilometers": 21456.5,
+  "collisions": 211,
   "leaderboard": {
    "ks_zandvoort_": {
     "tatuusfa1": {
@@ -249,8 +249,8 @@
    "ks_brands_hatch_gp": {
     "tatuusfa1": {
      "laptime": 79409,
-     "laps": 72,
-     "ts": 1765409796487
+     "laps": 77,
+     "ts": 1765410559885
     }
    },
    "ks_nurburgring_layout_gp_b": {
@@ -310,9 +310,9 @@
     }
    }
   },
-  "last_seen": 1765410034209,
-  "wins": 94,
-  "podiums": 147,
+  "last_seen": 1765410580564,
+  "wins": 95,
+  "podiums": 148,
   "poles": 277,
   "flaps": 118,
   "infr": 67
@@ -744,9 +744,9 @@
  {
   "guid": "76561198281399110",
   "name": "3lMist3r",
-  "points": 1642.684,
-  "kilometers": 7060.4,
-  "collisions": 402,
+  "points": 1646.745,
+  "kilometers": 7083.8,
+  "collisions": 403,
   "leaderboard": {
    "ks_zandvoort_": {
     "tatuusfa1": {
@@ -779,8 +779,8 @@
    "ks_brands_hatch_gp": {
     "tatuusfa1": {
      "laptime": 81487,
-     "laps": 60,
-     "ts": 1765409960935
+     "laps": 65,
+     "ts": 1765410570633
     }
    },
    "ks_nurburgring_layout_gp_b": {
@@ -840,9 +840,9 @@
     }
    }
   },
-  "last_seen": 1765410034209,
+  "last_seen": 1765410581865,
   "wins": 35,
-  "podiums": 113,
+  "podiums": 114,
   "poles": 5,
   "flaps": 8,
   "infr": 2
@@ -942,9 +942,9 @@
  {
   "guid": "76561198273504643",
   "name": "Alexander",
-  "points": 1568.258,
-  "kilometers": 14573.1,
-  "collisions": 305,
+  "points": 1569.801,
+  "kilometers": 14588.3,
+  "collisions": 306,
   "leaderboard": {
    "ks_zandvoort_": {
     "tatuusfa1": {
@@ -977,8 +977,8 @@
    "ks_brands_hatch_gp": {
     "tatuusfa1": {
      "laptime": 79505,
-     "laps": 131,
-     "ts": 1765409939061
+     "laps": 136,
+     "ts": 1765414985086
     }
    },
    "ks_nurburgring_layout_gp_b": {
@@ -1038,7 +1038,7 @@
     }
    }
   },
-  "last_seen": 1765410034209,
+  "last_seen": 1765415016322,
   "wins": 65,
   "podiums": 94,
   "poles": 130,
@@ -7330,9 +7330,9 @@
  {
   "guid": "76561197977141841",
   "name": "koza",
-  "points": 186.349,
-  "kilometers": 1117,
-  "collisions": 104,
+  "points": 186.014,
+  "kilometers": 1113.9,
+  "collisions": 105,
   "leaderboard": {
    "spa_": {
     "tatuusfa1": {
@@ -7377,7 +7377,7 @@
     }
    }
   },
-  "last_seen": 1765410034209,
+  "last_seen": 1765410135375,
   "wins": 4,
   "podiums": 10,
   "poles": 0,
@@ -7840,7 +7840,7 @@
   "guid": "76561198101135819",
   "name": "BicycleSid",
   "points": 173.083,
-  "kilometers": 1238,
+  "kilometers": 1239.4,
   "collisions": 212,
   "leaderboard": {
    "ks_zandvoort_": {
@@ -7879,7 +7879,7 @@
     }
    }
   },
-  "last_seen": 1765410034209,
+  "last_seen": 1765410187251,
   "wins": 2,
   "podiums": 4,
   "poles": 1,
@@ -23937,6 +23937,28 @@
   "infr": 6
  },
  {
+  "guid": "76561198250672976",
+  "name": "Freddepadd",
+  "points": 66.484,
+  "kilometers": 90.4,
+  "collisions": 5,
+  "leaderboard": {
+   "ks_brands_hatch_gp": {
+    "tatuusfa1": {
+     "laptime": 80332,
+     "laps": 11,
+     "ts": 1765410410273
+    }
+   }
+  },
+  "last_seen": 1765410421838,
+  "wins": 0,
+  "podiums": 1,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 0
+ },
+ {
   "guid": "76561199102455046",
   "name": "Pitexior_",
   "points": 66.457,
@@ -25391,28 +25413,6 @@
   "poles": 0,
   "flaps": 0,
   "infr": 1
- },
- {
-  "guid": "76561198250672976",
-  "name": "Freddepadd",
-  "points": 64.825,
-  "kilometers": 73.9,
-  "collisions": 5,
-  "leaderboard": {
-   "ks_brands_hatch_gp": {
-    "tatuusfa1": {
-     "laptime": 80332,
-     "laps": 7,
-     "ts": 1765409745724
-    }
-   }
-  },
-  "last_seen": 1765410034209,
-  "wins": 0,
-  "podiums": 1,
-  "poles": 0,
-  "flaps": 0,
-  "infr": 0
  },
  {
   "guid": "76561199624789656",
@@ -67962,6 +67962,21 @@
   "leaderboard": {
   },
   "last_seen": 1763165627070,
+  "wins": 0,
+  "podiums": 0,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 0
+ },
+ {
+  "guid": "76561199284135267",
+  "name": "PavilionRegular",
+  "points": 48.941,
+  "kilometers": 5.8,
+  "collisions": 2,
+  "leaderboard": {
+  },
+  "last_seen": 1765410624378,
   "wins": 0,
   "podiums": 0,
   "poles": 0,
