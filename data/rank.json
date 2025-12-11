@@ -2331,8 +2331,8 @@
  {
   "guid": "76561198028559312",
   "name": "Konrad Czarnota",
-  "points": 746.0150000000001,
-  "kilometers": 6746.6,
+  "points": 745.835,
+  "kilometers": 6746.4,
   "collisions": 271,
   "leaderboard": {
    "mugello_": {
@@ -2413,7 +2413,7 @@
     }
    }
   },
-  "last_seen": 1765488313203,
+  "last_seen": 1765489403723,
   "wins": 19,
   "podiums": 46,
   "poles": 31,
@@ -3026,9 +3026,9 @@
  {
   "guid": "76561198868504121",
   "name": "Dre Mano",
-  "points": 526.279,
-  "kilometers": 6973.8,
-  "collisions": 363,
+  "points": 532.243,
+  "kilometers": 6997.3,
+  "collisions": 365,
   "leaderboard": {
    "ks_zandvoort_": {
     "tatuusfa1": {
@@ -3061,8 +3061,8 @@
    "ks_brands_hatch_gp": {
     "tatuusfa1": {
      "laptime": 80404,
-     "laps": 125,
-     "ts": 1765488044776
+     "laps": 130,
+     "ts": 1765488852411
     }
    },
    "ks_nurburgring_layout_gp_b": {
@@ -3115,11 +3115,11 @@
     }
    }
   },
-  "last_seen": 1765488313203,
-  "wins": 28,
-  "podiums": 62,
+  "last_seen": 1765489056697,
+  "wins": 29,
+  "podiums": 63,
   "poles": 15,
-  "flaps": 21,
+  "flaps": 22,
   "infr": 26
  },
  {
@@ -30646,6 +30646,28 @@
   "infr": 0
  },
  {
+  "guid": "76561198879783810",
+  "name": "ot220",
+  "points": 60.381,
+  "kilometers": 57.3,
+  "collisions": 4,
+  "leaderboard": {
+   "ks_brands_hatch_gp": {
+    "tatuusfa1": {
+     "laptime": 83301,
+     "laps": 10,
+     "ts": 1765488603392
+    }
+   }
+  },
+  "last_seen": 1765488679834,
+  "wins": 0,
+  "podiums": 1,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 0
+ },
+ {
   "guid": "76561199323690644",
   "name": "agustin rocha",
   "points": 60.379,
@@ -31768,28 +31790,6 @@
   "poles": 0,
   "flaps": 0,
   "infr": 1
- },
- {
-  "guid": "76561198879783810",
-  "name": "ot220",
-  "points": 59.300000000000004,
-  "kilometers": 46.4,
-  "collisions": 1,
-  "leaderboard": {
-   "ks_brands_hatch_gp": {
-    "tatuusfa1": {
-     "laptime": 83301,
-     "laps": 7,
-     "ts": 1765488244644
-    }
-   }
-  },
-  "last_seen": 1765488313203,
-  "wins": 0,
-  "podiums": 1,
-  "poles": 0,
-  "flaps": 0,
-  "infr": 0
  },
  {
   "guid": "76561198196175239",
@@ -63051,6 +63051,21 @@
   "leaderboard": {
   },
   "last_seen": 1765236733646,
+  "wins": 0,
+  "podiums": 0,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 0
+ },
+ {
+  "guid": "76561199028100126",
+  "name": "Lucas Locht",
+  "points": 49.618,
+  "kilometers": 6.2,
+  "collisions": 1,
+  "leaderboard": {
+  },
+  "last_seen": 1765488643418,
   "wins": 0,
   "podiums": 0,
   "poles": 0,
