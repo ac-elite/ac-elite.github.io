@@ -4839,7 +4839,7 @@
     }
    }
   },
-  "last_seen": 1765103805535,
+  "last_seen": 1765544018286,
   "wins": 46,
   "podiums": 108,
   "poles": 66,
@@ -43055,6 +43055,42 @@
   "infr": 0
  },
  {
+  "guid": "76561198290305259",
+  "name": "Costello J 04",
+  "points": 54.128,
+  "kilometers": 401.6,
+  "collisions": 46,
+  "leaderboard": {
+   "imola_": {
+    "tatuusfa1": {
+     "laptime": 105909,
+     "laps": 1,
+     "ts": 1761256907450
+    }
+   },
+   "ks_red_bull_ring_layout_gp": {
+    "tatuusfa1": {
+     "laptime": 89635,
+     "laps": 6,
+     "ts": 1762529317270
+    }
+   },
+   "ks_brands_hatch_gp": {
+    "tatuusfa1": {
+     "laptime": 79900,
+     "laps": 6,
+     "ts": 1765540602163
+    }
+   }
+  },
+  "last_seen": 1765540822318,
+  "wins": 0,
+  "podiums": 1,
+  "poles": 1,
+  "flaps": 0,
+  "infr": 4
+ },
+ {
   "guid": "76561199036929268",
   "name": "Rubikugel",
   "points": 54.127,
@@ -64500,42 +64536,6 @@
   "infr": 0
  },
  {
-  "guid": "76561198290305259",
-  "name": "Costello J 04",
-  "points": 49.497,
-  "kilometers": 385.6,
-  "collisions": 46,
-  "leaderboard": {
-   "imola_": {
-    "tatuusfa1": {
-     "laptime": 105909,
-     "laps": 1,
-     "ts": 1761256907450
-    }
-   },
-   "ks_red_bull_ring_layout_gp": {
-    "tatuusfa1": {
-     "laptime": 89635,
-     "laps": 6,
-     "ts": 1762529317270
-    }
-   },
-   "ks_brands_hatch_gp": {
-    "tatuusfa1": {
-     "laptime": 80300,
-     "laps": 4,
-     "ts": 1765540154783
-    }
-   }
-  },
-  "last_seen": 1765540224721,
-  "wins": 0,
-  "podiums": 1,
-  "poles": 1,
-  "flaps": 0,
-  "infr": 4
- },
- {
   "guid": "76561199136125511",
   "name": "Dr.Flashy5657",
   "points": 49.49400000000001,
@@ -72002,49 +72002,6 @@
   "infr": 0
  },
  {
-  "guid": "76561198063836037",
-  "name": "sevennilnine",
-  "points": 48.036,
-  "kilometers": 297.4,
-  "collisions": 5,
-  "leaderboard": {
-   "ks_zandvoort_": {
-    "tatuusfa1": {
-     "laptime": 101857,
-     "laps": 5,
-     "ts": 1756467290044
-    }
-   },
-   "ks_barcelona_layout_gp": {
-    "tatuusfa1": {
-     "laptime": 110806,
-     "laps": 5,
-     "ts": 1758445927251
-    }
-   },
-   "ks_nurburgring_layout_gp_b": {
-    "tatuusfa1": {
-     "laptime": 118604,
-     "laps": 3,
-     "ts": 1759444781204
-    }
-   },
-   "magione_": {
-    "tatuusfa1": {
-     "laptime": 72201,
-     "laps": 5,
-     "ts": 1763562565627
-    }
-   }
-  },
-  "last_seen": 1763562747195,
-  "wins": 0,
-  "podiums": 1,
-  "poles": 0,
-  "flaps": 0,
-  "infr": 3
- },
- {
   "guid": "76561199247314803",
   "name": "Mario Acevedo",
   "points": 48.033,
@@ -72161,6 +72118,49 @@
   "poles": 0,
   "flaps": 0,
   "infr": 1
+ },
+ {
+  "guid": "76561198063836037",
+  "name": "sevennilnine",
+  "points": 48.023,
+  "kilometers": 297.9,
+  "collisions": 5,
+  "leaderboard": {
+   "ks_zandvoort_": {
+    "tatuusfa1": {
+     "laptime": 101857,
+     "laps": 5,
+     "ts": 1756467290044
+    }
+   },
+   "ks_barcelona_layout_gp": {
+    "tatuusfa1": {
+     "laptime": 110806,
+     "laps": 5,
+     "ts": 1758445927251
+    }
+   },
+   "ks_nurburgring_layout_gp_b": {
+    "tatuusfa1": {
+     "laptime": 118604,
+     "laps": 3,
+     "ts": 1759444781204
+    }
+   },
+   "magione_": {
+    "tatuusfa1": {
+     "laptime": 72201,
+     "laps": 5,
+     "ts": 1763562565627
+    }
+   }
+  },
+  "last_seen": 1765543418948,
+  "wins": 0,
+  "podiums": 1,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 3
  },
  {
   "guid": "76561198126906497",
