@@ -1494,8 +1494,8 @@
  {
   "guid": "76561198028884703",
   "name": "Fancy Natra",
-  "points": 985.775,
-  "kilometers": 5073.4,
+  "points": 985.475,
+  "kilometers": 5081.2,
   "collisions": 133,
   "leaderboard": {
    "ks_brands_hatch_gp": {
@@ -1555,7 +1555,7 @@
     }
    }
   },
-  "last_seen": 1762723042317,
+  "last_seen": 1765571399312,
   "wins": 34,
   "podiums": 80,
   "poles": 12,
@@ -2515,9 +2515,9 @@
  {
   "guid": "76561198163482603",
   "name": "Wohall",
-  "points": 678.195,
-  "kilometers": 7449,
-  "collisions": 911,
+  "points": 676.681,
+  "kilometers": 7460.8,
+  "collisions": 915,
   "leaderboard": {
    "spa_": {
     "tatuusfa1": {
@@ -2569,7 +2569,7 @@
     }
    }
   },
-  "last_seen": 1765570683465,
+  "last_seen": 1765571399312,
   "wins": 14,
   "podiums": 44,
   "poles": 4,
@@ -3115,7 +3115,7 @@
     }
    }
   },
-  "last_seen": 1765570683465,
+  "last_seen": 1765570693701,
   "wins": 31,
   "podiums": 67,
   "poles": 15,
@@ -3409,8 +3409,8 @@
  {
   "guid": "76561199095074508",
   "name": "HugeBigBeans",
-  "points": 480.948,
-  "kilometers": 2231.3,
+  "points": 481.488,
+  "kilometers": 2243,
   "collisions": 133,
   "leaderboard": {
    "ks_silverstone_gp": {
@@ -3458,15 +3458,15 @@
    "ks_brands_hatch_gp": {
     "tatuusfa1": {
      "laptime": 80037,
-     "laps": 71,
-     "ts": 1765402234533
+     "laps": 73,
+     "ts": 1765571303879
     }
    }
   },
-  "last_seen": 1765402488564,
+  "last_seen": 1765571399312,
   "wins": 26,
   "podiums": 35,
-  "poles": 12,
+  "poles": 13,
   "flaps": 11,
   "infr": 2
  },
@@ -4332,9 +4332,9 @@
  {
   "guid": "76561198858822043",
   "name": "isi",
-  "points": 372.30699999999996,
-  "kilometers": 5626.9,
-  "collisions": 933,
+  "points": 372.42,
+  "kilometers": 5638.6,
+  "collisions": 934,
   "leaderboard": {
    "spa_": {
     "tatuusfa1": {
@@ -4381,12 +4381,12 @@
    "ks_brands_hatch_gp": {
     "tatuusfa1": {
      "laptime": 82206,
-     "laps": 77,
-     "ts": 1765487428200
+     "laps": 78,
+     "ts": 1765571325955
     }
    }
   },
-  "last_seen": 1765487561906,
+  "last_seen": 1765571399312,
   "wins": 3,
   "podiums": 18,
   "poles": 1,
@@ -22184,49 +22184,6 @@
   "infr": 0
  },
  {
-  "guid": "76561199180315918",
-  "name": "thathinker",
-  "points": 69.196,
-  "kilometers": 2724.5,
-  "collisions": 76,
-  "leaderboard": {
-   "ks_zandvoort_": {
-    "tatuusfa1": {
-     "laptime": 95530,
-     "laps": 48,
-     "ts": 1762889496932
-    }
-   },
-   "monza_": {
-    "tatuusfa1": {
-     "laptime": 111998,
-     "laps": 25,
-     "ts": 1757013655745
-    }
-   },
-   "mugello_": {
-    "tatuusfa1": {
-     "laptime": 106215,
-     "laps": 51,
-     "ts": 1757960199497
-    }
-   },
-   "ks_silverstone_gp": {
-    "tatuusfa1": {
-     "laptime": 119970,
-     "laps": 12,
-     "ts": 1760806635266
-    }
-   }
-  },
-  "last_seen": 1762889526101,
-  "wins": 6,
-  "podiums": 14,
-  "poles": 0,
-  "flaps": 5,
-  "infr": 104
- },
- {
   "guid": "76561197993897512",
   "name": "Daniele De Santis",
   "points": 69.169,
@@ -22364,6 +22321,49 @@
   "poles": 0,
   "flaps": 0,
   "infr": 0
+ },
+ {
+  "guid": "76561199180315918",
+  "name": "thathinker",
+  "points": 68.896,
+  "kilometers": 2724.5,
+  "collisions": 76,
+  "leaderboard": {
+   "ks_zandvoort_": {
+    "tatuusfa1": {
+     "laptime": 95530,
+     "laps": 48,
+     "ts": 1762889496932
+    }
+   },
+   "monza_": {
+    "tatuusfa1": {
+     "laptime": 111998,
+     "laps": 25,
+     "ts": 1757013655745
+    }
+   },
+   "mugello_": {
+    "tatuusfa1": {
+     "laptime": 106215,
+     "laps": 51,
+     "ts": 1757960199497
+    }
+   },
+   "ks_silverstone_gp": {
+    "tatuusfa1": {
+     "laptime": 119970,
+     "laps": 12,
+     "ts": 1760806635266
+    }
+   }
+  },
+  "last_seen": 1765571399312,
+  "wins": 6,
+  "podiums": 14,
+  "poles": 0,
+  "flaps": 5,
+  "infr": 104
  },
  {
   "guid": "76561198878727196",
