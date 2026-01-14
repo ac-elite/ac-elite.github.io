@@ -4708,8 +4708,8 @@
  {
   "guid": "76561199026962142",
   "name": "JAmes May",
-  "points": 499.45,
-  "kilometers": 6885.1,
+  "points": 505.303,
+  "kilometers": 6925.6,
   "collisions": 683,
   "leaderboard": {
    "imola_": {
@@ -4784,13 +4784,13 @@
    },
    "monza_": {
     "tatuusfa1": {
-     "laptime": 113019,
-     "laps": 7,
-     "ts": 1768411931673
+     "laptime": 112273,
+     "laps": 11,
+     "ts": 1768412587879
     }
    }
   },
-  "last_seen": 1768411994384,
+  "last_seen": 1768412744259,
   "wins": 4,
   "podiums": 17,
   "poles": 3,
@@ -33309,28 +33309,6 @@
   "infr": 2
  },
  {
-  "guid": "76561199218212610",
-  "name": "rych0v",
-  "points": 65.404,
-  "kilometers": 41.5,
-  "collisions": 1,
-  "leaderboard": {
-   "monza_": {
-    "tatuusfa1": {
-     "laptime": 118509,
-     "laps": 4,
-     "ts": 1768411957064
-    }
-   }
-  },
-  "last_seen": 1768411994385,
-  "wins": 0,
-  "podiums": 1,
-  "poles": 0,
-  "flaps": 0,
-  "infr": 0
- },
- {
   "guid": "76561199231222282",
   "name": "HoMbReBaLa",
   "points": 65.39399999999999,
@@ -33753,6 +33731,28 @@
   "poles": 0,
   "flaps": 0,
   "infr": 1
+ },
+ {
+  "guid": "76561199218212610",
+  "name": "rych0v",
+  "points": 64.97399999999999,
+  "kilometers": 50.4,
+  "collisions": 2,
+  "leaderboard": {
+   "monza_": {
+    "tatuusfa1": {
+     "laptime": 118509,
+     "laps": 4,
+     "ts": 1768411957064
+    }
+   }
+  },
+  "last_seen": 1768412255424,
+  "wins": 0,
+  "podiums": 1,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 0
  },
  {
   "guid": "76561198965364782",
@@ -39566,6 +39566,35 @@
   "poles": 0,
   "flaps": 0,
   "infr": 2
+ },
+ {
+  "guid": "76561198795165037",
+  "name": "Mageza Zulu",
+  "points": 61.357,
+  "kilometers": 69.2,
+  "collisions": 7,
+  "leaderboard": {
+   "ks_vallelunga_classic_circuit": {
+    "tatuusfa1": {
+     "laptime": 82364,
+     "laps": 1,
+     "ts": 1767290272802
+    }
+   },
+   "monza_": {
+    "tatuusfa1": {
+     "laptime": 117393,
+     "laps": 5,
+     "ts": 1768412558788
+    }
+   }
+  },
+  "last_seen": 1768412744260,
+  "wins": 0,
+  "podiums": 1,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 0
  },
  {
   "guid": "76561198983099309",
@@ -51183,35 +51212,6 @@
   "last_seen": 1766348144525,
   "wins": 0,
   "podiums": 0,
-  "poles": 0,
-  "flaps": 0,
-  "infr": 0
- },
- {
-  "guid": "76561198795165037",
-  "name": "Mageza Zulu",
-  "points": 56.862,
-  "kilometers": 41.7,
-  "collisions": 7,
-  "leaderboard": {
-   "ks_vallelunga_classic_circuit": {
-    "tatuusfa1": {
-     "laptime": 82364,
-     "laps": 1,
-     "ts": 1767290272802
-    }
-   },
-   "monza_": {
-    "tatuusfa1": {
-     "laptime": 118229,
-     "laps": 3,
-     "ts": 1768411962472
-    }
-   }
-  },
-  "last_seen": 1768411994385,
-  "wins": 0,
-  "podiums": 1,
   "poles": 0,
   "flaps": 0,
   "infr": 0
@@ -100037,21 +100037,6 @@
   "infr": 0
  },
  {
-  "guid": "76561198367699083",
-  "name": "MateGaming02",
-  "points": 49.197,
-  "kilometers": 26.1,
-  "collisions": 2,
-  "leaderboard": {
-  },
-  "last_seen": 1768132484940,
-  "wins": 0,
-  "podiums": 0,
-  "poles": 0,
-  "flaps": 0,
-  "infr": 0
- },
- {
   "guid": "76561198020570045",
   "name": "BaDfAsT",
   "points": 49.195,
@@ -103748,6 +103733,21 @@
   "podiums": 2,
   "poles": 0,
   "flaps": 1,
+  "infr": 0
+ },
+ {
+  "guid": "76561198367699083",
+  "name": "MateGaming02",
+  "points": 48.722,
+  "kilometers": 32,
+  "collisions": 3,
+  "leaderboard": {
+  },
+  "last_seen": 1768412744259,
+  "wins": 0,
+  "podiums": 0,
+  "poles": 0,
+  "flaps": 0,
   "infr": 0
  },
  {
