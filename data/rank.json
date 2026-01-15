@@ -4834,66 +4834,9 @@
   "infr": 1
  },
  {
-  "guid": "76561198098029574",
-  "name": "Mark Lyons",
-  "points": 467.21,
-  "kilometers": 1810.3,
-  "collisions": 27,
-  "leaderboard": {
-   "mugello_": {
-    "tatuusfa1": {
-     "laptime": 105080,
-     "laps": 43,
-     "ts": 1764978138687
-    }
-   },
-   "ks_brands_hatch_gp": {
-    "tatuusfa1": {
-     "laptime": 80699,
-     "laps": 27,
-     "ts": 1765671159225
-    }
-   },
-   "ks_laguna_seca_": {
-    "tatuusfa1": {
-     "laptime": 78455,
-     "laps": 138,
-     "ts": 1760212266606
-    }
-   },
-   "ks_red_bull_ring_layout_gp": {
-    "tatuusfa1": {
-     "laptime": 89353,
-     "laps": 16,
-     "ts": 1762380093132
-    }
-   },
-   "magione_": {
-    "tatuusfa1": {
-     "laptime": 68577,
-     "laps": 5,
-     "ts": 1763586734716
-    }
-   },
-   "ks_barcelona_layout_moto": {
-    "tatuusfa1": {
-     "laptime": 100693,
-     "laps": 7,
-     "ts": 1764538889518
-    }
-   }
-  },
-  "last_seen": 1765672120112,
-  "wins": 31,
-  "podiums": 46,
-  "poles": 22,
-  "flaps": 29,
-  "infr": 15
- },
- {
   "guid": "76561198379324541",
   "name": "MazaTribe",
-  "points": 463.678,
+  "points": 468.75,
   "kilometers": 3598.2,
   "collisions": 253,
   "leaderboard": {
@@ -4997,11 +4940,68 @@
    }
   },
   "last_seen": 1768517419091,
-  "wins": 2,
-  "podiums": 23,
+  "wins": 3,
+  "podiums": 24,
   "poles": 2,
-  "flaps": 2,
+  "flaps": 3,
   "infr": 8
+ },
+ {
+  "guid": "76561198098029574",
+  "name": "Mark Lyons",
+  "points": 467.21,
+  "kilometers": 1810.3,
+  "collisions": 27,
+  "leaderboard": {
+   "mugello_": {
+    "tatuusfa1": {
+     "laptime": 105080,
+     "laps": 43,
+     "ts": 1764978138687
+    }
+   },
+   "ks_brands_hatch_gp": {
+    "tatuusfa1": {
+     "laptime": 80699,
+     "laps": 27,
+     "ts": 1765671159225
+    }
+   },
+   "ks_laguna_seca_": {
+    "tatuusfa1": {
+     "laptime": 78455,
+     "laps": 138,
+     "ts": 1760212266606
+    }
+   },
+   "ks_red_bull_ring_layout_gp": {
+    "tatuusfa1": {
+     "laptime": 89353,
+     "laps": 16,
+     "ts": 1762380093132
+    }
+   },
+   "magione_": {
+    "tatuusfa1": {
+     "laptime": 68577,
+     "laps": 5,
+     "ts": 1763586734716
+    }
+   },
+   "ks_barcelona_layout_moto": {
+    "tatuusfa1": {
+     "laptime": 100693,
+     "laps": 7,
+     "ts": 1764538889518
+    }
+   }
+  },
+  "last_seen": 1765672120112,
+  "wins": 31,
+  "podiums": 46,
+  "poles": 22,
+  "flaps": 29,
+  "infr": 15
  },
  {
   "guid": "76561198999796654",
@@ -19927,6 +19927,35 @@
   "infr": 3
  },
  {
+  "guid": "76561198354701606",
+  "name": "Themostregular",
+  "points": 83.45400000000001,
+  "kilometers": 218,
+  "collisions": 4,
+  "leaderboard": {
+   "spa_": {
+    "tatuusfa1": {
+     "laptime": 148359,
+     "laps": 16,
+     "ts": 1768159322877
+    }
+   },
+   "monza_": {
+    "tatuusfa1": {
+     "laptime": 118951,
+     "laps": 3,
+     "ts": 1768517997195
+    }
+   }
+  },
+  "last_seen": 1768518165354,
+  "wins": 1,
+  "podiums": 2,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 0
+ },
+ {
   "guid": "76561199217316006",
   "name": "pelati",
   "points": 83.396,
@@ -23898,28 +23927,6 @@
   "infr": 1
  },
  {
-  "guid": "76561198354701606",
-  "name": "Themostregular",
-  "points": 75.67299999999999,
-  "kilometers": 188.3,
-  "collisions": 2,
-  "leaderboard": {
-   "spa_": {
-    "tatuusfa1": {
-     "laptime": 148359,
-     "laps": 16,
-     "ts": 1768159322877
-    }
-   }
-  },
-  "last_seen": 1768159338474,
-  "wins": 1,
-  "podiums": 2,
-  "poles": 0,
-  "flaps": 0,
-  "infr": 0
- },
- {
   "guid": "76561198110810096",
   "name": "BeneficialQC",
   "points": 75.634,
@@ -25740,6 +25747,42 @@
    }
   },
   "last_seen": 1764093086115,
+  "wins": 0,
+  "podiums": 1,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 0
+ },
+ {
+  "guid": "76561199215272727",
+  "name": "adam",
+  "points": 72.943,
+  "kilometers": 137.4,
+  "collisions": 11,
+  "leaderboard": {
+   "ks_nurburgring_layout_gp_a": {
+    "tatuusfa1": {
+     "laptime": 134379,
+     "laps": 1,
+     "ts": 1766855702130
+    }
+   },
+   "spa_": {
+    "tatuusfa1": {
+     "laptime": 148603,
+     "laps": 1,
+     "ts": 1767997806385
+    }
+   },
+   "monza_": {
+    "tatuusfa1": {
+     "laptime": 117396,
+     "laps": 7,
+     "ts": 1768518055210
+    }
+   }
+  },
+  "last_seen": 1768518165354,
   "wins": 0,
   "podiums": 1,
   "poles": 0,
@@ -27919,42 +27962,6 @@
    }
   },
   "last_seen": 1763154358079,
-  "wins": 0,
-  "podiums": 1,
-  "poles": 0,
-  "flaps": 0,
-  "infr": 0
- },
- {
-  "guid": "76561199215272727",
-  "name": "adam",
-  "points": 70.128,
-  "kilometers": 107.8,
-  "collisions": 8,
-  "leaderboard": {
-   "ks_nurburgring_layout_gp_a": {
-    "tatuusfa1": {
-     "laptime": 134379,
-     "laps": 1,
-     "ts": 1766855702130
-    }
-   },
-   "spa_": {
-    "tatuusfa1": {
-     "laptime": 148603,
-     "laps": 1,
-     "ts": 1767997806385
-    }
-   },
-   "monza_": {
-    "tatuusfa1": {
-     "laptime": 118106,
-     "laps": 5,
-     "ts": 1768517404838
-    }
-   }
-  },
-  "last_seen": 1768517436469,
   "wins": 0,
   "podiums": 1,
   "poles": 0,
@@ -41428,28 +41435,6 @@
   "infr": 0
  },
  {
-  "guid": "76561199143071595",
-  "name": "auryo7",
-  "points": 60.594,
-  "kilometers": 75,
-  "collisions": 9,
-  "leaderboard": {
-   "monza_": {
-    "tatuusfa1": {
-     "laptime": 119772,
-     "laps": 3,
-     "ts": 1768517048438
-    }
-   }
-  },
-  "last_seen": 1768517436469,
-  "wins": 0,
-  "podiums": 1,
-  "poles": 0,
-  "flaps": 0,
-  "infr": 0
- },
- {
   "guid": "76561199211928066",
   "name": "SP1-747",
   "points": 60.572,
@@ -43595,6 +43580,28 @@
   "poles": 0,
   "flaps": 0,
   "infr": 2
+ },
+ {
+  "guid": "76561199143071595",
+  "name": "auryo7",
+  "points": 59.592000000000006,
+  "kilometers": 106.4,
+  "collisions": 15,
+  "leaderboard": {
+   "monza_": {
+    "tatuusfa1": {
+     "laptime": 119772,
+     "laps": 4,
+     "ts": 1768518133784
+    }
+   }
+  },
+  "last_seen": 1768518165354,
+  "wins": 0,
+  "podiums": 1,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 0
  },
  {
   "guid": "76561198163160183",
