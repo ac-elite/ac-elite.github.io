@@ -7760,7 +7760,7 @@
     }
    }
   },
-  "last_seen": 1768559640465,
+  "last_seen": 1768559644309,
   "wins": 7,
   "podiums": 17,
   "poles": 1,
@@ -13763,7 +13763,7 @@
  {
   "guid": "76561198264023324",
   "name": "Adamkaaa",
-  "points": 113.28299999999999,
+  "points": 113.283,
   "kilometers": 385.4,
   "collisions": 21,
   "leaderboard": {
@@ -13782,7 +13782,7 @@
     }
    }
   },
-  "last_seen": 1767451405925,
+  "last_seen": 1768583023324,
   "wins": 0,
   "podiums": 1,
   "poles": 0,
@@ -27359,56 +27359,6 @@
   "infr": 0
  },
  {
-  "guid": "76561199808100604",
-  "name": "tedin1_",
-  "points": 70.989,
-  "kilometers": 1008,
-  "collisions": 161,
-  "leaderboard": {
-   "mugello_": {
-    "tatuusfa1": {
-     "laptime": 110022,
-     "laps": 46,
-     "ts": 1765046900230
-    }
-   },
-   "ks_silverstone_gp": {
-    "tatuusfa1": {
-     "laptime": 123309,
-     "laps": 19,
-     "ts": 1766087160963
-    }
-   },
-   "ks_nurburgring_layout_gp_a": {
-    "tatuusfa1": {
-     "laptime": 120300,
-     "laps": 15,
-     "ts": 1766854982546
-    }
-   },
-   "ks_vallelunga_classic_circuit": {
-    "tatuusfa1": {
-     "laptime": 73306,
-     "laps": 10,
-     "ts": 1767033845728
-    }
-   },
-   "spa_": {
-    "tatuusfa1": {
-     "laptime": 144450,
-     "laps": 3,
-     "ts": 1767984583692
-    }
-   }
-  },
-  "last_seen": 1767984640008,
-  "wins": 1,
-  "podiums": 3,
-  "poles": 0,
-  "flaps": 0,
-  "infr": 8
- },
- {
   "guid": "76561198025519734",
   "name": "marki",
   "points": 70.942,
@@ -27697,6 +27647,56 @@
   "poles": 0,
   "flaps": 0,
   "infr": 0
+ },
+ {
+  "guid": "76561199808100604",
+  "name": "tedin1_",
+  "points": 70.46900000000001,
+  "kilometers": 1019.9,
+  "collisions": 163,
+  "leaderboard": {
+   "mugello_": {
+    "tatuusfa1": {
+     "laptime": 110022,
+     "laps": 46,
+     "ts": 1765046900230
+    }
+   },
+   "ks_silverstone_gp": {
+    "tatuusfa1": {
+     "laptime": 123309,
+     "laps": 19,
+     "ts": 1766087160963
+    }
+   },
+   "ks_nurburgring_layout_gp_a": {
+    "tatuusfa1": {
+     "laptime": 120300,
+     "laps": 15,
+     "ts": 1766854982546
+    }
+   },
+   "ks_vallelunga_classic_circuit": {
+    "tatuusfa1": {
+     "laptime": 73306,
+     "laps": 10,
+     "ts": 1767033845728
+    }
+   },
+   "spa_": {
+    "tatuusfa1": {
+     "laptime": 144450,
+     "laps": 3,
+     "ts": 1767984583692
+    }
+   }
+  },
+  "last_seen": 1768579840009,
+  "wins": 1,
+  "podiums": 3,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 8
  },
  {
   "guid": "76561198146266783",
