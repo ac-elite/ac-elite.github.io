@@ -3838,9 +3838,9 @@
  {
   "guid": "76561198253261997",
   "name": "universol",
-  "points": 627.271,
-  "kilometers": 7538.8,
-  "collisions": 391,
+  "points": 626.9459999999999,
+  "kilometers": 7562.4,
+  "collisions": 392,
   "leaderboard": {
    "ks_nurburgring_layout_gp_b": {
     "tatuusfa1": {
@@ -3913,7 +3913,7 @@
     }
    }
   },
-  "last_seen": 1768630789969,
+  "last_seen": 1768631278372,
   "wins": 28,
   "podiums": 52,
   "poles": 34,
@@ -30232,6 +30232,28 @@
   "infr": 0
  },
  {
+  "guid": "76561199112910296",
+  "name": "JDee09",
+  "points": 68.48100000000001,
+  "kilometers": 199.4,
+  "collisions": 13,
+  "leaderboard": {
+   "monza_": {
+    "tatuusfa1": {
+     "laptime": 119686,
+     "laps": 14,
+     "ts": 1768645896356
+    }
+   }
+  },
+  "last_seen": 1768646072354,
+  "wins": 1,
+  "podiums": 2,
+  "poles": 0,
+  "flaps": 1,
+  "infr": 0
+ },
+ {
   "guid": "76561198290747023",
   "name": "Mexican Minister of Defense",
   "points": 68.438,
@@ -30251,28 +30273,6 @@
   "podiums": 1,
   "poles": 0,
   "flaps": 0,
-  "infr": 0
- },
- {
-  "guid": "76561199112910296",
-  "name": "JDee09",
-  "points": 68.361,
-  "kilometers": 181.6,
-  "collisions": 13,
-  "leaderboard": {
-   "monza_": {
-    "tatuusfa1": {
-     "laptime": 119772,
-     "laps": 13,
-     "ts": 1768557273713
-    }
-   }
-  },
-  "last_seen": 1768557372712,
-  "wins": 1,
-  "podiums": 2,
-  "poles": 0,
-  "flaps": 1,
   "infr": 0
  },
  {
@@ -38262,56 +38262,6 @@
   "infr": 0
  },
  {
-  "guid": "76561198290305259",
-  "name": "Costello J 04",
-  "points": 61.949,
-  "kilometers": 959.1,
-  "collisions": 73,
-  "leaderboard": {
-   "imola_": {
-    "tatuusfa1": {
-     "laptime": 105909,
-     "laps": 1,
-     "ts": 1761256907450
-    }
-   },
-   "ks_red_bull_ring_layout_gp": {
-    "tatuusfa1": {
-     "laptime": 89635,
-     "laps": 6,
-     "ts": 1762529317270
-    }
-   },
-   "ks_brands_hatch_gp": {
-    "tatuusfa1": {
-     "laptime": 79671,
-     "laps": 26,
-     "ts": 1765811440339
-    }
-   },
-   "ks_silverstone_gp": {
-    "tatuusfa1": {
-     "laptime": 119396,
-     "laps": 4,
-     "ts": 1766156469413
-    }
-   },
-   "ks_nurburgring_layout_gp_a": {
-    "tatuusfa1": {
-     "laptime": 115272,
-     "laps": 4,
-     "ts": 1766502986256
-    }
-   }
-  },
-  "last_seen": 1766502993946,
-  "wins": 0,
-  "podiums": 1,
-  "poles": 3,
-  "flaps": 1,
-  "infr": 4
- },
- {
   "guid": "76561199130205433",
   "name": "Mickey_Wickey",
   "points": 61.922,
@@ -39333,6 +39283,56 @@
   "poles": 0,
   "flaps": 0,
   "infr": 1
+ },
+ {
+  "guid": "76561198290305259",
+  "name": "Costello J 04",
+  "points": 61.526,
+  "kilometers": 975.5,
+  "collisions": 77,
+  "leaderboard": {
+   "imola_": {
+    "tatuusfa1": {
+     "laptime": 105909,
+     "laps": 1,
+     "ts": 1761256907450
+    }
+   },
+   "ks_red_bull_ring_layout_gp": {
+    "tatuusfa1": {
+     "laptime": 89635,
+     "laps": 6,
+     "ts": 1762529317270
+    }
+   },
+   "ks_brands_hatch_gp": {
+    "tatuusfa1": {
+     "laptime": 79671,
+     "laps": 26,
+     "ts": 1765811440339
+    }
+   },
+   "ks_silverstone_gp": {
+    "tatuusfa1": {
+     "laptime": 119396,
+     "laps": 4,
+     "ts": 1766156469413
+    }
+   },
+   "ks_nurburgring_layout_gp_a": {
+    "tatuusfa1": {
+     "laptime": 115272,
+     "laps": 4,
+     "ts": 1766502986256
+    }
+   }
+  },
+  "last_seen": 1768646072354,
+  "wins": 0,
+  "podiums": 1,
+  "poles": 3,
+  "flaps": 1,
+  "infr": 4
  },
  {
   "guid": "76561198139140987",
