@@ -2033,9 +2033,9 @@
  {
   "guid": "76561198319370833",
   "name": "Bennett Racz Szabo",
-  "points": 1124.606,
-  "kilometers": 8250.2,
-  "collisions": 165,
+  "points": 1124.261,
+  "kilometers": 8270.8,
+  "collisions": 166,
   "leaderboard": {
    "ks_zandvoort_": {
     "tatuusfa1": {
@@ -2096,12 +2096,12 @@
    "rt_suzuka_suzukagp": {
     "tatuusfa1": {
      "laptime": 121042,
-     "laps": 3,
-     "ts": 1768827419454
+     "laps": 4,
+     "ts": 1768827700203
     }
    }
   },
-  "last_seen": 1768827451171,
+  "last_seen": 1768827900171,
   "wins": 66,
   "podiums": 90,
   "poles": 54,
@@ -5679,7 +5679,7 @@
  {
   "guid": "76561199067031859",
   "name": "Saba",
-  "points": 364.61199999999997,
+  "points": 364.312,
   "kilometers": 18524.3,
   "collisions": 1149,
   "leaderboard": {
@@ -5794,7 +5794,7 @@
     }
    }
   },
-  "last_seen": 1768164069301,
+  "last_seen": 1768836602048,
   "wins": 47,
   "podiums": 110,
   "poles": 68,
@@ -5804,8 +5804,8 @@
  {
   "guid": "76561199560459292",
   "name": "NJ4FTP2 VR",
-  "points": 353.829,
-  "kilometers": 1739.2,
+  "points": 353.529,
+  "kilometers": 1745.1,
   "collisions": 13,
   "leaderboard": {
    "ks_zandvoort_": {
@@ -5851,7 +5851,7 @@
     }
    }
   },
-  "last_seen": 1766953098586,
+  "last_seen": 1768836602048,
   "wins": 7,
   "podiums": 25,
   "poles": 2,
@@ -9702,7 +9702,7 @@
   "guid": "76561199144027951",
   "name": "J kruse",
   "points": 177.607,
-  "kilometers": 494.8,
+  "kilometers": 495.1,
   "collisions": 34,
   "leaderboard": {
    "ks_zandvoort_": {
@@ -9748,7 +9748,7 @@
     }
    }
   },
-  "last_seen": 1768750913519,
+  "last_seen": 1768827999419,
   "wins": 1,
   "podiums": 3,
   "poles": 0,
@@ -177345,78 +177345,6 @@
   "infr": 0
  },
  {
-  "guid": "76561198340698400",
-  "name": "Norberto Ochoa",
-  "points": 33.834,
-  "kilometers": 1353.2,
-  "collisions": 235,
-  "leaderboard": {
-   "magione_": {
-    "tatuusfa1": {
-     "laptime": 74570,
-     "laps": 13,
-     "ts": 1763833087988
-    }
-   },
-   "ks_barcelona_layout_moto": {
-    "tatuusfa1": {
-     "laptime": 108332,
-     "laps": 11,
-     "ts": 1764108684493
-    }
-   },
-   "mugello_": {
-    "tatuusfa1": {
-     "laptime": 112669,
-     "laps": 8,
-     "ts": 1765065794094
-    }
-   },
-   "ks_brands_hatch_gp": {
-    "tatuusfa1": {
-     "laptime": 89743,
-     "laps": 5,
-     "ts": 1765485164431
-    }
-   },
-   "ks_silverstone_gp": {
-    "tatuusfa1": {
-     "laptime": 128156,
-     "laps": 20,
-     "ts": 1766330224674
-    }
-   },
-   "ks_nurburgring_layout_gp_a": {
-    "tatuusfa1": {
-     "laptime": 121821,
-     "laps": 61,
-     "ts": 1766965101763
-    }
-   },
-   "ks_vallelunga_classic_circuit": {
-    "tatuusfa1": {
-     "laptime": 73493,
-     "laps": 23,
-     "ts": 1767554320400
-    }
-   },
-   "spa_": {
-    "tatuusfa1": {
-     "laptime": 146507,
-     "laps": 2,
-     "ts": 1767728065849
-    }
-   }
-  },
-  "last_seen": 1768435662967,
-  "wins": 0,
-  "podiums": 1,
-  "poles": 0,
-  "flaps": 0,
-  "infr": 13,
-  "lang": "es"
- },
- {
   "guid": "76561198820479226",
   "name": "_-Drag-_",
   "points": 33.833,
@@ -177861,6 +177789,78 @@
   "poles": 0,
   "flaps": 0,
   "infr": 0
+ },
+ {
+  "guid": "76561198340698400",
+  "name": "Norberto Ochoa",
+  "points": 33.764,
+  "kilometers": 1356,
+  "collisions": 235,
+  "leaderboard": {
+   "magione_": {
+    "tatuusfa1": {
+     "laptime": 74570,
+     "laps": 13,
+     "ts": 1763833087988
+    }
+   },
+   "ks_barcelona_layout_moto": {
+    "tatuusfa1": {
+     "laptime": 108332,
+     "laps": 11,
+     "ts": 1764108684493
+    }
+   },
+   "mugello_": {
+    "tatuusfa1": {
+     "laptime": 112669,
+     "laps": 8,
+     "ts": 1765065794094
+    }
+   },
+   "ks_brands_hatch_gp": {
+    "tatuusfa1": {
+     "laptime": 89743,
+     "laps": 5,
+     "ts": 1765485164431
+    }
+   },
+   "ks_silverstone_gp": {
+    "tatuusfa1": {
+     "laptime": 128156,
+     "laps": 20,
+     "ts": 1766330224674
+    }
+   },
+   "ks_nurburgring_layout_gp_a": {
+    "tatuusfa1": {
+     "laptime": 121821,
+     "laps": 61,
+     "ts": 1766965101763
+    }
+   },
+   "ks_vallelunga_classic_circuit": {
+    "tatuusfa1": {
+     "laptime": 73493,
+     "laps": 23,
+     "ts": 1767554320400
+    }
+   },
+   "spa_": {
+    "tatuusfa1": {
+     "laptime": 146507,
+     "laps": 2,
+     "ts": 1767728065849
+    }
+   }
+  },
+  "last_seen": 1768832523116,
+  "wins": 0,
+  "podiums": 1,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 13,
+  "lang": "es"
  },
  {
   "guid": "76561198121301344",
