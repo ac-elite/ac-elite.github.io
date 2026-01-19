@@ -228,9 +228,9 @@
  {
   "guid": "76561199084335436",
   "name": "Marcos Mariño",
-  "points": 2936.852,
-  "kilometers": 18409.7,
-  "collisions": 749,
+  "points": 2944.909,
+  "kilometers": 18452.6,
+  "collisions": 751,
   "leaderboard": {
    "ks_zandvoort_": {
     "tatuusfa1": {
@@ -336,9 +336,16 @@
      "laps": 230,
      "ts": 1767556054294
     }
+   },
+   "rt_suzuka_suzukagp": {
+    "tatuusfa1": {
+     "laptime": 120545,
+     "laps": 3,
+     "ts": 1768840838977
+    }
    }
   },
-  "last_seen": 1767556072505,
+  "last_seen": 1768841015235,
   "wins": 66,
   "podiums": 213,
   "poles": 155,
@@ -593,9 +600,9 @@
  {
   "guid": "76561198273504643",
   "name": "Alexander",
-  "points": 2108.847,
-  "kilometers": 17587.9,
-  "collisions": 401,
+  "points": 2118.267,
+  "kilometers": 17659.8,
+  "collisions": 402,
   "leaderboard": {
    "ks_zandvoort_": {
     "tatuusfa1": {
@@ -706,9 +713,16 @@
      "laps": 105,
      "ts": 1767391211467
     }
+   },
+   "rt_suzuka_suzukagp": {
+    "tatuusfa1": {
+     "laptime": 118332,
+     "laps": 3,
+     "ts": 1768840786746
+    }
    }
   },
-  "last_seen": 1768506475034,
+  "last_seen": 1768841015235,
   "wins": 86,
   "podiums": 122,
   "poles": 157,
@@ -5592,73 +5606,9 @@
   "infr": 47
  },
  {
-  "guid": "76561199560459292",
-  "name": "NJ4FTP2 VR",
-  "points": 374.966,
-  "kilometers": 1851,
-  "collisions": 14,
-  "leaderboard": {
-   "ks_zandvoort_": {
-    "tatuusfa1": {
-     "laptime": 95407,
-     "laps": 56,
-     "ts": 1756520136410
-    }
-   },
-   "monza_": {
-    "tatuusfa1": {
-     "laptime": 111279,
-     "laps": 53,
-     "ts": 1756874494901
-    }
-   },
-   "ks_brands_hatch_gp": {
-    "tatuusfa1": {
-     "laptime": 80430,
-     "laps": 88,
-     "ts": 1765714914160
-    }
-   },
-   "ks_red_bull_ring_layout_gp": {
-    "tatuusfa1": {
-     "laptime": 90220,
-     "laps": 17,
-     "ts": 1762473323795
-    }
-   },
-   "ks_nurburgring_layout_gp_a": {
-    "tatuusfa1": {
-     "laptime": 119642,
-     "laps": 1,
-     "ts": 1766533215893
-    }
-   },
-   "imola_": {
-    "rss_formula_rss_3_v6": {
-     "laptime": 93321,
-     "laps": 35,
-     "ts": 1766953029935
-    }
-   },
-   "rt_suzuka_suzukagp": {
-    "tatuusfa1": {
-     "laptime": 120454,
-     "laps": 10,
-     "ts": 1768838973704
-    }
-   }
-  },
-  "last_seen": 1768839005246,
-  "wins": 8,
-  "podiums": 27,
-  "poles": 2,
-  "flaps": 7,
-  "infr": 1
- },
- {
   "guid": "76561199067031859",
   "name": "Saba",
-  "points": 374.846,
+  "points": 377.623,
   "kilometers": 18569.1,
   "collisions": 1150,
   "leaderboard": {
@@ -5781,11 +5731,75 @@
    }
   },
   "last_seen": 1768838992439,
-  "wins": 47,
-  "podiums": 110,
+  "wins": 48,
+  "podiums": 111,
   "poles": 68,
   "flaps": 56,
   "infr": 106
+ },
+ {
+  "guid": "76561199560459292",
+  "name": "NJ4FTP2 VR",
+  "points": 374.966,
+  "kilometers": 1851,
+  "collisions": 14,
+  "leaderboard": {
+   "ks_zandvoort_": {
+    "tatuusfa1": {
+     "laptime": 95407,
+     "laps": 56,
+     "ts": 1756520136410
+    }
+   },
+   "monza_": {
+    "tatuusfa1": {
+     "laptime": 111279,
+     "laps": 53,
+     "ts": 1756874494901
+    }
+   },
+   "ks_brands_hatch_gp": {
+    "tatuusfa1": {
+     "laptime": 80430,
+     "laps": 88,
+     "ts": 1765714914160
+    }
+   },
+   "ks_red_bull_ring_layout_gp": {
+    "tatuusfa1": {
+     "laptime": 90220,
+     "laps": 17,
+     "ts": 1762473323795
+    }
+   },
+   "ks_nurburgring_layout_gp_a": {
+    "tatuusfa1": {
+     "laptime": 119642,
+     "laps": 1,
+     "ts": 1766533215893
+    }
+   },
+   "imola_": {
+    "rss_formula_rss_3_v6": {
+     "laptime": 93321,
+     "laps": 35,
+     "ts": 1766953029935
+    }
+   },
+   "rt_suzuka_suzukagp": {
+    "tatuusfa1": {
+     "laptime": 120454,
+     "laps": 10,
+     "ts": 1768838973704
+    }
+   }
+  },
+  "last_seen": 1768839013265,
+  "wins": 8,
+  "podiums": 27,
+  "poles": 2,
+  "flaps": 7,
+  "infr": 1
  },
  {
   "guid": "76561198017060736",
@@ -171644,7 +171658,7 @@
   "guid": "76561199235854596",
   "name": "Mauricio",
   "points": 34.79,
-  "kilometers": 105.7,
+  "kilometers": 113.2,
   "collisions": 46,
   "leaderboard": {
    "mugello_": {
@@ -171655,7 +171669,7 @@
     }
    }
   },
-  "last_seen": 1765930514024,
+  "last_seen": 1768839551255,
   "wins": 0,
   "podiums": 0,
   "poles": 0,
