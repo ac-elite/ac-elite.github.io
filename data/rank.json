@@ -235,9 +235,9 @@
  {
   "guid": "76561199084335436",
   "name": "Marcos Mariño",
-  "points": 2992.3070000000002,
-  "kilometers": 18860,
-  "collisions": 759,
+  "points": 2997.238,
+  "kilometers": 18964.3,
+  "collisions": 763,
   "leaderboard": {
    "ks_zandvoort_": {
     "tatuusfa1": {
@@ -347,16 +347,16 @@
    "rt_suzuka_suzukagp": {
     "tatuusfa1": {
      "laptime": 119002,
-     "laps": 46,
-     "ts": 1768851440069
+     "laps": 55,
+     "ts": 1768937203372
     }
    }
   },
-  "last_seen": 1768851493966,
+  "last_seen": 1768937235176,
   "wins": 68,
-  "podiums": 219,
+  "podiums": 221,
   "poles": 155,
-  "flaps": 169,
+  "flaps": 170,
   "infr": 54
  },
  {
@@ -2561,6 +2561,91 @@
   "infr": 19
  },
  {
+  "guid": "76561198823475881",
+  "name": "Dani3314",
+  "points": 896.68,
+  "kilometers": 6424,
+  "collisions": 394,
+  "leaderboard": {
+   "ks_zandvoort_": {
+    "tatuusfa1": {
+     "laptime": 94579,
+     "laps": 169,
+     "ts": 1763309535027
+    }
+   },
+   "monza_": {
+    "tatuusfa1": {
+     "laptime": 111652,
+     "laps": 22,
+     "ts": 1757002502609
+    }
+   },
+   "mugello_": {
+    "tatuusfa1": {
+     "laptime": 105659,
+     "laps": 69,
+     "ts": 1765047720257
+    }
+   },
+   "ks_silverstone_gp": {
+    "tatuusfa1": {
+     "laptime": 118942,
+     "laps": 121,
+     "ts": 1766420107138
+    }
+   },
+   "imola_": {
+    "tatuusfa1": {
+     "laptime": 104194,
+     "laps": 5,
+     "ts": 1760978126505
+    }
+   },
+   "magione_": {
+    "tatuusfa1": {
+     "laptime": 67573,
+     "laps": 86,
+     "ts": 1763916044556
+    }
+   },
+   "ks_nurburgring_layout_gp_a": {
+    "tatuusfa1": {
+     "laptime": 115451,
+     "laps": 45,
+     "ts": 1766852418649
+    }
+   },
+   "ks_vallelunga_classic_circuit": {
+    "tatuusfa1": {
+     "laptime": 69669,
+     "laps": 179,
+     "ts": 1767556053903
+    }
+   },
+   "spa_": {
+    "tatuusfa1": {
+     "laptime": 139180,
+     "laps": 41,
+     "ts": 1767978522813
+    }
+   },
+   "rt_suzuka_suzukagp": {
+    "tatuusfa1": {
+     "laptime": 119084,
+     "laps": 38,
+     "ts": 1768937203155
+    }
+   }
+  },
+  "last_seen": 1768937235176,
+  "wins": 47,
+  "podiums": 70,
+  "poles": 31,
+  "flaps": 52,
+  "infr": 21
+ },
+ {
   "guid": "76561199077447002",
   "name": "pedro picapiedra",
   "points": 896.2950000000001,
@@ -2762,91 +2847,6 @@
   "poles": 21,
   "flaps": 28,
   "infr": 2
- },
- {
-  "guid": "76561198823475881",
-  "name": "Dani3314",
-  "points": 887.748,
-  "kilometers": 6267.2,
-  "collisions": 391,
-  "leaderboard": {
-   "ks_zandvoort_": {
-    "tatuusfa1": {
-     "laptime": 94579,
-     "laps": 169,
-     "ts": 1763309535027
-    }
-   },
-   "monza_": {
-    "tatuusfa1": {
-     "laptime": 111652,
-     "laps": 22,
-     "ts": 1757002502609
-    }
-   },
-   "mugello_": {
-    "tatuusfa1": {
-     "laptime": 105659,
-     "laps": 69,
-     "ts": 1765047720257
-    }
-   },
-   "ks_silverstone_gp": {
-    "tatuusfa1": {
-     "laptime": 118942,
-     "laps": 121,
-     "ts": 1766420107138
-    }
-   },
-   "imola_": {
-    "tatuusfa1": {
-     "laptime": 104194,
-     "laps": 5,
-     "ts": 1760978126505
-    }
-   },
-   "magione_": {
-    "tatuusfa1": {
-     "laptime": 67573,
-     "laps": 86,
-     "ts": 1763916044556
-    }
-   },
-   "ks_nurburgring_layout_gp_a": {
-    "tatuusfa1": {
-     "laptime": 115451,
-     "laps": 45,
-     "ts": 1766852418649
-    }
-   },
-   "ks_vallelunga_classic_circuit": {
-    "tatuusfa1": {
-     "laptime": 69669,
-     "laps": 179,
-     "ts": 1767556053903
-    }
-   },
-   "spa_": {
-    "tatuusfa1": {
-     "laptime": 139180,
-     "laps": 41,
-     "ts": 1767978522813
-    }
-   },
-   "rt_suzuka_suzukagp": {
-    "tatuusfa1": {
-     "laptime": 119091,
-     "laps": 26,
-     "ts": 1768850598740
-    }
-   }
-  },
-  "last_seen": 1768933605034,
-  "wins": 45,
-  "podiums": 68,
-  "poles": 31,
-  "flaps": 51,
-  "infr": 21
  },
  {
   "guid": "76561198028559312",
@@ -3618,8 +3618,8 @@
  {
   "guid": "76561198868504121",
   "name": "Dre Mano",
-  "points": 665.657,
-  "kilometers": 8763.2,
+  "points": 665.214,
+  "kilometers": 8776.3,
   "collisions": 555,
   "leaderboard": {
    "ks_zandvoort_": {
@@ -3728,7 +3728,7 @@
     }
    }
   },
-  "last_seen": 1768865728861,
+  "last_seen": 1768935191161,
   "wins": 35,
   "podiums": 80,
   "poles": 17,
