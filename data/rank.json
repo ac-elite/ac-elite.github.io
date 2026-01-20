@@ -225,7 +225,7 @@
     }
    }
   },
-  "last_seen": 1768866135198,
+  "last_seen": 1768866145958,
   "wins": 102,
   "podiums": 288,
   "poles": 91,
@@ -362,8 +362,8 @@
  {
   "guid": "76561198328304798",
   "name": "CarterReza",
-  "points": 2856.456,
-  "kilometers": 22864.1,
+  "points": 2858.698,
+  "kilometers": 22959.9,
   "collisions": 228,
   "leaderboard": {
    "ks_zandvoort_": {
@@ -479,12 +479,12 @@
    "rt_suzuka_suzukagp": {
     "tatuusfa1": {
      "laptime": 118080,
-     "laps": 23,
-     "ts": 1768866043303
+     "laps": 29,
+     "ts": 1768867954836
     }
    }
   },
-  "last_seen": 1768866135198,
+  "last_seen": 1768868124662,
   "wins": 99,
   "podiums": 156,
   "poles": 281,
@@ -1118,7 +1118,7 @@
     }
    }
   },
-  "last_seen": 1768866135198,
+  "last_seen": 1768866202552,
   "wins": 17,
   "podiums": 107,
   "poles": 5,
@@ -1908,7 +1908,7 @@
     }
    }
   },
-  "last_seen": 1768866135198,
+  "last_seen": 1768866191635,
   "wins": 22,
   "podiums": 72,
   "poles": 6,
@@ -5061,7 +5061,7 @@
  {
   "guid": "76561198023212152",
   "name": "Nick Edwards",
-  "points": 467.995,
+  "points": 470.60200000000003,
   "kilometers": 1607.9,
   "collisions": 69,
   "leaderboard": {
@@ -5131,7 +5131,7 @@
   },
   "last_seen": 1768866123377,
   "wins": 6,
-  "podiums": 21,
+  "podiums": 22,
   "poles": 3,
   "flaps": 9,
   "infr": 1
@@ -5988,7 +5988,7 @@
   "guid": "76561199044398303",
   "name": "Jaden Neal",
   "points": 362.454,
-  "kilometers": 1274.4,
+  "kilometers": 1280.3,
   "collisions": 71,
   "leaderboard": {
    "ks_barcelona_layout_gp": {
@@ -6027,7 +6027,7 @@
     }
    }
   },
-  "last_seen": 1768866135198,
+  "last_seen": 1768866875129,
   "wins": 12,
   "podiums": 19,
   "poles": 6,
@@ -38066,6 +38066,28 @@
   "infr": 0
  },
  {
+  "guid": "76561198205867847",
+  "name": "Ariel Audu",
+  "points": 62.478,
+  "kilometers": 65,
+  "collisions": 2,
+  "leaderboard": {
+   "rt_suzuka_suzukagp": {
+    "tatuusfa1": {
+     "laptime": 122532,
+     "laps": 5,
+     "ts": 1768866542258
+    }
+   }
+  },
+  "last_seen": 1768866697886,
+  "wins": 0,
+  "podiums": 0,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 0
+ },
+ {
   "guid": "76561199000221135",
   "name": "Evgeny Makarevich",
   "points": 62.45,
@@ -43147,6 +43169,28 @@
   "infr": 0
  },
  {
+  "guid": "76561198314832243",
+  "name": "Rawblankito",
+  "points": 60.068000000000005,
+  "kilometers": 59.8,
+  "collisions": 0,
+  "leaderboard": {
+   "rt_suzuka_suzukagp": {
+    "tatuusfa1": {
+     "laptime": 122134,
+     "laps": 6,
+     "ts": 1768865944147
+    }
+   }
+  },
+  "last_seen": 1768866102756,
+  "wins": 0,
+  "podiums": 0,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 0
+ },
+ {
   "guid": "76561198195600749",
   "name": "Džionis Poteto",
   "points": 60.068,
@@ -44496,28 +44540,6 @@
   "poles": 0,
   "flaps": 0,
   "infr": 3
- },
- {
-  "guid": "76561198314832243",
-  "name": "Rawblankito",
-  "points": 59.52,
-  "kilometers": 59.8,
-  "collisions": 0,
-  "leaderboard": {
-   "rt_suzuka_suzukagp": {
-    "tatuusfa1": {
-     "laptime": 122134,
-     "laps": 6,
-     "ts": 1768865944147
-    }
-   }
-  },
-  "last_seen": 1768866102756,
-  "wins": 0,
-  "podiums": 0,
-  "poles": 0,
-  "flaps": 0,
-  "infr": 0
  },
  {
   "guid": "76561199729828909",
@@ -48147,28 +48169,6 @@
    }
   },
   "last_seen": 1767137104184,
-  "wins": 0,
-  "podiums": 0,
-  "poles": 0,
-  "flaps": 0,
-  "infr": 0
- },
- {
-  "guid": "76561198205867847",
-  "name": "Ariel Audu",
-  "points": 57.938,
-  "kilometers": 47.2,
-  "collisions": 2,
-  "leaderboard": {
-   "rt_suzuka_suzukagp": {
-    "tatuusfa1": {
-     "laptime": 124196,
-     "laps": 3,
-     "ts": 1768865979295
-    }
-   }
-  },
-  "last_seen": 1768866135198,
   "wins": 0,
   "podiums": 0,
   "poles": 0,
@@ -89544,21 +89544,6 @@
   "infr": 0
  },
  {
-  "guid": "76561198236010780",
-  "name": "Jonathan Lo",
-  "points": 49.909,
-  "kilometers": 8.2,
-  "collisions": 0,
-  "leaderboard": {
-  },
-  "last_seen": 1768866135198,
-  "wins": 0,
-  "podiums": 0,
-  "poles": 0,
-  "flaps": 0,
-  "infr": 0
- },
- {
   "guid": "76561198083248418",
   "name": "davexx_",
   "points": 49.908,
@@ -91658,6 +91643,21 @@
   "leaderboard": {
   },
   "last_seen": 1766263128450,
+  "wins": 0,
+  "podiums": 0,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 0
+ },
+ {
+  "guid": "76561198236010780",
+  "name": "Jonathan Lo",
+  "points": 49.821999999999996,
+  "kilometers": 12.2,
+  "collisions": 0,
+  "leaderboard": {
+  },
+  "last_seen": 1768866199958,
   "wins": 0,
   "podiums": 0,
   "poles": 0,
@@ -95982,6 +95982,21 @@
   "leaderboard": {
   },
   "last_seen": 1763851392888,
+  "wins": 0,
+  "podiums": 0,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 0
+ },
+ {
+  "guid": "76561199800926274",
+  "name": "Noah Vonch",
+  "points": 49.591,
+  "kilometers": 4.9,
+  "collisions": 1,
+  "leaderboard": {
+  },
+  "last_seen": 1768866940050,
   "wins": 0,
   "podiums": 0,
   "poles": 0,
