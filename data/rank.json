@@ -494,9 +494,9 @@
  {
   "guid": "76561198093128155",
   "name": "GREG Coulard",
-  "points": 2572.745,
-  "kilometers": 14000.1,
-  "collisions": 407,
+  "points": 2584.121,
+  "kilometers": 14061.5,
+  "collisions": 409,
   "leaderboard": {
    "ks_zandvoort_": {
     "tatuusfa1": {
@@ -605,15 +605,15 @@
    },
    "rt_suzuka_suzukagp": {
     "tatuusfa1": {
-     "laptime": 120460,
-     "laps": 6,
-     "ts": 1768940640011
+     "laptime": 119934,
+     "laps": 13,
+     "ts": 1768942245950
     }
    }
   },
-  "last_seen": 1768940731183,
-  "wins": 112,
-  "podiums": 200,
+  "last_seen": 1768942337182,
+  "wins": 113,
+  "podiums": 201,
   "poles": 55,
   "flaps": 88,
   "infr": 30
@@ -5380,8 +5380,8 @@
  {
   "guid": "76561199560459292",
   "name": "NJ4FTP2 VR",
-  "points": 437.487,
-  "kilometers": 2301.7,
+  "points": 442.099,
+  "kilometers": 2366.1,
   "collisions": 23,
   "leaderboard": {
    "ks_zandvoort_": {
@@ -5429,16 +5429,16 @@
    "rt_suzuka_suzukagp": {
     "tatuusfa1": {
      "laptime": 119523,
-     "laps": 58,
-     "ts": 1768940539789
+     "laps": 64,
+     "ts": 1768942256174
     }
    }
   },
-  "last_seen": 1768940731183,
+  "last_seen": 1768942337182,
   "wins": 10,
-  "podiums": 33,
+  "podiums": 34,
   "poles": 2,
-  "flaps": 7,
+  "flaps": 8,
   "infr": 1
  },
  {
@@ -71183,35 +71183,6 @@
   "infr": 0
  },
  {
-  "guid": "76561198095447625",
-  "name": "UGO Coulard",
-  "points": 52.679,
-  "kilometers": 144.3,
-  "collisions": 6,
-  "leaderboard": {
-   "mugello_": {
-    "tatuusfa1": {
-     "laptime": 109200,
-     "laps": 7,
-     "ts": 1757366361590
-    }
-   },
-   "rt_suzuka_suzukagp": {
-    "tatuusfa1": {
-     "laptime": 122303,
-     "laps": 3,
-     "ts": 1768940676294
-    }
-   }
-  },
-  "last_seen": 1768940731183,
-  "wins": 0,
-  "podiums": 1,
-  "poles": 0,
-  "flaps": 0,
-  "infr": 1
- },
- {
   "guid": "76561198063643671",
   "name": "B U Z Z",
   "points": 52.673,
@@ -71672,6 +71643,35 @@
   "poles": 0,
   "flaps": 0,
   "infr": 0
+ },
+ {
+  "guid": "76561198095447625",
+  "name": "UGO Coulard",
+  "points": 52.592,
+  "kilometers": 193.8,
+  "collisions": 11,
+  "leaderboard": {
+   "mugello_": {
+    "tatuusfa1": {
+     "laptime": 109200,
+     "laps": 7,
+     "ts": 1757366361590
+    }
+   },
+   "rt_suzuka_suzukagp": {
+    "tatuusfa1": {
+     "laptime": 122303,
+     "laps": 6,
+     "ts": 1768941902818
+    }
+   }
+  },
+  "last_seen": 1768942315023,
+  "wins": 0,
+  "podiums": 1,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 1
  },
  {
   "guid": "76561198092762713",
