@@ -2266,9 +2266,9 @@
  {
   "guid": "76561199074878863",
   "name": "Gee",
-  "points": 936.139,
-  "kilometers": 4932.2,
-  "collisions": 199,
+  "points": 938.322,
+  "kilometers": 4985.2,
+  "collisions": 201,
   "leaderboard": {
    "ks_zandvoort_": {
     "tatuusfa1": {
@@ -2371,14 +2371,14 @@
    "rt_suzuka_suzukagp": {
     "tatuusfa1": {
      "laptime": 120108,
-     "laps": 15,
-     "ts": 1768846272798
+     "laps": 20,
+     "ts": 1769012977634
     }
    }
   },
-  "last_seen": 1768846483771,
+  "last_seen": 1769013496743,
   "wins": 23,
-  "podiums": 58,
+  "podiums": 59,
   "poles": 12,
   "flaps": 17,
   "infr": 12
@@ -3752,8 +3752,8 @@
  {
   "guid": "76561198037237397",
   "name": "Friedrich Hartmann",
-  "points": 665.602,
-  "kilometers": 4846.2,
+  "points": 666.0219999999999,
+  "kilometers": 4861.7,
   "collisions": 184,
   "leaderboard": {
    "mugello_": {
@@ -3857,12 +3857,12 @@
    "rt_suzuka_suzukagp": {
     "tatuusfa1": {
      "laptime": 125417,
-     "laps": 4,
-     "ts": 1769010661133
+     "laps": 5,
+     "ts": 1769011005298
     }
    }
   },
-  "last_seen": 1769010693317,
+  "last_seen": 1769011099477,
   "wins": 12,
   "podiums": 44,
   "poles": 2,
@@ -5094,6 +5094,70 @@
   "infr": 1
  },
  {
+  "guid": "76561199560459292",
+  "name": "NJ4FTP2 VR",
+  "points": 475.849,
+  "kilometers": 2702.7,
+  "collisions": 32,
+  "leaderboard": {
+   "ks_zandvoort_": {
+    "tatuusfa1": {
+     "laptime": 95407,
+     "laps": 56,
+     "ts": 1756520136410
+    }
+   },
+   "monza_": {
+    "tatuusfa1": {
+     "laptime": 111279,
+     "laps": 53,
+     "ts": 1756874494901
+    }
+   },
+   "ks_brands_hatch_gp": {
+    "tatuusfa1": {
+     "laptime": 80430,
+     "laps": 88,
+     "ts": 1765714914160
+    }
+   },
+   "ks_red_bull_ring_layout_gp": {
+    "tatuusfa1": {
+     "laptime": 90220,
+     "laps": 17,
+     "ts": 1762473323795
+    }
+   },
+   "ks_nurburgring_layout_gp_a": {
+    "tatuusfa1": {
+     "laptime": 119642,
+     "laps": 1,
+     "ts": 1766533215893
+    }
+   },
+   "imola_": {
+    "rss_formula_rss_3_v6": {
+     "laptime": 93321,
+     "laps": 35,
+     "ts": 1766953029935
+    }
+   },
+   "rt_suzuka_suzukagp": {
+    "tatuusfa1": {
+     "laptime": 118823,
+     "laps": 92,
+     "ts": 1769013610202
+    }
+   }
+  },
+  "last_seen": 1769013718144,
+  "wins": 14,
+  "podiums": 38,
+  "poles": 3,
+  "flaps": 12,
+  "infr": 1
+ },
+ {
   "guid": "76561198023212152",
   "name": "Nick Edwards",
   "points": 470.60200000000003,
@@ -5227,70 +5291,6 @@
   "poles": 22,
   "flaps": 29,
   "infr": 15
- },
- {
-  "guid": "76561199560459292",
-  "name": "NJ4FTP2 VR",
-  "points": 465.869,
-  "kilometers": 2595.8,
-  "collisions": 30,
-  "leaderboard": {
-   "ks_zandvoort_": {
-    "tatuusfa1": {
-     "laptime": 95407,
-     "laps": 56,
-     "ts": 1756520136410
-    }
-   },
-   "monza_": {
-    "tatuusfa1": {
-     "laptime": 111279,
-     "laps": 53,
-     "ts": 1756874494901
-    }
-   },
-   "ks_brands_hatch_gp": {
-    "tatuusfa1": {
-     "laptime": 80430,
-     "laps": 88,
-     "ts": 1765714914160
-    }
-   },
-   "ks_red_bull_ring_layout_gp": {
-    "tatuusfa1": {
-     "laptime": 90220,
-     "laps": 17,
-     "ts": 1762473323795
-    }
-   },
-   "ks_nurburgring_layout_gp_a": {
-    "tatuusfa1": {
-     "laptime": 119642,
-     "laps": 1,
-     "ts": 1766533215893
-    }
-   },
-   "imola_": {
-    "rss_formula_rss_3_v6": {
-     "laptime": 93321,
-     "laps": 35,
-     "ts": 1766953029935
-    }
-   },
-   "rt_suzuka_suzukagp": {
-    "tatuusfa1": {
-     "laptime": 118871,
-     "laps": 83,
-     "ts": 1769008819173
-    }
-   }
-  },
-  "last_seen": 1769008860570,
-  "wins": 13,
-  "podiums": 37,
-  "poles": 3,
-  "flaps": 11,
-  "infr": 1
  },
  {
   "guid": "76561198999796654",
@@ -20307,6 +20307,42 @@
   "infr": 1
  },
  {
+  "guid": "76561198017481596",
+  "name": "AndyQ",
+  "points": 84.404,
+  "kilometers": 287.5,
+  "collisions": 1,
+  "leaderboard": {
+   "mugello_": {
+    "tatuusfa1": {
+     "laptime": 106539,
+     "laps": 15,
+     "ts": 1757868634719
+    }
+   },
+   "ks_silverstone_gp": {
+    "tatuusfa1": {
+     "laptime": 121800,
+     "laps": 13,
+     "ts": 1766045356157
+    }
+   },
+   "rt_suzuka_suzukagp": {
+    "tatuusfa1": {
+     "laptime": 123214,
+     "laps": 1,
+     "ts": 1769013686816
+    }
+   }
+  },
+  "last_seen": 1769013718144,
+  "wins": 3,
+  "podiums": 6,
+  "poles": 0,
+  "flaps": 1,
+  "infr": 0
+ },
+ {
   "guid": "76561199049873962",
   "name": "SinB",
   "points": 84.31400000000001,
@@ -21580,35 +21616,6 @@
   "podiums": 1,
   "poles": 0,
   "flaps": 0,
-  "infr": 0
- },
- {
-  "guid": "76561198017481596",
-  "name": "AndyQ",
-  "points": 80.634,
-  "kilometers": 275.6,
-  "collisions": 1,
-  "leaderboard": {
-   "mugello_": {
-    "tatuusfa1": {
-     "laptime": 106539,
-     "laps": 15,
-     "ts": 1757868634719
-    }
-   },
-   "ks_silverstone_gp": {
-    "tatuusfa1": {
-     "laptime": 121800,
-     "laps": 13,
-     "ts": 1766045356157
-    }
-   }
-  },
-  "last_seen": 1766045413241,
-  "wins": 3,
-  "podiums": 6,
-  "poles": 0,
-  "flaps": 1,
   "infr": 0
  },
  {
