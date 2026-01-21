@@ -5096,8 +5096,8 @@
  {
   "guid": "76561199560459292",
   "name": "NJ4FTP2 VR",
-  "points": 475.849,
-  "kilometers": 2702.7,
+  "points": 475.757,
+  "kilometers": 2716.9,
   "collisions": 32,
   "leaderboard": {
    "ks_zandvoort_": {
@@ -5150,7 +5150,7 @@
     }
    }
   },
-  "last_seen": 1769013718144,
+  "last_seen": 1769013973146,
   "wins": 14,
   "podiums": 38,
   "poles": 3,
@@ -8791,9 +8791,9 @@
  {
   "guid": "76561198101135819",
   "name": "BicycleSid",
-  "points": 204.26000000000002,
-  "kilometers": 1547.4,
-  "collisions": 252,
+  "points": 204.11200000000002,
+  "kilometers": 1554.2,
+  "collisions": 253,
   "leaderboard": {
    "ks_zandvoort_": {
     "tatuusfa1": {
@@ -8845,7 +8845,7 @@
     }
    }
   },
-  "last_seen": 1767564572998,
+  "last_seen": 1769017654276,
   "wins": 3,
   "podiums": 5,
   "poles": 1,
@@ -20307,42 +20307,6 @@
   "infr": 1
  },
  {
-  "guid": "76561198017481596",
-  "name": "AndyQ",
-  "points": 84.404,
-  "kilometers": 287.5,
-  "collisions": 1,
-  "leaderboard": {
-   "mugello_": {
-    "tatuusfa1": {
-     "laptime": 106539,
-     "laps": 15,
-     "ts": 1757868634719
-    }
-   },
-   "ks_silverstone_gp": {
-    "tatuusfa1": {
-     "laptime": 121800,
-     "laps": 13,
-     "ts": 1766045356157
-    }
-   },
-   "rt_suzuka_suzukagp": {
-    "tatuusfa1": {
-     "laptime": 123214,
-     "laps": 1,
-     "ts": 1769013686816
-    }
-   }
-  },
-  "last_seen": 1769013718144,
-  "wins": 3,
-  "podiums": 6,
-  "poles": 0,
-  "flaps": 1,
-  "infr": 0
- },
- {
   "guid": "76561199049873962",
   "name": "SinB",
   "points": 84.31400000000001,
@@ -20377,6 +20341,42 @@
   "poles": 1,
   "flaps": 1,
   "infr": 1
+ },
+ {
+  "guid": "76561198017481596",
+  "name": "AndyQ",
+  "points": 84.28399999999999,
+  "kilometers": 297.9,
+  "collisions": 2,
+  "leaderboard": {
+   "mugello_": {
+    "tatuusfa1": {
+     "laptime": 106539,
+     "laps": 15,
+     "ts": 1757868634719
+    }
+   },
+   "ks_silverstone_gp": {
+    "tatuusfa1": {
+     "laptime": 121800,
+     "laps": 13,
+     "ts": 1766045356157
+    }
+   },
+   "rt_suzuka_suzukagp": {
+    "tatuusfa1": {
+     "laptime": 123214,
+     "laps": 1,
+     "ts": 1769013686816
+    }
+   }
+  },
+  "last_seen": 1769013930708,
+  "wins": 3,
+  "podiums": 6,
+  "poles": 0,
+  "flaps": 1,
+  "infr": 0
  },
  {
   "guid": "76561198267516909",
@@ -54945,28 +54945,6 @@
   "infr": 1
  },
  {
-  "guid": "76561198791484043",
-  "name": "charles",
-  "points": 56.191,
-  "kilometers": 31.9,
-  "collisions": 8,
-  "leaderboard": {
-   "ks_vallelunga_classic_circuit": {
-    "tatuusfa1": {
-     "laptime": 73056,
-     "laps": 8,
-     "ts": 1767102447700
-    }
-   }
-  },
-  "last_seen": 1767102778601,
-  "wins": 0,
-  "podiums": 0,
-  "poles": 0,
-  "flaps": 0,
-  "infr": 0
- },
- {
   "guid": "76561199064574877",
   "name": "kichan",
   "points": 56.190000000000005,
@@ -55509,6 +55487,35 @@
    }
   },
   "last_seen": 1765067325665,
+  "wins": 0,
+  "podiums": 0,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 0
+ },
+ {
+  "guid": "76561198791484043",
+  "name": "charles",
+  "points": 56.065000000000005,
+  "kilometers": 49.7,
+  "collisions": 11,
+  "leaderboard": {
+   "ks_vallelunga_classic_circuit": {
+    "tatuusfa1": {
+     "laptime": 73056,
+     "laps": 8,
+     "ts": 1767102447700
+    }
+   },
+   "rt_suzuka_suzukagp": {
+    "tatuusfa1": {
+     "laptime": 147868,
+     "laps": 1,
+     "ts": 1769017613827
+    }
+   }
+  },
+  "last_seen": 1769018048635,
   "wins": 0,
   "podiums": 0,
   "poles": 0,
@@ -116363,28 +116370,6 @@
   "infr": 4
  },
  {
-  "guid": "76561199113787263",
-  "name": "mArco-X",
-  "points": 46.592,
-  "kilometers": 16.7,
-  "collisions": 13,
-  "leaderboard": {
-   "ks_vallelunga_classic_circuit": {
-    "tatuusfa1": {
-     "laptime": 73532,
-     "laps": 3,
-     "ts": 1767102451667
-    }
-   }
-  },
-  "last_seen": 1767102771526,
-  "wins": 0,
-  "podiums": 0,
-  "poles": 0,
-  "flaps": 0,
-  "infr": 0
- },
- {
   "guid": "76561198064510038",
   "name": "Mustafa",
   "points": 46.585,
@@ -136137,6 +136122,28 @@
   "last_seen": 1760131356519,
   "wins": 0,
   "podiums": 1,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 0
+ },
+ {
+  "guid": "76561199113787263",
+  "name": "mArco-X",
+  "points": 42.476000000000006,
+  "kilometers": 45.1,
+  "collisions": 20,
+  "leaderboard": {
+   "ks_vallelunga_classic_circuit": {
+    "tatuusfa1": {
+     "laptime": 73532,
+     "laps": 3,
+     "ts": 1767102451667
+    }
+   }
+  },
+  "last_seen": 1769018048635,
+  "wins": 0,
+  "podiums": 0,
   "poles": 0,
   "flaps": 0,
   "infr": 0
