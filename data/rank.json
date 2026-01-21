@@ -2768,8 +2768,8 @@
  {
   "guid": "76561198791680040",
   "name": "TJ09",
-  "points": 890.337,
-  "kilometers": 3737.9,
+  "points": 894.157,
+  "kilometers": 3749.8,
   "collisions": 49,
   "leaderboard": {
    "ks_zandvoort_": {
@@ -2846,9 +2846,16 @@
      "laps": 47,
      "ts": 1767554664706
     }
+   },
+   "rt_suzuka_suzukagp": {
+    "tatuusfa1": {
+     "laptime": 122544,
+     "laps": 1,
+     "ts": 1769009578204
+    }
    }
   },
-  "last_seen": 1767984054711,
+  "last_seen": 1769009629147,
   "wins": 24,
   "podiums": 50,
   "poles": 21,
@@ -3823,8 +3830,8 @@
  {
   "guid": "76561198037237397",
   "name": "Friedrich Hartmann",
-  "points": 647.963,
-  "kilometers": 4793.4,
+  "points": 647.663,
+  "kilometers": 4799.3,
   "collisions": 184,
   "leaderboard": {
    "mugello_": {
@@ -3926,7 +3933,7 @@
     }
    }
   },
-  "last_seen": 1768850644539,
+  "last_seen": 1769009629147,
   "wins": 11,
   "podiums": 43,
   "poles": 2,
@@ -5217,9 +5224,9 @@
  {
   "guid": "76561199560459292",
   "name": "NJ4FTP2 VR",
-  "points": 465.916,
-  "kilometers": 2538.9,
-  "collisions": 29,
+  "points": 465.869,
+  "kilometers": 2595.8,
+  "collisions": 30,
   "leaderboard": {
    "ks_zandvoort_": {
     "tatuusfa1": {
@@ -5265,13 +5272,13 @@
    },
    "rt_suzuka_suzukagp": {
     "tatuusfa1": {
-     "laptime": 119358,
-     "laps": 81,
-     "ts": 1769001704644
+     "laptime": 118871,
+     "laps": 83,
+     "ts": 1769008819173
     }
    }
   },
-  "last_seen": 1769001817915,
+  "last_seen": 1769008860570,
   "wins": 13,
   "podiums": 37,
   "poles": 3,
@@ -25808,6 +25815,63 @@
   "infr": 4
  },
  {
+  "guid": "76561199808100604",
+  "name": "tedin1_",
+  "points": 73.65599999999999,
+  "kilometers": 1061.9,
+  "collisions": 169,
+  "leaderboard": {
+   "mugello_": {
+    "tatuusfa1": {
+     "laptime": 110022,
+     "laps": 46,
+     "ts": 1765046900230
+    }
+   },
+   "ks_silverstone_gp": {
+    "tatuusfa1": {
+     "laptime": 123309,
+     "laps": 19,
+     "ts": 1766087160963
+    }
+   },
+   "ks_nurburgring_layout_gp_a": {
+    "tatuusfa1": {
+     "laptime": 120300,
+     "laps": 15,
+     "ts": 1766854982546
+    }
+   },
+   "ks_vallelunga_classic_circuit": {
+    "tatuusfa1": {
+     "laptime": 73306,
+     "laps": 10,
+     "ts": 1767033845728
+    }
+   },
+   "spa_": {
+    "tatuusfa1": {
+     "laptime": 144450,
+     "laps": 3,
+     "ts": 1767984583692
+    }
+   },
+   "rt_suzuka_suzukagp": {
+    "tatuusfa1": {
+     "laptime": 130419,
+     "laps": 1,
+     "ts": 1769004273514
+    }
+   }
+  },
+  "last_seen": 1769004960648,
+  "wins": 1,
+  "podiums": 3,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 8
+ },
+ {
   "guid": "76561198346633407",
   "name": "Niram",
   "points": 73.641,
@@ -28196,56 +28260,6 @@
   "poles": 0,
   "flaps": 0,
   "infr": 0
- },
- {
-  "guid": "76561199808100604",
-  "name": "tedin1_",
-  "points": 70.442,
-  "kilometers": 1031.8,
-  "collisions": 164,
-  "leaderboard": {
-   "mugello_": {
-    "tatuusfa1": {
-     "laptime": 110022,
-     "laps": 46,
-     "ts": 1765046900230
-    }
-   },
-   "ks_silverstone_gp": {
-    "tatuusfa1": {
-     "laptime": 123309,
-     "laps": 19,
-     "ts": 1766087160963
-    }
-   },
-   "ks_nurburgring_layout_gp_a": {
-    "tatuusfa1": {
-     "laptime": 120300,
-     "laps": 15,
-     "ts": 1766854982546
-    }
-   },
-   "ks_vallelunga_classic_circuit": {
-    "tatuusfa1": {
-     "laptime": 73306,
-     "laps": 10,
-     "ts": 1767033845728
-    }
-   },
-   "spa_": {
-    "tatuusfa1": {
-     "laptime": 144450,
-     "laps": 3,
-     "ts": 1767984583692
-    }
-   }
-  },
-  "last_seen": 1769003807468,
-  "wins": 1,
-  "podiums": 3,
-  "poles": 0,
-  "flaps": 0,
-  "infr": 8
  },
  {
   "guid": "76561198263296696",
