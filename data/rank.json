@@ -235,9 +235,9 @@
  {
   "guid": "76561199084335436",
   "name": "Marcos Mariño",
-  "points": 3007.22,
-  "kilometers": 19057.9,
-  "collisions": 763,
+  "points": 3012.3239999999996,
+  "kilometers": 19131,
+  "collisions": 764,
   "leaderboard": {
    "ks_zandvoort_": {
     "tatuusfa1": {
@@ -347,16 +347,16 @@
    "rt_suzuka_suzukagp": {
     "tatuusfa1": {
      "laptime": 118928,
-     "laps": 65,
-     "ts": 1769021451729
+     "laps": 71,
+     "ts": 1769107584737
     }
    }
   },
-  "last_seen": 1769021500725,
-  "wins": 69,
-  "podiums": 223,
+  "last_seen": 1769107908141,
+  "wins": 70,
+  "podiums": 224,
   "poles": 155,
-  "flaps": 172,
+  "flaps": 173,
   "infr": 54
  },
  {
@@ -1996,8 +1996,8 @@
  {
   "guid": "76561198845443064",
   "name": "Peter Paris",
-  "points": 1202.768,
-  "kilometers": 6509.9,
+  "points": 1203.156,
+  "kilometers": 6559.2,
   "collisions": 346,
   "leaderboard": {
    "ks_zandvoort_": {
@@ -2079,13 +2079,13 @@
    },
    "rt_suzuka_suzukagp": {
     "tatuusfa1": {
-     "laptime": 121968,
-     "laps": 8,
-     "ts": 1769021439155
+     "laptime": 121962,
+     "laps": 10,
+     "ts": 1769107660914
     }
    }
   },
-  "last_seen": 1769026275367,
+  "last_seen": 1769107908141,
   "wins": 17,
   "podiums": 78,
   "poles": 6,
@@ -5103,9 +5103,9 @@
  {
   "guid": "76561199560459292",
   "name": "NJ4FTP2 VR",
-  "points": 475.757,
-  "kilometers": 2716.9,
-  "collisions": 32,
+  "points": 476.11899999999997,
+  "kilometers": 2796.8,
+  "collisions": 36,
   "leaderboard": {
    "ks_zandvoort_": {
     "tatuusfa1": {
@@ -5152,12 +5152,12 @@
    "rt_suzuka_suzukagp": {
     "tatuusfa1": {
      "laptime": 118823,
-     "laps": 92,
-     "ts": 1769013610202
+     "laps": 97,
+     "ts": 1769106687244
     }
    }
   },
-  "last_seen": 1769013973146,
+  "last_seen": 1769107908141,
   "wins": 14,
   "podiums": 38,
   "poles": 3,
@@ -59618,56 +59618,6 @@
   "infr": 2
  },
  {
-  "guid": "76561199151047683",
-  "name": "Nyck Debris",
-  "points": 55.063,
-  "kilometers": 663.6,
-  "collisions": 118,
-  "leaderboard": {
-   "ks_red_bull_ring_layout_gp": {
-    "tatuusfa1": {
-     "laptime": 90784,
-     "laps": 8,
-     "ts": 1762549800799
-    }
-   },
-   "ks_zandvoort_": {
-    "tatuusfa1": {
-     "laptime": 95227,
-     "laps": 38,
-     "ts": 1763138761234
-    }
-   },
-   "magione_": {
-    "tatuusfa1": {
-     "laptime": 68521,
-     "laps": 24,
-     "ts": 1763764346231
-    }
-   },
-   "mugello_": {
-    "tatuusfa1": {
-     "laptime": 106665,
-     "laps": 3,
-     "ts": 1764709957711
-    }
-   },
-   "ks_vallelunga_classic_circuit": {
-    "tatuusfa1": {
-     "laptime": 70504,
-     "laps": 12,
-     "ts": 1767131700835
-    }
-   }
-  },
-  "last_seen": 1769092932100,
-  "wins": 1,
-  "podiums": 5,
-  "poles": 0,
-  "flaps": 1,
-  "infr": 5
- },
- {
   "guid": "76561199553390105",
   "name": "RSAmarena",
   "points": 55.054,
@@ -60771,6 +60721,56 @@
   "poles": 0,
   "flaps": 0,
   "infr": 1
+ },
+ {
+  "guid": "76561199151047683",
+  "name": "Nyck Debris",
+  "points": 54.749,
+  "kilometers": 680.2,
+  "collisions": 119,
+  "leaderboard": {
+   "ks_red_bull_ring_layout_gp": {
+    "tatuusfa1": {
+     "laptime": 90784,
+     "laps": 8,
+     "ts": 1762549800799
+    }
+   },
+   "ks_zandvoort_": {
+    "tatuusfa1": {
+     "laptime": 95227,
+     "laps": 38,
+     "ts": 1763138761234
+    }
+   },
+   "magione_": {
+    "tatuusfa1": {
+     "laptime": 68521,
+     "laps": 24,
+     "ts": 1763764346231
+    }
+   },
+   "mugello_": {
+    "tatuusfa1": {
+     "laptime": 106665,
+     "laps": 3,
+     "ts": 1764709957711
+    }
+   },
+   "ks_vallelunga_classic_circuit": {
+    "tatuusfa1": {
+     "laptime": 70504,
+     "laps": 12,
+     "ts": 1767131700835
+    }
+   }
+  },
+  "last_seen": 1769093324160,
+  "wins": 1,
+  "podiums": 5,
+  "poles": 0,
+  "flaps": 1,
+  "infr": 5
  },
  {
   "guid": "76561199117738450",
@@ -274765,21 +274765,6 @@
   "infr": 1
  },
  {
-  "guid": "76561199126370754",
-  "name": "lucas_silvacastanheira",
-  "points": 23.308999999999997,
-  "kilometers": 22.8,
-  "collisions": 7,
-  "leaderboard": {
-  },
-  "last_seen": 1765124190989,
-  "wins": 0,
-  "podiums": 0,
-  "poles": 0,
-  "flaps": 0,
-  "infr": 3
- },
- {
   "guid": "76561198322344012",
   "name": "Diego",
   "points": 23.307000000000002,
@@ -276648,6 +276633,21 @@
   "poles": 1,
   "flaps": 0,
   "infr": 5
+ },
+ {
+  "guid": "76561199126370754",
+  "name": "lucas_silvacastanheira",
+  "points": 22.83,
+  "kilometers": 29.5,
+  "collisions": 9,
+  "leaderboard": {
+  },
+  "last_seen": 1769107726500,
+  "wins": 0,
+  "podiums": 0,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 3
  },
  {
   "guid": "76561198821780899",
