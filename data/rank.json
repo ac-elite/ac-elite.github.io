@@ -235,8 +235,8 @@
  {
   "guid": "76561199084335436",
   "name": "Marcos Mariño",
-  "points": 3019.51,
-  "kilometers": 19216.4,
+  "points": 3025.727,
+  "kilometers": 19289.9,
   "collisions": 768,
   "leaderboard": {
    "ks_zandvoort_": {
@@ -347,14 +347,14 @@
    "rt_suzuka_suzukagp": {
     "tatuusfa1": {
      "laptime": 118853,
-     "laps": 77,
-     "ts": 1769190847117
+     "laps": 84,
+     "ts": 1769192398878
     }
    }
   },
-  "last_seen": 1769190878296,
-  "wins": 70,
-  "podiums": 225,
+  "last_seen": 1769193246531,
+  "wins": 71,
+  "podiums": 226,
   "poles": 155,
   "flaps": 173,
   "infr": 54
@@ -621,9 +621,9 @@
  {
   "guid": "76561198273504643",
   "name": "Alexander",
-  "points": 2170.542,
-  "kilometers": 18137.3,
-  "collisions": 413,
+  "points": 2171.384,
+  "kilometers": 18174.3,
+  "collisions": 414,
   "leaderboard": {
    "ks_zandvoort_": {
     "tatuusfa1": {
@@ -738,15 +738,15 @@
    "rt_suzuka_suzukagp": {
     "tatuusfa1": {
      "laptime": 117968,
-     "laps": 47,
-     "ts": 1769039971372
+     "laps": 50,
+     "ts": 1769192734310
     }
    }
   },
-  "last_seen": 1769039998596,
+  "last_seen": 1769193246531,
   "wins": 88,
   "podiums": 124,
-  "poles": 164,
+  "poles": 165,
   "flaps": 82,
   "infr": 33
  },
@@ -1298,9 +1298,9 @@
  {
   "guid": "76561199189412808",
   "name": "spxrco",
-  "points": 1608.173,
-  "kilometers": 7809.7,
-  "collisions": 468,
+  "points": 1611.616,
+  "kilometers": 7851.9,
+  "collisions": 471,
   "leaderboard": {
    "ks_zandvoort_": {
     "tatuusfa1": {
@@ -1402,13 +1402,13 @@
    },
    "rt_suzuka_suzukagp": {
     "tatuusfa1": {
-     "laptime": 120839,
-     "laps": 3,
-     "ts": 1769190846726
+     "laptime": 119820,
+     "laps": 5,
+     "ts": 1769191793942
     }
    }
   },
-  "last_seen": 1769190878296,
+  "last_seen": 1769191909769,
   "wins": 51,
   "podiums": 102,
   "poles": 21,
@@ -2010,9 +2010,9 @@
  {
   "guid": "76561198845443064",
   "name": "Peter Paris",
-  "points": 1203.702,
-  "kilometers": 6591.8,
-  "collisions": 348,
+  "points": 1208.6100000000001,
+  "kilometers": 6635.9,
+  "collisions": 352,
   "leaderboard": {
    "ks_zandvoort_": {
     "tatuusfa1": {
@@ -2093,13 +2093,13 @@
    },
    "rt_suzuka_suzukagp": {
     "tatuusfa1": {
-     "laptime": 121704,
-     "laps": 13,
-     "ts": 1769108438505
+     "laptime": 121389,
+     "laps": 17,
+     "ts": 1769192988969
     }
    }
   },
-  "last_seen": 1769108644974,
+  "last_seen": 1769193246531,
   "wins": 17,
   "podiums": 78,
   "poles": 6,
@@ -19938,6 +19938,28 @@
   "infr": 4
  },
  {
+  "guid": "76561198815387770",
+  "name": "Robert Mayer",
+  "points": 85.35900000000001,
+  "kilometers": 423.1,
+  "collisions": 20,
+  "leaderboard": {
+   "rt_suzuka_suzukagp": {
+    "tatuusfa1": {
+     "laptime": 118542,
+     "laps": 31,
+     "ts": 1769193118549
+    }
+   }
+  },
+  "last_seen": 1769193246531,
+  "wins": 1,
+  "podiums": 3,
+  "poles": 4,
+  "flaps": 1,
+  "infr": 0
+ },
+ {
   "guid": "76561199260829774",
   "name": "Ljudek",
   "points": 85.276,
@@ -20476,28 +20498,6 @@
   "poles": 0,
   "flaps": 0,
   "infr": 1
- },
- {
-  "guid": "76561198815387770",
-  "name": "Robert Mayer",
-  "points": 83.88,
-  "kilometers": 358.7,
-  "collisions": 17,
-  "leaderboard": {
-   "rt_suzuka_suzukagp": {
-    "tatuusfa1": {
-     "laptime": 118542,
-     "laps": 25,
-     "ts": 1768854519983
-    }
-   }
-  },
-  "last_seen": 1768854956696,
-  "wins": 1,
-  "podiums": 2,
-  "poles": 4,
-  "flaps": 1,
-  "infr": 0
  },
  {
   "guid": "76561198375790114",
@@ -49012,6 +49012,70 @@
   "infr": 0
  },
  {
+  "guid": "76561198862804968",
+  "name": "Burckliuk",
+  "points": 57.707,
+  "kilometers": 458.8,
+  "collisions": 39,
+  "leaderboard": {
+   "ks_laguna_seca_": {
+    "tatuusfa1": {
+     "laptime": 82973,
+     "laps": 7,
+     "ts": 1760223556220
+    }
+   },
+   "ks_silverstone_gp": {
+    "tatuusfa1": {
+     "laptime": 124511,
+     "laps": 2,
+     "ts": 1760454987737
+    }
+   },
+   "spa_": {
+    "tatuusfa1": {
+     "laptime": 142705,
+     "laps": 4,
+     "ts": 1761949035907
+    }
+   },
+   "ks_zandvoort_": {
+    "tatuusfa1": {
+     "laptime": 96745,
+     "laps": 14,
+     "ts": 1763218996277
+    }
+   },
+   "magione_": {
+    "tatuusfa1": {
+     "laptime": 70495,
+     "laps": 2,
+     "ts": 1763393252967
+    }
+   },
+   "ks_barcelona_layout_moto": {
+    "tatuusfa1": {
+     "laptime": 101247,
+     "laps": 5,
+     "ts": 1764010508965
+    }
+   },
+   "rt_suzuka_suzukagp": {
+    "tatuusfa1": {
+     "laptime": 123643,
+     "laps": 2,
+     "ts": 1769193141939
+    }
+   }
+  },
+  "last_seen": 1769193246531,
+  "wins": 0,
+  "podiums": 0,
+  "poles": 1,
+  "flaps": 0,
+  "infr": 2
+ },
+ {
   "guid": "76561199577485658",
   "name": "Kanye West",
   "points": 57.706999999999994,
@@ -64654,63 +64718,6 @@
   "poles": 0,
   "flaps": 0,
   "infr": 3
- },
- {
-  "guid": "76561198862804968",
-  "name": "Burckliuk",
-  "points": 53.785000000000004,
-  "kilometers": 410.4,
-  "collisions": 36,
-  "leaderboard": {
-   "ks_laguna_seca_": {
-    "tatuusfa1": {
-     "laptime": 82973,
-     "laps": 7,
-     "ts": 1760223556220
-    }
-   },
-   "ks_silverstone_gp": {
-    "tatuusfa1": {
-     "laptime": 124511,
-     "laps": 2,
-     "ts": 1760454987737
-    }
-   },
-   "spa_": {
-    "tatuusfa1": {
-     "laptime": 142705,
-     "laps": 4,
-     "ts": 1761949035907
-    }
-   },
-   "ks_zandvoort_": {
-    "tatuusfa1": {
-     "laptime": 96745,
-     "laps": 14,
-     "ts": 1763218996277
-    }
-   },
-   "magione_": {
-    "tatuusfa1": {
-     "laptime": 70495,
-     "laps": 2,
-     "ts": 1763393252967
-    }
-   },
-   "ks_barcelona_layout_moto": {
-    "tatuusfa1": {
-     "laptime": 101247,
-     "laps": 5,
-     "ts": 1764010508965
-    }
-   }
-  },
-  "last_seen": 1764010853878,
-  "wins": 0,
-  "podiums": 0,
-  "poles": 1,
-  "flaps": 0,
-  "infr": 2
  },
  {
   "guid": "76561199792967867",
