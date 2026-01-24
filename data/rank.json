@@ -3405,9 +3405,9 @@
  {
   "guid": "76561199095074508",
   "name": "HugeBigBeans",
-  "points": 696.714,
-  "kilometers": 3251.9,
-  "collisions": 168,
+  "points": 701.713,
+  "kilometers": 3277.9,
+  "collisions": 169,
   "leaderboard": {
    "ks_silverstone_gp": {
     "tatuusfa1": {
@@ -3478,9 +3478,16 @@
      "laps": 17,
      "ts": 1767996133514
     }
+   },
+   "rt_suzuka_suzukagp": {
+    "tatuusfa1": {
+     "laptime": 120901,
+     "laps": 3,
+     "ts": 1769290548049
+    }
    }
   },
-  "last_seen": 1769290146229,
+  "last_seen": 1769290736474,
   "wins": 39,
   "podiums": 52,
   "poles": 18,
@@ -40844,6 +40851,28 @@
   "last_seen": 1765058105143,
   "wins": 0,
   "podiums": 0,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 0
+ },
+ {
+  "guid": "76561198349554175",
+  "name": "John Choi",
+  "points": 61.262,
+  "kilometers": 38.3,
+  "collisions": 0,
+  "leaderboard": {
+   "rt_suzuka_suzukagp": {
+    "tatuusfa1": {
+     "laptime": 126840,
+     "laps": 5,
+     "ts": 1769290943771
+    }
+   }
+  },
+  "last_seen": 1769290975302,
+  "wins": 1,
+  "podiums": 1,
   "poles": 0,
   "flaps": 0,
   "infr": 0
@@ -95425,21 +95454,6 @@
   "leaderboard": {
   },
   "last_seen": 1764720500713,
-  "wins": 0,
-  "podiums": 0,
-  "poles": 0,
-  "flaps": 0,
-  "infr": 0
- },
- {
-  "guid": "76561198349554175",
-  "name": "John Choi",
-  "points": 49.635000000000005,
-  "kilometers": 2.6,
-  "collisions": 0,
-  "leaderboard": {
-  },
-  "last_seen": 1769290146229,
   "wins": 0,
   "podiums": 0,
   "poles": 0,
