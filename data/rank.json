@@ -3907,8 +3907,8 @@
  {
   "guid": "76561198253261997",
   "name": "universol",
-  "points": 654.966,
-  "kilometers": 8508.6,
+  "points": 655.355,
+  "kilometers": 8521.7,
   "collisions": 408,
   "leaderboard": {
    "ks_nurburgring_layout_gp_b": {
@@ -3983,13 +3983,13 @@
    },
    "rt_suzuka_suzukagp": {
     "tatuusfa1": {
-     "laptime": 118796,
-     "laps": 31,
-     "ts": 1769360790576
+     "laptime": 118655,
+     "laps": 32,
+     "ts": 1769361101375
     }
    }
   },
-  "last_seen": 1769360897755,
+  "last_seen": 1769361143743,
   "wins": 28,
   "podiums": 52,
   "poles": 34,
@@ -8425,6 +8425,77 @@
   "infr": 1
  },
  {
+  "guid": "76561198101135819",
+  "name": "BicycleSid",
+  "points": 213.70399999999998,
+  "kilometers": 1653.1,
+  "collisions": 260,
+  "leaderboard": {
+   "ks_zandvoort_": {
+    "tatuusfa1": {
+     "laptime": 106263,
+     "laps": 1,
+     "ts": 1762990055196
+    }
+   },
+   "magione_": {
+    "tatuusfa1": {
+     "laptime": 68544,
+     "laps": 112,
+     "ts": 1763941641064
+    }
+   },
+   "ks_barcelona_layout_moto": {
+    "tatuusfa1": {
+     "laptime": 102145,
+     "laps": 17,
+     "ts": 1764611485104
+    }
+   },
+   "mugello_": {
+    "tatuusfa1": {
+     "laptime": 107355,
+     "laps": 42,
+     "ts": 1764890746903
+    }
+   },
+   "ks_brands_hatch_gp": {
+    "tatuusfa1": {
+     "laptime": 82750,
+     "laps": 14,
+     "ts": 1765409896829
+    }
+   },
+   "ks_silverstone_gp": {
+    "tatuusfa1": {
+     "laptime": 123218,
+     "laps": 8,
+     "ts": 1766421028313
+    }
+   },
+   "ks_vallelunga_classic_circuit": {
+    "tatuusfa1": {
+     "laptime": 71713,
+     "laps": 12,
+     "ts": 1767564425094
+    }
+   },
+   "rt_suzuka_suzukagp": {
+    "tatuusfa1": {
+     "laptime": 125613,
+     "laps": 3,
+     "ts": 1769377853765
+    }
+   }
+  },
+  "last_seen": 1769377864541,
+  "wins": 3,
+  "podiums": 5,
+  "poles": 1,
+  "flaps": 1,
+  "infr": 1
+ },
+ {
   "guid": "76561199571695916",
   "name": "popcron",
   "points": 211.952,
@@ -8792,77 +8863,6 @@
   "podiums": 7,
   "poles": 4,
   "flaps": 2,
-  "infr": 1
- },
- {
-  "guid": "76561198101135819",
-  "name": "BicycleSid",
-  "points": 206.159,
-  "kilometers": 1629.3,
-  "collisions": 259,
-  "leaderboard": {
-   "ks_zandvoort_": {
-    "tatuusfa1": {
-     "laptime": 106263,
-     "laps": 1,
-     "ts": 1762990055196
-    }
-   },
-   "magione_": {
-    "tatuusfa1": {
-     "laptime": 68544,
-     "laps": 112,
-     "ts": 1763941641064
-    }
-   },
-   "ks_barcelona_layout_moto": {
-    "tatuusfa1": {
-     "laptime": 102145,
-     "laps": 17,
-     "ts": 1764611485104
-    }
-   },
-   "mugello_": {
-    "tatuusfa1": {
-     "laptime": 107355,
-     "laps": 42,
-     "ts": 1764890746903
-    }
-   },
-   "ks_brands_hatch_gp": {
-    "tatuusfa1": {
-     "laptime": 82750,
-     "laps": 14,
-     "ts": 1765409896829
-    }
-   },
-   "ks_silverstone_gp": {
-    "tatuusfa1": {
-     "laptime": 123218,
-     "laps": 8,
-     "ts": 1766421028313
-    }
-   },
-   "ks_vallelunga_classic_circuit": {
-    "tatuusfa1": {
-     "laptime": 71713,
-     "laps": 12,
-     "ts": 1767564425094
-    }
-   },
-   "rt_suzuka_suzukagp": {
-    "tatuusfa1": {
-     "laptime": 127715,
-     "laps": 1,
-     "ts": 1769125282177
-    }
-   }
-  },
-  "last_seen": 1769299814507,
-  "wins": 3,
-  "podiums": 5,
-  "poles": 1,
-  "flaps": 1,
   "infr": 1
  },
  {
