@@ -122,9 +122,9 @@
  {
   "guid": "76561198828350593",
   "name": "Grimlord",
-  "points": 3836.961,
-  "kilometers": 18277.7,
-  "collisions": 458,
+  "points": 3861.112,
+  "kilometers": 18316.6,
+  "collisions": 465,
   "leaderboard": {
    "ks_zandvoort_": {
     "tatuusfa1": {
@@ -223,9 +223,16 @@
      "laps": 42,
      "ts": 1768866051819
     }
+   },
+   "canada_2021_": {
+    "tatuusfa1": {
+     "laptime": 95913,
+     "laps": 9,
+     "ts": 1769445344406
+    }
    }
   },
-  "last_seen": 1768866145958,
+  "last_seen": 1769445451843,
   "wins": 102,
   "podiums": 288,
   "poles": 91,
@@ -1003,9 +1010,9 @@
  {
   "guid": "76561198010877229",
   "name": "JoP",
-  "points": 1953.58,
-  "kilometers": 12841.9,
-  "collisions": 483,
+  "points": 1957.069,
+  "kilometers": 12858.3,
+  "collisions": 489,
   "leaderboard": {
    "ks_zandvoort_": {
     "tatuusfa1": {
@@ -1123,9 +1130,16 @@
      "laps": 47,
      "ts": 1768948718026
     }
+   },
+   "canada_2021_": {
+    "tatuusfa1": {
+     "laptime": 99415,
+     "laps": 2,
+     "ts": 1769445156096
+    }
    }
   },
-  "last_seen": 1768948888121,
+  "last_seen": 1769445451843,
   "wins": 17,
   "podiums": 109,
   "poles": 5,
@@ -5682,54 +5696,11 @@
   "infr": 47
  },
  {
-  "guid": "76561199196456328",
-  "name": "14scares",
-  "points": 416.234,
-  "kilometers": 3889.7,
-  "collisions": 520,
-  "leaderboard": {
-   "ks_zandvoort_": {
-    "tatuusfa1": {
-     "laptime": 94404,
-     "laps": 70,
-     "ts": 1763238777328
-    }
-   },
-   "magione_": {
-    "tatuusfa1": {
-     "laptime": 67510,
-     "laps": 67,
-     "ts": 1763844764893
-    }
-   },
-   "ks_silverstone_gp": {
-    "tatuusfa1": {
-     "laptime": 119265,
-     "laps": 59,
-     "ts": 1766269866448
-    }
-   },
-   "ks_vallelunga_classic_circuit": {
-    "tatuusfa1": {
-     "laptime": 69638,
-     "laps": 110,
-     "ts": 1767388410864
-    }
-   }
-  },
-  "last_seen": 1767388591084,
-  "wins": 11,
-  "podiums": 29,
-  "poles": 10,
-  "flaps": 9,
-  "infr": 28
- },
- {
   "guid": "76561198965135660",
   "name": "samino",
-  "points": 415.32300000000004,
-  "kilometers": 7921.4,
-  "collisions": 580,
+  "points": 417.176,
+  "kilometers": 7944.5,
+  "collisions": 587,
   "leaderboard": {
    "ks_zandvoort_": {
     "tatuusfa1": {
@@ -5835,14 +5806,64 @@
      "laps": 7,
      "ts": 1768923179815
     }
+   },
+   "canada_2021_": {
+    "tatuusfa1": {
+     "laptime": 98182,
+     "laps": 4,
+     "ts": 1769445292500
+    }
    }
   },
-  "last_seen": 1768923353003,
+  "last_seen": 1769445451843,
   "wins": 17,
   "podiums": 46,
   "poles": 22,
   "flaps": 20,
   "infr": 29
+ },
+ {
+  "guid": "76561199196456328",
+  "name": "14scares",
+  "points": 416.234,
+  "kilometers": 3889.7,
+  "collisions": 520,
+  "leaderboard": {
+   "ks_zandvoort_": {
+    "tatuusfa1": {
+     "laptime": 94404,
+     "laps": 70,
+     "ts": 1763238777328
+    }
+   },
+   "magione_": {
+    "tatuusfa1": {
+     "laptime": 67510,
+     "laps": 67,
+     "ts": 1763844764893
+    }
+   },
+   "ks_silverstone_gp": {
+    "tatuusfa1": {
+     "laptime": 119265,
+     "laps": 59,
+     "ts": 1766269866448
+    }
+   },
+   "ks_vallelunga_classic_circuit": {
+    "tatuusfa1": {
+     "laptime": 69638,
+     "laps": 110,
+     "ts": 1767388410864
+    }
+   }
+  },
+  "last_seen": 1767388591084,
+  "wins": 11,
+  "podiums": 29,
+  "poles": 10,
+  "flaps": 9,
+  "infr": 28
  },
  {
   "guid": "76561199067031859",
