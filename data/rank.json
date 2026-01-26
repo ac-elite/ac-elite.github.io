@@ -2230,7 +2230,7 @@
  {
   "guid": "76561198277908651",
   "name": "Marcin Jankowski",
-  "points": 1075.243,
+  "points": 1074.943,
   "kilometers": 7458.7,
   "collisions": 309,
   "leaderboard": {
@@ -2319,7 +2319,7 @@
     }
    }
   },
-  "last_seen": 1769115423480,
+  "last_seen": 1769467823166,
   "wins": 21,
   "podiums": 50,
   "poles": 10,
@@ -3624,9 +3624,9 @@
  {
   "guid": "76561198868504121",
   "name": "Dre Mano",
-  "points": 672.715,
-  "kilometers": 8910.9,
-  "collisions": 560,
+  "points": 672.948,
+  "kilometers": 8911.9,
+  "collisions": 563,
   "leaderboard": {
    "ks_zandvoort_": {
     "tatuusfa1": {
@@ -3735,13 +3735,13 @@
    },
    "canada_2021_": {
     "tatuusfa1": {
-     "laptime": 97926,
-     "laps": 1,
-     "ts": 1769463937779
+     "laptime": 97652,
+     "laps": 2,
+     "ts": 1769464174256
     }
    }
   },
-  "last_seen": 1769463959637,
+  "last_seen": 1769464191381,
   "wins": 35,
   "podiums": 80,
   "poles": 17,
@@ -8483,9 +8483,9 @@
  {
   "guid": "76561198101135819",
   "name": "BicycleSid",
-  "points": 213.70399999999998,
-  "kilometers": 1653.1,
-  "collisions": 260,
+  "points": 212.572,
+  "kilometers": 1666.3,
+  "collisions": 265,
   "leaderboard": {
    "ks_zandvoort_": {
     "tatuusfa1": {
@@ -8544,7 +8544,7 @@
     }
    }
   },
-  "last_seen": 1769377864541,
+  "last_seen": 1769467823166,
   "wins": 3,
   "podiums": 5,
   "poles": 1,
@@ -11120,9 +11120,59 @@
   "infr": 0
  },
  {
+  "guid": "76561198136861827",
+  "name": "CosmicCaravan_",
+  "points": 153.456,
+  "kilometers": 873.7,
+  "collisions": 35,
+  "leaderboard": {
+   "ks_silverstone_gp": {
+    "tatuusfa1": {
+     "laptime": 121196,
+     "laps": 33,
+     "ts": 1760892102662
+    }
+   },
+   "imola_": {
+    "tatuusfa1": {
+     "laptime": 105226,
+     "laps": 10,
+     "ts": 1761315465117
+    }
+   },
+   "spa_": {
+    "tatuusfa1": {
+     "laptime": 141049,
+     "laps": 10,
+     "ts": 1761743326942
+    }
+   },
+   "mugello_": {
+    "tatuusfa1": {
+     "laptime": 108604,
+     "laps": 3,
+     "ts": 1764787731336
+    }
+   },
+   "ks_brands_hatch_gp": {
+    "tatuusfa1": {
+     "laptime": 83312,
+     "laps": 9,
+     "ts": 1765315006704
+    }
+   }
+  },
+  "last_seen": 1765645042521,
+  "wins": 3,
+  "podiums": 10,
+  "poles": 0,
+  "flaps": 3,
+  "infr": 3
+ },
+ {
   "guid": "76561198258292014",
   "name": "Syme_17",
-  "points": 153.562,
+  "points": 153.262,
   "kilometers": 2307.8,
   "collisions": 305,
   "leaderboard": {
@@ -11197,62 +11247,12 @@
     }
    }
   },
-  "last_seen": 1769263264526,
+  "last_seen": 1769467823166,
   "wins": 1,
   "podiums": 7,
   "poles": 2,
   "flaps": 1,
   "infr": 12
- },
- {
-  "guid": "76561198136861827",
-  "name": "CosmicCaravan_",
-  "points": 153.456,
-  "kilometers": 873.7,
-  "collisions": 35,
-  "leaderboard": {
-   "ks_silverstone_gp": {
-    "tatuusfa1": {
-     "laptime": 121196,
-     "laps": 33,
-     "ts": 1760892102662
-    }
-   },
-   "imola_": {
-    "tatuusfa1": {
-     "laptime": 105226,
-     "laps": 10,
-     "ts": 1761315465117
-    }
-   },
-   "spa_": {
-    "tatuusfa1": {
-     "laptime": 141049,
-     "laps": 10,
-     "ts": 1761743326942
-    }
-   },
-   "mugello_": {
-    "tatuusfa1": {
-     "laptime": 108604,
-     "laps": 3,
-     "ts": 1764787731336
-    }
-   },
-   "ks_brands_hatch_gp": {
-    "tatuusfa1": {
-     "laptime": 83312,
-     "laps": 9,
-     "ts": 1765315006704
-    }
-   }
-  },
-  "last_seen": 1765645042521,
-  "wins": 3,
-  "podiums": 10,
-  "poles": 0,
-  "flaps": 3,
-  "infr": 3
  },
  {
   "guid": "76561198389126804",
