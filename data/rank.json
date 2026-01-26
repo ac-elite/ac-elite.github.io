@@ -129,9 +129,9 @@
  {
   "guid": "76561198828350593",
   "name": "Grimlord",
-  "points": 3897.915,
-  "kilometers": 18553,
-  "collisions": 494,
+  "points": 3900.524,
+  "kilometers": 18579.5,
+  "collisions": 498,
   "leaderboard": {
    "ks_zandvoort_": {
     "tatuusfa1": {
@@ -234,14 +234,14 @@
    "canada_2021_": {
     "tatuusfa1": {
      "laptime": 95477,
-     "laps": 52,
-     "ts": 1769462628873
+     "laps": 57,
+     "ts": 1769463351746
     }
    }
   },
-  "last_seen": 1769462725151,
+  "last_seen": 1769463465909,
   "wins": 106,
-  "podiums": 293,
+  "podiums": 294,
   "poles": 93,
   "flaps": 127,
   "infr": 5
@@ -3622,95 +3622,10 @@
   "infr": 5
  },
  {
-  "guid": "76561198256412900",
-  "name": "Josh Pie",
-  "points": 670.287,
-  "kilometers": 5779,
-  "collisions": 215,
-  "leaderboard": {
-   "monza_": {
-    "tatuusfa1": {
-     "laptime": 111908,
-     "laps": 53,
-     "ts": 1757193672499
-    }
-   },
-   "mugello_": {
-    "tatuusfa1": {
-     "laptime": 106535,
-     "laps": 31,
-     "ts": 1757882386476
-    }
-   },
-   "ks_barcelona_layout_gp": {
-    "tatuusfa1": {
-     "laptime": 104736,
-     "laps": 8,
-     "ts": 1758065660698
-    }
-   },
-   "ks_brands_hatch_gp": {
-    "tatuusfa1": {
-     "laptime": 81767,
-     "laps": 10,
-     "ts": 1765554534391
-    }
-   },
-   "ks_nurburgring_layout_gp_b": {
-    "tatuusfa1": {
-     "laptime": 113567,
-     "laps": 38,
-     "ts": 1759695380565
-    }
-   },
-   "ks_laguna_seca_": {
-    "tatuusfa1": {
-     "laptime": 79657,
-     "laps": 77,
-     "ts": 1760128431858
-    }
-   },
-   "ks_silverstone_gp": {
-    "tatuusfa1": {
-     "laptime": 120255,
-     "laps": 54,
-     "ts": 1766000247047
-    }
-   },
-   "imola_": {
-    "tatuusfa1": {
-     "laptime": 105041,
-     "laps": 7,
-     "ts": 1761421764680
-    }
-   },
-   "spa_": {
-    "tatuusfa1": {
-     "laptime": 139961,
-     "laps": 37,
-     "ts": 1762197290426
-    }
-   },
-   "ks_red_bull_ring_layout_gp": {
-    "tatuusfa1": {
-     "laptime": 89753,
-     "laps": 31,
-     "ts": 1762538043427
-    }
-   }
-  },
-  "last_seen": 1766000370873,
-  "wins": 12,
-  "podiums": 52,
-  "poles": 8,
-  "flaps": 9,
-  "infr": 17
- },
- {
   "guid": "76561198868504121",
   "name": "Dre Mano",
-  "points": 669.216,
-  "kilometers": 8901.2,
+  "points": 672.715,
+  "kilometers": 8910.9,
   "collisions": 560,
   "leaderboard": {
    "ks_zandvoort_": {
@@ -3817,14 +3732,106 @@
      "laps": 19,
      "ts": 1769213147679
     }
+   },
+   "canada_2021_": {
+    "tatuusfa1": {
+     "laptime": 97926,
+     "laps": 1,
+     "ts": 1769463937779
+    }
    }
   },
-  "last_seen": 1769213166874,
+  "last_seen": 1769463959637,
   "wins": 35,
   "podiums": 80,
   "poles": 17,
   "flaps": 26,
   "infr": 36
+ },
+ {
+  "guid": "76561198256412900",
+  "name": "Josh Pie",
+  "points": 670.287,
+  "kilometers": 5779,
+  "collisions": 215,
+  "leaderboard": {
+   "monza_": {
+    "tatuusfa1": {
+     "laptime": 111908,
+     "laps": 53,
+     "ts": 1757193672499
+    }
+   },
+   "mugello_": {
+    "tatuusfa1": {
+     "laptime": 106535,
+     "laps": 31,
+     "ts": 1757882386476
+    }
+   },
+   "ks_barcelona_layout_gp": {
+    "tatuusfa1": {
+     "laptime": 104736,
+     "laps": 8,
+     "ts": 1758065660698
+    }
+   },
+   "ks_brands_hatch_gp": {
+    "tatuusfa1": {
+     "laptime": 81767,
+     "laps": 10,
+     "ts": 1765554534391
+    }
+   },
+   "ks_nurburgring_layout_gp_b": {
+    "tatuusfa1": {
+     "laptime": 113567,
+     "laps": 38,
+     "ts": 1759695380565
+    }
+   },
+   "ks_laguna_seca_": {
+    "tatuusfa1": {
+     "laptime": 79657,
+     "laps": 77,
+     "ts": 1760128431858
+    }
+   },
+   "ks_silverstone_gp": {
+    "tatuusfa1": {
+     "laptime": 120255,
+     "laps": 54,
+     "ts": 1766000247047
+    }
+   },
+   "imola_": {
+    "tatuusfa1": {
+     "laptime": 105041,
+     "laps": 7,
+     "ts": 1761421764680
+    }
+   },
+   "spa_": {
+    "tatuusfa1": {
+     "laptime": 139961,
+     "laps": 37,
+     "ts": 1762197290426
+    }
+   },
+   "ks_red_bull_ring_layout_gp": {
+    "tatuusfa1": {
+     "laptime": 89753,
+     "laps": 31,
+     "ts": 1762538043427
+    }
+   }
+  },
+  "last_seen": 1766000370873,
+  "wins": 12,
+  "podiums": 52,
+  "poles": 8,
+  "flaps": 9,
+  "infr": 17
  },
  {
   "guid": "76561198037237397",
@@ -5613,9 +5620,9 @@
  {
   "guid": "76561198965135660",
   "name": "samino",
-  "points": 421.018,
-  "kilometers": 7962.7,
-  "collisions": 618,
+  "points": 426.217,
+  "kilometers": 7989.2,
+  "collisions": 622,
   "leaderboard": {
    "ks_zandvoort_": {
     "tatuusfa1": {
@@ -5725,16 +5732,16 @@
    "canada_2021_": {
     "tatuusfa1": {
      "laptime": 96156,
-     "laps": 15,
-     "ts": 1769462308114
+     "laps": 20,
+     "ts": 1769463351562
     }
    }
   },
-  "last_seen": 1769462725151,
-  "wins": 17,
-  "podiums": 46,
+  "last_seen": 1769463461090,
+  "wins": 18,
+  "podiums": 47,
   "poles": 22,
-  "flaps": 20,
+  "flaps": 21,
   "infr": 29
  },
  {
