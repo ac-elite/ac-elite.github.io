@@ -1609,9 +1609,9 @@
  {
   "guid": "76561198802663250",
   "name": "Felipe Rodriguez",
-  "points": 1282.363,
-  "kilometers": 7126.7,
-  "collisions": 334,
+  "points": 1286.173,
+  "kilometers": 7139.9,
+  "collisions": 336,
   "leaderboard": {
    "ks_zandvoort_": {
     "tatuusfa1": {
@@ -1720,13 +1720,13 @@
    },
    "canada_2021_": {
     "tatuusfa1": {
-     "laptime": 97592,
-     "laps": 20,
-     "ts": 1769457598079
+     "laptime": 97025,
+     "laps": 22,
+     "ts": 1769552126191
     }
    }
   },
-  "last_seen": 1769457755127,
+  "last_seen": 1769552259250,
   "wins": 25,
   "podiums": 79,
   "poles": 7,
@@ -2343,8 +2343,8 @@
  {
   "guid": "76561199074878863",
   "name": "Gee",
-  "points": 938.322,
-  "kilometers": 4985.2,
+  "points": 938.303,
+  "kilometers": 4981.5,
   "collisions": 201,
   "leaderboard": {
    "ks_zandvoort_": {
@@ -2453,7 +2453,7 @@
     }
    }
   },
-  "last_seen": 1769013496743,
+  "last_seen": 1769532233853,
   "wins": 23,
   "podiums": 59,
   "poles": 12,
@@ -8260,84 +8260,6 @@
   "infr": 7
  },
  {
-  "guid": "76561198101135819",
-  "name": "BicycleSid",
-  "points": 220.692,
-  "kilometers": 1678.2,
-  "collisions": 268,
-  "leaderboard": {
-   "ks_zandvoort_": {
-    "tatuusfa1": {
-     "laptime": 106263,
-     "laps": 1,
-     "ts": 1762990055196
-    }
-   },
-   "magione_": {
-    "tatuusfa1": {
-     "laptime": 68544,
-     "laps": 112,
-     "ts": 1763941641064
-    }
-   },
-   "ks_barcelona_layout_moto": {
-    "tatuusfa1": {
-     "laptime": 102145,
-     "laps": 17,
-     "ts": 1764611485104
-    }
-   },
-   "mugello_": {
-    "tatuusfa1": {
-     "laptime": 107355,
-     "laps": 42,
-     "ts": 1764890746903
-    }
-   },
-   "ks_brands_hatch_gp": {
-    "tatuusfa1": {
-     "laptime": 82750,
-     "laps": 14,
-     "ts": 1765409896829
-    }
-   },
-   "ks_silverstone_gp": {
-    "tatuusfa1": {
-     "laptime": 123218,
-     "laps": 8,
-     "ts": 1766421028313
-    }
-   },
-   "ks_vallelunga_classic_circuit": {
-    "tatuusfa1": {
-     "laptime": 71713,
-     "laps": 12,
-     "ts": 1767564425094
-    }
-   },
-   "rt_suzuka_suzukagp": {
-    "tatuusfa1": {
-     "laptime": 125613,
-     "laps": 3,
-     "ts": 1769377853765
-    }
-   },
-   "canada_2021_": {
-    "tatuusfa1": {
-     "laptime": 100616,
-     "laps": 4,
-     "ts": 1769468371303
-    }
-   }
-  },
-  "last_seen": 1769531112292,
-  "wins": 3,
-  "podiums": 6,
-  "poles": 1,
-  "flaps": 1,
-  "infr": 1
- },
- {
   "guid": "76561198120575245",
   "name": "Jean Jaques",
   "points": 220.57799999999997,
@@ -8428,6 +8350,84 @@
   "poles": 0,
   "flaps": 1,
   "infr": 4
+ },
+ {
+  "guid": "76561198101135819",
+  "name": "BicycleSid",
+  "points": 220.353,
+  "kilometers": 1685.8,
+  "collisions": 270,
+  "leaderboard": {
+   "ks_zandvoort_": {
+    "tatuusfa1": {
+     "laptime": 106263,
+     "laps": 1,
+     "ts": 1762990055196
+    }
+   },
+   "magione_": {
+    "tatuusfa1": {
+     "laptime": 68544,
+     "laps": 112,
+     "ts": 1763941641064
+    }
+   },
+   "ks_barcelona_layout_moto": {
+    "tatuusfa1": {
+     "laptime": 102145,
+     "laps": 17,
+     "ts": 1764611485104
+    }
+   },
+   "mugello_": {
+    "tatuusfa1": {
+     "laptime": 107355,
+     "laps": 42,
+     "ts": 1764890746903
+    }
+   },
+   "ks_brands_hatch_gp": {
+    "tatuusfa1": {
+     "laptime": 82750,
+     "laps": 14,
+     "ts": 1765409896829
+    }
+   },
+   "ks_silverstone_gp": {
+    "tatuusfa1": {
+     "laptime": 123218,
+     "laps": 8,
+     "ts": 1766421028313
+    }
+   },
+   "ks_vallelunga_classic_circuit": {
+    "tatuusfa1": {
+     "laptime": 71713,
+     "laps": 12,
+     "ts": 1767564425094
+    }
+   },
+   "rt_suzuka_suzukagp": {
+    "tatuusfa1": {
+     "laptime": 125613,
+     "laps": 3,
+     "ts": 1769377853765
+    }
+   },
+   "canada_2021_": {
+    "tatuusfa1": {
+     "laptime": 100616,
+     "laps": 5,
+     "ts": 1769531336227
+    }
+   }
+  },
+  "last_seen": 1769531423011,
+  "wins": 3,
+  "podiums": 6,
+  "poles": 1,
+  "flaps": 1,
+  "infr": 1
  },
  {
   "guid": "76561198338473674",
