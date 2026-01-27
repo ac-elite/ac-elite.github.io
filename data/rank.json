@@ -3558,89 +3558,11 @@
   "infr": 2
  },
  {
-  "guid": "76561198084420751",
-  "name": "Dutchy1964",
-  "points": 675.191,
-  "kilometers": 3201.2,
-  "collisions": 60,
-  "leaderboard": {
-   "monza_": {
-    "tatuusfa1": {
-     "laptime": 111950,
-     "laps": 14,
-     "ts": 1757194136558
-    }
-   },
-   "mugello_": {
-    "tatuusfa1": {
-     "laptime": 106096,
-     "laps": 101,
-     "ts": 1757685736120
-    }
-   },
-   "ks_nurburgring_layout_gp_b": {
-    "tatuusfa1": {
-     "laptime": 114648,
-     "laps": 22,
-     "ts": 1759528974814
-    }
-   },
-   "ks_laguna_seca_": {
-    "tatuusfa1": {
-     "laptime": 80422,
-     "laps": 77,
-     "ts": 1759947929694
-    }
-   },
-   "ks_silverstone_gp": {
-    "tatuusfa1": {
-     "laptime": 120206,
-     "laps": 44,
-     "ts": 1760387464929
-    }
-   },
-   "imola_": {
-    "tatuusfa1": {
-     "laptime": 105708,
-     "laps": 7,
-     "ts": 1761498177068
-    }
-   },
-   "spa_": {
-    "tatuusfa1": {
-     "laptime": 141248,
-     "laps": 9,
-     "ts": 1761596449367
-    }
-   },
-   "ks_red_bull_ring_layout_gp": {
-    "tatuusfa1": {
-     "laptime": 90336,
-     "laps": 17,
-     "ts": 1762634098242
-    }
-   },
-   "ks_zandvoort_": {
-    "tatuusfa1": {
-     "laptime": 95425,
-     "laps": 53,
-     "ts": 1762732658835
-    }
-   }
-  },
-  "last_seen": 1762732845139,
-  "wins": 13,
-  "podiums": 45,
-  "poles": 3,
-  "flaps": 3,
-  "infr": 5
- },
- {
   "guid": "76561198253261997",
   "name": "universol",
-  "points": 675.129,
-  "kilometers": 8725.7,
-  "collisions": 441,
+  "points": 675.5070000000001,
+  "kilometers": 8726.9,
+  "collisions": 442,
   "leaderboard": {
    "ks_nurburgring_layout_gp_b": {
     "tatuusfa1": {
@@ -3722,17 +3644,95 @@
    "canada_2021_": {
     "tatuusfa1": {
      "laptime": 95688,
-     "laps": 16,
-     "ts": 1769526460577
+     "laps": 17,
+     "ts": 1769526882440
     }
    }
   },
-  "last_seen": 1769526675277,
+  "last_seen": 1769526901707,
   "wins": 28,
   "podiums": 52,
   "poles": 34,
   "flaps": 43,
   "infr": 31
+ },
+ {
+  "guid": "76561198084420751",
+  "name": "Dutchy1964",
+  "points": 675.191,
+  "kilometers": 3201.2,
+  "collisions": 60,
+  "leaderboard": {
+   "monza_": {
+    "tatuusfa1": {
+     "laptime": 111950,
+     "laps": 14,
+     "ts": 1757194136558
+    }
+   },
+   "mugello_": {
+    "tatuusfa1": {
+     "laptime": 106096,
+     "laps": 101,
+     "ts": 1757685736120
+    }
+   },
+   "ks_nurburgring_layout_gp_b": {
+    "tatuusfa1": {
+     "laptime": 114648,
+     "laps": 22,
+     "ts": 1759528974814
+    }
+   },
+   "ks_laguna_seca_": {
+    "tatuusfa1": {
+     "laptime": 80422,
+     "laps": 77,
+     "ts": 1759947929694
+    }
+   },
+   "ks_silverstone_gp": {
+    "tatuusfa1": {
+     "laptime": 120206,
+     "laps": 44,
+     "ts": 1760387464929
+    }
+   },
+   "imola_": {
+    "tatuusfa1": {
+     "laptime": 105708,
+     "laps": 7,
+     "ts": 1761498177068
+    }
+   },
+   "spa_": {
+    "tatuusfa1": {
+     "laptime": 141248,
+     "laps": 9,
+     "ts": 1761596449367
+    }
+   },
+   "ks_red_bull_ring_layout_gp": {
+    "tatuusfa1": {
+     "laptime": 90336,
+     "laps": 17,
+     "ts": 1762634098242
+    }
+   },
+   "ks_zandvoort_": {
+    "tatuusfa1": {
+     "laptime": 95425,
+     "laps": 53,
+     "ts": 1762732658835
+    }
+   }
+  },
+  "last_seen": 1762732845139,
+  "wins": 13,
+  "podiums": 45,
+  "poles": 3,
+  "flaps": 3,
+  "infr": 5
  },
  {
   "guid": "76561198868504121",
@@ -8262,9 +8262,9 @@
  {
   "guid": "76561198101135819",
   "name": "BicycleSid",
-  "points": 220.892,
-  "kilometers": 1692.8,
-  "collisions": 267,
+  "points": 220.692,
+  "kilometers": 1678.2,
+  "collisions": 268,
   "leaderboard": {
    "ks_zandvoort_": {
     "tatuusfa1": {
@@ -8330,7 +8330,7 @@
     }
    }
   },
-  "last_seen": 1769468556250,
+  "last_seen": 1769531112292,
   "wins": 3,
   "podiums": 6,
   "poles": 1,
