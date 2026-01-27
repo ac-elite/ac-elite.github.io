@@ -635,8 +635,8 @@
  {
   "guid": "76561198273504643",
   "name": "Alexander",
-  "points": 2193.4300000000003,
-  "kilometers": 18237,
+  "points": 2193.379,
+  "kilometers": 18234.6,
   "collisions": 427,
   "leaderboard": {
    "ks_zandvoort_": {
@@ -764,7 +764,7 @@
     }
    }
   },
-  "last_seen": 1769553559842,
+  "last_seen": 1769554367021,
   "wins": 89,
   "podiums": 125,
   "poles": 165,
@@ -6282,6 +6282,63 @@
   "infr": 2
  },
  {
+  "guid": "76561198066917659",
+  "name": "maVVam",
+  "points": 338.585,
+  "kilometers": 3960.9,
+  "collisions": 99,
+  "leaderboard": {
+   "monza_": {
+    "tatuusfa1": {
+     "laptime": 110537,
+     "laps": 121,
+     "ts": 1757200234824
+    }
+   },
+   "mugello_": {
+    "tatuusfa1": {
+     "laptime": 105404,
+     "laps": 6,
+     "ts": 1757704215614
+    }
+   },
+   "ks_red_bull_ring_layout_gp": {
+    "tatuusfa1": {
+     "laptime": 89366,
+     "laps": 38,
+     "ts": 1762641319701
+    }
+   },
+   "ks_zandvoort_": {
+    "tatuusfa1": {
+     "laptime": 94047,
+     "laps": 142,
+     "ts": 1762991587308
+    }
+   },
+   "rt_suzuka_suzukagp": {
+    "tatuusfa1": {
+     "laptime": 119953,
+     "laps": 6,
+     "ts": 1769124179421
+    }
+   },
+   "canada_2021_": {
+    "tatuusfa1": {
+     "laptime": 95195,
+     "laps": 6,
+     "ts": 1769554280526
+    }
+   }
+  },
+  "last_seen": 1769554367021,
+  "wins": 9,
+  "podiums": 18,
+  "poles": 24,
+  "flaps": 16,
+  "infr": 5
+ },
+ {
   "guid": "76561199479560632",
   "name": "okajima",
   "points": 337.043,
@@ -6365,63 +6422,6 @@
   "poles": 2,
   "flaps": 10,
   "infr": 90
- },
- {
-  "guid": "76561198066917659",
-  "name": "maVVam",
-  "points": 332.504,
-  "kilometers": 3951.3,
-  "collisions": 98,
-  "leaderboard": {
-   "monza_": {
-    "tatuusfa1": {
-     "laptime": 110537,
-     "laps": 121,
-     "ts": 1757200234824
-    }
-   },
-   "mugello_": {
-    "tatuusfa1": {
-     "laptime": 105404,
-     "laps": 6,
-     "ts": 1757704215614
-    }
-   },
-   "ks_red_bull_ring_layout_gp": {
-    "tatuusfa1": {
-     "laptime": 89366,
-     "laps": 38,
-     "ts": 1762641319701
-    }
-   },
-   "ks_zandvoort_": {
-    "tatuusfa1": {
-     "laptime": 94047,
-     "laps": 142,
-     "ts": 1762991587308
-    }
-   },
-   "rt_suzuka_suzukagp": {
-    "tatuusfa1": {
-     "laptime": 119953,
-     "laps": 6,
-     "ts": 1769124179421
-    }
-   },
-   "canada_2021_": {
-    "tatuusfa1": {
-     "laptime": 95244,
-     "laps": 3,
-     "ts": 1769553632493
-    }
-   }
-  },
-  "last_seen": 1769553766087,
-  "wins": 9,
-  "podiums": 18,
-  "poles": 24,
-  "flaps": 16,
-  "infr": 5
  },
  {
   "guid": "76561198335731342",
@@ -8269,8 +8269,8 @@
  {
   "guid": "76561198101135819",
   "name": "BicycleSid",
-  "points": 221.651,
-  "kilometers": 1709.9,
+  "points": 221.996,
+  "kilometers": 1712.8,
   "collisions": 275,
   "leaderboard": {
    "ks_zandvoort_": {
@@ -8332,12 +8332,12 @@
    "canada_2021_": {
     "tatuusfa1": {
      "laptime": 99444,
-     "laps": 7,
-     "ts": 1769553613710
+     "laps": 8,
+     "ts": 1769553987059
     }
    }
   },
-  "last_seen": 1769553766087,
+  "last_seen": 1769554034302,
   "wins": 3,
   "podiums": 6,
   "poles": 1,
