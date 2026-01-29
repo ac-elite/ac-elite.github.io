@@ -129,7 +129,7 @@
  {
   "guid": "76561198828350593",
   "name": "Grimlord",
-  "points": 3896.899,
+  "points": 3896.599,
   "kilometers": 18617,
   "collisions": 507,
   "leaderboard": {
@@ -239,7 +239,7 @@
     }
    }
   },
-  "last_seen": 1769719677012,
+  "last_seen": 1769721659696,
   "wins": 106,
   "podiums": 294,
   "poles": 93,
@@ -376,9 +376,9 @@
  {
   "guid": "76561198328304798",
   "name": "CarterReza",
-  "points": 2879.828,
-  "kilometers": 23037.2,
-  "collisions": 241,
+  "points": 2889.536,
+  "kilometers": 23063.3,
+  "collisions": 245,
   "leaderboard": {
    "ks_zandvoort_": {
     "tatuusfa1": {
@@ -500,16 +500,16 @@
    "canada_2021_": {
     "tatuusfa1": {
      "laptime": 94279,
-     "laps": 14,
-     "ts": 1769719464881
+     "laps": 21,
+     "ts": 1769720741887
     }
    }
   },
-  "last_seen": 1769719677012,
-  "wins": 99,
-  "podiums": 157,
+  "last_seen": 1769720770050,
+  "wins": 100,
+  "podiums": 158,
   "poles": 282,
-  "flaps": 124,
+  "flaps": 125,
   "infr": 69
  },
  {
@@ -642,9 +642,9 @@
  {
   "guid": "76561198273504643",
   "name": "Alexander",
-  "points": 2241.3469999999998,
-  "kilometers": 18499.7,
-  "collisions": 480,
+  "points": 2243.973,
+  "kilometers": 18530.4,
+  "collisions": 487,
   "leaderboard": {
    "ks_zandvoort_": {
     "tatuusfa1": {
@@ -765,13 +765,13 @@
    },
    "canada_2021_": {
     "tatuusfa1": {
-     "laptime": 94172,
-     "laps": 79,
-     "ts": 1769719337634
+     "laptime": 94102,
+     "laps": 87,
+     "ts": 1769721521041
     }
    }
   },
-  "last_seen": 1769719677012,
+  "last_seen": 1769721659696,
   "wins": 91,
   "podiums": 128,
   "poles": 167,
@@ -906,9 +906,9 @@
  {
   "guid": "76561198281399110",
   "name": "3lMist3r",
-  "points": 2033.461,
-  "kilometers": 9104.8,
-  "collisions": 528,
+  "points": 2034.7849999999999,
+  "kilometers": 9123,
+  "collisions": 530,
   "leaderboard": {
    "ks_zandvoort_": {
     "tatuusfa1": {
@@ -1023,12 +1023,12 @@
    "canada_2021_": {
     "tatuusfa1": {
      "laptime": 96737,
-     "laps": 16,
-     "ts": 1769719470455
+     "laps": 20,
+     "ts": 1769720202684
     }
    }
   },
-  "last_seen": 1769719677012,
+  "last_seen": 1769720220265,
   "wins": 41,
   "podiums": 135,
   "poles": 8,
@@ -1167,7 +1167,7 @@
     }
    }
   },
-  "last_seen": 1769713915083,
+  "last_seen": 1769721105361,
   "wins": 17,
   "podiums": 111,
   "poles": 5,
@@ -1733,7 +1733,7 @@
     }
    }
   },
-  "last_seen": 1769719677012,
+  "last_seen": 1769720339762,
   "wins": 25,
   "podiums": 79,
   "poles": 7,
@@ -1743,9 +1743,9 @@
  {
   "guid": "76561198212710700",
   "name": "Stella",
-  "points": 1286.303,
-  "kilometers": 6054.9,
-  "collisions": 174,
+  "points": 1285.89,
+  "kilometers": 6073.3,
+  "collisions": 179,
   "leaderboard": {
    "ks_zandvoort_": {
     "tatuusfa1": {
@@ -1867,12 +1867,12 @@
    "canada_2021_": {
     "tatuusfa1": {
      "laptime": 94707,
-     "laps": 8,
-     "ts": 1769719493054
+     "laps": 11,
+     "ts": 1769721332495
     }
    }
   },
-  "last_seen": 1769719677012,
+  "last_seen": 1769721659696,
   "wins": 47,
   "podiums": 69,
   "poles": 51,
@@ -292547,6 +292547,35 @@
   "infr": 5
  },
  {
+  "guid": "76561199232134487",
+  "name": "ZNOX_YTB",
+  "points": 13.568999999999999,
+  "kilometers": 151.4,
+  "collisions": 17,
+  "leaderboard": {
+   "ks_zandvoort_": {
+    "tatuusfa1": {
+     "laptime": 105642,
+     "laps": 2,
+     "ts": 1756593589553
+    }
+   },
+   "canada_2021_": {
+    "tatuusfa1": {
+     "laptime": 105128,
+     "laps": 3,
+     "ts": 1769721588581
+    }
+   }
+  },
+  "last_seen": 1769721604147,
+  "wins": 0,
+  "podiums": 0,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 4
+ },
+ {
   "guid": "76561199611845550",
   "name": "Zilzeiz",
   "points": 13.49,
@@ -295081,28 +295110,6 @@
   "poles": 1,
   "flaps": 0,
   "infr": 17
- },
- {
-  "guid": "76561199232134487",
-  "name": "ZNOX_YTB",
-  "points": 8.994,
-  "kilometers": 141.9,
-  "collisions": 12,
-  "leaderboard": {
-   "ks_zandvoort_": {
-    "tatuusfa1": {
-     "laptime": 105642,
-     "laps": 2,
-     "ts": 1756593589553
-    }
-   }
-  },
-  "last_seen": 1760815687813,
-  "wins": 0,
-  "podiums": 0,
-  "poles": 0,
-  "flaps": 0,
-  "infr": 4
  },
  {
   "guid": "76561198419489665",
