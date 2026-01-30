@@ -10361,7 +10361,7 @@
     }
    }
   },
-  "last_seen": 1769782052409,
+  "last_seen": 1769782083083,
   "wins": 5,
   "podiums": 11,
   "poles": 0,
@@ -20244,6 +20244,56 @@
   "infr": 1
  },
  {
+  "guid": "76561198058378519",
+  "name": "Oblak",
+  "points": 85.108,
+  "kilometers": 493.3,
+  "collisions": 29,
+  "leaderboard": {
+   "ks_laguna_seca_": {
+    "tatuusfa1": {
+     "laptime": 84374,
+     "laps": 13,
+     "ts": 1760204259951
+    }
+   },
+   "ks_silverstone_gp": {
+    "tatuusfa1": {
+     "laptime": 127745,
+     "laps": 1,
+     "ts": 1760277634552
+    }
+   },
+   "imola_": {
+    "tatuusfa1": {
+     "laptime": 108663,
+     "laps": 9,
+     "ts": 1761490109787
+    }
+   },
+   "mugello_": {
+    "tatuusfa1": {
+     "laptime": 109118,
+     "laps": 12,
+     "ts": 1764954736049
+    }
+   },
+   "canada_2021_": {
+    "tatuusfa1": {
+     "laptime": 102581,
+     "laps": 2,
+     "ts": 1769790321793
+    }
+   }
+  },
+  "last_seen": 1769790353403,
+  "wins": 1,
+  "podiums": 3,
+  "poles": 0,
+  "flaps": 1,
+  "infr": 0
+ },
+ {
   "guid": "76561198101602322",
   "name": "rob",
   "points": 85.07300000000001,
@@ -22701,49 +22751,6 @@
   "poles": 0,
   "flaps": 0,
   "infr": 7
- },
- {
-  "guid": "76561198058378519",
-  "name": "Oblak",
-  "points": 79.042,
-  "kilometers": 480.1,
-  "collisions": 28,
-  "leaderboard": {
-   "ks_laguna_seca_": {
-    "tatuusfa1": {
-     "laptime": 84374,
-     "laps": 13,
-     "ts": 1760204259951
-    }
-   },
-   "ks_silverstone_gp": {
-    "tatuusfa1": {
-     "laptime": 127745,
-     "laps": 1,
-     "ts": 1760277634552
-    }
-   },
-   "imola_": {
-    "tatuusfa1": {
-     "laptime": 108663,
-     "laps": 9,
-     "ts": 1761490109787
-    }
-   },
-   "mugello_": {
-    "tatuusfa1": {
-     "laptime": 109118,
-     "laps": 12,
-     "ts": 1764954736049
-    }
-   }
-  },
-  "last_seen": 1764954934138,
-  "wins": 1,
-  "podiums": 3,
-  "poles": 0,
-  "flaps": 1,
-  "infr": 0
  },
  {
   "guid": "76561199120330833",
