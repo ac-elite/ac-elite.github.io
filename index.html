@@ -866,6 +866,13 @@
 
           <!-- Desktop Navigation -->
           <div class="desktop-nav hidden sm:flex gap-2 lg:gap-3 items-center">
+            <button
+              onclick="openLicenseModal()"
+              class="nav-btn btn-ghost px-3 lg:px-5 py-2 lg:py-2.5 rounded-xl font-semibold text-sm"
+              title="License & Safety Rating overview"
+            >
+              <span class="hidden lg:inline">📋 </span>License / SR
+            </button>
             <a
               href="https://discord.gg/d2EbxGYBbj"
               target="_blank"
@@ -888,13 +895,6 @@
               class="nav-btn btn-ghost px-3 lg:px-5 py-2 lg:py-2.5 rounded-xl font-semibold text-sm"
             >
               <span class="hidden lg:inline">🏆 </span>Leaderboard
-            </button>
-            <button
-              onclick="openLicenseModal()"
-              class="nav-btn btn-ghost px-3 lg:px-5 py-2 lg:py-2.5 rounded-xl font-semibold text-sm"
-              title="License & Safety Rating uitleg"
-            >
-              <span class="hidden lg:inline">📋 </span>License / SR
             </button>
             <button
               onclick="handleShopClick()"
@@ -920,11 +920,17 @@
 
       <!-- Mobile Menu -->
       <div class="mobile-menu" id="mobile-menu">
+        <button
+          onclick="openLicenseModal(); closeMobileMenu();"
+          class="nav-btn btn-ghost px-5 py-3 rounded-xl font-semibold text-base mt-4 sm:mt-0"
+        >
+          📋 License / SR
+        </button>
         <a
           href="https://discord.gg/d2EbxGYBbj"
           target="_blank"
           rel="noopener noreferrer"
-          class="btn-discord px-5 py-3 rounded-xl font-semibold text-base flex items-center justify-center gap-2 mt-4 sm:mt-0"
+          class="btn-discord px-5 py-3 rounded-xl font-semibold text-base flex items-center justify-center gap-2"
           onclick="closeMobileMenu()"
         >
           💬 Join Discord
@@ -942,12 +948,6 @@
           id="mobile-nav-leaderboard"
         >
           🏆 Leaderboard
-        </button>
-        <button
-          onclick="openLicenseModal(); closeMobileMenu();"
-          class="nav-btn btn-ghost px-5 py-3 rounded-xl font-semibold text-base"
-        >
-          📋 License / SR
         </button>
         <button
           onclick="handleShopClick(); closeMobileMenu();"
@@ -1572,7 +1572,7 @@
           type="button"
           class="absolute top-3 right-3 text-slate-500 hover:text-slate-300 text-xl p-2 z-10"
           onclick="closeLicenseModal()"
-          aria-label="Sluiten"
+          aria-label="Close"
         >
           ✕
         </button>
@@ -1593,36 +1593,36 @@
           <!-- License tab -->
           <div id="license-modal-pane-license" class="license-modal-pane active">
             <p class="text-slate-400 text-sm mb-4">
-              Je License (pace/skill) wordt bepaald door je positie op de leaderboards per track en je totaal gereden km.
+              Your License (pace/skill) is based on your position on the leaderboards per track and your total km driven.
             </p>
             <div class="space-y-0">
               <div class="license-tier-row">
                 <div class="license-tier-badge-wrap"><span class="license-badge licence-master">Master</span></div>
-                <span class="text-slate-300 text-sm">Min. 6.000 km en pace score ≥ 3.700</span>
+                <span class="text-slate-300 text-sm">Min. 6,000 km and pace score ≥ 3,700</span>
               </div>
               <div class="license-tier-row">
                 <div class="license-tier-badge-wrap"><span class="license-badge licence-diamond">Diamond</span></div>
-                <span class="text-slate-300 text-sm">Min. 5.000 km en pace score ≥ 2.500</span>
+                <span class="text-slate-300 text-sm">Min. 5,000 km and pace score ≥ 2,500</span>
               </div>
               <div class="license-tier-row">
                 <div class="license-tier-badge-wrap"><span class="license-badge licence-platinum">Platinum</span></div>
-                <span class="text-slate-300 text-sm">Min. 3.500 km en pace score ≥ 1.500</span>
+                <span class="text-slate-300 text-sm">Min. 3,500 km and pace score ≥ 1,500</span>
               </div>
               <div class="license-tier-row">
                 <div class="license-tier-badge-wrap"><span class="license-badge licence-gold">Gold</span></div>
-                <span class="text-slate-300 text-sm">Min. 2.000 km en pace score ≥ 800</span>
+                <span class="text-slate-300 text-sm">Min. 2,000 km and pace score ≥ 800</span>
               </div>
               <div class="license-tier-row">
                 <div class="license-tier-badge-wrap"><span class="license-badge licence-silver">Silver</span></div>
-                <span class="text-slate-300 text-sm">Min. 1.000 km en pace score ≥ 400</span>
+                <span class="text-slate-300 text-sm">Min. 1,000 km and pace score ≥ 400</span>
               </div>
               <div class="license-tier-row">
                 <div class="license-tier-badge-wrap"><span class="license-badge licence-bronze">Bronze</span></div>
-                <span class="text-slate-300 text-sm">Min. 100 km (gekwalificeerd)</span>
+                <span class="text-slate-300 text-sm">Min. 100 km (qualified)</span>
               </div>
               <div class="license-tier-row">
                 <div class="license-tier-badge-wrap"><span class="license-badge licence-rookie">Rookie</span></div>
-                <span class="text-slate-300 text-sm">Onder 100 km gereden</span>
+                <span class="text-slate-300 text-sm">Under 100 km driven</span>
               </div>
             </div>
           </div>
@@ -1632,10 +1632,10 @@
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-4">
               <div>
                 <p class="text-slate-400 text-sm mb-2">
-                  Safety Rating (1.00–9.99) meet hoe schoon je rijdt. De formule weegt crashes en infractions per 100 km.
+                  Safety Rating (1.00–9.99) measures how clean you drive. The formula weighs crashes and infractions per 100 km.
                 </p>
                 <p class="text-slate-400 text-sm mb-2">
-                  Hogere SR = minder incidenten. Je tier hangt af van je SR én je totaal gereden km (meer km = toegang tot hogere tiers).
+                  Higher SR = fewer incidents. Your tier depends on your SR and total km driven (more km = access to higher tiers).
                 </p>
               </div>
               <div class="overflow-x-auto">
@@ -1648,13 +1648,13 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <tr><td><span class="sr-badge sr-badge-S">S</span></td><td>3.0</td><td>6.000</td></tr>
-                    <tr><td><span class="sr-badge sr-badge-A">A</span></td><td>2.7</td><td>5.000</td></tr>
-                    <tr><td><span class="sr-badge sr-badge-B">B</span></td><td>2.4</td><td>3.500</td></tr>
-                    <tr><td><span class="sr-badge sr-badge-C">C</span></td><td>2.1</td><td>2.000</td></tr>
-                    <tr><td><span class="sr-badge sr-badge-D">D</span></td><td>1.8</td><td>1.000</td></tr>
+                    <tr><td><span class="sr-badge sr-badge-S">S</span></td><td>3.0</td><td>6,000</td></tr>
+                    <tr><td><span class="sr-badge sr-badge-A">A</span></td><td>2.7</td><td>5,000</td></tr>
+                    <tr><td><span class="sr-badge sr-badge-B">B</span></td><td>2.4</td><td>3,500</td></tr>
+                    <tr><td><span class="sr-badge sr-badge-C">C</span></td><td>2.1</td><td>2,000</td></tr>
+                    <tr><td><span class="sr-badge sr-badge-D">D</span></td><td>1.8</td><td>1,000</td></tr>
                     <tr><td><span class="sr-badge sr-badge-E">E</span></td><td>1.5</td><td>100</td></tr>
-                    <tr><td><span class="sr-badge sr-badge-F">F</span></td><td>—</td><td>&lt; 100 km of lage SR</td></tr>
+                    <tr><td><span class="sr-badge sr-badge-F">F</span></td><td>—</td><td>&lt; 100 km or low SR</td></tr>
                   </tbody>
                 </table>
               </div>
@@ -1930,10 +1930,11 @@
         return driverLicenses[driver.guid] || { license: "Bronze", paceScore: 0 };
       }
 
-      function renderLicenseBadge(driver) {
-        const { license } = getDriverLicense(driver);
+      function renderLicenseBadge(driver, showScore = true) {
+        const { license, paceScore } = getDriverLicense(driver);
         const tierClass = "license-badge licence-" + license.toLowerCase();
-        return `<span class="${tierClass}" title="License: ${license}">${license}</span>`;
+        const scoreStr = showScore ? " | " + Math.round(paceScore).toLocaleString() : "";
+        return `<span class="${tierClass}" title="License: ${license} (${Math.round(paceScore).toLocaleString()} pts)">${license}${scoreStr}</span>`;
       }
 
       /* ==================== Team Badge (Creator / Admin / Moderator) ==================== */
