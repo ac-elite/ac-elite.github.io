@@ -185,27 +185,29 @@
         background: linear-gradient(135deg, #047857 0%, #059669 50%, #10b981 100%);
         box-shadow: 0 0 12px rgba(16, 185, 129, 0.4);
       }
-      /* A = very good (blue – no overlap with License Master purple) */
-      .sr-badge-A {
+      /* A subtiers (blue – no overlap with License Elite purple) */
+      .sr-badge-A1, .sr-badge-A2, .sr-badge-A3 {
         background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 50%, #60a5fa 100%);
         box-shadow: 0 0 12px rgba(59, 130, 246, 0.35);
       }
-      /* B = good (amber – distinct from License Gold) */
-      .sr-badge-B {
+      .sr-badge-A1 { box-shadow: 0 0 14px rgba(59, 130, 246, 0.5); }
+      /* B subtiers (amber – distinct from License Gold) */
+      .sr-badge-B1, .sr-badge-B2, .sr-badge-B3 {
         background: linear-gradient(135deg, #b45309 0%, #d97706 50%, #f59e0b 100%);
         box-shadow: 0 0 10px rgba(245, 158, 11, 0.35);
       }
-      /* C = average (orange) */
-      .sr-badge-C {
+      .sr-badge-B1 { box-shadow: 0 0 12px rgba(245, 158, 11, 0.45); }
+      /* C subtiers (orange) */
+      .sr-badge-C1, .sr-badge-C2, .sr-badge-C3 {
         background: linear-gradient(135deg, #c2410c 0%, #ea580c 50%, #fb923c 100%);
         box-shadow: 0 0 10px rgba(234, 88, 12, 0.3);
       }
-      /* D = below average (orange-red) */
-      .sr-badge-D {
+      /* D subtiers (orange-red) */
+      .sr-badge-D1, .sr-badge-D2, .sr-badge-D3 {
         background: linear-gradient(135deg, #b91c1c 0%, #dc2626 50%, #f87171 100%);
       }
-      /* E = poor (red) */
-      .sr-badge-E {
+      /* E subtiers (red) */
+      .sr-badge-E1, .sr-badge-E2, .sr-badge-E3 {
         background: linear-gradient(135deg, #991b1b 0%, #b91c1c 50%, #ef4444 100%);
         box-shadow: 0 0 10px rgba(220, 38, 38, 0.35);
       }
@@ -231,14 +233,26 @@
         text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
       }
       /* Master = ultimate tier (violet/purple – prestigious, “legend”) */
-      .licence-master {
+      .licence-elite {
         background: linear-gradient(135deg, #4c1d95 0%, #6d28d9 40%, #8b5cf6 70%, #a78bfa 100%);
         box-shadow: 0 0 18px rgba(139, 92, 246, 0.5), 0 0 8px rgba(167, 139, 250, 0.3);
+      }
+      /* Diamond+ = top Diamond (slightly brighter) */
+      .licence-diamond-plus {
+        background: linear-gradient(135deg, #0369a1 0%, #0ea5e9 50%, #38bdf8 100%);
+        box-shadow: 0 0 16px rgba(56, 189, 248, 0.5);
       }
       /* Diamond = precious blue */
       .licence-diamond {
         background: linear-gradient(135deg, #0c4a6e 0%, #0369a1 50%, #0ea5e9 100%);
         box-shadow: 0 0 14px rgba(14, 165, 233, 0.45);
+      }
+      /* Platinum+ = brighter platinum */
+      .licence-platinum-plus {
+        background: linear-gradient(135deg, #cbd5e1 0%, #e2e8f0 50%, #f8fafc 100%);
+        color: #1e293b;
+        text-shadow: 0 1px 0 rgba(255, 255, 255, 0.9);
+        box-shadow: 0 0 14px rgba(226, 232, 240, 0.5);
       }
       /* Platinum = cool white-platinum (distinct from Silver) */
       .licence-platinum {
@@ -247,7 +261,13 @@
         text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
         box-shadow: 0 0 12px rgba(203, 213, 225, 0.4);
       }
-
+      /* Gold+ = brighter gold */
+      .licence-gold-plus {
+        background: linear-gradient(135deg, #ca8a04 0%, #eab308 40%, #facc15 70%, #fef08a 100%);
+        color: #1c1917;
+        text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+        box-shadow: 0 0 16px rgba(250, 204, 21, 0.5);
+      }
       /* Gold = warm metallic gold (distinct from SR B amber) */
       .licence-gold {
         background: linear-gradient(135deg, #a16207 0%, #ca8a04 40%, #eab308 70%, #fde047 100%);
@@ -256,12 +276,21 @@
         box-shadow: 0 0 14px rgba(234, 179, 8, 0.45);
       }
 
+      /* Silver+ = brighter silver */
+      .licence-silver-plus {
+        background: linear-gradient(135deg, #64748b 0%, #94a3b8 50%, #cbd5e1 100%);
+        box-shadow: 0 0 14px rgba(148, 163, 184, 0.4);
+      }
       /* Silver = silver grey */
       .licence-silver {
         background: linear-gradient(135deg, #475569 0%, #64748b 50%, #94a3b8 100%);
         box-shadow: 0 0 12px rgba(100, 116, 139, 0.35);
       }
-
+      /* Bronze+ = brighter bronze */
+      .licence-bronze-plus {
+        background: linear-gradient(135deg, #92400e 0%, #b45309 50%, #d97706 100%);
+        box-shadow: 0 0 14px rgba(217, 119, 6, 0.4);
+      }
       /* Bronze = copper/bronze */
       .licence-bronze {
         background: linear-gradient(135deg, #78350f 0%, #92400e 50%, #b45309 100%);
@@ -805,7 +834,13 @@
       }
       .license-tier-badge-wrap {
         flex-shrink: 0;
-        min-width: 100px;
+        width: 100px;
+        display: flex;
+        justify-content: center;
+      }
+      .license-tier-badge-wrap .license-badge {
+        min-width: 85px;
+        text-align: center;
       }
       .sr-overview-table {
         width: 100%;
@@ -820,9 +855,18 @@
         letter-spacing: 0.05em;
       }
       .sr-overview-table td {
-        padding: 0.5rem 0.75rem;
+        padding: 0.4rem 0.75rem;
         font-size: 0.875rem;
         color: #e2e8f0;
+      }
+      .sr-overview-table td:first-child {
+        width: 60px;
+        text-align: center;
+      }
+      .sr-overview-table .sr-badge {
+        min-width: 40px;
+        display: inline-block;
+        text-align: center;
       }
 
       /* Reduce motion for accessibility */
@@ -1604,28 +1648,48 @@
             </p>
             <div class="space-y-0">
               <div class="license-tier-row">
-                <div class="license-tier-badge-wrap"><span class="license-badge licence-master">Master</span></div>
-                <span class="text-slate-300 text-sm">Min. 6,000 km, pace score ≥ 3,700, and at least 8 tracks</span>
+                <div class="license-tier-badge-wrap"><span class="license-badge licence-elite">Elite</span></div>
+                <span class="text-slate-300 text-sm">6,000 km, score ≥ 3,700, 8 tracks</span>
+              </div>
+              <div class="license-tier-row">
+                <div class="license-tier-badge-wrap"><span class="license-badge licence-diamond-plus">Diamond+</span></div>
+                <span class="text-slate-300 text-sm">5,000 km, score ≥ 3,100, 6 tracks</span>
               </div>
               <div class="license-tier-row">
                 <div class="license-tier-badge-wrap"><span class="license-badge licence-diamond">Diamond</span></div>
-                <span class="text-slate-300 text-sm">Min. 5,000 km, pace score ≥ 2,500, and at least 6 tracks</span>
+                <span class="text-slate-300 text-sm">5,000 km, score ≥ 2,500, 6 tracks</span>
+              </div>
+              <div class="license-tier-row">
+                <div class="license-tier-badge-wrap"><span class="license-badge licence-platinum-plus">Platinum+</span></div>
+                <span class="text-slate-300 text-sm">3,500 km, score ≥ 2,000, 5 tracks</span>
               </div>
               <div class="license-tier-row">
                 <div class="license-tier-badge-wrap"><span class="license-badge licence-platinum">Platinum</span></div>
-                <span class="text-slate-300 text-sm">Min. 3,500 km, pace score ≥ 1,500, and at least 5 tracks</span>
+                <span class="text-slate-300 text-sm">3,500 km, score ≥ 1,500, 5 tracks</span>
+              </div>
+              <div class="license-tier-row">
+                <div class="license-tier-badge-wrap"><span class="license-badge licence-gold-plus">Gold+</span></div>
+                <span class="text-slate-300 text-sm">2,000 km, score ≥ 1,150, 4 tracks</span>
               </div>
               <div class="license-tier-row">
                 <div class="license-tier-badge-wrap"><span class="license-badge licence-gold">Gold</span></div>
-                <span class="text-slate-300 text-sm">Min. 2,000 km, pace score ≥ 800, and at least 4 tracks</span>
+                <span class="text-slate-300 text-sm">2,000 km, score ≥ 800, 4 tracks</span>
+              </div>
+              <div class="license-tier-row">
+                <div class="license-tier-badge-wrap"><span class="license-badge licence-silver-plus">Silver+</span></div>
+                <span class="text-slate-300 text-sm">1,000 km, score ≥ 600, 3 tracks</span>
               </div>
               <div class="license-tier-row">
                 <div class="license-tier-badge-wrap"><span class="license-badge licence-silver">Silver</span></div>
-                <span class="text-slate-300 text-sm">Min. 1,000 km, pace score ≥ 400, and at least 3 tracks</span>
+                <span class="text-slate-300 text-sm">1,000 km, score ≥ 400, 3 tracks</span>
+              </div>
+              <div class="license-tier-row">
+                <div class="license-tier-badge-wrap"><span class="license-badge licence-bronze-plus">Bronze+</span></div>
+                <span class="text-slate-300 text-sm">100 km, score ≥ 200</span>
               </div>
               <div class="license-tier-row">
                 <div class="license-tier-badge-wrap"><span class="license-badge licence-bronze">Bronze</span></div>
-                <span class="text-slate-300 text-sm">Min. 100 km (qualified)</span>
+                <span class="text-slate-300 text-sm">100 km (qualified)</span>
               </div>
               <div class="license-tier-row">
                 <div class="license-tier-badge-wrap"><span class="license-badge licence-rookie">Rookie</span></div>
@@ -1658,13 +1722,23 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <tr><td><span class="sr-badge sr-badge-S">S</span></td><td>3.0</td><td>6,000</td></tr>
-                    <tr><td><span class="sr-badge sr-badge-A">A</span></td><td>2.7</td><td>5,000</td></tr>
-                    <tr><td><span class="sr-badge sr-badge-B">B</span></td><td>2.4</td><td>3,500</td></tr>
-                    <tr><td><span class="sr-badge sr-badge-C">C</span></td><td>2.1</td><td>2,000</td></tr>
-                    <tr><td><span class="sr-badge sr-badge-D">D</span></td><td>1.8</td><td>1,000</td></tr>
-                    <tr><td><span class="sr-badge sr-badge-E">E</span></td><td>1.5</td><td>100</td></tr>
-                    <tr><td><span class="sr-badge sr-badge-F">F</span></td><td>—</td><td>&lt; 100 km or low SR</td></tr>
+                    <tr><td><span class="sr-badge sr-badge-S">S</span></td><td>3.0+</td><td>3,000</td></tr>
+                    <tr><td><span class="sr-badge sr-badge-A1">A1</span></td><td>2.9</td><td>2,000</td></tr>
+                    <tr><td><span class="sr-badge sr-badge-A2">A2</span></td><td>2.8</td><td>2,000</td></tr>
+                    <tr><td><span class="sr-badge sr-badge-A3">A3</span></td><td>2.7</td><td>2,000</td></tr>
+                    <tr><td><span class="sr-badge sr-badge-B1">B1</span></td><td>2.6</td><td>1,500</td></tr>
+                    <tr><td><span class="sr-badge sr-badge-B2">B2</span></td><td>2.5</td><td>1,500</td></tr>
+                    <tr><td><span class="sr-badge sr-badge-B3">B3</span></td><td>2.4</td><td>1,500</td></tr>
+                    <tr><td><span class="sr-badge sr-badge-C1">C1</span></td><td>2.3</td><td>1,000</td></tr>
+                    <tr><td><span class="sr-badge sr-badge-C2">C2</span></td><td>2.2</td><td>1,000</td></tr>
+                    <tr><td><span class="sr-badge sr-badge-C3">C3</span></td><td>2.1</td><td>1,000</td></tr>
+                    <tr><td><span class="sr-badge sr-badge-D1">D1</span></td><td>2.0</td><td>500</td></tr>
+                    <tr><td><span class="sr-badge sr-badge-D2">D2</span></td><td>1.9</td><td>500</td></tr>
+                    <tr><td><span class="sr-badge sr-badge-D3">D3</span></td><td>1.8</td><td>500</td></tr>
+                    <tr><td><span class="sr-badge sr-badge-E1">E1</span></td><td>1.7</td><td>100</td></tr>
+                    <tr><td><span class="sr-badge sr-badge-E2">E2</span></td><td>1.6</td><td>100</td></tr>
+                    <tr><td><span class="sr-badge sr-badge-E3">E3</span></td><td>1.5</td><td>100</td></tr>
+                    <tr><td><span class="sr-badge sr-badge-F">F</span></td><td>&lt; 1.5</td><td>&lt; 100 km</td></tr>
                   </tbody>
                 </table>
               </div>
@@ -1790,13 +1864,24 @@
         COLLISION_WEIGHT: 1.0,
         INFRACTION_WEIGHT: 2.0,
       };
+      // SR tiers with subtiers (1=highest, 3=lowest within letter) and lowered km requirements
       const SR_TIERS = [
-        { name: "S", minSR: 3.0, minKm: 6000 },
-        { name: "A", minSR: 2.7, minKm: 5000 },
-        { name: "B", minSR: 2.4, minKm: 3500 },
-        { name: "C", minSR: 2.1, minKm: 2000 },
-        { name: "D", minSR: 1.8, minKm: 1000 },
-        { name: "E", minSR: 1.5, minKm: 100 },
+        { name: "S", minSR: 3.0, minKm: 3000 },
+        { name: "A1", minSR: 2.9, minKm: 2000 },
+        { name: "A2", minSR: 2.8, minKm: 2000 },
+        { name: "A3", minSR: 2.7, minKm: 2000 },
+        { name: "B1", minSR: 2.6, minKm: 1500 },
+        { name: "B2", minSR: 2.5, minKm: 1500 },
+        { name: "B3", minSR: 2.4, minKm: 1500 },
+        { name: "C1", minSR: 2.3, minKm: 1000 },
+        { name: "C2", minSR: 2.2, minKm: 1000 },
+        { name: "C3", minSR: 2.1, minKm: 1000 },
+        { name: "D1", minSR: 2.0, minKm: 500 },
+        { name: "D2", minSR: 1.9, minKm: 500 },
+        { name: "D3", minSR: 1.8, minKm: 500 },
+        { name: "E1", minSR: 1.7, minKm: 100 },
+        { name: "E2", minSR: 1.6, minKm: 100 },
+        { name: "E3", minSR: 1.5, minKm: 100 },
       ];
 
       function safetyRating(d) {
@@ -1860,14 +1945,19 @@
         CONSISTENCY_BONUS_MAX: 50,
       };
       const LICENSE_TIERS = {
-        Master: { minKm: 6000, minScore: 3700, minTracks: 8 },
+        Elite: { minKm: 6000, minScore: 3700, minTracks: 8 },
+        "Diamond+": { minKm: 5000, minScore: 3100, minTracks: 6 },
         Diamond: { minKm: 5000, minScore: 2500, minTracks: 6 },
+        "Platinum+": { minKm: 3500, minScore: 2000, minTracks: 5 },
         Platinum: { minKm: 3500, minScore: 1500, minTracks: 5 },
+        "Gold+": { minKm: 2000, minScore: 1150, minTracks: 4 },
         Gold: { minKm: 2000, minScore: 800, minTracks: 4 },
+        "Silver+": { minKm: 1000, minScore: 600, minTracks: 3 },
         Silver: { minKm: 1000, minScore: 400, minTracks: 3 },
+        "Bronze+": { minKm: 100, minScore: 200 },
         Bronze: { minKm: 100, minScore: 0 },
       };
-      const LICENSE_TIER_ORDER = ["Master", "Diamond", "Platinum", "Gold", "Silver", "Bronze"];
+      const LICENSE_TIER_ORDER = ["Elite", "Diamond+", "Diamond", "Platinum+", "Platinum", "Gold+", "Gold", "Silver+", "Silver", "Bronze+", "Bronze"];
 
       function computeFullLeaderboardScores(drivers) {
         const paceScores = new Array(drivers.length).fill(0);
@@ -1946,7 +2036,8 @@
 
       function renderLicenseBadge(driver, showScore = true) {
         const { license, paceScore } = getDriverLicense(driver);
-        const tierClass = "license-badge licence-" + license.toLowerCase();
+        // Convert "Diamond+" to "diamond-plus" for CSS class
+        const tierClass = "license-badge licence-" + license.toLowerCase().replace("+", "-plus");
         const scoreStr = showScore ? " | " + Math.round(paceScore).toLocaleString() : "";
         return `<span class="${tierClass}" title="License: ${license} (${Math.round(paceScore).toLocaleString()} pts)">${license}${scoreStr}</span>`;
       }
