@@ -2252,11 +2252,15 @@
               Search Driver
             </label>
             <input
-              type="text"
+              type="search"
               id="driver-search"
+              name="q"
               placeholder="Enter driver name or Steam64 ID..."
               class="input-modern"
               autocomplete="off"
+              data-lpignore="true"
+              data-form-type="other"
+              readonly
             />
             <div id="autocomplete-results" class="autocomplete-results"></div>
           </div>
@@ -3876,8 +3880,8 @@
           <tr class="cursor-pointer hover:bg-white/5 transition-colors" onclick="openDriverFromLeaderboard('${item.driver.guid || ""}')">
             <td class="col-pos"><span class="pos-badge pos-default">${pos}</span></td>
             <td class="col-driver"><div class="flex items-center gap-2 flex-wrap"><span class="text-white font-semibold">${escapeHtml((item.driver.name || "Unknown").slice(0, 25))}</span>${renderTeamBadge(item.driver)}</div></td>
-            <td class="col-license"><div class="flex items-center gap-2 flex-wrap">${renderLicenseBadge(item.driver, true, true)}${renderSRBadge(item.driver, true, true)}</div></td>
-            <td class="font-mono text-slate-400">${item.sr.sr.toFixed(2)}</td>
+            <td class="col-license"><div class="flex items-center gap-2 flex-wrap">${renderLicenseBadge(item.driver, true, true)}</div></td>
+            <td class="col-laptime"><div class="flex items-center gap-2 flex-wrap">${renderSRBadge(item.driver, true, true)}</div></td>
             <td class="col-km font-mono text-slate-400" style="text-align:right">${(item.driver.kilometers || 0).toLocaleString()}</td>
           </tr>`;
             }
@@ -4066,6 +4070,11 @@
         "autocomplete-results"
       );
       let autocompleteTimeout;
+
+      // Remove readonly on focus so user can type; prevents Chrome password manager on load
+      searchInput.addEventListener("focus", function () {
+        this.removeAttribute("readonly");
+      });
 
       searchInput.addEventListener("input", function () {
         clearTimeout(autocompleteTimeout);
