@@ -8,7 +8,7 @@
  * Usage:
  *   node scripts/license-and-safety.js [rank.json] [min-km] [car]
  *
- * Defaults: rank.json (project root), 100 km, tatuusfa1
+ * Defaults: data/rank.json (same as website), 100 km, tatuusfa1
  *
  * Logic matches the website (index.html). All tunable values are in CONFIG below.
  */
@@ -21,7 +21,7 @@ const path = require("path");
 // -----------------------------------------------------------------------------
 
 const CONFIG = {
-  defaultRankPath: path.join(__dirname, "..", "rank.json"),
+  defaultRankPath: path.join(__dirname, "..", "data", "rank.json"),
   defaultMinKm: 100,
   defaultCar: "tatuusfa1",
 

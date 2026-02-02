@@ -3242,10 +3242,14 @@
 
       function renderSRBadge(driver, showValue = true, clickable = true) {
         const { sr, tier, tierClass } = getDriverSR(driver);
-        const value = showValue ? " " + sr.toFixed(2) : "";
+        const km = driver ? (driver.kilometers || 0) : 0;
+        const value = showValue ? " | " + sr.toFixed(2) : "";
         const clickClass = clickable ? " badge-clickable" : "";
         const clickAttr = clickable ? ' onclick="handleBadgeClickSafety(event)"' : "";
-        return `<span class="sr-badge ${tierClass}${clickClass}" title="Safety Rating: ${sr.toFixed(2)} (${tier}) — Click for info"${clickAttr}>${tier}${value}</span>`;
+        const srTitle = km < 100
+          ? "Safety Rating: " + sr.toFixed(2) + " (tier " + tier + ") — Provisional until 100 km; official tier (E and above) from 100 km. Click for info."
+          : "Safety Rating: " + sr.toFixed(2) + " (" + tier + "). Click for info.";
+        return `<span class="sr-badge ${tierClass}${clickClass}" title="${srTitle}"${clickAttr}>${tier}${value}</span>`;
       }
 
       /* ==================== License (pace/skill – match license-and-safety.js) ==================== */
@@ -3357,10 +3361,14 @@
         const { license, paceScore } = getDriverLicense(driver);
         // Convert "Diamond+" to "diamond-plus" for CSS class
         const tierClass = "license-badge licence-" + license.toLowerCase().replace("+", "-plus");
-        const scoreStr = showScore ? " | " + Math.round(paceScore).toLocaleString() : "";
+        // Rookie: no pace score yet (< 100 km), so show only "Rookie" to avoid confusion with SR
+        const scoreStr = showScore && license !== "Rookie" ? " | " + Math.round(paceScore).toLocaleString() : "";
         const clickClass = clickable ? " badge-clickable" : "";
         const clickAttr = clickable ? ' onclick="handleBadgeClickLicense(event)"' : "";
-        return `<span class="${tierClass}${clickClass}" title="License: ${license} (${Math.round(paceScore).toLocaleString()} pts) — Click for info"${clickAttr}>${license}${scoreStr}</span>`;
+        const licenseTitle = license === "Rookie"
+          ? "License (pace/skill): Rookie — No pace score yet. Need min. 100 km to promote to Bronze and above. Click for info."
+          : "License (pace/skill): " + license + " — " + Math.round(paceScore).toLocaleString() + " pts. Click for info.";
+        return `<span class="${tierClass}${clickClass}" title="${licenseTitle}"${clickAttr}>${license}${scoreStr}</span>`;
       }
 
       /* ==================== Team Badge (Creator / Admin / Moderator) ==================== */
