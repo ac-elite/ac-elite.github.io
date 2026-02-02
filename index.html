@@ -164,49 +164,142 @@
         border-left: 4px solid #3b82f6;
       }
 
-      /* ==================== Licence Badges ==================== */
+      /* ==================== Safety Rating (SR) Badges – LFM style ==================== */
+      .sr-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 4px 10px;
+        border-radius: 8px;
+        font-family: "Orbitron", sans-serif;
+        font-weight: 700;
+        font-size: 0.75rem;
+        line-height: 1.2;
+        color: #fff;
+        white-space: nowrap;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+      }
+      /* S = excellent (green, like LFM S license) */
+      .sr-badge-S {
+        background: linear-gradient(135deg, #15803d 0%, #22c55e 40%, #4ade80 100%);
+        box-shadow: 0 0 12px rgba(34, 197, 94, 0.4);
+      }
+      /* A = very good (purple) */
+      .sr-badge-A {
+        background: linear-gradient(135deg, #6d28d9 0%, #8b5cf6 50%, #a78bfa 100%);
+        box-shadow: 0 0 12px rgba(139, 92, 246, 0.35);
+      }
+      /* B = good (yellow/gold) */
+      .sr-badge-B {
+        background: linear-gradient(135deg, #ca8a04 0%, #eab308 50%, #facc15 100%);
+        color: #1c1917;
+        text-shadow: 0 1px 0 rgba(255, 255, 255, 0.4);
+      }
+      /* C = average (amber/orange) */
+      .sr-badge-C {
+        background: linear-gradient(135deg, #b45309 0%, #d97706 50%, #f59e0b 100%);
+        box-shadow: 0 0 10px rgba(217, 119, 6, 0.3);
+      }
+      /* D = below average (orange-red) */
+      .sr-badge-D {
+        background: linear-gradient(135deg, #c2410c 0%, #ea580c 50%, #f97316 100%);
+      }
+      /* E = poor (red) */
+      .sr-badge-E {
+        background: linear-gradient(135deg, #b91c1c 0%, #dc2626 50%, #ef4444 100%);
+        box-shadow: 0 0 10px rgba(220, 38, 38, 0.35);
+      }
+      /* F = rookie / beginner (grey) */
+      .sr-badge-F {
+        background: linear-gradient(135deg, #374151 0%, #4b5563 50%, #6b7280 100%);
+      }
+
+      /* ==================== License Badges (pace/skill) – LFM style ==================== */
+      .license-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 4px 10px;
+        border-radius: 8px;
+        font-family: "Orbitron", sans-serif;
+        font-weight: 700;
+        font-size: 0.75rem;
+        line-height: 1.2;
+        color: #fff;
+        white-space: nowrap;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+      }
+      /* Master = top tier (black/dark, like LFM Platinum) */
+      .licence-master {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+        box-shadow: 0 0 14px rgba(30, 41, 59, 0.5);
+      }
+      /* Diamond = vibrant blue (like LFM Diamond) */
+      .licence-diamond {
+        background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 50%, #3b82f6 100%);
+        box-shadow: 0 0 14px rgba(37, 99, 235, 0.45);
+      }
+      /* Platinum = silver/platinum */
       .licence-platinum {
-        background: linear-gradient(
-          135deg,
-          #e5e4e2 0%,
-          #a8a8a8 50%,
-          #e5e4e2 100%
-        );
-        box-shadow: 0 0 15px rgba(229, 228, 226, 0.3);
+        background: linear-gradient(135deg, #64748b 0%, #94a3b8 50%, #cbd5e1 100%);
+        box-shadow: 0 0 12px rgba(148, 163, 184, 0.35);
       }
 
+      /* Gold = bright gold (like LFM Gold) */
       .licence-gold {
-        background: linear-gradient(
-          135deg,
-          #b8960c 0%,
-          #d4af37 25%,
-          #f4e076 50%,
-          #d4af37 75%,
-          #b8960c 100%
-        );
-        box-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+        background: linear-gradient(135deg, #b45309 0%, #d4af37 40%, #facc15 100%);
+        color: #1c1917;
+        text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+        box-shadow: 0 0 14px rgba(212, 175, 55, 0.45);
       }
 
+      /* Silver = silver grey */
       .licence-silver {
-        background: linear-gradient(
-          135deg,
-          #a0a0a0 0%,
-          #c0c0c0 50%,
-          #e0e0e0 75%,
-          #c0c0c0 100%
-        );
-        box-shadow: 0 0 15px rgba(192, 192, 192, 0.3);
+        background: linear-gradient(135deg, #475569 0%, #64748b 50%, #94a3b8 100%);
+        box-shadow: 0 0 12px rgba(100, 116, 139, 0.35);
       }
 
+      /* Bronze = copper/brown (like LFM Bronze) */
       .licence-bronze {
-        background: linear-gradient(
-          135deg,
-          #8b5a2b 0%,
-          #cd7f32 50%,
-          #daa06d 75%,
-          #cd7f32 100%
-        );
-        box-shadow: 0 0 15px rgba(205, 127, 50, 0.3);
+        background: linear-gradient(135deg, #78350f 0%, #a16207 50%, #ca8a04 100%);
+        box-shadow: 0 0 12px rgba(161, 98, 7, 0.35);
+      }
+
+      /* Rookie = red (like LFM Rookie) */
+      .licence-rookie {
+        background: linear-gradient(135deg, #991b1b 0%, #b91c1c 50%, #dc2626 100%);
+        box-shadow: 0 0 12px rgba(185, 28, 28, 0.4);
+      }
+
+      /* ==================== Team Badges (Creator / Admin / Moderator – Discord style) ==================== */
+      .team-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 4px 8px;
+        border-radius: 8px;
+        font-family: "Orbitron", sans-serif;
+        font-weight: 700;
+        font-size: 0.7rem;
+        line-height: 1.2;
+        color: #fff;
+        white-space: nowrap;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+      }
+      .team-badge-creator {
+        background: linear-gradient(135deg, #991b1b 0%, #b91c1c 50%, #dc2626 100%);
+        box-shadow: 0 0 12px rgba(185, 28, 28, 0.4);
+      }
+      .team-badge-admin {
+        background: linear-gradient(135deg, #6d28d9 0%, #7c3aed 50%, #8b5cf6 100%);
+        box-shadow: 0 0 12px rgba(124, 58, 237, 0.4);
+      }
+      .team-badge-moderator {
+        background: linear-gradient(135deg, #15803d 0%, #16a34a 50%, #22c55e 100%);
+        box-shadow: 0 0 12px rgba(34, 197, 94, 0.35);
       }
 
       /* ==================== Autocomplete ==================== */
@@ -667,6 +760,70 @@
         }
       }
 
+      /* ==================== License / SR Modal (LFM style) ==================== */
+      .license-modal-tabs {
+        display: flex;
+        gap: 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        margin-bottom: 1rem;
+      }
+      .license-modal-tab {
+        padding: 0.75rem 1.25rem;
+        font-family: "Orbitron", sans-serif;
+        font-weight: 600;
+        font-size: 0.875rem;
+        color: #64748b;
+        background: none;
+        border: none;
+        border-bottom: 3px solid transparent;
+        cursor: pointer;
+        transition: color 0.2s, border-color 0.2s;
+      }
+      .license-modal-tab:hover {
+        color: #94a3b8;
+      }
+      .license-modal-tab.active {
+        color: #22c55e;
+        border-bottom-color: #22c55e;
+      }
+      .license-modal-pane {
+        display: none;
+      }
+      .license-modal-pane.active {
+        display: block;
+      }
+      .license-tier-row {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      }
+      .license-tier-row:last-child {
+        border-bottom: none;
+      }
+      .license-tier-badge-wrap {
+        flex-shrink: 0;
+        min-width: 100px;
+      }
+      .sr-overview-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      .sr-overview-table th {
+        text-align: left;
+        padding: 0.5rem 0.75rem;
+        font-size: 0.7rem;
+        color: #94a3b8;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+      .sr-overview-table td {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.875rem;
+        color: #e2e8f0;
+      }
+
       /* Reduce motion for accessibility */
       @media (prefers-reduced-motion: reduce) {
         .animate-float,
@@ -733,6 +890,13 @@
               <span class="hidden lg:inline">🏆 </span>Leaderboard
             </button>
             <button
+              onclick="openLicenseModal()"
+              class="nav-btn btn-ghost px-3 lg:px-5 py-2 lg:py-2.5 rounded-xl font-semibold text-sm"
+              title="License & Safety Rating uitleg"
+            >
+              <span class="hidden lg:inline">📋 </span>License / SR
+            </button>
+            <button
               onclick="handleShopClick()"
               id="nav-shop"
               class="nav-btn btn-locked px-3 lg:px-5 py-2 lg:py-2.5 rounded-xl font-semibold text-sm"
@@ -778,6 +942,12 @@
           id="mobile-nav-leaderboard"
         >
           🏆 Leaderboard
+        </button>
+        <button
+          onclick="openLicenseModal(); closeMobileMenu();"
+          class="nav-btn btn-ghost px-5 py-3 rounded-xl font-semibold text-base"
+        >
+          📋 License / SR
         </button>
         <button
           onclick="handleShopClick(); closeMobileMenu();"
@@ -957,12 +1127,17 @@
             class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
           >
             <div class="min-w-0 flex-1">
-              <h3
-                id="driver-name"
-                class="font-racing text-xl sm:text-2xl lg:text-3xl font-bold text-white mb-1 truncate"
-              >
-                Driver Name
-              </h3>
+              <div class="flex flex-wrap items-center gap-2 sm:gap-3 mb-1">
+                <h3
+                  id="driver-name"
+                  class="font-racing text-xl sm:text-2xl lg:text-3xl font-bold text-white truncate"
+                >
+                  Driver Name
+                </h3>
+                <span id="driver-team-badge"></span>
+                <span id="driver-license-badge"></span>
+                <span id="driver-sr-badge"></span>
+              </div>
               <p
                 id="driver-guid"
                 class="text-slate-500 text-xs sm:text-sm font-mono break-all"
@@ -1387,6 +1562,108 @@
       </div>
     </div>
 
+    <!-- License / Safety Rating Modal (LFM style) -->
+    <div
+      id="license-sr-modal"
+      class="fixed inset-0 z-[90] hidden bg-black/70 backdrop-blur-sm flex items-center justify-center p-4"
+    >
+      <div class="glass-card max-w-2xl w-full rounded-2xl p-5 sm:p-6 lg:p-8 relative max-h-[90vh] overflow-hidden flex flex-col">
+        <button
+          type="button"
+          class="absolute top-3 right-3 text-slate-500 hover:text-slate-300 text-xl p-2 z-10"
+          onclick="closeLicenseModal()"
+          aria-label="Sluiten"
+        >
+          ✕
+        </button>
+        <h2 class="font-racing text-lg sm:text-xl font-bold text-amber-400 mb-4 pr-10">
+          AC Elite License / Safety Rating / How To
+        </h2>
+
+        <div class="license-modal-tabs">
+          <button type="button" class="license-modal-tab active" data-tab="license" onclick="switchLicenseModalTab('license')">
+            LICENSE
+          </button>
+          <button type="button" class="license-modal-tab" data-tab="safety" onclick="switchLicenseModalTab('safety')">
+            SAFETY RATING
+          </button>
+        </div>
+
+        <div class="overflow-y-auto flex-1 min-h-0">
+          <!-- License tab -->
+          <div id="license-modal-pane-license" class="license-modal-pane active">
+            <p class="text-slate-400 text-sm mb-4">
+              Je License (pace/skill) wordt bepaald door je positie op de leaderboards per track en je totaal gereden km.
+            </p>
+            <div class="space-y-0">
+              <div class="license-tier-row">
+                <div class="license-tier-badge-wrap"><span class="license-badge licence-master">Master</span></div>
+                <span class="text-slate-300 text-sm">Min. 6.000 km en pace score ≥ 3.700</span>
+              </div>
+              <div class="license-tier-row">
+                <div class="license-tier-badge-wrap"><span class="license-badge licence-diamond">Diamond</span></div>
+                <span class="text-slate-300 text-sm">Min. 5.000 km en pace score ≥ 2.500</span>
+              </div>
+              <div class="license-tier-row">
+                <div class="license-tier-badge-wrap"><span class="license-badge licence-platinum">Platinum</span></div>
+                <span class="text-slate-300 text-sm">Min. 3.500 km en pace score ≥ 1.500</span>
+              </div>
+              <div class="license-tier-row">
+                <div class="license-tier-badge-wrap"><span class="license-badge licence-gold">Gold</span></div>
+                <span class="text-slate-300 text-sm">Min. 2.000 km en pace score ≥ 800</span>
+              </div>
+              <div class="license-tier-row">
+                <div class="license-tier-badge-wrap"><span class="license-badge licence-silver">Silver</span></div>
+                <span class="text-slate-300 text-sm">Min. 1.000 km en pace score ≥ 400</span>
+              </div>
+              <div class="license-tier-row">
+                <div class="license-tier-badge-wrap"><span class="license-badge licence-bronze">Bronze</span></div>
+                <span class="text-slate-300 text-sm">Min. 100 km (gekwalificeerd)</span>
+              </div>
+              <div class="license-tier-row">
+                <div class="license-tier-badge-wrap"><span class="license-badge licence-rookie">Rookie</span></div>
+                <span class="text-slate-300 text-sm">Onder 100 km gereden</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Safety Rating tab -->
+          <div id="license-modal-pane-safety" class="license-modal-pane">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-4">
+              <div>
+                <p class="text-slate-400 text-sm mb-2">
+                  Safety Rating (1.00–9.99) meet hoe schoon je rijdt. De formule weegt crashes en infractions per 100 km.
+                </p>
+                <p class="text-slate-400 text-sm mb-2">
+                  Hogere SR = minder incidenten. Je tier hangt af van je SR én je totaal gereden km (meer km = toegang tot hogere tiers).
+                </p>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="sr-overview-table">
+                  <thead>
+                    <tr>
+                      <th>SR License</th>
+                      <th>Min SR</th>
+                      <th>Min KM</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr><td><span class="sr-badge sr-badge-S">S</span></td><td>3.0</td><td>6.000</td></tr>
+                    <tr><td><span class="sr-badge sr-badge-A">A</span></td><td>2.7</td><td>5.000</td></tr>
+                    <tr><td><span class="sr-badge sr-badge-B">B</span></td><td>2.4</td><td>3.500</td></tr>
+                    <tr><td><span class="sr-badge sr-badge-C">C</span></td><td>2.1</td><td>2.000</td></tr>
+                    <tr><td><span class="sr-badge sr-badge-D">D</span></td><td>1.8</td><td>1.000</td></tr>
+                    <tr><td><span class="sr-badge sr-badge-E">E</span></td><td>1.5</td><td>100</td></tr>
+                    <tr><td><span class="sr-badge sr-badge-F">F</span></td><td>—</td><td>&lt; 100 km of lage SR</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Footer -->
     <footer class="border-t border-white/5 mt-10 sm:mt-16 py-8 sm:py-10">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 text-center">
@@ -1413,11 +1690,39 @@
       const SHOP_PASSWORD = "ac-elite-shop";
       const ITEMS_PER_PAGE = 15;
 
+      /* ==================== Team (Creator / Admin / Moderator) – GUIDs from rank.json ==================== */
+      const TEAM_ROLES = {
+        creator: [
+          "76561198025621442", /* DIEnamic */
+          "76561198212710700", /* Stella */
+        ],
+        admin: [
+          "76561198025621442", /* DIEnamic */
+          "76561198273504643", /* Alexander */
+          "76561198328304798", /* CarterReza */
+          "76561198828350593", /* Grimlord */
+          "76561198275276823", /* Pedro Muela */
+          "76561199067031859", /* Saba */
+          "76561198212710700", /* Stella */
+          /* Koe – niet gevonden in rank.json; voeg GUID toe wanneer bekend */
+        ],
+        moderator: [
+          "76561199696427326", /* archera */
+          "76561198328304798", /* CarterReza */
+          "76561197986606289", /* Chaloem */
+          "76561199664649696", /* olalekezion810 */
+          "76561198328746047", /* Spacelab */
+          "76561198834200084", /* sparky */
+        ],
+      };
+
       /* ==================== State Variables ==================== */
       let leaderboardData = {};
       let rankData = [];
       let metadata = {};
       let dataLoaded = false;
+      /** guid -> { license, paceScore } (populated after loadAllData) */
+      let driverLicenses = {};
       let shopUnlocked = false;
       let currentTrack = null;
       let currentPage = 1;
@@ -1463,6 +1768,190 @@
           paypalUrl: "https://www.sandbox.paypal.com/checkoutnow?token=FAKE123",
         },
       ];
+
+      /* ==================== Safety Rating (match license-and-safety.js) ==================== */
+      const SR_CONFIG = {
+        SR_BASE: 1.0,
+        SR_SCALE: 8.99,
+        SR_MIN: 1.0,
+        SR_MAX: 9.99,
+        COLLISION_WEIGHT: 1.0,
+        INFRACTION_WEIGHT: 2.0,
+      };
+      const SR_TIERS = [
+        { name: "S", minSR: 3.0, minKm: 6000 },
+        { name: "A", minSR: 2.7, minKm: 5000 },
+        { name: "B", minSR: 2.4, minKm: 3500 },
+        { name: "C", minSR: 2.1, minKm: 2000 },
+        { name: "D", minSR: 1.8, minKm: 1000 },
+        { name: "E", minSR: 1.5, minKm: 100 },
+      ];
+
+      function safetyRating(d) {
+        const km = d.kilometers || 0;
+        if (km <= 0) return SR_CONFIG.SR_MIN;
+        const crashes = d.collisions ?? d.crashes ?? 0;
+        const infr = d.infr ?? 0;
+        const c100 = (crashes / km) * 100;
+        const i100 = (infr / km) * 100;
+        if (!isFinite(c100) || !isFinite(i100)) return SR_CONFIG.SR_MIN;
+        const weighted =
+          c100 * SR_CONFIG.COLLISION_WEIGHT +
+          i100 * SR_CONFIG.INFRACTION_WEIGHT;
+        const sr =
+          SR_CONFIG.SR_BASE + SR_CONFIG.SR_SCALE / (1 + weighted);
+        return Math.min(
+          SR_CONFIG.SR_MAX,
+          Math.max(SR_CONFIG.SR_MIN, sr)
+        );
+      }
+
+      function getSRTier(sr, km) {
+        for (const t of SR_TIERS) {
+          if (sr >= t.minSR && km >= t.minKm) return t.name;
+        }
+        return "F";
+      }
+
+      /** Returns { sr, tier, tierClass } for rendering the badge. */
+      function getDriverSR(driver) {
+        if (!driver) return { sr: 0, tier: "F", tierClass: "sr-badge-F" };
+        const km = driver.kilometers || 0;
+        const sr = safetyRating(driver);
+        const tier = getSRTier(sr, km);
+        return {
+          sr,
+          tier,
+          tierClass: "sr-badge-" + tier,
+        };
+      }
+
+      function renderSRBadge(driver, showValue = true) {
+        const { sr, tier, tierClass } = getDriverSR(driver);
+        const value = showValue ? " " + sr.toFixed(2) : "";
+        return `<span class="sr-badge ${tierClass}" title="Safety Rating: ${sr.toFixed(2)} (${tier})">${tier}${value}</span>`;
+      }
+
+      /* ==================== License (pace/skill – match license-and-safety.js) ==================== */
+      const LICENSE_CONFIG = {
+        ROOKIE_KM_MAX: 100,
+        MIN_KM: 100,
+        TRACK_MIN_DRIVERS: 5,
+        TRACK_WEIGHT_BASE: 1.0,
+        TRACK_WEIGHT_SCALE: 0.02,
+        TRACK_WEIGHT_MAX: 2.0,
+        POSITION_MULTIPLIERS: {
+          1: 2.0, 2: 1.7, 3: 1.5, 4: 1.3, 5: 1.2,
+          6: 1.1, 7: 1.1, 8: 1.1, 9: 1.1, 10: 1.1,
+        },
+        CONSISTENCY_BONUS_PER_TRACK: 2,
+        CONSISTENCY_BONUS_MAX: 50,
+      };
+      const LICENSE_TIERS = {
+        Master: { minKm: 6000, minScore: 3700 },
+        Diamond: { minKm: 5000, minScore: 2500 },
+        Platinum: { minKm: 3500, minScore: 1500 },
+        Gold: { minKm: 2000, minScore: 800 },
+        Silver: { minKm: 1000, minScore: 400 },
+        Bronze: { minKm: 100, minScore: 0 },
+      };
+      const LICENSE_TIER_ORDER = ["Master", "Diamond", "Platinum", "Gold", "Silver", "Bronze"];
+
+      function computeFullLeaderboardScores(drivers) {
+        const paceScores = new Array(drivers.length).fill(0);
+        const trackCounts = new Array(drivers.length).fill(0);
+        const cfg = LICENSE_CONFIG;
+        const tracks = new Set();
+        drivers.forEach((d) => {
+          const lb = d.leaderboard || {};
+          Object.keys(lb).forEach((track) => {
+            if (lb[track] && lb[track][CAR] && lb[track][CAR].laptime != null) tracks.add(track);
+          });
+        });
+        tracks.forEach((track) => {
+          const entries = [];
+          drivers.forEach((d, i) => {
+            const carData = d.leaderboard?.[track]?.[CAR];
+            if (!carData || carData.laptime == null) return;
+            entries.push({ driverIndex: i, laptime: carData.laptime });
+          });
+          entries.sort((a, b) => a.laptime - b.laptime);
+          const total = entries.length;
+          if (total < cfg.TRACK_MIN_DRIVERS) return;
+          const extra = total - cfg.TRACK_MIN_DRIVERS;
+          const trackWeight = Math.min(cfg.TRACK_WEIGHT_MAX, cfg.TRACK_WEIGHT_BASE + extra * cfg.TRACK_WEIGHT_SCALE);
+          entries.forEach((entry, position) => {
+            const pos1 = position + 1;
+            const baseScore = total > 1 ? ((total - position) / total) * 100 : 100;
+            const mult = cfg.POSITION_MULTIPLIERS[pos1] || 1.0;
+            const score = baseScore * mult * trackWeight;
+            paceScores[entry.driverIndex] += score;
+            trackCounts[entry.driverIndex]++;
+          });
+        });
+        drivers.forEach((d, i) => {
+          const bonus = Math.min(cfg.CONSISTENCY_BONUS_MAX, trackCounts[i] * cfg.CONSISTENCY_BONUS_PER_TRACK);
+          paceScores[i] += bonus;
+        });
+        return { paceScores };
+      }
+
+      function computeDriverLicenses() {
+        driverLicenses = {};
+        if (!rankData.length) return;
+        const { paceScores } = computeFullLeaderboardScores(rankData);
+        const qualified = rankData
+          .map((d, i) => ({ ...d, _i: i, _licenseScore: (d.kilometers || 0) >= LICENSE_CONFIG.MIN_KM ? (paceScores[i] || 0) : -1 }))
+          .filter((d) => (d.kilometers || 0) >= LICENSE_CONFIG.MIN_KM);
+        const sorted = [...qualified].sort((a, b) => b._licenseScore - a._licenseScore);
+        sorted.forEach((d) => {
+          const km = d.kilometers || 0;
+          const score = d._licenseScore || 0;
+          let license = "Bronze";
+          for (const name of LICENSE_TIER_ORDER) {
+            const tier = LICENSE_TIERS[name];
+            if (km >= tier.minKm && score >= tier.minScore) {
+              license = name;
+              break;
+            }
+          }
+          driverLicenses[d.guid] = { license, paceScore: score };
+        });
+        rankData.forEach((d) => {
+          if (driverLicenses[d.guid]) return;
+          driverLicenses[d.guid] = { license: "Rookie", paceScore: 0 };
+        });
+      }
+
+      function getDriverLicense(driver) {
+        if (!driver) return { license: "Rookie", paceScore: 0 };
+        const km = driver.kilometers || 0;
+        if (km < LICENSE_CONFIG.ROOKIE_KM_MAX) return { license: "Rookie", paceScore: 0 };
+        return driverLicenses[driver.guid] || { license: "Bronze", paceScore: 0 };
+      }
+
+      function renderLicenseBadge(driver) {
+        const { license } = getDriverLicense(driver);
+        const tierClass = "license-badge licence-" + license.toLowerCase();
+        return `<span class="${tierClass}" title="License: ${license}">${license}</span>`;
+      }
+
+      /* ==================== Team Badge (Creator / Admin / Moderator) ==================== */
+      function getDriverTeamRole(guid) {
+        if (!guid) return null;
+        if (TEAM_ROLES.creator.includes(guid)) return "creator";
+        if (TEAM_ROLES.admin.includes(guid)) return "admin";
+        if (TEAM_ROLES.moderator.includes(guid)) return "moderator";
+        return null;
+      }
+
+      function renderTeamBadge(driver) {
+        if (!driver || !driver.guid) return "";
+        const role = getDriverTeamRole(driver.guid);
+        if (!role) return "";
+        const label = role.charAt(0).toUpperCase() + role.slice(1);
+        return `<span class="team-badge team-badge-${role}" title="AC Elite ${label}">${label}</span>`;
+      }
 
       /* ==================== Utility Functions ==================== */
       function getTrackDisplayName(trackId) {
@@ -1695,6 +2184,7 @@
           showLoading(false);
           updateDataStatus(dataLoaded);
           updateQuickStats();
+          computeDriverLicenses();
           updateLastSync();
         } catch (err) {
           console.error("Failed to load data:", err);
@@ -1848,6 +2338,29 @@
         if (modal) modal.classList.add("hidden");
       }
 
+      /* ==================== License / SR Modal ==================== */
+      function openLicenseModal() {
+        const modal = document.getElementById("license-sr-modal");
+        if (modal) {
+          modal.classList.remove("hidden");
+          switchLicenseModalTab("license");
+        }
+      }
+
+      function closeLicenseModal() {
+        const modal = document.getElementById("license-sr-modal");
+        if (modal) modal.classList.add("hidden");
+      }
+
+      function switchLicenseModalTab(tab) {
+        document.querySelectorAll(".license-modal-tab").forEach((btn) => {
+          btn.classList.toggle("active", btn.getAttribute("data-tab") === tab);
+        });
+        document.querySelectorAll(".license-modal-pane").forEach((pane) => {
+          pane.classList.toggle("active", pane.id === "license-modal-pane-" + tab);
+        });
+      }
+
       function unlockShopFromModal() {
         const input = document.getElementById("shop-password-input");
         const error = document.getElementById("shop-password-error");
@@ -1923,7 +2436,12 @@
             .map(
               (d) => `
             <div class="autocomplete-item" onclick="selectDriver('${d.guid}')">
-              <div class="autocomplete-name">${escapeHtml(d.name)}</div>
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="autocomplete-name">${escapeHtml(d.name)}</span>
+                ${renderTeamBadge(d)}
+                ${renderLicenseBadge(d)}
+                ${renderSRBadge(d, true)}
+              </div>
               <div class="autocomplete-guid">${d.guid}</div>
             </div>
           `
@@ -2014,8 +2532,20 @@
         const crPer100 = km > 0 ? crashes / (km / 100) : 0;
         const infrPer100 = km > 0 ? infr / (km / 100) : 0;
 
-        // Update header
+        // Update header (name + Team + License + Safety Rating badges)
         document.getElementById("driver-name").textContent = driver.name;
+        const teamBadgeEl = document.getElementById("driver-team-badge");
+        if (teamBadgeEl) {
+          teamBadgeEl.innerHTML = renderTeamBadge(driver);
+        }
+        const licenseBadgeEl = document.getElementById("driver-license-badge");
+        if (licenseBadgeEl) {
+          licenseBadgeEl.innerHTML = renderLicenseBadge(driver);
+        }
+        const srBadgeEl = document.getElementById("driver-sr-badge");
+        if (srBadgeEl) {
+          srBadgeEl.innerHTML = renderSRBadge(driver, true);
+        }
         document.getElementById(
           "driver-guid"
         ).textContent = `GUID: ${driver.guid}`;
@@ -2174,6 +2704,17 @@
               posClass = "bg-blue-600 text-white";
             }
 
+            const driverForBadges = rankData.find((d) => d.guid === entry.guid);
+            const teamBadgeHtml = driverForBadges
+              ? renderTeamBadge(driverForBadges)
+              : "";
+            const licenseBadgeHtml = driverForBadges
+              ? renderLicenseBadge(driverForBadges)
+              : "";
+            const srBadgeHtml = driverForBadges
+              ? renderSRBadge(driverForBadges, true)
+              : "";
+
             return `
             <tr class="border-b border-white/5 ${rowClass} cursor-pointer hover:bg-white/5" onclick="openDriverFromLeaderboard('${
               entry.guid || ""
@@ -2181,9 +2722,16 @@
               <td class="py-3 sm:py-4 px-3 sm:px-6">
                 <span class="px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-xs sm:text-sm ${posClass}">${pos}</span>
               </td>
-              <td class="py-3 sm:py-4 px-3 sm:px-6 font-semibold text-sm">${escapeHtml(
-                entry.name?.slice(0, 25) || "Unknown"
-              )}${medal}</td>
+              <td class="py-3 sm:py-4 px-3 sm:px-6 font-semibold text-sm">
+                <span class="inline-flex items-center gap-2 flex-wrap">
+                  ${teamBadgeHtml}
+                  ${licenseBadgeHtml}
+                  ${srBadgeHtml}
+                  <span>${escapeHtml(
+                    entry.name?.slice(0, 25) || "Unknown"
+                  )}${medal}</span>
+                </span>
+              </td>
               <td class="py-3 sm:py-4 px-3 sm:px-6 font-mono text-amber-400 font-bold text-sm sm:text-lg">${formatLaptime(
                 entry.laptime
               )}</td>
@@ -2405,16 +2953,23 @@
         // Keyboard shortcuts
         document.addEventListener("keydown", (e) => {
           if (e.key === "Escape") {
+            closeLicenseModal();
             closeShopModal();
             closeMobileMenu();
           }
         });
 
-        // Close modal on backdrop click
-        const modal = document.getElementById("shop-password-modal");
-        if (modal) {
-          modal.addEventListener("click", (e) => {
-            if (e.target === modal) closeShopModal();
+        // Close modals on backdrop click
+        const shopModal = document.getElementById("shop-password-modal");
+        if (shopModal) {
+          shopModal.addEventListener("click", (e) => {
+            if (e.target === shopModal) closeShopModal();
+          });
+        }
+        const licenseModal = document.getElementById("license-sr-modal");
+        if (licenseModal) {
+          licenseModal.addEventListener("click", (e) => {
+            if (e.target === licenseModal) closeLicenseModal();
           });
         }
 
