@@ -1661,7 +1661,7 @@
           align-items: center;
           justify-content: flex-start;
           gap: 16px;
-          z-index: 55;
+          z-index: 110;
           padding-left: 20px;
           padding-right: 20px;
           padding-bottom: 20px;
@@ -2007,49 +2007,49 @@
           </div>
         </div>
       </div>
-
-      <!-- Mobile Menu -->
-      <div class="mobile-menu" id="mobile-menu">
-        <button
-          onclick="openLicenseModal(); closeMobileMenu();"
-          class="nav-btn btn-license px-5 py-3 rounded-xl font-semibold text-base mt-4 sm:mt-0 flex items-center justify-center gap-1"
-          title="License & Safety Rating (opens info)"
-        >
-          📋 License / SR <span class="nav-beta-hint">(BETA)</span>
-        </button>
-        <a
-          href="https://discord.gg/d2EbxGYBbj"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="btn-discord px-5 py-3 rounded-xl font-semibold text-base flex items-center justify-center gap-2"
-          onclick="closeMobileMenu()"
-          title="Join Discord (opens in new tab)"
-        >
-          💬 Join Discord <span class="nav-external-icon" aria-hidden="true">↗</span>
-        </a>
-        <button
-          onclick="showPage('stats'); closeMobileMenu();"
-          class="nav-btn btn-ghost active px-5 py-3 rounded-xl font-semibold text-base"
-          id="mobile-nav-stats"
-        >
-          📊 Stats
-        </button>
-        <button
-          onclick="showPage('leaderboard'); closeMobileMenu();"
-          class="nav-btn btn-ghost px-5 py-3 rounded-xl font-semibold text-base"
-          id="mobile-nav-leaderboard"
-        >
-          🏆 Leaderboard
-        </button>
-        <button
-          onclick="handleShopClick(); closeMobileMenu();"
-          class="nav-btn btn-locked px-5 py-3 rounded-xl font-semibold text-base"
-          id="mobile-nav-shop"
-        >
-          🛠️ Setups
-        </button>
-      </div>
     </nav>
+
+    <!-- Mobile Menu (outside nav so position:fixed is viewport-relative, not clipped by nav's backdrop-filter) -->
+    <div class="mobile-menu" id="mobile-menu">
+      <button
+        onclick="openLicenseModal(); closeMobileMenu();"
+        class="nav-btn btn-license px-5 py-3 rounded-xl font-semibold text-base mt-4 sm:mt-0 flex items-center justify-center gap-1"
+        title="License & Safety Rating (opens info)"
+      >
+        📋 License / SR <span class="nav-beta-hint">(BETA)</span>
+      </button>
+      <a
+        href="https://discord.gg/d2EbxGYBbj"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="btn-discord px-5 py-3 rounded-xl font-semibold text-base flex items-center justify-center gap-2"
+        onclick="closeMobileMenu()"
+        title="Join Discord (opens in new tab)"
+      >
+        💬 Join Discord <span class="nav-external-icon" aria-hidden="true">↗</span>
+      </a>
+      <button
+        onclick="showPage('stats'); closeMobileMenu();"
+        class="nav-btn btn-ghost active px-5 py-3 rounded-xl font-semibold text-base"
+        id="mobile-nav-stats"
+      >
+        📊 Stats
+      </button>
+      <button
+        onclick="showPage('leaderboard'); closeMobileMenu();"
+        class="nav-btn btn-ghost px-5 py-3 rounded-xl font-semibold text-base"
+        id="mobile-nav-leaderboard"
+      >
+        🏆 Leaderboard
+      </button>
+      <button
+        onclick="handleShopClick(); closeMobileMenu();"
+        class="nav-btn btn-locked px-5 py-3 rounded-xl font-semibold text-base"
+        id="mobile-nav-shop"
+      >
+        🛠️ Setups
+      </button>
+    </div>
 
     <!-- Loading Overlay -->
     <div
