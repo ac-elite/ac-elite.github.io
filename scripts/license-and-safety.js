@@ -56,14 +56,15 @@ const CONFIG = {
   // Score is pure pace - no km multiplier penalty anymore!
   ROOKIE_KM_MAX: 100, // under this km = Rookie
 
-  // LICENSE TIERS: km = eligibility gate, score = minimum pace score required
-  // If you have enough km AND enough score, you get that tier
+  // LICENSE TIERS: km = eligibility gate, score = minimum pace score, minTracks = anti single-track farming
+  // Server has 1 track at a time (weekly rotation); "tracks" = different circuits you've set a time on over time
+  // We do NOT use wins/podiums — fair for sprint races and solo runs never count as "wins"
   LICENSE_TIERS: {
-    Master:   { minKm: 6000, minScore: 3700 },   // Top tier: need 6000km AND high pace
-    Diamond:  { minKm: 5000, minScore: 2500 },   // Need 5000km AND good pace
-    Platinum: { minKm: 3500, minScore: 1500 },   // Need 3500km AND decent pace
-    Gold:     { minKm: 2000, minScore: 800 },    // Need 2000km
-    Silver:   { minKm: 1000, minScore: 400 },    // Need 1000km
+    Master:   { minKm: 6000, minScore: 3700, minTracks: 8 },
+    Diamond:  { minKm: 5000, minScore: 2500, minTracks: 6 },
+    Platinum: { minKm: 3500, minScore: 1500, minTracks: 5 },
+    Gold:     { minKm: 2000, minScore: 800, minTracks: 4 },
+    Silver:   { minKm: 1000, minScore: 400, minTracks: 3 },
     Bronze:   { minKm: 100,  minScore: 0 },      // Just need 100km (qualified)
   },
 
@@ -75,7 +76,8 @@ const CONFIG = {
   SR_SCALE: 8.99,
   SR_MIN: 1.0,
   SR_MAX: 9.99,
-  
+  SR_START: 2.50,  // LFM-style: every driver starts at 2.50 until enough km for a real rating
+
   // Incident weights (tune these based on severity)
   COLLISION_WEIGHT: 1.0,          // Base weight for collisions
   INFRACTION_WEIGHT: 2.0,         // Infractions are more serious (intentional/reckless)
@@ -141,21 +143,22 @@ function infractionsPer100km(d) {
  */
 function safetyRating(d) {
   const km = d.kilometers || 0;
-  if (km <= 0) return CONFIG.SR_MIN;
-  
+  if (km <= 0) return CONFIG.SR_START;  // no data yet = start at 2.50
+  // From 1 km onward: formula applies, so rookies can lose SR immediately if they drive badly
+
   // Calculate weighted incident rate per 100km
   const c100 = crashesPer100km(d);
   const i100 = infractionsPer100km(d);
-  
-  // Handle Infinity cases
-  if (!isFinite(c100) || !isFinite(i100)) return CONFIG.SR_MIN;
-  
+
+  // Handle Infinity cases (e.g. 0 km already handled above)
+  if (!isFinite(c100) || !isFinite(i100)) return CONFIG.SR_START;
+
   const weightedIncidents = (c100 * CONFIG.COLLISION_WEIGHT) + (i100 * CONFIG.INFRACTION_WEIGHT);
-  
+
   // SR calculation: SR = base + scale / (1 + incidents)
   // This gives: 0 incidents -> SR 9.99, high incidents -> SR approaches 1.0
   const sr = CONFIG.SR_BASE + CONFIG.SR_SCALE / (1 + weightedIncidents);
-  
+
   return Math.min(CONFIG.SR_MAX, Math.max(CONFIG.SR_MIN, sr));
 }
 
@@ -180,10 +183,12 @@ function assignLicenseTiers(drivers) {
     const score = d._licenseScore || 0;
     
     // Find the highest tier this driver qualifies for
+    const tracks = d._trackCount || 0;
     let assignedTier = "Bronze"; // default
     for (const tierName of tierOrder) {
       const tier = LICENSE_TIERS[tierName];
-      if (km >= tier.minKm && score >= tier.minScore) {
+      const okTracks = tier.minTracks == null || tracks >= tier.minTracks;
+      if (km >= tier.minKm && score >= tier.minScore && okTracks) {
         assignedTier = tierName;
         break; // Found highest qualifying tier
       }
@@ -385,6 +390,7 @@ const qualified = filtered.map((d) => {
   return {
     ...d,
     _licenseScore: licScore,
+    _trackCount: trackCounts[d._i] || 0,
     _sr: sr,
     _srTier: getSRTier(sr, km),
     _potentialSRTier: getPotentialSRTier(sr),  // What they could achieve with more km
@@ -423,7 +429,8 @@ console.log("  TIER SYSTEM (km = eligibility gate, score = qualification):");
 console.log("    Tier       Min KM    Min Score");
 console.log("    -----------------------------------");
 Object.entries(LICENSE_TIERS).forEach(([name, tier]) => {
-  console.log("    " + name.padEnd(10) + " " + String(tier.minKm).padStart(6) + " km   " + String(tier.minScore).padStart(6) + " pts");
+  const tracksStr = tier.minTracks != null ? "   " + String(tier.minTracks).padStart(2) + " tracks" : "";
+  console.log("    " + name.padEnd(10) + " " + String(tier.minKm).padStart(6) + " km   " + String(tier.minScore).padStart(6) + " pts" + tracksStr);
 });
 console.log("    Rookie     < " + ROOKIE_KM_MAX + " km");
 console.log("");

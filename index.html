@@ -164,7 +164,7 @@
         border-left: 4px solid #3b82f6;
       }
 
-      /* ==================== Safety Rating (SR) Badges – LFM style ==================== */
+      /* ==================== Safety Rating (SR) Badges – green = clean, red = danger ==================== */
       .sr-badge {
         display: inline-flex;
         align-items: center;
@@ -180,42 +180,41 @@
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
         text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
       }
-      /* S = excellent (green, like LFM S license) */
+      /* S = excellent (green) */
       .sr-badge-S {
-        background: linear-gradient(135deg, #15803d 0%, #22c55e 40%, #4ade80 100%);
-        box-shadow: 0 0 12px rgba(34, 197, 94, 0.4);
+        background: linear-gradient(135deg, #047857 0%, #059669 50%, #10b981 100%);
+        box-shadow: 0 0 12px rgba(16, 185, 129, 0.4);
       }
-      /* A = very good (purple) */
+      /* A = very good (blue – no overlap with License Master purple) */
       .sr-badge-A {
-        background: linear-gradient(135deg, #6d28d9 0%, #8b5cf6 50%, #a78bfa 100%);
-        box-shadow: 0 0 12px rgba(139, 92, 246, 0.35);
+        background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 50%, #60a5fa 100%);
+        box-shadow: 0 0 12px rgba(59, 130, 246, 0.35);
       }
-      /* B = good (yellow/gold) */
+      /* B = good (amber – distinct from License Gold) */
       .sr-badge-B {
-        background: linear-gradient(135deg, #ca8a04 0%, #eab308 50%, #facc15 100%);
-        color: #1c1917;
-        text-shadow: 0 1px 0 rgba(255, 255, 255, 0.4);
-      }
-      /* C = average (amber/orange) */
-      .sr-badge-C {
         background: linear-gradient(135deg, #b45309 0%, #d97706 50%, #f59e0b 100%);
-        box-shadow: 0 0 10px rgba(217, 119, 6, 0.3);
+        box-shadow: 0 0 10px rgba(245, 158, 11, 0.35);
+      }
+      /* C = average (orange) */
+      .sr-badge-C {
+        background: linear-gradient(135deg, #c2410c 0%, #ea580c 50%, #fb923c 100%);
+        box-shadow: 0 0 10px rgba(234, 88, 12, 0.3);
       }
       /* D = below average (orange-red) */
       .sr-badge-D {
-        background: linear-gradient(135deg, #c2410c 0%, #ea580c 50%, #f97316 100%);
+        background: linear-gradient(135deg, #b91c1c 0%, #dc2626 50%, #f87171 100%);
       }
       /* E = poor (red) */
       .sr-badge-E {
-        background: linear-gradient(135deg, #b91c1c 0%, #dc2626 50%, #ef4444 100%);
+        background: linear-gradient(135deg, #991b1b 0%, #b91c1c 50%, #ef4444 100%);
         box-shadow: 0 0 10px rgba(220, 38, 38, 0.35);
       }
-      /* F = rookie / beginner (grey) */
+      /* F = rookie / not enough data (grey) */
       .sr-badge-F {
         background: linear-gradient(135deg, #374151 0%, #4b5563 50%, #6b7280 100%);
       }
 
-      /* ==================== License Badges (pace/skill) – LFM style ==================== */
+      /* ==================== License Badges (pace/skill) – prestige ladder, no overlap with SR ==================== */
       .license-badge {
         display: inline-flex;
         align-items: center;
@@ -231,28 +230,30 @@
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
         text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
       }
-      /* Master = top tier (black/dark, like LFM Platinum) */
+      /* Master = ultimate tier (violet/purple – prestigious, “legend”) */
       .licence-master {
-        background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
-        box-shadow: 0 0 14px rgba(30, 41, 59, 0.5);
+        background: linear-gradient(135deg, #4c1d95 0%, #6d28d9 40%, #8b5cf6 70%, #a78bfa 100%);
+        box-shadow: 0 0 18px rgba(139, 92, 246, 0.5), 0 0 8px rgba(167, 139, 250, 0.3);
       }
-      /* Diamond = vibrant blue (like LFM Diamond) */
+      /* Diamond = precious blue */
       .licence-diamond {
-        background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 50%, #3b82f6 100%);
-        box-shadow: 0 0 14px rgba(37, 99, 235, 0.45);
+        background: linear-gradient(135deg, #0c4a6e 0%, #0369a1 50%, #0ea5e9 100%);
+        box-shadow: 0 0 14px rgba(14, 165, 233, 0.45);
       }
-      /* Platinum = silver/platinum */
+      /* Platinum = cool white-platinum (distinct from Silver) */
       .licence-platinum {
-        background: linear-gradient(135deg, #64748b 0%, #94a3b8 50%, #cbd5e1 100%);
-        box-shadow: 0 0 12px rgba(148, 163, 184, 0.35);
+        background: linear-gradient(135deg, #94a3b8 0%, #cbd5e1 50%, #f1f5f9 100%);
+        color: #1e293b;
+        text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
+        box-shadow: 0 0 12px rgba(203, 213, 225, 0.4);
       }
 
-      /* Gold = bright gold (like LFM Gold) */
+      /* Gold = warm metallic gold (distinct from SR B amber) */
       .licence-gold {
-        background: linear-gradient(135deg, #b45309 0%, #d4af37 40%, #facc15 100%);
+        background: linear-gradient(135deg, #a16207 0%, #ca8a04 40%, #eab308 70%, #fde047 100%);
         color: #1c1917;
         text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
-        box-shadow: 0 0 14px rgba(212, 175, 55, 0.45);
+        box-shadow: 0 0 14px rgba(234, 179, 8, 0.45);
       }
 
       /* Silver = silver grey */
@@ -261,16 +262,16 @@
         box-shadow: 0 0 12px rgba(100, 116, 139, 0.35);
       }
 
-      /* Bronze = copper/brown (like LFM Bronze) */
+      /* Bronze = copper/bronze */
       .licence-bronze {
-        background: linear-gradient(135deg, #78350f 0%, #a16207 50%, #ca8a04 100%);
-        box-shadow: 0 0 12px rgba(161, 98, 7, 0.35);
+        background: linear-gradient(135deg, #78350f 0%, #92400e 50%, #b45309 100%);
+        box-shadow: 0 0 12px rgba(180, 83, 9, 0.35);
       }
 
-      /* Rookie = red (like LFM Rookie) */
+      /* Rookie = slate (beginner; red reserved for SR danger) */
       .licence-rookie {
-        background: linear-gradient(135deg, #991b1b 0%, #b91c1c 50%, #dc2626 100%);
-        box-shadow: 0 0 12px rgba(185, 28, 28, 0.4);
+        background: linear-gradient(135deg, #334155 0%, #475569 50%, #64748b 100%);
+        box-shadow: 0 0 10px rgba(71, 85, 105, 0.35);
       }
 
       /* ==================== Team Badges (Creator / Admin / Moderator – Discord style) ==================== */
@@ -1595,26 +1596,32 @@
             <p class="text-slate-400 text-sm mb-4">
               Your License (pace/skill) is based on your position on the leaderboards per track and your total km driven.
             </p>
+            <p class="text-slate-500 text-xs mb-4">
+              We do not use race results (wins or podiums)—only leaderboard pace and distance. So it works the same for sprint races and full grids, and a solo run never counts as a &quot;win&quot; for this system.
+            </p>
+            <p class="text-slate-500 text-xs mb-4">
+              The server runs one track at a time (weekly rotation). &quot;Tracks&quot; below = number of <em>different</em> circuits you have set a time on over time.
+            </p>
             <div class="space-y-0">
               <div class="license-tier-row">
                 <div class="license-tier-badge-wrap"><span class="license-badge licence-master">Master</span></div>
-                <span class="text-slate-300 text-sm">Min. 6,000 km and pace score ≥ 3,700</span>
+                <span class="text-slate-300 text-sm">Min. 6,000 km, pace score ≥ 3,700, and at least 8 tracks</span>
               </div>
               <div class="license-tier-row">
                 <div class="license-tier-badge-wrap"><span class="license-badge licence-diamond">Diamond</span></div>
-                <span class="text-slate-300 text-sm">Min. 5,000 km and pace score ≥ 2,500</span>
+                <span class="text-slate-300 text-sm">Min. 5,000 km, pace score ≥ 2,500, and at least 6 tracks</span>
               </div>
               <div class="license-tier-row">
                 <div class="license-tier-badge-wrap"><span class="license-badge licence-platinum">Platinum</span></div>
-                <span class="text-slate-300 text-sm">Min. 3,500 km and pace score ≥ 1,500</span>
+                <span class="text-slate-300 text-sm">Min. 3,500 km, pace score ≥ 1,500, and at least 5 tracks</span>
               </div>
               <div class="license-tier-row">
                 <div class="license-tier-badge-wrap"><span class="license-badge licence-gold">Gold</span></div>
-                <span class="text-slate-300 text-sm">Min. 2,000 km and pace score ≥ 800</span>
+                <span class="text-slate-300 text-sm">Min. 2,000 km, pace score ≥ 800, and at least 4 tracks</span>
               </div>
               <div class="license-tier-row">
                 <div class="license-tier-badge-wrap"><span class="license-badge licence-silver">Silver</span></div>
-                <span class="text-slate-300 text-sm">Min. 1,000 km and pace score ≥ 400</span>
+                <span class="text-slate-300 text-sm">Min. 1,000 km, pace score ≥ 400, and at least 3 tracks</span>
               </div>
               <div class="license-tier-row">
                 <div class="license-tier-badge-wrap"><span class="license-badge licence-bronze">Bronze</span></div>
@@ -1632,10 +1639,13 @@
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-4">
               <div>
                 <p class="text-slate-400 text-sm mb-2">
-                  Safety Rating (1.00–9.99) measures how clean you drive. The formula weighs crashes and infractions per 100 km.
+                  We use our own safety rating system that calculates your overall safety on track. The formula takes into account how many incidents per distance you have (we use incidents per 100 km, similar to incidents per corner in a race).
                 </p>
                 <p class="text-slate-400 text-sm mb-2">
-                  Higher SR = fewer incidents. Your tier depends on your SR and total km driven (more km = access to higher tiers).
+                  The scale is from <strong>1.00</strong> (lowest) to <strong>9.99</strong> (highest). Every driver starts at a minimum rating of <strong>2.50</strong> until enough distance is driven. If you crash often and drive little, your rating stays low; if you finish many km cleanly, your incident-per-distance ratio improves and your rating goes up.
+                </p>
+                <p class="text-slate-400 text-sm mb-2">
+                  We weigh <strong>collisions</strong> (car/wall damage) and <strong>infractions</strong> (e.g. track cuts) per 100 km. The table on the right shows what <strong>Min SR</strong> and <strong>Min KM</strong> you need for each tier; you need both. 9.99 is theoretical (near-zero incidents); in practice, 5+ is very clean, 7+ is excellent.
                 </p>
               </div>
               <div class="overflow-x-auto">
@@ -1775,6 +1785,8 @@
         SR_SCALE: 8.99,
         SR_MIN: 1.0,
         SR_MAX: 9.99,
+        SR_START: 2.50,
+        ROOKIE_KM_MAX: 100,
         COLLISION_WEIGHT: 1.0,
         INFRACTION_WEIGHT: 2.0,
       };
@@ -1789,12 +1801,12 @@
 
       function safetyRating(d) {
         const km = d.kilometers || 0;
-        if (km <= 0) return SR_CONFIG.SR_MIN;
+        if (km <= 0) return SR_CONFIG.SR_START;
         const crashes = d.collisions ?? d.crashes ?? 0;
         const infr = d.infr ?? 0;
         const c100 = (crashes / km) * 100;
         const i100 = (infr / km) * 100;
-        if (!isFinite(c100) || !isFinite(i100)) return SR_CONFIG.SR_MIN;
+        if (!isFinite(c100) || !isFinite(i100)) return SR_CONFIG.SR_START;
         const weighted =
           c100 * SR_CONFIG.COLLISION_WEIGHT +
           i100 * SR_CONFIG.INFRACTION_WEIGHT;
@@ -1848,11 +1860,11 @@
         CONSISTENCY_BONUS_MAX: 50,
       };
       const LICENSE_TIERS = {
-        Master: { minKm: 6000, minScore: 3700 },
-        Diamond: { minKm: 5000, minScore: 2500 },
-        Platinum: { minKm: 3500, minScore: 1500 },
-        Gold: { minKm: 2000, minScore: 800 },
-        Silver: { minKm: 1000, minScore: 400 },
+        Master: { minKm: 6000, minScore: 3700, minTracks: 8 },
+        Diamond: { minKm: 5000, minScore: 2500, minTracks: 6 },
+        Platinum: { minKm: 3500, minScore: 1500, minTracks: 5 },
+        Gold: { minKm: 2000, minScore: 800, minTracks: 4 },
+        Silver: { minKm: 1000, minScore: 400, minTracks: 3 },
         Bronze: { minKm: 100, minScore: 0 },
       };
       const LICENSE_TIER_ORDER = ["Master", "Diamond", "Platinum", "Gold", "Silver", "Bronze"];
@@ -1893,24 +1905,26 @@
           const bonus = Math.min(cfg.CONSISTENCY_BONUS_MAX, trackCounts[i] * cfg.CONSISTENCY_BONUS_PER_TRACK);
           paceScores[i] += bonus;
         });
-        return { paceScores };
+        return { paceScores, trackCounts };
       }
 
       function computeDriverLicenses() {
         driverLicenses = {};
         if (!rankData.length) return;
-        const { paceScores } = computeFullLeaderboardScores(rankData);
+        const { paceScores, trackCounts } = computeFullLeaderboardScores(rankData);
         const qualified = rankData
-          .map((d, i) => ({ ...d, _i: i, _licenseScore: (d.kilometers || 0) >= LICENSE_CONFIG.MIN_KM ? (paceScores[i] || 0) : -1 }))
+          .map((d, i) => ({ ...d, _i: i, _licenseScore: (d.kilometers || 0) >= LICENSE_CONFIG.MIN_KM ? (paceScores[i] || 0) : -1, _tracks: trackCounts[i] || 0 }))
           .filter((d) => (d.kilometers || 0) >= LICENSE_CONFIG.MIN_KM);
         const sorted = [...qualified].sort((a, b) => b._licenseScore - a._licenseScore);
         sorted.forEach((d) => {
           const km = d.kilometers || 0;
           const score = d._licenseScore || 0;
+          const tracks = d._tracks || 0;
           let license = "Bronze";
           for (const name of LICENSE_TIER_ORDER) {
             const tier = LICENSE_TIERS[name];
-            if (km >= tier.minKm && score >= tier.minScore) {
+            const okTracks = tier.minTracks == null || tracks >= tier.minTracks;
+            if (km >= tier.minKm && score >= tier.minScore && okTracks) {
               license = name;
               break;
             }
