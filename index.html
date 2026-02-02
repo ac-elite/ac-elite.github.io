@@ -1475,6 +1475,14 @@
         .leaderboard-table .col-gap { display: none !important; }
         .leaderboard-table th.col-gap { display: none !important; }
         .pos-badge { min-width: 28px; padding: 4px 6px; font-size: 0.7rem; }
+        /* Rankings page: keep License visible, hide KM to save space */
+        .leaderboard-table.rankings-table .col-license,
+        .leaderboard-table.rankings-table th.col-license { display: table-cell !important; }
+        .leaderboard-table.rankings-table .col-license { width: 120px; min-width: 100px; }
+        .leaderboard-table.rankings-table .col-km { display: none !important; }
+        .leaderboard-table.rankings-table th.col-km { display: none !important; }
+        /* Rankings sub-tabs: smaller on mobile so they wrap nicely */
+        .rankings-subtab { padding: 0.4rem 0.6rem; font-size: 0.75rem; }
       }
 
       /* ==================== Animations ==================== */
@@ -1794,6 +1802,55 @@
       .license-modal-pane.active {
         display: block;
       }
+      /* Rankings page tabs */
+      .rankings-tab {
+        background: rgba(30, 50, 85, 0.6);
+        color: #94a3b8;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+      }
+      .rankings-tab:hover {
+        background: rgba(40, 60, 100, 0.7);
+        color: #d4af37;
+      }
+      .rankings-tab.active {
+        background: linear-gradient(135deg, rgba(212, 175, 55, 0.2) 0%, rgba(212, 175, 55, 0.1) 100%);
+        color: #d4af37;
+        border-color: rgba(212, 175, 55, 0.3);
+      }
+      .rankings-pane.hidden {
+        display: none !important;
+      }
+      .rankings-subtab {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.8rem;
+        font-weight: 600;
+        border-radius: 8px;
+        background: rgba(30, 50, 85, 0.5);
+        color: #94a3b8;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        transition: all 0.2s ease;
+      }
+      .rankings-subtab:hover {
+        background: rgba(40, 60, 100, 0.6);
+        color: #d4af37;
+      }
+      .rankings-subtab.active {
+        background: rgba(212, 175, 55, 0.15);
+        color: #d4af37;
+        border-color: rgba(212, 175, 55, 0.25);
+      }
+      .rankings-tier-section {
+        background: rgba(20, 40, 70, 0.5);
+        border-radius: 12px;
+        padding: 1rem 1.25rem;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+      }
+      .rankings-tier-section h4 {
+        font-family: "Orbitron", sans-serif;
+        font-size: 0.9rem;
+        margin-bottom: 0.75rem;
+        color: #d4af37;
+      }
       .license-tier-row {
         display: flex;
         align-items: center;
@@ -1987,6 +2044,13 @@
               <span class="hidden lg:inline">🏆 </span>Leaderboard
             </button>
             <button
+              onclick="showPage('rankings')"
+              id="nav-rankings"
+              class="nav-btn btn-ghost rounded-xl font-semibold"
+            >
+              <span class="hidden lg:inline">📋 </span>Rankings
+            </button>
+            <button
               onclick="handleShopClick()"
               id="nav-shop"
               class="nav-btn btn-locked rounded-xl font-semibold"
@@ -2041,6 +2105,13 @@
         id="mobile-nav-leaderboard"
       >
         🏆 Leaderboard
+      </button>
+      <button
+        onclick="showPage('rankings'); closeMobileMenu();"
+        class="nav-btn btn-ghost px-5 py-3 rounded-xl font-semibold text-base"
+        id="mobile-nav-rankings"
+      >
+        📋 Rankings
       </button>
       <button
         onclick="handleShopClick(); closeMobileMenu();"
@@ -2604,6 +2675,136 @@
         </h3>
         <p class="text-slate-500 text-sm sm:text-base">
           Select a track above to view the leaderboard
+        </p>
+      </div>
+    </div>
+
+    <!-- Rankings Page (by License / SR / Overall) -->
+    <div
+      id="page-rankings"
+      class="page hidden max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-10"
+    >
+      <div class="mb-6 sm:mb-10">
+        <h2
+          class="font-racing text-2xl sm:text-3xl lg:text-4xl font-bold text-amber-400 text-glow mb-2"
+        >
+          📋 Rankings
+        </h2>
+        <p class="text-slate-400 text-sm sm:text-base">
+          Drivers ranked by License (pace/skill), Safety Rating, or overall. Overall = 70% pace score + 30% SR.
+        </p>
+      </div>
+
+      <!-- Tabs -->
+      <div class="flex flex-wrap gap-2 mb-6">
+        <button
+          type="button"
+          class="rankings-tab active rounded-xl px-4 py-2.5 font-semibold text-sm transition-colors"
+          data-tab="license"
+          onclick="switchRankingsTab('license')"
+        >
+          By License
+        </button>
+        <button
+          type="button"
+          class="rankings-tab rounded-xl px-4 py-2.5 font-semibold text-sm transition-colors"
+          data-tab="safety"
+          onclick="switchRankingsTab('safety')"
+        >
+          By Safety Rating
+        </button>
+        <button
+          type="button"
+          class="rankings-tab rounded-xl px-4 py-2.5 font-semibold text-sm transition-colors"
+          data-tab="overall"
+          onclick="switchRankingsTab('overall')"
+        >
+          Overall
+        </button>
+      </div>
+
+      <!-- By License: sub-tabs per tier + one table + pagination -->
+      <div id="rankings-pane-license" class="rankings-pane">
+        <div id="rankings-license-subtabs" class="flex flex-wrap gap-2 mb-4">
+          <!-- Populated by JS: Elite, Diamond+, ..., Rookie -->
+        </div>
+        <div id="rankings-license-table-wrap" class="glass-card rounded-2xl overflow-hidden mb-4">
+          <div class="overflow-x-auto">
+            <table class="leaderboard-table rankings-table">
+              <thead>
+                <tr>
+                  <th class="col-pos">#</th>
+                  <th class="col-driver">Driver</th>
+                  <th class="col-license">License</th>
+                  <th class="col-laptime" style="width:100px">SR</th>
+                  <th class="col-km" style="width:100px;text-align:right">KM</th>
+                </tr>
+              </thead>
+              <tbody id="rankings-license-body">
+                <!-- Populated by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div id="rankings-license-pagination" class="flex justify-center gap-1 sm:gap-2 flex-wrap"></div>
+      </div>
+
+      <!-- By Safety Rating: sub-tabs per tier + one table + pagination -->
+      <div id="rankings-pane-safety" class="rankings-pane hidden">
+        <div id="rankings-safety-subtabs" class="flex flex-wrap gap-2 mb-4">
+          <!-- Populated by JS: S, A1, ..., F -->
+        </div>
+        <div id="rankings-safety-table-wrap" class="glass-card rounded-2xl overflow-hidden mb-4">
+          <div class="overflow-x-auto">
+            <table class="leaderboard-table rankings-table">
+              <thead>
+                <tr>
+                  <th class="col-pos">#</th>
+                  <th class="col-driver">Driver</th>
+                  <th class="col-license">License</th>
+                  <th class="col-laptime" style="width:100px">SR</th>
+                  <th class="col-km" style="width:100px;text-align:right">KM</th>
+                </tr>
+              </thead>
+              <tbody id="rankings-safety-body">
+                <!-- Populated by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div id="rankings-safety-pagination" class="flex justify-center gap-1 sm:gap-2 flex-wrap"></div>
+      </div>
+
+      <!-- Overall: one table + pagination -->
+      <div id="rankings-pane-overall" class="rankings-pane hidden">
+        <div class="glass-card rounded-2xl overflow-hidden mb-4">
+          <div class="overflow-x-auto">
+            <table class="leaderboard-table rankings-table">
+              <thead>
+                <tr>
+                  <th class="col-pos">#</th>
+                  <th class="col-driver">Driver</th>
+                  <th class="col-license">License</th>
+                  <th class="col-laptime" style="width:100px">SR</th>
+                  <th class="col-km" style="width:100px;text-align:right">KM</th>
+                </tr>
+              </thead>
+              <tbody id="rankings-overall-body">
+                <!-- Populated by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div id="rankings-overall-pagination" class="flex justify-center gap-1 sm:gap-2 flex-wrap"></div>
+      </div>
+
+      <div id="no-rankings" class="hidden text-center py-12 sm:py-20">
+        <div class="text-5xl sm:text-7xl mb-4 sm:mb-6 animate-float">📋</div>
+        <h3 class="font-racing text-xl sm:text-2xl text-slate-300 mb-2 sm:mb-3">
+          No Data Yet
+        </h3>
+        <p class="text-slate-500 text-sm sm:text-base">
+          Rankings will appear once data is loaded
         </p>
       </div>
     </div>
@@ -3415,6 +3616,253 @@
         }
       }
 
+      /* ==================== Rankings Page (License / SR / Overall) ==================== */
+      const RANKINGS_PER_PAGE = 15;
+      let currentRankingsTab = "license";
+      let currentRankingsLicenseTier = "Elite";
+      let currentRankingsSafetyTier = "S";
+      let rankingsPageLicense = 1;
+      let rankingsPageSafety = 1;
+      let rankingsPageOverall = 1;
+
+      function switchRankingsTab(tab) {
+        currentRankingsTab = tab;
+        document.querySelectorAll(".rankings-tab").forEach((btn) => {
+          btn.classList.toggle("active", btn.getAttribute("data-tab") === tab);
+        });
+        document.querySelectorAll(".rankings-pane").forEach((pane) => {
+          const id = pane.id;
+          const paneTab = id.replace("rankings-pane-", "");
+          pane.classList.toggle("hidden", paneTab !== tab);
+        });
+        if (tab === "license") renderRankingsByLicense();
+        if (tab === "safety") renderRankingsBySafety();
+        if (tab === "overall") renderRankingsOverall();
+      }
+
+      function switchRankingsLicenseTier(tier) {
+        currentRankingsLicenseTier = tier;
+        rankingsPageLicense = 1;
+        document.querySelectorAll("#rankings-license-subtabs .rankings-subtab").forEach((btn) => {
+          btn.classList.toggle("active", btn.getAttribute("data-tier") === tier);
+        });
+        renderRankingsLicenseTable();
+      }
+
+      function switchRankingsSafetyTier(tier) {
+        currentRankingsSafetyTier = tier;
+        rankingsPageSafety = 1;
+        document.querySelectorAll("#rankings-safety-subtabs .rankings-subtab").forEach((btn) => {
+          btn.classList.toggle("active", btn.getAttribute("data-tier") === tier);
+        });
+        renderRankingsSafetyTable();
+      }
+
+      function goToRankingsPage(which, page) {
+        if (which === "license") {
+          rankingsPageLicense = page;
+          renderRankingsLicenseTable();
+        } else if (which === "safety") {
+          rankingsPageSafety = page;
+          renderRankingsSafetyTable();
+        } else if (which === "overall") {
+          rankingsPageOverall = page;
+          renderRankingsOverall();
+        }
+      }
+
+      function renderRankingsPage() {
+        const noEl = document.getElementById("no-rankings");
+        if (!rankData.length) {
+          noEl.classList.remove("hidden");
+          document.getElementById("rankings-license-body").innerHTML = "";
+          document.getElementById("rankings-safety-body").innerHTML = "";
+          document.getElementById("rankings-overall-body").innerHTML = "";
+          return;
+        }
+        noEl.classList.add("hidden");
+        computeDriverLicenses();
+        renderRankingsByLicense();
+        renderRankingsBySafety();
+        renderRankingsOverall();
+        switchRankingsTab(currentRankingsTab);
+      }
+
+      function renderRankingsByLicense() {
+        const tiers = [...LICENSE_TIER_ORDER, "Rookie"];
+        const counts = {};
+        tiers.forEach((t) => {
+          counts[t] = rankData.filter((d) => getDriverLicense(d).license === t).length;
+        });
+        const firstWithDrivers = tiers.find((t) => counts[t] > 0) || "Elite";
+        if (!counts[currentRankingsLicenseTier] && counts[currentRankingsLicenseTier] !== 0) currentRankingsLicenseTier = firstWithDrivers;
+        const subContainer = document.getElementById("rankings-license-subtabs");
+        subContainer.innerHTML = tiers
+          .map(
+            (t) => `
+          <button type="button" class="rankings-subtab ${t === currentRankingsLicenseTier ? "active" : ""}" data-tier="${escapeHtml(t)}" onclick="switchRankingsLicenseTier('${escapeHtml(t).replace(/'/g, "\\'")}')">${escapeHtml(t)} (${counts[t] || 0})</button>
+        `
+          )
+          .join("");
+        renderRankingsLicenseTable();
+      }
+
+      function renderRankingsLicenseTable() {
+        const tbody = document.getElementById("rankings-license-body");
+        const paginationEl = document.getElementById("rankings-license-pagination");
+        const drivers = rankData
+          .filter((d) => getDriverLicense(d).license === currentRankingsLicenseTier)
+          .map((d) => ({ driver: d, ...getDriverLicense(d) }))
+          .sort((a, b) => (b.paceScore || 0) - (a.paceScore || 0));
+        const totalPages = Math.max(1, Math.ceil(drivers.length / RANKINGS_PER_PAGE));
+        const page = Math.max(1, Math.min(rankingsPageLicense, totalPages));
+        rankingsPageLicense = page;
+        const start = (page - 1) * RANKINGS_PER_PAGE;
+        const slice = drivers.slice(start, start + RANKINGS_PER_PAGE);
+        if (drivers.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="5" class="py-8 text-center text-slate-500 text-sm">No drivers in this tier.</td></tr>';
+          paginationEl.innerHTML = "";
+          return;
+        }
+        tbody.innerHTML = slice
+          .map(
+            (item, idx) => {
+              const pos = start + idx + 1;
+              return `
+              <tr class="cursor-pointer hover:bg-white/5 transition-colors" onclick="openDriverFromLeaderboard('${item.driver.guid || ""}')">
+                <td class="col-pos"><span class="pos-badge pos-default">${pos}</span></td>
+                <td class="col-driver"><div class="flex items-center gap-2 flex-wrap"><span class="text-white font-semibold">${escapeHtml((item.driver.name || "Unknown").slice(0, 25))}</span>${renderTeamBadge(item.driver)}</div></td>
+                <td class="col-license"><div class="flex items-center gap-2 flex-wrap">${renderLicenseBadge(item.driver, true, false)}</div></td>
+                <td class="col-laptime"><div class="flex items-center gap-2 flex-wrap">${renderSRBadge(item.driver, true, false)}</div></td>
+                <td class="col-km font-mono text-slate-400" style="text-align:right">${(item.driver.kilometers || 0).toLocaleString()}</td>
+              </tr>`;
+            }
+          )
+          .join("");
+        paginationEl.innerHTML = renderRankingsPagination("license", page, totalPages, drivers.length);
+      }
+
+      function renderRankingsBySafety() {
+        const srTierNames = SR_TIERS.map((t) => t.name).concat("F");
+        const counts = {};
+        srTierNames.forEach((t) => {
+          counts[t] = rankData.filter((d) => getDriverSR(d).tier === t).length;
+        });
+        const firstWithDrivers = srTierNames.find((t) => counts[t] > 0) || "S";
+        if (!counts[currentRankingsSafetyTier] && counts[currentRankingsSafetyTier] !== 0) currentRankingsSafetyTier = firstWithDrivers;
+        const subContainer = document.getElementById("rankings-safety-subtabs");
+        subContainer.innerHTML = srTierNames
+          .map(
+            (t) => `
+          <button type="button" class="rankings-subtab ${t === currentRankingsSafetyTier ? "active" : ""}" data-tier="${t}" onclick="switchRankingsSafetyTier('${t}')">${t} (${counts[t] || 0})</button>
+        `
+          )
+          .join("");
+        renderRankingsSafetyTable();
+      }
+
+      function renderRankingsSafetyTable() {
+        const tbody = document.getElementById("rankings-safety-body");
+        const paginationEl = document.getElementById("rankings-safety-pagination");
+        const drivers = rankData
+          .filter((d) => getDriverSR(d).tier === currentRankingsSafetyTier)
+          .map((d) => ({ driver: d, ...getDriverSR(d) }))
+          .sort((a, b) => b.sr - a.sr);
+        const totalPages = Math.max(1, Math.ceil(drivers.length / RANKINGS_PER_PAGE));
+        const page = Math.max(1, Math.min(rankingsPageSafety, totalPages));
+        rankingsPageSafety = page;
+        const start = (page - 1) * RANKINGS_PER_PAGE;
+        const slice = drivers.slice(start, start + RANKINGS_PER_PAGE);
+        if (drivers.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="5" class="py-8 text-center text-slate-500 text-sm">No drivers in this tier.</td></tr>';
+          paginationEl.innerHTML = "";
+          return;
+        }
+        tbody.innerHTML = slice
+          .map(
+            (item, idx) => {
+              const pos = start + idx + 1;
+              return `
+              <tr class="cursor-pointer hover:bg-white/5 transition-colors" onclick="openDriverFromLeaderboard('${item.driver.guid || ""}')">
+                <td class="col-pos"><span class="pos-badge pos-default">${pos}</span></td>
+                <td class="col-driver"><div class="flex items-center gap-2 flex-wrap"><span class="text-white font-semibold">${escapeHtml((item.driver.name || "Unknown").slice(0, 25))}</span>${renderTeamBadge(item.driver)}</div></td>
+                <td class="col-license"><div class="flex items-center gap-2 flex-wrap">${renderLicenseBadge(item.driver, true, false)}</div></td>
+                <td class="col-laptime"><div class="flex items-center gap-2 flex-wrap">${renderSRBadge(item.driver, true, false)}</div></td>
+                <td class="col-km font-mono text-slate-400" style="text-align:right">${(item.driver.kilometers || 0).toLocaleString()}</td>
+              </tr>`;
+            }
+          )
+          .join("");
+        paginationEl.innerHTML = renderRankingsPagination("safety", page, totalPages, drivers.length);
+      }
+
+      function renderRankingsPagination(which, currentPage, totalPages, totalItems) {
+        if (totalPages <= 1) return "";
+        let html = `
+        <button onclick="goToRankingsPage('${which}', ${currentPage - 1})" ${currentPage === 1 ? "disabled" : ""} class="btn-ghost px-3 sm:px-4 py-2 rounded-xl disabled:opacity-30 disabled:cursor-not-allowed text-sm">←</button>`;
+        for (let i = 1; i <= totalPages; i++) {
+          if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
+            html += `<button onclick="goToRankingsPage('${which}', ${i})" class="${currentPage === i ? "btn-gold" : "btn-ghost"} px-3 sm:px-4 py-2 rounded-xl text-sm">${i}</button>`;
+          } else if (i === currentPage - 2 || i === currentPage + 2) {
+            html += `<span class="px-2 text-slate-600">...</span>`;
+          }
+        }
+        html += `<button onclick="goToRankingsPage('${which}', ${currentPage + 1})" ${currentPage === totalPages ? "disabled" : ""} class="btn-ghost px-3 sm:px-4 py-2 rounded-xl disabled:opacity-30 disabled:cursor-not-allowed text-sm">→</button>`;
+        return html;
+      }
+
+      /* Overall ranking: combined score = 70% pace + 30% SR (pace weighs more) */
+      const OVERALL_PACE_WEIGHT = 0.7;
+      const OVERALL_SR_WEIGHT = 0.3;
+      const SR_MIN = 1.0;
+      const SR_MAX = 9.99;
+
+      function renderRankingsOverall() {
+        const tbody = document.getElementById("rankings-overall-body");
+        const paginationEl = document.getElementById("rankings-overall-pagination");
+        const withLicense = rankData.map((d) => ({
+          driver: d,
+          license: getDriverLicense(d),
+          sr: getDriverSR(d),
+        }));
+        const maxPace = Math.max(1, ...withLicense.map((x) => x.license.paceScore || 0));
+        withLicense.forEach((x) => {
+          const paceNorm = maxPace > 0 ? (x.license.paceScore || 0) / maxPace : 0;
+          const srNorm = Math.max(0, Math.min(1, (x.sr.sr - SR_MIN) / (SR_MAX - SR_MIN)));
+          x._combined = OVERALL_PACE_WEIGHT * paceNorm + OVERALL_SR_WEIGHT * srNorm;
+        });
+        const sorted = [...withLicense].sort((a, b) => {
+          if (b._combined !== a._combined) return b._combined - a._combined;
+          return (b.license.paceScore || 0) - (a.license.paceScore || 0);
+        });
+        const totalPages = Math.max(1, Math.ceil(sorted.length / RANKINGS_PER_PAGE));
+        const page = Math.max(1, Math.min(rankingsPageOverall, totalPages));
+        rankingsPageOverall = page;
+        const start = (page - 1) * RANKINGS_PER_PAGE;
+        const slice = sorted.slice(start, start + RANKINGS_PER_PAGE);
+        if (sorted.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="5" class="py-8 text-center text-slate-500 text-sm">No ranked drivers yet.</td></tr>';
+          paginationEl.innerHTML = "";
+          return;
+        }
+        tbody.innerHTML = slice
+          .map(
+            (item, index) => {
+              const pos = start + index + 1;
+              return `
+          <tr class="cursor-pointer hover:bg-white/5 transition-colors" onclick="openDriverFromLeaderboard('${item.driver.guid || ""}')">
+            <td class="col-pos"><span class="pos-badge pos-default">${pos}</span></td>
+            <td class="col-driver"><div class="flex items-center gap-2 flex-wrap"><span class="text-white font-semibold">${escapeHtml((item.driver.name || "Unknown").slice(0, 25))}</span>${renderTeamBadge(item.driver)}</div></td>
+            <td class="col-license"><div class="flex items-center gap-2 flex-wrap">${renderLicenseBadge(item.driver, true, false)}${renderSRBadge(item.driver, true, false)}</div></td>
+            <td class="font-mono text-slate-400">${item.sr.sr.toFixed(2)}</td>
+            <td class="col-km font-mono text-slate-400" style="text-align:right">${(item.driver.kilometers || 0).toLocaleString()}</td>
+          </tr>`;
+            }
+          )
+          .join("");
+        paginationEl.innerHTML = renderRankingsPagination("overall", page, totalPages, sorted.length);
+      }
+
       function updateQuickStats() {
         document.getElementById("total-drivers").textContent =
           rankData.length.toLocaleString();
@@ -3490,6 +3938,10 @@
           if (!currentTrack && Object.keys(leaderboardData).length > 0) {
             selectTrack(Object.keys(leaderboardData)[0]);
           }
+        }
+
+        if (page === "rankings") {
+          renderRankingsPage();
         }
 
         if (page === "shop") {
