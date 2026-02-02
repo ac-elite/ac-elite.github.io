@@ -510,6 +510,19 @@
         transform: scale(1.05);
         filter: brightness(1.1);
       }
+      /* Badge click: pointer on desktop only; on mobile no click so default cursor */
+      @media (min-width: 640px) {
+        .license-badge.badge-clickable,
+        .sr-badge.badge-clickable {
+          cursor: pointer;
+        }
+      }
+      @media (max-width: 639px) {
+        .license-badge.badge-clickable,
+        .sr-badge.badge-clickable {
+          cursor: default;
+        }
+      }
       /* Master = ultimate tier (violet/purple – prestigious, “legend”) */
       .licence-elite {
         background: linear-gradient(135deg, rgba(76, 29, 149, 0.9) 0%, rgba(109, 40, 217, 0.9) 40%, rgba(139, 92, 246, 0.9) 70%, rgba(167, 139, 250, 0.9) 100%);
@@ -2695,11 +2708,19 @@
         </p>
       </div>
 
-      <!-- Tabs -->
+      <!-- Tabs: Overall first, then License, then SR -->
       <div class="flex flex-wrap gap-2 mb-6">
         <button
           type="button"
           class="rankings-tab active rounded-xl px-4 py-2.5 font-semibold text-sm transition-colors"
+          data-tab="overall"
+          onclick="switchRankingsTab('overall')"
+        >
+          Overall
+        </button>
+        <button
+          type="button"
+          class="rankings-tab rounded-xl px-4 py-2.5 font-semibold text-sm transition-colors"
           data-tab="license"
           onclick="switchRankingsTab('license')"
         >
@@ -2713,18 +2734,33 @@
         >
           By Safety Rating
         </button>
-        <button
-          type="button"
-          class="rankings-tab rounded-xl px-4 py-2.5 font-semibold text-sm transition-colors"
-          data-tab="overall"
-          onclick="switchRankingsTab('overall')"
-        >
-          Overall
-        </button>
+      </div>
+
+      <!-- Overall: one table + pagination (first / default) -->
+      <div id="rankings-pane-overall" class="rankings-pane">
+        <div class="glass-card rounded-2xl overflow-hidden mb-4">
+          <div class="overflow-x-auto">
+            <table class="leaderboard-table rankings-table">
+              <thead>
+                <tr>
+                  <th class="col-pos">#</th>
+                  <th class="col-driver">Driver</th>
+                  <th class="col-license">License</th>
+                  <th class="col-laptime" style="width:100px">SR</th>
+                  <th class="col-km" style="width:100px;text-align:right">KM</th>
+                </tr>
+              </thead>
+              <tbody id="rankings-overall-body">
+                <!-- Populated by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div id="rankings-overall-pagination" class="flex justify-center gap-1 sm:gap-2 flex-wrap"></div>
       </div>
 
       <!-- By License: sub-tabs per tier + one table + pagination -->
-      <div id="rankings-pane-license" class="rankings-pane">
+      <div id="rankings-pane-license" class="rankings-pane hidden">
         <div id="rankings-license-subtabs" class="flex flex-wrap gap-2 mb-4">
           <!-- Populated by JS: Elite, Diamond+, ..., Rookie -->
         </div>
@@ -2773,29 +2809,6 @@
           </div>
         </div>
         <div id="rankings-safety-pagination" class="flex justify-center gap-1 sm:gap-2 flex-wrap"></div>
-      </div>
-
-      <!-- Overall: one table + pagination -->
-      <div id="rankings-pane-overall" class="rankings-pane hidden">
-        <div class="glass-card rounded-2xl overflow-hidden mb-4">
-          <div class="overflow-x-auto">
-            <table class="leaderboard-table rankings-table">
-              <thead>
-                <tr>
-                  <th class="col-pos">#</th>
-                  <th class="col-driver">Driver</th>
-                  <th class="col-license">License</th>
-                  <th class="col-laptime" style="width:100px">SR</th>
-                  <th class="col-km" style="width:100px;text-align:right">KM</th>
-                </tr>
-              </thead>
-              <tbody id="rankings-overall-body">
-                <!-- Populated by JS -->
-              </tbody>
-            </table>
-          </div>
-        </div>
-        <div id="rankings-overall-pagination" class="flex justify-center gap-1 sm:gap-2 flex-wrap"></div>
       </div>
 
       <div id="no-rankings" class="hidden text-center py-12 sm:py-20">
@@ -3215,11 +3228,20 @@
         };
       }
 
+      /* Badge click: open License/SR modal on desktop only (>=640px); on mobile no-op so row click works */
+      function handleBadgeClickLicense(e) {
+        if (window.innerWidth >= 640) { e.stopPropagation(); openLicenseModal("license"); }
+      }
+      function handleBadgeClickSafety(e) {
+        if (window.innerWidth >= 640) { e.stopPropagation(); openLicenseModal("safety"); }
+      }
+
       function renderSRBadge(driver, showValue = true, clickable = true) {
         const { sr, tier, tierClass } = getDriverSR(driver);
         const value = showValue ? " " + sr.toFixed(2) : "";
-        const clickAttr = clickable ? ' style="cursor:pointer" onclick="openLicenseModal(\'safety\')"' : "";
-        return `<span class="sr-badge ${tierClass}" title="Safety Rating: ${sr.toFixed(2)} (${tier}) — Click for info"${clickAttr}>${tier}${value}</span>`;
+        const clickClass = clickable ? " badge-clickable" : "";
+        const clickAttr = clickable ? ' onclick="handleBadgeClickSafety(event)"' : "";
+        return `<span class="sr-badge ${tierClass}${clickClass}" title="Safety Rating: ${sr.toFixed(2)} (${tier}) — Click for info"${clickAttr}>${tier}${value}</span>`;
       }
 
       /* ==================== License (pace/skill – match license-and-safety.js) ==================== */
@@ -3332,8 +3354,9 @@
         // Convert "Diamond+" to "diamond-plus" for CSS class
         const tierClass = "license-badge licence-" + license.toLowerCase().replace("+", "-plus");
         const scoreStr = showScore ? " | " + Math.round(paceScore).toLocaleString() : "";
-        const clickAttr = clickable ? ' style="cursor:pointer" onclick="openLicenseModal(\'license\')"' : "";
-        return `<span class="${tierClass}" title="License: ${license} (${Math.round(paceScore).toLocaleString()} pts) — Click for info"${clickAttr}>${license}${scoreStr}</span>`;
+        const clickClass = clickable ? " badge-clickable" : "";
+        const clickAttr = clickable ? ' onclick="handleBadgeClickLicense(event)"' : "";
+        return `<span class="${tierClass}${clickClass}" title="License: ${license} (${Math.round(paceScore).toLocaleString()} pts) — Click for info"${clickAttr}>${license}${scoreStr}</span>`;
       }
 
       /* ==================== Team Badge (Creator / Admin / Moderator) ==================== */
@@ -3618,7 +3641,7 @@
 
       /* ==================== Rankings Page (License / SR / Overall) ==================== */
       const RANKINGS_PER_PAGE = 15;
-      let currentRankingsTab = "license";
+      let currentRankingsTab = "overall";
       let currentRankingsLicenseTier = "Elite";
       let currentRankingsSafetyTier = "S";
       let rankingsPageLicense = 1;
@@ -3732,8 +3755,8 @@
               <tr class="cursor-pointer hover:bg-white/5 transition-colors" onclick="openDriverFromLeaderboard('${item.driver.guid || ""}')">
                 <td class="col-pos"><span class="pos-badge pos-default">${pos}</span></td>
                 <td class="col-driver"><div class="flex items-center gap-2 flex-wrap"><span class="text-white font-semibold">${escapeHtml((item.driver.name || "Unknown").slice(0, 25))}</span>${renderTeamBadge(item.driver)}</div></td>
-                <td class="col-license"><div class="flex items-center gap-2 flex-wrap">${renderLicenseBadge(item.driver, true, false)}</div></td>
-                <td class="col-laptime"><div class="flex items-center gap-2 flex-wrap">${renderSRBadge(item.driver, true, false)}</div></td>
+                <td class="col-license"><div class="flex items-center gap-2 flex-wrap">${renderLicenseBadge(item.driver, true, true)}</div></td>
+                <td class="col-laptime"><div class="flex items-center gap-2 flex-wrap">${renderSRBadge(item.driver, true, true)}</div></td>
                 <td class="col-km font-mono text-slate-400" style="text-align:right">${(item.driver.kilometers || 0).toLocaleString()}</td>
               </tr>`;
             }
@@ -3786,8 +3809,8 @@
               <tr class="cursor-pointer hover:bg-white/5 transition-colors" onclick="openDriverFromLeaderboard('${item.driver.guid || ""}')">
                 <td class="col-pos"><span class="pos-badge pos-default">${pos}</span></td>
                 <td class="col-driver"><div class="flex items-center gap-2 flex-wrap"><span class="text-white font-semibold">${escapeHtml((item.driver.name || "Unknown").slice(0, 25))}</span>${renderTeamBadge(item.driver)}</div></td>
-                <td class="col-license"><div class="flex items-center gap-2 flex-wrap">${renderLicenseBadge(item.driver, true, false)}</div></td>
-                <td class="col-laptime"><div class="flex items-center gap-2 flex-wrap">${renderSRBadge(item.driver, true, false)}</div></td>
+                <td class="col-license"><div class="flex items-center gap-2 flex-wrap">${renderLicenseBadge(item.driver, true, true)}</div></td>
+                <td class="col-laptime"><div class="flex items-center gap-2 flex-wrap">${renderSRBadge(item.driver, true, true)}</div></td>
                 <td class="col-km font-mono text-slate-400" style="text-align:right">${(item.driver.kilometers || 0).toLocaleString()}</td>
               </tr>`;
             }
@@ -3853,7 +3876,7 @@
           <tr class="cursor-pointer hover:bg-white/5 transition-colors" onclick="openDriverFromLeaderboard('${item.driver.guid || ""}')">
             <td class="col-pos"><span class="pos-badge pos-default">${pos}</span></td>
             <td class="col-driver"><div class="flex items-center gap-2 flex-wrap"><span class="text-white font-semibold">${escapeHtml((item.driver.name || "Unknown").slice(0, 25))}</span>${renderTeamBadge(item.driver)}</div></td>
-            <td class="col-license"><div class="flex items-center gap-2 flex-wrap">${renderLicenseBadge(item.driver, true, false)}${renderSRBadge(item.driver, true, false)}</div></td>
+            <td class="col-license"><div class="flex items-center gap-2 flex-wrap">${renderLicenseBadge(item.driver, true, true)}${renderSRBadge(item.driver, true, true)}</div></td>
             <td class="font-mono text-slate-400">${item.sr.sr.toFixed(2)}</td>
             <td class="col-km font-mono text-slate-400" style="text-align:right">${(item.driver.kilometers || 0).toLocaleString()}</td>
           </tr>`;
