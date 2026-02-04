@@ -1503,7 +1503,7 @@
   "guid": "76561198999518018",
   "name": "David O.",
   "points": 1507.377,
-  "kilometers": 9095.9,
+  "kilometers": 9101.5,
   "collisions": 125,
   "leaderboard": {
    "ks_zandvoort_": {
@@ -1570,7 +1570,7 @@
     }
    }
   },
-  "last_seen": 1770149665072,
+  "last_seen": 1770220012676,
   "wins": 55,
   "podiums": 121,
   "poles": 35,
@@ -2056,81 +2056,10 @@
   "infr": 18
  },
  {
-  "guid": "76561198328746047",
-  "name": "Spacelab",
-  "points": 1231.318,
-  "kilometers": 9009.1,
-  "collisions": 168,
-  "leaderboard": {
-   "ks_zandvoort_": {
-    "tatuusfa1": {
-     "laptime": 94253,
-     "laps": 46,
-     "ts": 1756685316235
-    }
-   },
-   "monza_": {
-    "tatuusfa1": {
-     "laptime": 110474,
-     "laps": 66,
-     "ts": 1757206694708
-    }
-   },
-   "mugello_": {
-    "tatuusfa1": {
-     "laptime": 104279,
-     "laps": 172,
-     "ts": 1757887765631
-    }
-   },
-   "ks_barcelona_layout_gp": {
-    "tatuusfa1": {
-     "laptime": 102760,
-     "laps": 14,
-     "ts": 1758442731943
-    }
-   },
-   "ks_brands_hatch_gp": {
-    "tatuusfa1": {
-     "laptime": 79501,
-     "laps": 92,
-     "ts": 1759050430641
-    }
-   },
-   "ks_laguna_seca_": {
-    "tatuusfa1": {
-     "laptime": 78660,
-     "laps": 24,
-     "ts": 1759853117012
-    }
-   },
-   "ks_silverstone_gp": {
-    "tatuusfa1": {
-     "laptime": 118037,
-     "laps": 201,
-     "ts": 1766357634613
-    }
-   },
-   "magione_": {
-    "tatuusfa1": {
-     "laptime": 66767,
-     "laps": 277,
-     "ts": 1763681974593
-    }
-   }
-  },
-  "last_seen": 1766364171306,
-  "wins": 56,
-  "podiums": 79,
-  "poles": 77,
-  "flaps": 51,
-  "infr": 8
- },
- {
   "guid": "76561198845443064",
   "name": "Peter Paris",
-  "points": 1225.025,
-  "kilometers": 6731.1,
+  "points": 1236.755,
+  "kilometers": 6759,
   "collisions": 355,
   "leaderboard": {
    "ks_zandvoort_": {
@@ -2223,15 +2152,93 @@
      "laps": 5,
      "ts": 1769451376390
     }
+   },
+   "acu_unitedstates_a": {
+    "tatuusfa1": {
+     "laptime": 131724,
+     "laps": 4,
+     "ts": 1770218069561
+    }
    }
   },
-  "last_seen": 1770217395738,
+  "last_seen": 1770218093898,
   "wins": 18,
   "podiums": 80,
   "poles": 6,
   "flaps": 6,
   "infr": 8,
   "notif": 0
+ },
+ {
+  "guid": "76561198328746047",
+  "name": "Spacelab",
+  "points": 1231.318,
+  "kilometers": 9009.1,
+  "collisions": 168,
+  "leaderboard": {
+   "ks_zandvoort_": {
+    "tatuusfa1": {
+     "laptime": 94253,
+     "laps": 46,
+     "ts": 1756685316235
+    }
+   },
+   "monza_": {
+    "tatuusfa1": {
+     "laptime": 110474,
+     "laps": 66,
+     "ts": 1757206694708
+    }
+   },
+   "mugello_": {
+    "tatuusfa1": {
+     "laptime": 104279,
+     "laps": 172,
+     "ts": 1757887765631
+    }
+   },
+   "ks_barcelona_layout_gp": {
+    "tatuusfa1": {
+     "laptime": 102760,
+     "laps": 14,
+     "ts": 1758442731943
+    }
+   },
+   "ks_brands_hatch_gp": {
+    "tatuusfa1": {
+     "laptime": 79501,
+     "laps": 92,
+     "ts": 1759050430641
+    }
+   },
+   "ks_laguna_seca_": {
+    "tatuusfa1": {
+     "laptime": 78660,
+     "laps": 24,
+     "ts": 1759853117012
+    }
+   },
+   "ks_silverstone_gp": {
+    "tatuusfa1": {
+     "laptime": 118037,
+     "laps": 201,
+     "ts": 1766357634613
+    }
+   },
+   "magione_": {
+    "tatuusfa1": {
+     "laptime": 66767,
+     "laps": 277,
+     "ts": 1763681974593
+    }
+   }
+  },
+  "last_seen": 1766364171306,
+  "wins": 56,
+  "podiums": 79,
+  "poles": 77,
+  "flaps": 51,
+  "infr": 8
  },
  {
   "guid": "76561198319370833",
