@@ -1608,9 +1608,9 @@
  {
   "guid": "76561198802663250",
   "name": "Felipe Rodriguez",
-  "points": 1343.214,
-  "kilometers": 7425.4,
-  "collisions": 343,
+  "points": 1352.57,
+  "kilometers": 7493.6,
+  "collisions": 345,
   "leaderboard": {
    "ks_zandvoort_": {
     "tatuusfa1": {
@@ -1670,9 +1670,9 @@
    },
    "ks_red_bull_ring_layout_gp": {
     "tatuusfa1": {
-     "laptime": 89777,
-     "laps": 41,
-     "ts": 1770659590217
+     "laptime": 89503,
+     "laps": 53,
+     "ts": 1770668240369
     }
    },
    "magione_": {
@@ -1732,11 +1732,11 @@
     }
    }
   },
-  "last_seen": 1770659736270,
-  "wins": 27,
-  "podiums": 84,
+  "last_seen": 1770668274594,
+  "wins": 28,
+  "podiums": 85,
   "poles": 8,
-  "flaps": 22,
+  "flaps": 23,
   "infr": 14
  },
  {
@@ -46049,6 +46049,49 @@
   "infr": 0
  },
  {
+  "guid": "76561199066093793",
+  "name": "senna",
+  "points": 59.059000000000005,
+  "kilometers": 321.9,
+  "collisions": 28,
+  "leaderboard": {
+   "ks_nurburgring_layout_gp_b": {
+    "tatuusfa1": {
+     "laptime": 117971,
+     "laps": 13,
+     "ts": 1759671613197
+    }
+   },
+   "ks_laguna_seca_": {
+    "tatuusfa1": {
+     "laptime": 87914,
+     "laps": 1,
+     "ts": 1760208924086
+    }
+   },
+   "ks_vallelunga_classic_circuit": {
+    "tatuusfa1": {
+     "laptime": 71142,
+     "laps": 15,
+     "ts": 1767471908283
+    }
+   },
+   "ks_red_bull_ring_layout_gp": {
+    "tatuusfa1": {
+     "laptime": 91228,
+     "laps": 14,
+     "ts": 1770668250410
+    }
+   }
+  },
+  "last_seen": 1770668274594,
+  "wins": 2,
+  "podiums": 3,
+  "poles": 0,
+  "flaps": 1,
+  "infr": 3
+ },
+ {
   "guid": "76561199095419610",
   "name": "thge",
   "points": 59.055,
@@ -62795,6 +62838,42 @@
   "podiums": 0,
   "poles": 0,
   "flaps": 0,
+  "infr": 0
+ },
+ {
+  "guid": "76561199380215388",
+  "name": "Demeter Albert",
+  "points": 54.465,
+  "kilometers": 209.6,
+  "collisions": 15,
+  "leaderboard": {
+   "ks_nurburgring_layout_gp_b": {
+    "tatuusfa1": {
+     "laptime": 115827,
+     "laps": 5,
+     "ts": 1759507943986
+    }
+   },
+   "ks_laguna_seca_": {
+    "tatuusfa1": {
+     "laptime": 84271,
+     "laps": 1,
+     "ts": 1760208927161
+    }
+   },
+   "ks_red_bull_ring_layout_gp": {
+    "tatuusfa1": {
+     "laptime": 90260,
+     "laps": 15,
+     "ts": 1770668157746
+    }
+   }
+  },
+  "last_seen": 1770668274594,
+  "wins": 0,
+  "podiums": 1,
+  "poles": 2,
+  "flaps": 1,
   "infr": 0
  },
  {
@@ -92609,6 +92688,21 @@
   "infr": 0
  },
  {
+  "guid": "76561199179449152",
+  "name": "zertose",
+  "points": 49.822,
+  "kilometers": 5.6,
+  "collisions": 2,
+  "leaderboard": {
+  },
+  "last_seen": 1770667582013,
+  "wins": 0,
+  "podiums": 0,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 0
+ },
+ {
   "guid": "76561198236010780",
   "name": "Jonathan Lo",
   "points": 49.821999999999996,
@@ -96628,21 +96722,6 @@
   "infr": 0
  },
  {
-  "guid": "76561198795880584",
-  "name": "danidudar2",
-  "points": 49.604000000000006,
-  "kilometers": 8.6,
-  "collisions": 1,
-  "leaderboard": {
-  },
-  "last_seen": 1770666348862,
-  "wins": 0,
-  "podiums": 0,
-  "poles": 0,
-  "flaps": 0,
-  "infr": 0
- },
- {
   "guid": "76561199447290209",
   "name": "pacer",
   "points": 49.603,
@@ -97217,6 +97296,21 @@
   "leaderboard": {
   },
   "last_seen": 1766649578317,
+  "wins": 0,
+  "podiums": 0,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 0
+ },
+ {
+  "guid": "76561198795880584",
+  "name": "danidudar2",
+  "points": 49.580000000000005,
+  "kilometers": 10.8,
+  "collisions": 2,
+  "leaderboard": {
+  },
+  "last_seen": 1770666444579,
   "wins": 0,
   "podiums": 0,
   "poles": 0,
@@ -133710,42 +133804,6 @@
   "infr": 1
  },
  {
-  "guid": "76561199380215388",
-  "name": "Demeter Albert",
-  "points": 43.39,
-  "kilometers": 128.9,
-  "collisions": 8,
-  "leaderboard": {
-   "ks_nurburgring_layout_gp_b": {
-    "tatuusfa1": {
-     "laptime": 115827,
-     "laps": 5,
-     "ts": 1759507943986
-    }
-   },
-   "ks_laguna_seca_": {
-    "tatuusfa1": {
-     "laptime": 84271,
-     "laps": 1,
-     "ts": 1760208927161
-    }
-   },
-   "ks_red_bull_ring_layout_gp": {
-    "tatuusfa1": {
-     "laptime": 91015,
-     "laps": 4,
-     "ts": 1770665549337
-    }
-   }
-  },
-  "last_seen": 1770666348862,
-  "wins": 0,
-  "podiums": 0,
-  "poles": 2,
-  "flaps": 1,
-  "infr": 0
- },
- {
   "guid": "76561199101244670",
   "name": "Pet Casch",
   "points": 43.389,
@@ -140103,49 +140161,6 @@
   "poles": 0,
   "flaps": 0,
   "infr": 0
- },
- {
-  "guid": "76561199066093793",
-  "name": "senna",
-  "points": 41.659000000000006,
-  "kilometers": 247.6,
-  "collisions": 22,
-  "leaderboard": {
-   "ks_nurburgring_layout_gp_b": {
-    "tatuusfa1": {
-     "laptime": 117971,
-     "laps": 13,
-     "ts": 1759671613197
-    }
-   },
-   "ks_laguna_seca_": {
-    "tatuusfa1": {
-     "laptime": 87914,
-     "laps": 1,
-     "ts": 1760208924086
-    }
-   },
-   "ks_vallelunga_classic_circuit": {
-    "tatuusfa1": {
-     "laptime": 71142,
-     "laps": 15,
-     "ts": 1767471908283
-    }
-   },
-   "ks_red_bull_ring_layout_gp": {
-    "tatuusfa1": {
-     "laptime": 92669,
-     "laps": 2,
-     "ts": 1770665559953
-    }
-   }
-  },
-  "last_seen": 1770666348862,
-  "wins": 1,
-  "podiums": 1,
-  "poles": 0,
-  "flaps": 1,
-  "infr": 3
  },
  {
   "guid": "76561198060222637",
@@ -180644,6 +180659,35 @@
   "infr": 3
  },
  {
+  "guid": "76561199159404023",
+  "name": "Bo Sinn",
+  "points": 33.639,
+  "kilometers": 173.7,
+  "collisions": 12,
+  "leaderboard": {
+   "ks_nurburgring_layout_gp_b": {
+    "tatuusfa1": {
+     "laptime": 156097,
+     "laps": 1,
+     "ts": 1759507350228
+    }
+   },
+   "ks_red_bull_ring_layout_gp": {
+    "tatuusfa1": {
+     "laptime": 97932,
+     "laps": 15,
+     "ts": 1770668003117
+    }
+   }
+  },
+  "last_seen": 1770668274594,
+  "wins": 0,
+  "podiums": 1,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 1
+ },
+ {
   "guid": "76561199762500455",
   "name": "Norafawn",
   "points": 33.635,
@@ -181439,35 +181483,6 @@
   "poles": 0,
   "flaps": 0,
   "infr": 5
- },
- {
-  "guid": "76561199159404023",
-  "name": "Bo Sinn",
-  "points": 33.561,
-  "kilometers": 114.1,
-  "collisions": 6,
-  "leaderboard": {
-   "ks_nurburgring_layout_gp_b": {
-    "tatuusfa1": {
-     "laptime": 156097,
-     "laps": 1,
-     "ts": 1759507350228
-    }
-   },
-   "ks_red_bull_ring_layout_gp": {
-    "tatuusfa1": {
-     "laptime": 97932,
-     "laps": 7,
-     "ts": 1770666105567
-    }
-   }
-  },
-  "last_seen": 1770666348862,
-  "wins": 0,
-  "podiums": 1,
-  "poles": 0,
-  "flaps": 0,
-  "infr": 1
  },
  {
   "guid": "76561198207680457",
