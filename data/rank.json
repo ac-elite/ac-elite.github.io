@@ -3608,9 +3608,9 @@
  {
   "guid": "76561198253261997",
   "name": "universol",
-  "points": 709.603,
-  "kilometers": 10283.3,
-  "collisions": 529,
+  "points": 710.873,
+  "kilometers": 10376.1,
+  "collisions": 530,
   "leaderboard": {
    "ks_nurburgring_layout_gp_b": {
     "tatuusfa1": {
@@ -3636,8 +3636,8 @@
    "ks_red_bull_ring_layout_gp": {
     "tatuusfa1": {
      "laptime": 88762,
-     "laps": 97,
-     "ts": 1762622254228
+     "laps": 101,
+     "ts": 1770617421896
     }
    },
    "ks_zandvoort_": {
@@ -3704,7 +3704,7 @@
     }
    }
   },
-  "last_seen": 1770616308826,
+  "last_seen": 1770618147824,
   "wins": 28,
   "podiums": 53,
   "poles": 34,
@@ -90309,6 +90309,21 @@
   "leaderboard": {
   },
   "last_seen": 1766271360703,
+  "wins": 0,
+  "podiums": 0,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 0
+ },
+ {
+  "guid": "76561198096911616",
+  "name": "RICKYU",
+  "points": 49.903,
+  "kilometers": 5.3,
+  "collisions": 1,
+  "leaderboard": {
+  },
+  "last_seen": 1770618009892,
   "wins": 0,
   "podiums": 0,
   "poles": 0,
@@ -227556,42 +227571,6 @@
   "infr": 0
  },
  {
-  "guid": "76561197960267366",
-  "name": "Santti_87",
-  "points": 29.142,
-  "kilometers": 413.4,
-  "collisions": 62,
-  "leaderboard": {
-   "spa_": {
-    "tatuusfa1": {
-     "laptime": 147356,
-     "laps": 23,
-     "ts": 1762192222868
-    }
-   },
-   "ks_red_bull_ring_layout_gp": {
-    "tatuusfa1": {
-     "laptime": 104724,
-     "laps": 5,
-     "ts": 1762612036335
-    }
-   },
-   "ks_brands_hatch_gp": {
-    "tatuusfa1": {
-     "laptime": 94302,
-     "laps": 2,
-     "ts": 1765484096945
-    }
-   }
-  },
-  "last_seen": 1768005430317,
-  "wins": 1,
-  "podiums": 1,
-  "poles": 0,
-  "flaps": 0,
-  "infr": 8
- },
- {
   "guid": "76561198891532919",
   "name": "Alex",
   "points": 29.139999999999997,
@@ -239618,6 +239597,42 @@
   "poles": 0,
   "flaps": 0,
   "infr": 0
+ },
+ {
+  "guid": "76561197960267366",
+  "name": "Lohan",
+  "points": 28.627,
+  "kilometers": 422.2,
+  "collisions": 63,
+  "leaderboard": {
+   "spa_": {
+    "tatuusfa1": {
+     "laptime": 147356,
+     "laps": 23,
+     "ts": 1762192222868
+    }
+   },
+   "ks_red_bull_ring_layout_gp": {
+    "tatuusfa1": {
+     "laptime": 104724,
+     "laps": 5,
+     "ts": 1762612036335
+    }
+   },
+   "ks_brands_hatch_gp": {
+    "tatuusfa1": {
+     "laptime": 94302,
+     "laps": 2,
+     "ts": 1765484096945
+    }
+   }
+  },
+  "last_seen": 1770616973712,
+  "wins": 1,
+  "podiums": 1,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 9
  },
  {
   "guid": "76561198450946623",
