@@ -656,8 +656,8 @@
  {
   "guid": "76561198273504643",
   "name": "Alexander",
-  "points": 2260.911,
-  "kilometers": 18989,
+  "points": 2265.722,
+  "kilometers": 19045.5,
   "collisions": 490,
   "leaderboard": {
    "ks_zandvoort_": {
@@ -738,8 +738,8 @@
    "ks_red_bull_ring_layout_gp": {
     "tatuusfa1": {
      "laptime": 88725,
-     "laps": 136,
-     "ts": 1770851751446
+     "laps": 141,
+     "ts": 1770853117081
     }
    },
    "magione_": {
@@ -792,11 +792,11 @@
     }
    }
   },
-  "last_seen": 1770851934610,
-  "wins": 91,
-  "podiums": 128,
+  "last_seen": 1770853261048,
+  "wins": 92,
+  "podiums": 129,
   "poles": 167,
-  "flaps": 86,
+  "flaps": 87,
   "infr": 33
  },
  {
@@ -13824,6 +13824,63 @@
   "infr": 0
  },
  {
+  "guid": "76561199007630430",
+  "name": "Robert Reif",
+  "points": 119.596,
+  "kilometers": 526,
+  "collisions": 32,
+  "leaderboard": {
+   "ks_zandvoort_": {
+    "tatuusfa1": {
+     "laptime": 97425,
+     "laps": 33,
+     "ts": 1763303779544
+    }
+   },
+   "mugello_": {
+    "tatuusfa1": {
+     "laptime": 110402,
+     "laps": 12,
+     "ts": 1764702709400
+    }
+   },
+   "ks_brands_hatch_gp": {
+    "tatuusfa1": {
+     "laptime": 85831,
+     "laps": 6,
+     "ts": 1759069670101
+    }
+   },
+   "ks_nurburgring_layout_gp_b": {
+    "tatuusfa1": {
+     "laptime": 118350,
+     "laps": 5,
+     "ts": 1759272720024
+    }
+   },
+   "ks_red_bull_ring_layout_gp": {
+    "tatuusfa1": {
+     "laptime": 92500,
+     "laps": 8,
+     "ts": 1770853229520
+    }
+   },
+   "ks_vallelunga_classic_circuit": {
+    "tatuusfa1": {
+     "laptime": 75340,
+     "laps": 3,
+     "ts": 1767024587872
+    }
+   }
+  },
+  "last_seen": 1770853259420,
+  "wins": 0,
+  "podiums": 3,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 0
+ },
+ {
   "guid": "76561198337729949",
   "name": "Dockers35",
   "points": 119.12700000000001,
@@ -14940,63 +14997,6 @@
   "poles": 2,
   "flaps": 0,
   "infr": 8
- },
- {
-  "guid": "76561199007630430",
-  "name": "Robert Reif",
-  "points": 111.254,
-  "kilometers": 487.1,
-  "collisions": 31,
-  "leaderboard": {
-   "ks_zandvoort_": {
-    "tatuusfa1": {
-     "laptime": 97425,
-     "laps": 33,
-     "ts": 1763303779544
-    }
-   },
-   "mugello_": {
-    "tatuusfa1": {
-     "laptime": 110402,
-     "laps": 12,
-     "ts": 1764702709400
-    }
-   },
-   "ks_brands_hatch_gp": {
-    "tatuusfa1": {
-     "laptime": 85831,
-     "laps": 6,
-     "ts": 1759069670101
-    }
-   },
-   "ks_nurburgring_layout_gp_b": {
-    "tatuusfa1": {
-     "laptime": 118350,
-     "laps": 5,
-     "ts": 1759272720024
-    }
-   },
-   "ks_red_bull_ring_layout_gp": {
-    "tatuusfa1": {
-     "laptime": 93186,
-     "laps": 3,
-     "ts": 1770676734512
-    }
-   },
-   "ks_vallelunga_classic_circuit": {
-    "tatuusfa1": {
-     "laptime": 75340,
-     "laps": 3,
-     "ts": 1767024587872
-    }
-   }
-  },
-  "last_seen": 1770676850653,
-  "wins": 0,
-  "podiums": 3,
-  "poles": 0,
-  "flaps": 0,
-  "infr": 0
  },
  {
   "guid": "76561198166239342",
