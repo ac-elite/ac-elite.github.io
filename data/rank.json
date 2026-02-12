@@ -792,7 +792,7 @@
     }
    }
   },
-  "last_seen": 1770853261048,
+  "last_seen": 1770853265549,
   "wins": 92,
   "podiums": 129,
   "poles": 167,
@@ -3615,9 +3615,9 @@
  {
   "guid": "76561198253261997",
   "name": "universol",
-  "points": 711.947,
-  "kilometers": 10500.3,
-  "collisions": 534,
+  "points": 713.889,
+  "kilometers": 10574.7,
+  "collisions": 537,
   "leaderboard": {
    "ks_nurburgring_layout_gp_b": {
     "tatuusfa1": {
@@ -3643,8 +3643,8 @@
    "ks_red_bull_ring_layout_gp": {
     "tatuusfa1": {
      "laptime": 88762,
-     "laps": 112,
-     "ts": 1770704896677
+     "laps": 118,
+     "ts": 1770876580776
     }
    },
    "ks_zandvoort_": {
@@ -3711,7 +3711,7 @@
     }
    }
   },
-  "last_seen": 1770704903177,
+  "last_seen": 1770876638406,
   "wins": 28,
   "podiums": 53,
   "poles": 34,
@@ -13795,38 +13795,9 @@
   "infr": 2
  },
  {
-  "guid": "76561197996573463",
-  "name": "Futaba",
-  "points": 120.075,
-  "kilometers": 589.7,
-  "collisions": 30,
-  "leaderboard": {
-   "ks_nurburgring_layout_gp_a": {
-    "tatuusfa1": {
-     "laptime": 118574,
-     "laps": 28,
-     "ts": 1766623406305
-    }
-   },
-   "ks_vallelunga_classic_circuit": {
-    "tatuusfa1": {
-     "laptime": 70502,
-     "laps": 55,
-     "ts": 1767227456634
-    }
-   }
-  },
-  "last_seen": 1767227714718,
-  "wins": 1,
-  "podiums": 6,
-  "poles": 1,
-  "flaps": 0,
-  "infr": 0
- },
- {
   "guid": "76561199007630430",
   "name": "Robert Reif",
-  "points": 119.596,
+  "points": 120.305,
   "kilometers": 526,
   "collisions": 32,
   "leaderboard": {
@@ -13875,8 +13846,37 @@
   },
   "last_seen": 1770853259420,
   "wins": 0,
-  "podiums": 3,
+  "podiums": 4,
   "poles": 0,
+  "flaps": 0,
+  "infr": 0
+ },
+ {
+  "guid": "76561197996573463",
+  "name": "Futaba",
+  "points": 120.075,
+  "kilometers": 589.7,
+  "collisions": 30,
+  "leaderboard": {
+   "ks_nurburgring_layout_gp_a": {
+    "tatuusfa1": {
+     "laptime": 118574,
+     "laps": 28,
+     "ts": 1766623406305
+    }
+   },
+   "ks_vallelunga_classic_circuit": {
+    "tatuusfa1": {
+     "laptime": 70502,
+     "laps": 55,
+     "ts": 1767227456634
+    }
+   }
+  },
+  "last_seen": 1767227714718,
+  "wins": 1,
+  "podiums": 6,
+  "poles": 1,
   "flaps": 0,
   "infr": 0
  },
