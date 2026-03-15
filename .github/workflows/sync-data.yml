@@ -98,8 +98,7 @@ jobs:
                   
               } catch (err) {
                   console.error('FTP connection failed:', err.message);
-                  
-                  // Create error metadata
+                  // Write error metadata so "last updated" reflects last run (commit step will push it)
                   const metadata = {
                       lastSync: new Date().toISOString(),
                       status: 'error',
@@ -109,10 +108,9 @@ jobs:
                       path.join(dataDir, 'metadata.json'),
                       JSON.stringify(metadata, null, 2)
                   );
-                  
-                  process.exit(1);
+                  // Don't exit(1): let job continue so we commit updated metadata and timestamp is correct
               } finally {
-                  client.close();
+                  try { client.close(); } catch (_) {}
               }
               
               console.log('Sync completed!');
@@ -122,15 +120,26 @@ jobs:
           EOF
 
       - name: Commit and push changes
+        id: commit
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git add data/
 
-          # Only commit if there are changes
+          # Only commit if there are changes (metadata.json always updated with lastSync)
           if git diff --staged --quiet; then
             echo "No changes to commit"
+            echo "pushed=false" >> $GITHUB_OUTPUT
           else
             git commit -m "🔄 Sync KMR data - $(date -u +'%Y-%m-%d %H:%M:%S UTC')"
             git push
+            echo "pushed=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Fail if sync had errors
+        if: always()
+        run: |
+          if [ -f data/metadata.json ] && grep -q '"status":\s*"error"' data/metadata.json; then
+            echo "FTP sync failed; metadata was updated so 'last updated' is correct."
+            exit 1
           fi
