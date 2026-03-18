@@ -9,6 +9,7 @@
     "dev": "vite",
     "start": "vite preview",
     "build": "tsc && vite build",
+    "build:pages": "npm run build -- --base=/ && node scripts/publish-pages.mjs",
     "lint": "eslint \"src/**/*.{js,jsx,ts,tsx}\"",
     "lint:fix": "eslint --fix \"src/**/*.{js,jsx,ts,tsx}\"",
     "lint:print": "npx eslint --print-config eslint.config.mjs > eslint-show-config.json",
