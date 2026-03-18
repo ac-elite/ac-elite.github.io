@@ -4,9 +4,9 @@ permissions:
   contents: write
 
 on:
-  # Run every 5 minutes
+  # Run every hour
   schedule:
-    - cron: "*/5 * * * *"
+    - cron: "0 * * * *"
 
   # Allow manual trigger
   workflow_dispatch:

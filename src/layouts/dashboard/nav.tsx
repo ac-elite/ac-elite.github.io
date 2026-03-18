@@ -108,8 +108,8 @@ export function NavContent({ data, slots, sx }: NavContentProps) {
     <>
       <Box
         sx={{
-          mt: 0.25,
-          mb: 2.5,
+          mt: 0.5,
+          mb: 3,
           px: 0.25,
           py: 0.25,
           borderRadius: 1.5,
@@ -136,30 +136,31 @@ export function NavContent({ data, slots, sx }: NavContentProps) {
           <Box
             component="ul"
             sx={{
-              gap: 0.75,
+              gap: 1,
               display: 'flex',
               flexDirection: 'column',
             }}
           >
             {data.map((item) => {
               const isActived = item.path === pathname;
+              const isDisabled = Boolean(item.disabled);
+              const navButtonProps = isDisabled ? {} : { component: RouterLink, href: item.path };
 
               return (
                 <ListItem disableGutters disablePadding key={item.title}>
                   <ListItemButton
                     disableGutters
-                    component={RouterLink}
-                    href={item.path}
+                    {...navButtonProps}
                     sx={[
                       (theme) => ({
                         pl: 2,
-                        py: 1,
+                        py: 1.1,
                         gap: 2,
                         pr: 1.5,
-                        borderRadius: 0.75,
+                        borderRadius: 1,
                         typography: 'body2',
                         fontWeight: 'fontWeightMedium',
-                        minHeight: 46,
+                        minHeight: 48,
                         color: varAlpha(theme.vars.palette.common.whiteChannel, 0.72),
                         transition: theme.transitions.create(['background-color', 'color', 'box-shadow'], {
                           duration: theme.transitions.duration.shorter,
@@ -168,6 +169,14 @@ export function NavContent({ data, slots, sx }: NavContentProps) {
                           bgcolor: varAlpha(theme.vars.palette.common.whiteChannel, 0.08),
                           color: theme.vars.palette.common.white,
                         },
+                        ...(isDisabled && {
+                          opacity: 0.62,
+                          cursor: 'default',
+                          '&:hover': {
+                            bgcolor: 'transparent',
+                            color: varAlpha(theme.vars.palette.common.whiteChannel, 0.72),
+                          },
+                        }),
                         ...(isActived && {
                           fontWeight: 'fontWeightSemiBold',
                           color: theme.vars.palette.common.white,

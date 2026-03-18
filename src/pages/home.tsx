@@ -29,6 +29,7 @@ type RankDriver = {
   kilometers?: number;
   collisions?: number;
   infr?: number;
+  last_seen?: number;
   leaderboard?: DriverLeaderboard;
 };
 
@@ -36,6 +37,16 @@ type TeamRoles = {
   creator: string[];
   admin: string[];
   moderator: string[];
+};
+
+type Metadata = {
+  lastSync?: string;
+};
+
+type SyncStatus = {
+  label: 'Live' | 'Delayed' | 'Stale' | 'Unknown';
+  color: string;
+  ageText: string;
 };
 
 type DriverView = {
@@ -178,6 +189,81 @@ function formatNumber(value: number) {
   return value.toLocaleString();
 }
 
+function formatTimeAgo(isoString?: string) {
+  if (!isoString) return 'Unknown';
+  const timestamp = new Date(isoString).getTime();
+  if (!Number.isFinite(timestamp)) return 'Unknown';
+
+  const diffMs = Date.now() - timestamp;
+  if (diffMs < 0) return 'just now';
+
+  const minute = 60 * 1000;
+  const hour = 60 * minute;
+  const day = 24 * hour;
+
+  if (diffMs < minute) return 'just now';
+  if (diffMs < hour) {
+    const minutes = Math.floor(diffMs / minute);
+    return `${minutes} minute${minutes === 1 ? '' : 's'} ago`;
+  }
+  if (diffMs < day) {
+    const hours = Math.floor(diffMs / hour);
+    return `${hours} hour${hours === 1 ? '' : 's'} ago`;
+  }
+  const days = Math.floor(diffMs / day);
+  return `${days} day${days === 1 ? '' : 's'} ago`;
+}
+
+function parseTimestamp(input?: string | number) {
+  if (input == null) return undefined;
+  if (typeof input === 'number') {
+    // Support seconds and milliseconds unix timestamps
+    const ms = input < 1_000_000_000_000 ? input * 1000 : input;
+    return Number.isFinite(ms) ? ms : undefined;
+  }
+  const ms = new Date(input).getTime();
+  return Number.isFinite(ms) ? ms : undefined;
+}
+
+function getEffectiveLastSync(metadataLastSync: string | undefined, drivers: RankDriver[]) {
+  const metadataMs = parseTimestamp(metadataLastSync);
+  const rankLastSeenMs = drivers.reduce<number | undefined>((latest, driver) => {
+    const ts = parseTimestamp(driver.last_seen);
+    if (!ts) return latest;
+    if (!latest || ts > latest) return ts;
+    return latest;
+  }, undefined);
+
+  const best = [metadataMs, rankLastSeenMs].filter((x): x is number => Boolean(x)).sort((a, b) => b - a)[0];
+  return best ? new Date(best).toISOString() : undefined;
+}
+
+function getSyncStatus(lastSync?: string): SyncStatus {
+  if (!lastSync) {
+    return { label: 'Unknown', color: '#f59e0b', ageText: 'Unknown' };
+  }
+
+  const timestamp = new Date(lastSync).getTime();
+  if (!Number.isFinite(timestamp)) {
+    return { label: 'Unknown', color: '#f59e0b', ageText: 'Unknown' };
+  }
+
+  const diffMs = Date.now() - timestamp;
+  const hour = 60 * 60 * 1000;
+  const day = 24 * hour;
+  const ago = formatTimeAgo(lastSync);
+
+  if (diffMs <= 2 * hour) {
+    return { label: 'Live', color: '#22c55e', ageText: ago };
+  }
+
+  if (diffMs <= day) {
+    return { label: 'Delayed', color: '#f59e0b', ageText: ago };
+  }
+
+  return { label: 'Stale', color: '#ef4444', ageText: ago };
+}
+
 function getRoleLabel(role: TeamRole) {
   if (!role) return null;
   return role.charAt(0).toUpperCase() + role.slice(1);
@@ -306,6 +392,28 @@ function getTeamRole(guid: string, roles: TeamRoles): TeamRole {
   return null;
 }
 
+function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
+  const cleaned = hex.replace('#', '').trim();
+  if (cleaned.length !== 6) return null;
+  const num = Number.parseInt(cleaned, 16);
+  const r = Math.floor(num / 65536);
+  const g = Math.floor((num % 65536) / 256);
+  const b = num % 256;
+  return { r, g, b };
+}
+
+function glassFromHex(hexBg: string) {
+  const rgb = hexToRgb(hexBg);
+  if (!rgb) return {};
+
+  return {
+    background: `linear-gradient(135deg, rgba(${rgb.r},${rgb.g},${rgb.b},0.28) 0%, rgba(${rgb.r},${rgb.g},${rgb.b},0.08) 100%)`,
+    border: `1px solid rgba(${rgb.r},${rgb.g},${rgb.b},0.35)`,
+    backdropFilter: 'blur(12px)',
+    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.08)',
+  };
+}
+
 function AnimatedLinesBackground({ opacity = 0.5 }: { opacity?: number }) {
   return (
     <Box
@@ -327,7 +435,17 @@ function AnimatedLinesBackground({ opacity = 0.5 }: { opacity?: number }) {
   );
 }
 
-function HeroSection({ totalDrivers, totalLaps }: { totalDrivers: number; totalLaps: number }) {
+function HeroSection({
+  totalDrivers,
+  totalLaps,
+  activeTracks,
+  syncStatus,
+}: {
+  totalDrivers: number;
+  totalLaps: number;
+  activeTracks: number;
+  syncStatus: SyncStatus;
+}) {
   const theme = useTheme();
   const isMdUp = useMediaQuery(theme.breakpoints.up('md'));
 
@@ -336,7 +454,8 @@ function HeroSection({ totalDrivers, totalLaps }: { totalDrivers: number; totalL
       component="section"
       sx={{
         position: 'relative',
-        py: { xs: 8, md: 12 },
+        pt: { xs: 8, md: 12 },
+        pb: { xs: 6, md: 6 },
         background:
           'radial-gradient(circle at 0% 0%, rgba(23,33,59,0.28) 0, transparent 55%),' +
           'radial-gradient(circle at 100% 100%, rgba(35,31,32,0.2) 0, transparent 55%),' +
@@ -407,7 +526,7 @@ function HeroSection({ totalDrivers, totalLaps }: { totalDrivers: number; totalL
                       borderColor: 'rgba(255,255,255,0.3)',
                     },
                   }}
-                  href="https://discord.gg/"
+                  href="https://discord.gg/d2EbxGYBbj"
                   target="_blank"
                   rel="noreferrer"
                 >
@@ -436,38 +555,6 @@ function HeroSection({ totalDrivers, totalLaps }: { totalDrivers: number; totalL
                 </Button>
               </Stack>
 
-              <Grid container spacing={3} sx={{ pt: 2 }}>
-                <Grid size={{ xs: 6, sm: 'auto' }}>
-                  <Stack spacing={0.5}>
-                    <Typography variant="h4" sx={{ fontWeight: 800 }}>
-                      {formatNumber(totalDrivers)}
-                    </Typography>
-                    <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                      Drivers
-                    </Typography>
-                  </Stack>
-                </Grid>
-                <Grid size={{ xs: 6, sm: 'auto' }}>
-                  <Stack spacing={0.5}>
-                    <Typography variant="h4" sx={{ fontWeight: 800 }}>
-                      {formatNumber(totalLaps)}
-                    </Typography>
-                    <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                      Logged laps
-                    </Typography>
-                  </Stack>
-                </Grid>
-                <Grid size={{ xs: 12, sm: 'auto' }}>
-                  <Stack spacing={0.5}>
-                    <Typography variant="h4" sx={{ fontWeight: 800 }}>
-                      Live
-                    </Typography>
-                    <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                      Synced from `/data/rank.json`
-                    </Typography>
-                  </Stack>
-                </Grid>
-              </Grid>
             </Stack>
           </Grid>
 
@@ -475,59 +562,114 @@ function HeroSection({ totalDrivers, totalLaps }: { totalDrivers: number; totalL
             <Box
               sx={{
                 borderRadius: 4,
-                p: 2.25,
+                p: 2.5,
                 background: 'linear-gradient(145deg, rgba(19,36,71,0.7), rgba(35,31,32,0.4))',
                 border: '1px solid rgba(255,255,255,0.2)',
                 backdropFilter: 'blur(14px)',
                 boxShadow: '0 24px 60px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.08)',
               }}
             >
-              <Typography
-                variant="caption"
-                sx={{ textTransform: 'uppercase', color: 'rgba(255,255,255,0.75)', fontWeight: 700 }}
-              >
-                Live data
-              </Typography>
-
-              <Box
-                sx={{
-                  mt: 1.5,
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
-                  gap: 1,
-                }}
-              >
-                {[
-                  { label: 'Search', value: 'Name / Steam64' },
-                  { label: 'Safety', value: 'Live SR tier' },
-                  { label: 'Licence', value: 'Pace score based' },
-                ].map((stat) => (
-                  <Box
-                    key={stat.label}
-                    sx={{
-                      borderRadius: 2,
-                      p: 1.25,
-                      minHeight: 82,
-                      display: 'flex',
-                      flexDirection: 'column',
-                      justifyContent: 'center',
-                      background: 'linear-gradient(150deg, rgba(23,33,59,0.72), rgba(23,33,59,0.5))',
-                      border: '1px solid rgba(255,255,255,0.18)',
-                      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.08)',
-                    }}
+              <Stack spacing={2}>
+                <Box>
+                  <Typography
+                    variant="overline"
+                    sx={{ textTransform: 'uppercase', color: 'rgba(255,255,255,0.75)', fontWeight: 700 }}
                   >
-                    <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.72)' }}>
-                      {stat.label}
+                    Race Intelligence
+                  </Typography>
+                  <Typography variant="h6" sx={{ fontWeight: 800, mt: 0.4 }}>
+                    One view. All key data.
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5 }}>
+                    Live KMR-powered insights for driver search, safety rating, and licence progression.
+                  </Typography>
+                </Box>
+
+                <Box
+                  sx={{
+                    borderRadius: 2,
+                    p: 1.5,
+                    border: '1px solid rgba(255,255,255,0.16)',
+                    background: 'linear-gradient(150deg, rgba(23,33,59,0.72), rgba(23,33,59,0.52))',
+                  }}
+                >
+                  <Stack direction="row" alignItems="center" spacing={1}>
+                    <Box
+                      sx={{
+                        width: 9,
+                        height: 9,
+                        borderRadius: '50%',
+                        bgcolor: syncStatus.color,
+                        boxShadow: `0 0 0 3px ${syncStatus.color}22`,
+                      }}
+                    />
+                    <Typography sx={{ fontWeight: 800, color: syncStatus.color }}>
+                      {syncStatus.label}
                     </Typography>
-                    <Typography variant="subtitle2" sx={{ fontWeight: 700, lineHeight: 1.2 }}>
-                      {stat.value}
+                    <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                      • Data sync {syncStatus.ageText}
                     </Typography>
-                  </Box>
-                ))}
-              </Box>
+                  </Stack>
+                </Box>
+
+                <Grid container spacing={1}>
+                  {[
+                    { label: 'Total drivers', value: formatNumber(totalDrivers) },
+                    { label: 'Logged laps', value: formatNumber(totalLaps) },
+                    { label: 'Active tracks', value: formatNumber(activeTracks) },
+                    { label: 'Driver search', value: 'Steam64 + name' },
+                  ].map((item) => (
+                    <Grid key={item.label} size={{ xs: 6 }}>
+                      <Box
+                        sx={{
+                          borderRadius: 2,
+                          px: 1.5,
+                          py: 1.35,
+                          minHeight: 78,
+                          display: 'flex',
+                          flexDirection: 'column',
+                          justifyContent: 'center',
+                          border: '1px solid rgba(255,255,255,0.16)',
+                          bgcolor: 'rgba(15,28,56,0.5)',
+                        }}
+                      >
+                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.68)' }}>
+                          {item.label}
+                        </Typography>
+                        <Typography variant="subtitle2" sx={{ fontWeight: 800, lineHeight: 1.25, mt: 0.2 }}>
+                          {item.value}
+                        </Typography>
+                      </Box>
+                    </Grid>
+                  ))}
+                </Grid>
+              </Stack>
             </Box>
           </Grid>
         </Grid>
+
+        <Box
+          sx={{
+            mt: { xs: 3, md: 4 },
+            mb: 0,
+            borderRadius: 2.5,
+            px: { xs: 2, md: 2.5 },
+            py: { xs: 1.5, md: 1.75 },
+            border: '1px solid rgba(245,158,11,0.45)',
+            background:
+              'linear-gradient(135deg, rgba(245,158,11,0.16) 0%, rgba(217,119,6,0.08) 100%), rgba(15,23,42,0.4)',
+            backdropFilter: 'blur(12px)',
+            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.08)',
+          }}
+        >
+          <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.95)' }}>
+            <Box component="span" sx={{ fontWeight: 800, color: '#fbbf24' }}>
+              Note:
+            </Box>{' '}
+            Licence and Safety Rating calculations are currently work in progress. Values and thresholds may change
+            while we continue tuning.
+          </Typography>
+        </Box>
       </Container>
     </Box>
   );
@@ -591,7 +733,7 @@ function DriverSearchSection({
               Search drivers and view their profile
             </Typography>
             <Typography variant="body1" sx={{ maxWidth: 680, color: 'text.secondary' }}>
-              This search now uses live data from your previous version (`rank.json`) with real SR and licence calculations.
+              This search now uses live data from your previous version (`rank.json`) with real Safety Rating and licence calculations.
             </Typography>
           </Stack>
         </Stack>
@@ -600,7 +742,7 @@ function DriverSearchSection({
           elevation={0}
           sx={{
             mb: 4,
-            p: { xs: 2.5, md: 3 },
+            p: { xs: 2.75, md: 3.25 },
             borderRadius: 3,
             border: '1px solid rgba(255,255,255,0.2)',
             background:
@@ -744,7 +886,7 @@ function DriverSearchSection({
                 <Box
                   sx={{
                     borderRadius: 1.75,
-                    p: 1.25,
+                    p: 1.5,
                     border: '1px solid rgba(255,255,255,0.16)',
                     bgcolor: 'rgba(9,20,42,0.35)',
                     backdropFilter: 'blur(10px)',
@@ -805,7 +947,7 @@ function DriverSearchSection({
                 <Grid container spacing={1.5}>
                   {[
                     { label: 'Licence', value: `${selected.license} | ${Math.round(selected.paceScore)}` },
-                    { label: 'Safety', value: `${selected.safetyTier} | ${selected.safety.toFixed(2)}` },
+                    { label: 'Safety Rating', value: `${selected.safetyTier} | ${selected.safety.toFixed(2)}` },
                     { label: 'KM', value: formatNumber(Math.round(selected.kilometers)) },
                     { label: 'Collisions', value: formatNumber(selected.collisions) },
                     { label: 'Total Laps', value: formatNumber(selected.totalLaps) },
@@ -817,8 +959,29 @@ function DriverSearchSection({
                         sx={{
                           borderRadius: 2,
                           p: 1.5,
-                          bgcolor: 'rgba(23,33,59,0.82)',
-                          border: '1px solid rgba(148,163,184,0.35)',
+                          ...(item.label === 'Licence'
+                            ? (() => {
+                                const badge = getLicenseBadgeSx(selected.license) as any;
+                                const bg = typeof badge?.bgcolor === 'string' ? badge.bgcolor : '#F59E0B';
+                                return {
+                                  ...(glassFromHex(bg) as object),
+                                };
+                              })()
+                            : {}),
+                          ...(item.label === 'Safety Rating'
+                            ? (() => {
+                                const badge = getSRBadgeSx(selected.safetyTier) as any;
+                                const bg = typeof badge?.bgcolor === 'string' ? badge.bgcolor : '#EF4444';
+                                return {
+                                  ...(glassFromHex(bg) as object),
+                                };
+                              })()
+                            : {}),
+
+                          ...(item.label !== 'Licence' && item.label !== 'Safety Rating' && {
+                            bgcolor: 'rgba(23,33,59,0.82)',
+                            border: '1px solid rgba(148,163,184,0.35)',
+                          }),
                         }}
                       >
                         <Typography variant="caption" sx={{ color: 'text.secondary' }}>
@@ -943,6 +1106,7 @@ export default function Page() {
     admin: [],
     moderator: [],
   });
+  const [metadata, setMetadata] = useState<Metadata>({});
 
   useEffect(() => {
     let mounted = true;
@@ -951,14 +1115,16 @@ export default function Page() {
       setLoading(true);
       setError(null);
       try {
-        const [rank, roles] = await Promise.all([
+        const [rank, roles, meta] = await Promise.all([
           fetchJson<RankDriver[]>('/data/rank.json'),
           fetchJson<TeamRoles>('/data/team-roles.json'),
+          fetchJson<Metadata>('/data/metadata.json'),
         ]);
 
         if (!mounted) return;
         setRankData(rank);
         setTeamRoles(roles);
+        setMetadata(meta);
       } catch (e) {
         if (!mounted) return;
         setError(e instanceof Error ? e.message : 'Unknown error');
@@ -1028,8 +1194,19 @@ export default function Page() {
   const community = useMemo(() => {
     const totalDrivers = drivers.length;
     const totalLaps = drivers.reduce((sum, d) => sum + d.totalLaps, 0);
-    return { totalDrivers, totalLaps };
-  }, [drivers]);
+    const trackIds = new Set<string>();
+
+    rankData.forEach((driver) => {
+      const leaderboard = driver.leaderboard || {};
+      Object.entries(leaderboard).forEach(([trackId, cars]) => {
+        const laptime = cars?.[CAR]?.laptime;
+        if (typeof laptime === 'number') trackIds.add(trackId);
+      });
+    });
+
+    return { totalDrivers, totalLaps, activeTracks: trackIds.size };
+  }, [drivers, rankData]);
+  const syncStatus = getSyncStatus(getEffectiveLastSync(metadata.lastSync, rankData));
 
   return (
     <>
@@ -1039,7 +1216,12 @@ export default function Page() {
         content="AC Elite | Simracing community. Track your stats, search drivers, and compete on leaderboards."
       />
 
-      <HeroSection totalDrivers={community.totalDrivers} totalLaps={community.totalLaps} />
+      <HeroSection
+        totalDrivers={community.totalDrivers}
+        totalLaps={community.totalLaps}
+        activeTracks={community.activeTracks}
+        syncStatus={syncStatus}
+      />
       <DriverSearchSection
         drivers={drivers}
         loading={loading}

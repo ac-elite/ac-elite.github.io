@@ -153,8 +153,8 @@ export default function Page() {
         />
 
         <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1 }}>
-          <Stack spacing={2.5}>
-            <Stack spacing={0.75}>
+          <Stack spacing={3}>
+            <Stack spacing={1}>
               <Typography variant="h4" fontWeight={800}>
                 Leaderboard
               </Typography>
@@ -182,7 +182,7 @@ export default function Page() {
               <>
                 <Paper
                   sx={{
-                    p: 2,
+                    p: 2.5,
                     borderRadius: 3,
                     border: '1px solid rgba(255,255,255,0.18)',
                     background:
@@ -236,7 +236,7 @@ export default function Page() {
                           <TableCell>#</TableCell>
                           <TableCell>Driver</TableCell>
                           <TableCell>Licence</TableCell>
-                          <TableCell>SR</TableCell>
+                          <TableCell>Safety Rating</TableCell>
                           <TableCell>Lap Time</TableCell>
                           <TableCell align="right">Gap</TableCell>
                           <TableCell align="right">Laps</TableCell>

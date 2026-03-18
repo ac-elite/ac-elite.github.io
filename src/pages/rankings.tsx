@@ -299,13 +299,13 @@ export default function Page() {
         />
 
         <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1 }}>
-          <Stack spacing={2.5}>
-            <Stack spacing={0.75}>
+          <Stack spacing={3}>
+            <Stack spacing={1}>
               <Typography variant="h4" fontWeight={800}>
                 Rankings
               </Typography>
               <Typography color="text.secondary">
-                Ranked by overall (70% pace + 30% SR), by licence tier, or by safety tier.
+                Ranked by overall (70% pace + 30% Safety Rating), by licence tier, or by safety tier.
               </Typography>
             </Stack>
 
@@ -330,7 +330,7 @@ export default function Page() {
               <>
                 <Paper
                   sx={{
-                    p: 2,
+                    p: 2.5,
                     borderRadius: 3,
                     border: '1px solid rgba(255,255,255,0.18)',
                     background:
@@ -441,7 +441,7 @@ export default function Page() {
                           <TableCell>#</TableCell>
                           <TableCell>Driver</TableCell>
                           <TableCell>Licence</TableCell>
-                          <TableCell>SR</TableCell>
+                          <TableCell>Safety Rating</TableCell>
                           <TableCell align="right">KM</TableCell>
                         </TableRow>
                       </TableHead>
