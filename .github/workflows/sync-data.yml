@@ -46,8 +46,8 @@ jobs:
               const client = new ftp.Client();
               client.ftp.verbose = false;
               
-              // Ensure data directory exists
-              const dataDir = path.join(process.cwd(), 'data');
+              // Ensure public data directory exists
+              const dataDir = path.join(process.cwd(), 'public', 'data');
               if (!fs.existsSync(dataDir)) {
                   fs.mkdirSync(dataDir, { recursive: true });
               }
@@ -123,14 +123,12 @@ jobs:
 
       - name: Commit and push changes
         run: |
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
-          git add data/
+          git add public/data/
 
           # Only commit if there are changes
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "🔄 Sync KMR data - $(date -u +'%Y-%m-%d %H:%M:%S UTC')"
+            git -c user.email="github-actions[bot]@users.noreply.github.com" -c user.name="github-actions[bot]" commit -m "🔄 Sync KMR data - $(date -u +'%Y-%m-%d %H:%M:%S UTC')"
             git push
           fi
