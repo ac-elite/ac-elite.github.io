@@ -1,4 +1,4 @@
-import { cp, mkdir, rm } from 'node:fs/promises';
+import { cp, mkdir, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
 const rootDir = process.cwd();
@@ -11,6 +11,7 @@ async function publishPages() {
 
   await cp(distDir, docsDir, { recursive: true });
   await cp(path.join(docsDir, 'index.html'), path.join(docsDir, '404.html'));
+  await writeFile(path.join(docsDir, '.nojekyll'), '');
 
   console.log('Published GitHub Pages files to /docs');
 }
