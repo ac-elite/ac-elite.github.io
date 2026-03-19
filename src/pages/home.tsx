@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from 'react';
+import { useRef, useMemo, useState, useEffect } from 'react';
 
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
@@ -688,6 +688,7 @@ function DriverSearchSection({
 }) {
   const [query, setQuery] = useState('');
   const [selectedGuid, setSelectedGuid] = useState('');
+  const appliedInitialGuidRef = useRef<string | null>(null);
 
   const selected = useMemo(
     () => drivers.find((driver) => driver.guid === selectedGuid) || null,
@@ -703,12 +704,16 @@ function DriverSearchSection({
   }, [drivers, query]);
 
   useEffect(() => {
-    if (!initialDriverGuid || selectedGuid) return;
+    if (!initialDriverGuid) return;
+    if (appliedInitialGuidRef.current === initialDriverGuid) return;
+
     const found = drivers.find((driver) => driver.guid === initialDriverGuid);
     if (!found) return;
+
+    appliedInitialGuidRef.current = initialDriverGuid;
     setSelectedGuid(found.guid);
     setQuery(found.name);
-  }, [drivers, initialDriverGuid, selectedGuid]);
+  }, [drivers, initialDriverGuid]);
 
   return (
     <Box
