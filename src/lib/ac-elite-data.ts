@@ -21,6 +21,9 @@ export const SR_CONFIG = {
   SR_MIN: 1.0,
   SR_MAX: 9.99,
   SR_START: 2.5,
+  // SR is only fully trusted once a driver has enough distance.
+  // This prevents very low-km drivers from instantly sitting at extreme SR values.
+  CONFIDENCE_FULL_KM: 3000,
   COLLISION_WEIGHT: 1.0,
   INFRACTION_WEIGHT: 2.0,
 };
@@ -50,8 +53,22 @@ const LICENSE_CONFIG = {
   TRACK_WEIGHT_BASE: 1.0,
   TRACK_WEIGHT_SCALE: 0.02,
   TRACK_WEIGHT_MAX: 2.0,
+  // Around 50 laps per track means "full confidence".
+  CONFIDENCE_FULL_LAPS: 50,
+  // Reaching this many distinct tracks gives full participation scaling.
+  PARTICIPATION_FULL_TRACKS: 8,
+  // Keep at 0 by default; raise to e.g. 5 if you want a hard lap floor.
+  MIN_LAPS_FOR_SCORING: 0,
   CONSISTENCY_BONUS_PER_TRACK: 2,
   CONSISTENCY_BONUS_MAX: 50,
+  // Final fine-tune: reward drivers that are consistently high on each leaderboard.
+  POSITION_QUALITY_WEIGHT: 0.8,
+  POSITION_STABILITY_WEIGHT: 0.15,
+  // Extra signal: how often a driver finishes in the top group.
+  POSITION_TOP_FINISH_WEIGHT: 0.25,
+  TOP_FINISH_CUTOFF_POSITION: 5,
+  POSITION_FACTOR_BASE: 0.9,
+  POSITION_FACTOR_SCALE: 0.3,
   POSITION_MULTIPLIERS: {
     1: 2.0,
     2: 1.7,
@@ -65,6 +82,11 @@ const LICENSE_CONFIG = {
     10: 1.1,
   } as Record<number, number>,
 };
+
+function getTrackConfidence(laps: number) {
+  if (!Number.isFinite(laps) || laps <= 0) return 0;
+  return Math.min(1, Math.sqrt(laps / LICENSE_CONFIG.CONFIDENCE_FULL_LAPS));
+}
 
 export const LICENSE_TIERS: Record<string, { minKm: number; minScore: number; minTracks?: number }> = {
   Elite: { minKm: 6000, minScore: 3700, minTracks: 8 },
@@ -103,8 +125,13 @@ export function safetyRating(driver: RankDriver) {
   const i100 = (infr / km) * 100;
   if (!Number.isFinite(c100) || !Number.isFinite(i100)) return SR_CONFIG.SR_START;
   const weighted = c100 * SR_CONFIG.COLLISION_WEIGHT + i100 * SR_CONFIG.INFRACTION_WEIGHT;
-  const sr = SR_CONFIG.SR_BASE + SR_CONFIG.SR_SCALE / (1 + weighted);
-  return Math.min(SR_CONFIG.SR_MAX, Math.max(SR_CONFIG.SR_MIN, sr));
+  const rawSr = SR_CONFIG.SR_BASE + SR_CONFIG.SR_SCALE / (1 + weighted);
+
+  // Confidence rises with distance, so low-km SR stays closer to SR_START.
+  const confidence = Math.min(1, Math.sqrt(km / SR_CONFIG.CONFIDENCE_FULL_KM));
+  const confidenceAdjustedSr = SR_CONFIG.SR_START + (rawSr - SR_CONFIG.SR_START) * confidence;
+
+  return Math.min(SR_CONFIG.SR_MAX, Math.max(SR_CONFIG.SR_MIN, confidenceAdjustedSr));
 }
 
 export function getSRTier(sr: number, km: number) {
@@ -126,6 +153,8 @@ export function computeLicenseMap(drivers: RankDriver[]) {
 
   const paceScores = new Array(drivers.length).fill(0) as number[];
   const trackCounts = new Array(drivers.length).fill(0) as number[];
+  const positionRatios = drivers.map(() => [] as number[]);
+  const topFinishCounts = new Array(drivers.length).fill(0) as number[];
   const tracks = new Set<string>();
 
   for (const driver of drivers) {
@@ -136,12 +165,14 @@ export function computeLicenseMap(drivers: RankDriver[]) {
   }
 
   for (const trackId of tracks) {
-    const entries: { driverIndex: number; laptime: number }[] = [];
+    const entries: { driverIndex: number; laptime: number; laps: number }[] = [];
 
     drivers.forEach((driver, idx) => {
-      const laptime = driver.leaderboard?.[trackId]?.[CAR]?.laptime;
+      const carData = driver.leaderboard?.[trackId]?.[CAR];
+      const laptime = carData?.laptime;
       if (typeof laptime !== 'number') return;
-      entries.push({ driverIndex: idx, laptime });
+      const laps = typeof carData?.laps === 'number' ? carData.laps : 0;
+      entries.push({ driverIndex: idx, laptime, laps });
     });
 
     entries.sort((a, b) => a.laptime - b.laptime);
@@ -157,8 +188,23 @@ export function computeLicenseMap(drivers: RankDriver[]) {
       const pos1 = position + 1;
       const baseScore = entries.length > 1 ? ((entries.length - position) / entries.length) * 100 : 100;
       const multiplier = LICENSE_CONFIG.POSITION_MULTIPLIERS[pos1] || 1;
-      paceScores[entry.driverIndex] += baseScore * multiplier * trackWeight;
+
       trackCounts[entry.driverIndex] += 1;
+
+      if (entry.laps < LICENSE_CONFIG.MIN_LAPS_FOR_SCORING) return;
+
+      const confidence = getTrackConfidence(entry.laps);
+      if (confidence <= 0) return;
+
+      paceScores[entry.driverIndex] += baseScore * multiplier * trackWeight * confidence;
+
+      // 0 means P1, 1 means last place. Used for consistency fine-tuning.
+      const ratio = entries.length > 1 ? position / (entries.length - 1) : 0;
+      positionRatios[entry.driverIndex].push(ratio);
+
+      if (pos1 <= LICENSE_CONFIG.TOP_FINISH_CUTOFF_POSITION) {
+        topFinishCounts[entry.driverIndex] += 1;
+      }
     });
   }
 
@@ -167,7 +213,33 @@ export function computeLicenseMap(drivers: RankDriver[]) {
       LICENSE_CONFIG.CONSISTENCY_BONUS_MAX,
       trackCounts[idx] * LICENSE_CONFIG.CONSISTENCY_BONUS_PER_TRACK
     );
-    paceScores[idx] = score + bonus;
+    const participationFactor = Math.min(1, trackCounts[idx] / LICENSE_CONFIG.PARTICIPATION_FULL_TRACKS);
+    const baseScore = (score + bonus) * participationFactor;
+
+    // Position quality/stability factor:
+    // - quality rewards being near the top more often
+    // - stability rewards less spread in placements
+    const ratios = positionRatios[idx];
+    if (!ratios.length) {
+      paceScores[idx] = baseScore;
+      return;
+    }
+
+    const avgRatio = ratios.reduce((sum, value) => sum + value, 0) / ratios.length;
+    const quality = 1 - avgRatio;
+
+    const variance = ratios.reduce((sum, value) => sum + (value - avgRatio) ** 2, 0) / ratios.length;
+    const stdDev = Math.sqrt(variance);
+    const stability = Math.max(0, 1 - stdDev * 2);
+
+    const topFinishRate = topFinishCounts[idx] / ratios.length;
+    const combined =
+      quality * LICENSE_CONFIG.POSITION_QUALITY_WEIGHT +
+      stability * LICENSE_CONFIG.POSITION_STABILITY_WEIGHT +
+      topFinishRate * LICENSE_CONFIG.POSITION_TOP_FINISH_WEIGHT;
+    const positionFactor = LICENSE_CONFIG.POSITION_FACTOR_BASE + LICENSE_CONFIG.POSITION_FACTOR_SCALE * combined;
+
+    paceScores[idx] = baseScore * positionFactor;
   });
 
   const qualified = drivers
@@ -249,32 +321,36 @@ export function calculateGap(fastestLap: number, currentLap: number) {
 }
 
 export function getLicenseBadgeSx(license: string): SxProps<Theme> {
+  const textColor = '#111827';
   const styles: Record<string, SxProps<Theme>> = {
-    Elite: { bgcolor: '#7C3AED', color: '#FFFFFF' },
-    'Diamond+': { bgcolor: '#2563EB', color: '#FFFFFF' },
-    Diamond: { bgcolor: '#0EA5E9', color: '#082F49' },
-    'Platinum+': { bgcolor: '#E2E8F0', color: '#0F172A' },
-    Platinum: { bgcolor: '#CBD5E1', color: '#0F172A' },
-    'Gold+': { bgcolor: '#FBBF24', color: '#111827' },
-    Gold: { bgcolor: '#F59E0B', color: '#111827' },
-    'Silver+': { bgcolor: '#94A3B8', color: '#0F172A' },
-    Silver: { bgcolor: '#64748B', color: '#FFFFFF' },
-    'Bronze+': { bgcolor: '#C2410C', color: '#FFFFFF' },
-    Bronze: { bgcolor: '#92400E', color: '#FFFFFF' },
-    Rookie: { bgcolor: '#374151', color: '#FFFFFF' },
+    // Unified dark text for consistency; backgrounds are tuned for contrast.
+    Elite: { bgcolor: '#C084FC', color: textColor },
+    'Diamond+': { bgcolor: '#60A5FA', color: textColor },
+    Diamond: { bgcolor: '#22D3EE', color: textColor },
+    'Platinum+': { bgcolor: '#F1F5F9', color: textColor },
+    Platinum: { bgcolor: '#D7E1EB', color: textColor },
+    'Gold+': { bgcolor: '#FDE047', color: textColor },
+    Gold: { bgcolor: '#FACC15', color: textColor },
+    'Silver+': { bgcolor: '#A8B9CC', color: textColor },
+    Silver: { bgcolor: '#C9D5E1', color: textColor },
+    'Bronze+': { bgcolor: '#FB923C', color: textColor },
+    Bronze: { bgcolor: '#F97316', color: textColor },
+    Rookie: { bgcolor: '#B2BDC8', color: textColor },
   };
   return styles[license] || styles.Bronze;
 }
 
 export function getSRBadgeSx(tier: string): SxProps<Theme> {
+  const textColor = '#111827';
   const first = tier.charAt(0);
-  if (first === 'S') return { bgcolor: '#16A34A', color: '#FFFFFF' };
-  if (first === 'A') return { bgcolor: '#22C55E', color: '#052E16' };
-  if (first === 'B') return { bgcolor: '#06B6D4', color: '#083344' };
-  if (first === 'C') return { bgcolor: '#F59E0B', color: '#111827' };
-  if (first === 'D') return { bgcolor: '#F97316', color: '#111827' };
-  if (first === 'E') return { bgcolor: '#EF4444', color: '#FFFFFF' };
-  return { bgcolor: '#6B7280', color: '#FFFFFF' };
+  // LFM-like SR palette with consistent dark text for readability.
+  if (first === 'S') return { bgcolor: '#22C55E', color: textColor };
+  if (first === 'A') return { bgcolor: '#7C3AED', color: textColor };
+  if (first === 'B') return { bgcolor: '#EAF239', color: textColor };
+  if (first === 'C') return { bgcolor: '#D1D5DB', color: textColor };
+  if (first === 'D') return { bgcolor: '#EA7A2D', color: textColor };
+  if (first === 'E') return { bgcolor: '#9CA3AF', color: textColor };
+  return { bgcolor: '#FF1F2D', color: textColor };
 }
 
 export function getOverallCombinedScore(paceScore: number, sr: number, maxPaceScore: number) {

@@ -370,7 +370,7 @@ export default function Page() {
                 Rankings
               </Typography>
               <Typography color="text.secondary">
-                Ranked by overall (70% pace + 30% Safety Rating), by licence tier, or by safety tier.
+                Compare drivers by overall performance, or filter directly by licence tier and Safety Rating tier.
               </Typography>
             </Stack>
 
@@ -609,7 +609,7 @@ export default function Page() {
                             <TableRow
                               key={`${item.driver.guid}-${pos}`}
                               onClick={() => {
-                                window.location.href = `${APP_BASE_URL}?driver=${encodeURIComponent(item.driver.guid)}#driver-search`;
+                                window.location.href = `${APP_BASE_URL}driver/${encodeURIComponent(item.driver.guid)}`;
                               }}
                               sx={{
                                 cursor: 'pointer',

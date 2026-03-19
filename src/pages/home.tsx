@@ -1,4 +1,4 @@
-import { useRef, useMemo, useState, useEffect } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
@@ -73,6 +73,9 @@ const SR_CONFIG = {
   SR_MIN: 1.0,
   SR_MAX: 9.99,
   SR_START: 2.5,
+  // SR is only fully trusted once a driver has enough distance.
+  // This prevents very low-km drivers from instantly sitting at extreme SR values.
+  CONFIDENCE_FULL_KM: 3000,
   COLLISION_WEIGHT: 1.0,
   INFRACTION_WEIGHT: 2.0,
 };
@@ -104,8 +107,22 @@ const LICENSE_CONFIG = {
   TRACK_WEIGHT_BASE: 1.0,
   TRACK_WEIGHT_SCALE: 0.02,
   TRACK_WEIGHT_MAX: 2.0,
+  // Around 50 laps per track means "full confidence".
+  CONFIDENCE_FULL_LAPS: 50,
+  // Reaching this many distinct tracks gives full participation scaling.
+  PARTICIPATION_FULL_TRACKS: 8,
+  // Keep at 0 by default; raise to e.g. 5 if you want a hard lap floor.
+  MIN_LAPS_FOR_SCORING: 0,
   CONSISTENCY_BONUS_PER_TRACK: 2,
   CONSISTENCY_BONUS_MAX: 50,
+  // Final fine-tune: reward drivers that are consistently high on each leaderboard.
+  POSITION_QUALITY_WEIGHT: 0.8,
+  POSITION_STABILITY_WEIGHT: 0.15,
+  // Extra signal: how often a driver finishes in the top group.
+  POSITION_TOP_FINISH_WEIGHT: 0.25,
+  TOP_FINISH_CUTOFF_POSITION: 5,
+  POSITION_FACTOR_BASE: 0.9,
+  POSITION_FACTOR_SCALE: 0.3,
   POSITION_MULTIPLIERS: {
     1: 2.0,
     2: 1.7,
@@ -119,6 +136,11 @@ const LICENSE_CONFIG = {
     10: 1.1,
   } as Record<number, number>,
 };
+
+function getTrackConfidence(laps: number) {
+  if (!Number.isFinite(laps) || laps <= 0) return 0;
+  return Math.min(1, Math.sqrt(laps / LICENSE_CONFIG.CONFIDENCE_FULL_LAPS));
+}
 
 const LICENSE_TIERS: Record<string, { minKm: number; minScore: number; minTracks?: number }> = {
   Elite: { minKm: 6000, minScore: 3700, minTracks: 8 },
@@ -285,8 +307,13 @@ function safetyRating(driver: RankDriver) {
   const i100 = (infr / km) * 100;
   if (!Number.isFinite(c100) || !Number.isFinite(i100)) return SR_CONFIG.SR_START;
   const weighted = c100 * SR_CONFIG.COLLISION_WEIGHT + i100 * SR_CONFIG.INFRACTION_WEIGHT;
-  const sr = SR_CONFIG.SR_BASE + SR_CONFIG.SR_SCALE / (1 + weighted);
-  return Math.min(SR_CONFIG.SR_MAX, Math.max(SR_CONFIG.SR_MIN, sr));
+  const rawSr = SR_CONFIG.SR_BASE + SR_CONFIG.SR_SCALE / (1 + weighted);
+
+  // Confidence rises with distance, so low-km SR stays closer to SR_START.
+  const confidence = Math.min(1, Math.sqrt(km / SR_CONFIG.CONFIDENCE_FULL_KM));
+  const confidenceAdjustedSr = SR_CONFIG.SR_START + (rawSr - SR_CONFIG.SR_START) * confidence;
+
+  return Math.min(SR_CONFIG.SR_MAX, Math.max(SR_CONFIG.SR_MIN, confidenceAdjustedSr));
 }
 
 function getSRTier(sr: number, km: number) {
@@ -299,6 +326,8 @@ function getSRTier(sr: number, km: number) {
 function computeFullLeaderboardScores(drivers: RankDriver[]) {
   const paceScores = new Array(drivers.length).fill(0) as number[];
   const trackCounts = new Array(drivers.length).fill(0) as number[];
+  const positionRatios = drivers.map(() => [] as number[]);
+  const topFinishCounts = new Array(drivers.length).fill(0) as number[];
   const tracks = new Set<string>();
 
   for (const driver of drivers) {
@@ -309,12 +338,14 @@ function computeFullLeaderboardScores(drivers: RankDriver[]) {
   }
 
   for (const trackId of tracks) {
-    const entries: { driverIndex: number; laptime: number }[] = [];
+    const entries: { driverIndex: number; laptime: number; laps: number }[] = [];
 
     drivers.forEach((driver, idx) => {
-      const laptime = driver.leaderboard?.[trackId]?.[CAR]?.laptime;
+      const carData = driver.leaderboard?.[trackId]?.[CAR];
+      const laptime = carData?.laptime;
       if (typeof laptime !== 'number') return;
-      entries.push({ driverIndex: idx, laptime });
+      const laps = typeof carData?.laps === 'number' ? carData.laps : 0;
+      entries.push({ driverIndex: idx, laptime, laps });
     });
 
     entries.sort((a, b) => a.laptime - b.laptime);
@@ -330,9 +361,24 @@ function computeFullLeaderboardScores(drivers: RankDriver[]) {
       const pos1 = position + 1;
       const baseScore = entries.length > 1 ? ((entries.length - position) / entries.length) * 100 : 100;
       const multiplier = LICENSE_CONFIG.POSITION_MULTIPLIERS[pos1] || 1.0;
-      const score = baseScore * multiplier * trackWeight;
-      paceScores[entry.driverIndex] += score;
+
       trackCounts[entry.driverIndex] += 1;
+
+      if (entry.laps < LICENSE_CONFIG.MIN_LAPS_FOR_SCORING) return;
+
+      const confidence = getTrackConfidence(entry.laps);
+      if (confidence <= 0) return;
+
+      const score = baseScore * multiplier * trackWeight * confidence;
+      paceScores[entry.driverIndex] += score;
+
+      // 0 means P1, 1 means last place. Used for consistency fine-tuning.
+      const ratio = entries.length > 1 ? position / (entries.length - 1) : 0;
+      positionRatios[entry.driverIndex].push(ratio);
+
+      if (pos1 <= LICENSE_CONFIG.TOP_FINISH_CUTOFF_POSITION) {
+        topFinishCounts[entry.driverIndex] += 1;
+      }
     });
   }
 
@@ -341,7 +387,33 @@ function computeFullLeaderboardScores(drivers: RankDriver[]) {
       LICENSE_CONFIG.CONSISTENCY_BONUS_MAX,
       trackCounts[idx] * LICENSE_CONFIG.CONSISTENCY_BONUS_PER_TRACK
     );
-    paceScores[idx] = score + bonus;
+    const participationFactor = Math.min(1, trackCounts[idx] / LICENSE_CONFIG.PARTICIPATION_FULL_TRACKS);
+    const baseScore = (score + bonus) * participationFactor;
+
+    // Position quality/stability factor:
+    // - quality rewards being near the top more often
+    // - stability rewards less spread in placements
+    const ratios = positionRatios[idx];
+    if (!ratios.length) {
+      paceScores[idx] = baseScore;
+      return;
+    }
+
+    const avgRatio = ratios.reduce((sum, value) => sum + value, 0) / ratios.length;
+    const quality = 1 - avgRatio;
+
+    const variance = ratios.reduce((sum, value) => sum + (value - avgRatio) ** 2, 0) / ratios.length;
+    const stdDev = Math.sqrt(variance);
+    const stability = Math.max(0, 1 - stdDev * 2);
+
+    const topFinishRate = topFinishCounts[idx] / ratios.length;
+    const combined =
+      quality * LICENSE_CONFIG.POSITION_QUALITY_WEIGHT +
+      stability * LICENSE_CONFIG.POSITION_STABILITY_WEIGHT +
+      topFinishRate * LICENSE_CONFIG.POSITION_TOP_FINISH_WEIGHT;
+    const positionFactor = LICENSE_CONFIG.POSITION_FACTOR_BASE + LICENSE_CONFIG.POSITION_FACTOR_SCALE * combined;
+
+    paceScores[idx] = baseScore * positionFactor;
   });
 
   return { paceScores, trackCounts };
@@ -390,28 +462,6 @@ function getTeamRole(guid: string, roles: TeamRoles): TeamRole {
   if (roles.admin.includes(guid)) return 'admin';
   if (roles.moderator.includes(guid)) return 'moderator';
   return null;
-}
-
-function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
-  const cleaned = hex.replace('#', '').trim();
-  if (cleaned.length !== 6) return null;
-  const num = Number.parseInt(cleaned, 16);
-  const r = Math.floor(num / 65536);
-  const g = Math.floor((num % 65536) / 256);
-  const b = num % 256;
-  return { r, g, b };
-}
-
-function glassFromHex(hexBg: string) {
-  const rgb = hexToRgb(hexBg);
-  if (!rgb) return {};
-
-  return {
-    background: `linear-gradient(135deg, rgba(${rgb.r},${rgb.g},${rgb.b},0.28) 0%, rgba(${rgb.r},${rgb.g},${rgb.b},0.08) 100%)`,
-    border: `1px solid rgba(${rgb.r},${rgb.g},${rgb.b},0.35)`,
-    backdropFilter: 'blur(12px)',
-    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.08)',
-  };
 }
 
 function AnimatedLinesBackground({ opacity = 0.5 }: { opacity?: number }) {
@@ -679,21 +729,12 @@ function DriverSearchSection({
   drivers,
   loading,
   error,
-  initialDriverGuid,
 }: {
   drivers: DriverView[];
   loading: boolean;
   error: string | null;
-  initialDriverGuid?: string;
 }) {
   const [query, setQuery] = useState('');
-  const [selectedGuid, setSelectedGuid] = useState('');
-  const appliedInitialGuidRef = useRef<string | null>(null);
-
-  const selected = useMemo(
-    () => drivers.find((driver) => driver.guid === selectedGuid) || null,
-    [drivers, selectedGuid]
-  );
 
   const matches = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -702,18 +743,6 @@ function DriverSearchSection({
       .filter((driver) => driver.name.toLowerCase().includes(q) || driver.guid.includes(q))
       .slice(0, 8);
   }, [drivers, query]);
-
-  useEffect(() => {
-    if (!initialDriverGuid) return;
-    if (appliedInitialGuidRef.current === initialDriverGuid) return;
-
-    const found = drivers.find((driver) => driver.guid === initialDriverGuid);
-    if (!found) return;
-
-    appliedInitialGuidRef.current = initialDriverGuid;
-    setSelectedGuid(found.guid);
-    setQuery(found.name);
-  }, [drivers, initialDriverGuid]);
 
   return (
     <Box
@@ -768,7 +797,6 @@ function DriverSearchSection({
                   value={query}
                   onChange={(event) => {
                     setQuery(event.target.value);
-                    setSelectedGuid('');
                   }}
                   placeholder="Driver name or Steam64 ID..."
                   variant="outlined"
@@ -815,8 +843,7 @@ function DriverSearchSection({
                         <ListItemButton
                           key={driver.guid}
                           onClick={() => {
-                            setSelectedGuid(driver.guid);
-                            setQuery(driver.name);
+                            window.location.href = `${APP_BASE_URL}driver/${encodeURIComponent(driver.guid)}`;
                           }}
                           sx={{
                             px: 1.75,
@@ -905,17 +932,6 @@ function DriverSearchSection({
                       {loading ? '...' : formatNumber(drivers.length)}
                     </Typography>
                   </Stack>
-
-                  {selected && (
-                    <Box sx={{ mt: 0.75 }}>
-                      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                        Selected driver
-                      </Typography>
-                      <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                        {selected.name}
-                      </Typography>
-                    </Box>
-                  )}
                 </Box>
 
                 {loading && <Typography color="text.secondary">Loading drivers...</Typography>}
@@ -924,85 +940,6 @@ function DriverSearchSection({
             </Grid>
           </Grid>
         </Paper>
-
-        {selected && (
-          <Paper
-            elevation={0}
-            sx={{
-              p: { xs: 2.5, md: 3 },
-              borderRadius: 3,
-              border: '1px solid rgba(148,163,184,0.45)',
-              background: 'linear-gradient(135deg, rgba(19,36,71,0.96), rgba(35,31,32,0.82))',
-            }}
-          >
-            <Grid container spacing={2}>
-              <Grid size={{ xs: 12, md: 4 }}>
-                <Typography variant="overline" sx={{ color: 'text.secondary' }}>
-                  Driver
-                </Typography>
-                <Typography variant="h5" sx={{ fontWeight: 800 }}>
-                  {selected.name}
-                </Typography>
-                <Typography variant="body2" sx={{ color: 'text.secondary', fontFamily: 'monospace' }}>
-                  {selected.guid}
-                </Typography>
-              </Grid>
-
-              <Grid size={{ xs: 12, md: 8 }}>
-                <Grid container spacing={1.5}>
-                  {[
-                    { label: 'Licence', value: `${selected.license} | ${Math.round(selected.paceScore)}` },
-                    { label: 'Safety Rating', value: `${selected.safetyTier} | ${selected.safety.toFixed(2)}` },
-                    { label: 'KM', value: formatNumber(Math.round(selected.kilometers)) },
-                    { label: 'Collisions', value: formatNumber(selected.collisions) },
-                    { label: 'Total Laps', value: formatNumber(selected.totalLaps) },
-                    { label: 'Tracks Driven', value: formatNumber(selected.tracksDriven) },
-                    { label: 'Favorite Track', value: selected.favoriteTrack },
-                  ].map((item) => (
-                    <Grid key={item.label} size={{ xs: 12, sm: 6, md: 4 }}>
-                      <Box
-                        sx={{
-                          borderRadius: 2,
-                          p: 1.5,
-                          ...(item.label === 'Licence'
-                            ? (() => {
-                                const badge = getLicenseBadgeSx(selected.license) as any;
-                                const bg = typeof badge?.bgcolor === 'string' ? badge.bgcolor : '#F59E0B';
-                                return {
-                                  ...(glassFromHex(bg) as object),
-                                };
-                              })()
-                            : {}),
-                          ...(item.label === 'Safety Rating'
-                            ? (() => {
-                                const badge = getSRBadgeSx(selected.safetyTier) as any;
-                                const bg = typeof badge?.bgcolor === 'string' ? badge.bgcolor : '#EF4444';
-                                return {
-                                  ...(glassFromHex(bg) as object),
-                                };
-                              })()
-                            : {}),
-
-                          ...(item.label !== 'Licence' && item.label !== 'Safety Rating' && {
-                            bgcolor: 'rgba(23,33,59,0.82)',
-                            border: '1px solid rgba(148,163,184,0.35)',
-                          }),
-                        }}
-                      >
-                        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                          {item.label}
-                        </Typography>
-                        <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
-                          {item.value}
-                        </Typography>
-                      </Box>
-                    </Grid>
-                  ))}
-                </Grid>
-              </Grid>
-            </Grid>
-          </Paper>
-        )}
       </Container>
     </Box>
   );
@@ -1098,11 +1035,6 @@ function DashboardSection({ drivers }: { drivers: DriverView[] }) {
 }
 
 export default function Page() {
-  const initialDriverGuid = useMemo(() => {
-    if (typeof window === 'undefined') return '';
-    return new URLSearchParams(window.location.search).get('driver') || '';
-  }, []);
-
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [rankData, setRankData] = useState<RankDriver[]>([]);
@@ -1231,7 +1163,6 @@ export default function Page() {
         drivers={drivers}
         loading={loading}
         error={error}
-        initialDriverGuid={initialDriverGuid}
       />
       <DashboardSection drivers={drivers} />
     </>

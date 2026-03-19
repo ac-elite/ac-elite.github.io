@@ -223,7 +223,9 @@ export default function Page() {
               <Typography variant="h4" fontWeight={800}>
                 Leaderboard
               </Typography>
-              <Typography color="text.secondary">Best lap times per track ({CAR}).</Typography>
+              <Typography color="text.secondary">
+                Track-based leaderboard for {CAR}. Click a driver to open the full profile.
+              </Typography>
             </Stack>
 
             {loading && (
@@ -367,7 +369,7 @@ export default function Page() {
                                 ...getPodiumRowSx(absolutePos),
                               }}
                               onClick={() => {
-                                window.location.href = `${APP_BASE_URL}?driver=${encodeURIComponent(entry.guid)}#driver-search`;
+                                window.location.href = `${APP_BASE_URL}driver/${encodeURIComponent(entry.guid)}`;
                               }}
                             >
                               <TableCell>

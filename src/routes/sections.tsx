@@ -15,6 +15,8 @@ export const HomePage = lazy(() => import('src/pages/home'));
 export const DashboardPage = lazy(() => import('src/pages/dashboard'));
 export const LeaderboardPage = lazy(() => import('src/pages/leaderboard'));
 export const RankingsPage = lazy(() => import('src/pages/rankings'));
+export const HallOfFamePage = lazy(() => import('src/pages/hall-of-fame'));
+export const DriverProfilePage = lazy(() => import('src/pages/driver-profile'));
 export const Page404 = lazy(() => import('src/pages/page-not-found'));
 
 const renderFallback = () => (
@@ -52,6 +54,8 @@ export const routesSection: RouteObject[] = [
       { path: 'dashboard', element: <DashboardPage /> },
       { path: 'leaderboard', element: <LeaderboardPage /> },
       { path: 'rankings', element: <RankingsPage /> },
+      { path: 'hall-of-fame', element: <HallOfFamePage /> },
+      { path: 'driver/:driverGuid', element: <DriverProfilePage /> },
       { path: 'home', element: <HomePage /> },
     ],
   },

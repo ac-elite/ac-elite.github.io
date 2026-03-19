@@ -59,8 +59,6 @@ export const navData = [
     title: 'Hall of Fame',
     path: '/hall-of-fame',
     icon: icon('ic-user'),
-    info: comingSoonBadge,
-    disabled: true,
   },
   {
     title: 'Setup Store',

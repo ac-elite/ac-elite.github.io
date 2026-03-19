@@ -182,8 +182,9 @@ export function LicenseSafetyGuideButton({ compact = false }: LicenseSafetyGuide
               </Typography>
 
               <Typography variant="body2" sx={{ color: 'text.secondary', maxWidth: 880 }}>
-                We do not use race results (wins or podiums) for license progression. The pace score is built from
-                track position, track participation and consistency bonus over time.
+                We do not use race results (wins or podiums) for license progression. Pace is built from leaderboard
+                position per track, laps-based confidence (low laps = lower impact), participation scaling by number of
+                tracks, and a consistency factor that rewards frequent top finishes.
               </Typography>
 
               <Typography variant="body2" sx={{ color: 'text.secondary', maxWidth: 880 }}>
@@ -261,8 +262,9 @@ export function LicenseSafetyGuideButton({ compact = false }: LicenseSafetyGuide
               </Typography>
 
               <Typography variant="body2" sx={{ color: 'text.secondary', maxWidth: 880 }}>
-                Formula input uses collisions and infractions per 100 km. Lower incident density means a higher
-                rating. Drivers start at {SR_CONFIG.SR_START.toFixed(1)} and progress as clean distance grows.
+                Formula input uses collisions and infractions per 100 km. Lower incident density means a higher raw
+                rating. Drivers start at {SR_CONFIG.SR_START.toFixed(1)} and SR confidence scales with total distance,
+                so very low-km drivers stay closer to the start value until enough clean km is logged.
               </Typography>
 
               <Typography variant="body2" sx={{ color: 'text.secondary', maxWidth: 880 }}>
