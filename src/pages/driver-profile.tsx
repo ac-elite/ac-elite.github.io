@@ -65,6 +65,40 @@ const gridMove = keyframes`
   100% { background-position: 48px 48px, 48px 48px, 96px 0; }
 `;
 
+function getPositionChipSx(position: number) {
+  if (position === 1) {
+    return {
+      color: '#fef3c7',
+      border: '1px solid rgba(245, 158, 11, 0.55)',
+      background: 'linear-gradient(135deg, rgba(245,158,11,0.38), rgba(245,158,11,0.14))',
+      backdropFilter: 'blur(10px)',
+      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.22)',
+    };
+  }
+  if (position === 2) {
+    return {
+      color: '#e2e8f0',
+      border: '1px solid rgba(148, 163, 184, 0.55)',
+      background: 'linear-gradient(135deg, rgba(148,163,184,0.35), rgba(148,163,184,0.12))',
+      backdropFilter: 'blur(10px)',
+      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.2)',
+    };
+  }
+  if (position === 3) {
+    return {
+      color: '#ffedd5',
+      border: '1px solid rgba(194, 101, 31, 0.6)',
+      background: 'linear-gradient(135deg, rgba(194,101,31,0.36), rgba(194,101,31,0.14))',
+      backdropFilter: 'blur(10px)',
+      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.2)',
+    };
+  }
+  return {
+    bgcolor: 'rgba(255,255,255,0.12)',
+    color: '#fff',
+  };
+}
+
 export default function Page() {
   const { driverGuid = '' } = useParams();
   const [loading, setLoading] = useState(true);
@@ -333,9 +367,7 @@ export default function Page() {
                                 sx={{
                                   minWidth: 44,
                                   fontWeight: 700,
-                                  bgcolor: row.position <= 3 ? 'rgba(245,158,11,0.2)' : 'rgba(255,255,255,0.12)',
-                                  color: '#fff',
-                                  border: row.position <= 3 ? '1px solid rgba(245,158,11,0.5)' : 'none',
+                                  ...getPositionChipSx(row.position),
                                 }}
                               />
                             </TableCell>
