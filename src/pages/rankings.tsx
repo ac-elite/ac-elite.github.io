@@ -14,7 +14,6 @@ import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import Container from '@mui/material/Container';
 import { keyframes } from '@mui/material/styles';
-import InputLabel from '@mui/material/InputLabel';
 import Typography from '@mui/material/Typography';
 import FormControl from '@mui/material/FormControl';
 import TableContainer from '@mui/material/TableContainer';
@@ -441,13 +440,8 @@ export default function Page() {
                         License tier
                       </Typography>
                       <FormControl size="small" sx={{ maxWidth: 360, width: '100%' }}>
-                        <InputLabel id="rankings-license-tier-select-label" sx={{ color: 'rgba(255,255,255,0.82)' }}>
-                          Select license tier
-                        </InputLabel>
                         <Select
-                          labelId="rankings-license-tier-select-label"
                           value={licenseTier}
-                          label="Select license tier"
                           onChange={(event) => {
                             setLicenseTier(event.target.value);
                             setPageLicense(1);
@@ -486,7 +480,21 @@ export default function Page() {
                           }}
                         >
                           {licenseTiers.map((tier) => (
-                            <MenuItem key={tier} value={tier}>
+                            <MenuItem
+                              key={tier}
+                              value={tier}
+                              sx={{
+                                color: '#fff',
+                                '&.Mui-selected': {
+                                  bgcolor: 'rgba(191,225,255,0.2)',
+                                  color: '#fff',
+                                  fontWeight: 700,
+                                },
+                                '&.Mui-selected:hover': {
+                                  bgcolor: 'rgba(191,225,255,0.28)',
+                                },
+                              }}
+                            >
                               {tier} ({licenseCounts[tier] || 0})
                             </MenuItem>
                           ))}
@@ -501,13 +509,8 @@ export default function Page() {
                         Safety tier
                       </Typography>
                       <FormControl size="small" sx={{ maxWidth: 360, width: '100%' }}>
-                        <InputLabel id="rankings-safety-tier-select-label" sx={{ color: 'rgba(255,255,255,0.82)' }}>
-                          Select safety tier
-                        </InputLabel>
                         <Select
-                          labelId="rankings-safety-tier-select-label"
                           value={safetyTier}
-                          label="Select safety tier"
                           onChange={(event) => {
                             setSafetyTier(event.target.value);
                             setPageSafety(1);
@@ -546,7 +549,21 @@ export default function Page() {
                           }}
                         >
                           {safetyTiers.map((tier) => (
-                            <MenuItem key={tier} value={tier}>
+                            <MenuItem
+                              key={tier}
+                              value={tier}
+                              sx={{
+                                color: '#fff',
+                                '&.Mui-selected': {
+                                  bgcolor: 'rgba(191,225,255,0.2)',
+                                  color: '#fff',
+                                  fontWeight: 700,
+                                },
+                                '&.Mui-selected:hover': {
+                                  bgcolor: 'rgba(191,225,255,0.28)',
+                                },
+                              }}
+                            >
                               {tier} ({safetyCounts[tier] || 0})
                             </MenuItem>
                           ))}

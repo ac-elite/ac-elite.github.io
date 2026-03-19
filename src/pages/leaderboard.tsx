@@ -14,7 +14,6 @@ import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import Container from '@mui/material/Container';
 import { keyframes } from '@mui/material/styles';
-import InputLabel from '@mui/material/InputLabel';
 import Typography from '@mui/material/Typography';
 import FormControl from '@mui/material/FormControl';
 import TableContainer from '@mui/material/TableContainer';
@@ -261,19 +260,8 @@ export default function Page() {
                       Track filter
                     </Typography>
                     <FormControl size="small" sx={{ maxWidth: 420, width: '100%' }}>
-                      <InputLabel
-                        id="leaderboard-track-select-label"
-                        sx={{
-                          color: 'rgba(255,255,255,0.82)',
-                          '&.Mui-focused': { color: '#dbeafe' },
-                        }}
-                      >
-                        Select track
-                      </InputLabel>
                       <Select
-                        labelId="leaderboard-track-select-label"
                         value={currentTrack}
-                        label="Select track"
                         onChange={(event) => setCurrentTrack(event.target.value)}
                         sx={{
                           borderRadius: 2,
