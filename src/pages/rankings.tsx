@@ -5,14 +5,18 @@ import Chip from '@mui/material/Chip';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import Table from '@mui/material/Table';
+import Select from '@mui/material/Select';
 import Button from '@mui/material/Button';
+import MenuItem from '@mui/material/MenuItem';
 import TableRow from '@mui/material/TableRow';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import Container from '@mui/material/Container';
 import { keyframes } from '@mui/material/styles';
+import InputLabel from '@mui/material/InputLabel';
 import Typography from '@mui/material/Typography';
+import FormControl from '@mui/material/FormControl';
 import TableContainer from '@mui/material/TableContainer';
 
 import { CONFIG } from 'src/config-global';
@@ -432,56 +436,122 @@ export default function Page() {
                   </Stack>
 
                   {tab === 'license' && (
-                    <Stack direction="row" gap={1} flexWrap="wrap" sx={{ mt: 1.5 }}>
-                      {licenseTiers.map((tier) => (
-                        <Button
-                          key={tier}
-                          size="small"
-                          variant={tier === licenseTier ? 'contained' : 'outlined'}
-                          onClick={() => {
-                            setLicenseTier(tier);
+                    <Stack spacing={1.2} sx={{ mt: 1.5 }}>
+                      <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.78)', letterSpacing: 0.3 }}>
+                        License tier
+                      </Typography>
+                      <FormControl size="small" sx={{ maxWidth: 360, width: '100%' }}>
+                        <InputLabel id="rankings-license-tier-select-label" sx={{ color: 'rgba(255,255,255,0.82)' }}>
+                          Select license tier
+                        </InputLabel>
+                        <Select
+                          labelId="rankings-license-tier-select-label"
+                          value={licenseTier}
+                          label="Select license tier"
+                          onChange={(event) => {
+                            setLicenseTier(event.target.value);
                             setPageLicense(1);
                           }}
-                          sx={
-                            tier === licenseTier
-                              ? { ...getLicenseBadgeSx(tier), fontWeight: 700 }
-                              : {
-                                  color: 'rgba(255,255,255,0.9)',
-                                  borderColor: 'rgba(255,255,255,0.3)',
-                                  backgroundColor: 'rgba(255,255,255,0.03)',
-                                }
-                          }
+                          sx={{
+                            borderRadius: 2,
+                            color: '#fff',
+                            bgcolor: 'rgba(10,22,47,0.88)',
+                            boxShadow: '0 0 0 1px rgba(255,255,255,0.08), inset 0 1px 0 rgba(255,255,255,0.08)',
+                            '& .MuiOutlinedInput-notchedOutline': {
+                              borderColor: 'rgba(191,225,255,0.4)',
+                            },
+                            '&:hover .MuiOutlinedInput-notchedOutline': {
+                              borderColor: 'rgba(191,225,255,0.65)',
+                            },
+                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                              borderColor: 'rgba(191,225,255,0.92)',
+                              boxShadow: '0 0 0 3px rgba(173,216,255,0.2)',
+                            },
+                            '& .MuiSelect-select': {
+                              fontWeight: 700,
+                            },
+                            '& .MuiSvgIcon-root': {
+                              color: '#dbeafe',
+                            },
+                          }}
+                          MenuProps={{
+                            PaperProps: {
+                              sx: {
+                                bgcolor: '#132447',
+                                color: '#fff',
+                                border: '1px solid rgba(191,225,255,0.3)',
+                                mt: 0.5,
+                              },
+                            },
+                          }}
                         >
-                          {tier} ({licenseCounts[tier] || 0})
-                        </Button>
-                      ))}
+                          {licenseTiers.map((tier) => (
+                            <MenuItem key={tier} value={tier}>
+                              {tier} ({licenseCounts[tier] || 0})
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
                     </Stack>
                   )}
 
                   {tab === 'safety' && (
-                    <Stack direction="row" gap={1} flexWrap="wrap" sx={{ mt: 1.5 }}>
-                      {safetyTiers.map((tier) => (
-                        <Button
-                          key={tier}
-                          size="small"
-                          variant={tier === safetyTier ? 'contained' : 'outlined'}
-                          onClick={() => {
-                            setSafetyTier(tier);
+                    <Stack spacing={1.2} sx={{ mt: 1.5 }}>
+                      <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.78)', letterSpacing: 0.3 }}>
+                        Safety tier
+                      </Typography>
+                      <FormControl size="small" sx={{ maxWidth: 360, width: '100%' }}>
+                        <InputLabel id="rankings-safety-tier-select-label" sx={{ color: 'rgba(255,255,255,0.82)' }}>
+                          Select safety tier
+                        </InputLabel>
+                        <Select
+                          labelId="rankings-safety-tier-select-label"
+                          value={safetyTier}
+                          label="Select safety tier"
+                          onChange={(event) => {
+                            setSafetyTier(event.target.value);
                             setPageSafety(1);
                           }}
-                          sx={
-                            tier === safetyTier
-                              ? { ...getSRBadgeSx(tier), fontWeight: 700 }
-                              : {
-                                  color: 'rgba(255,255,255,0.9)',
-                                  borderColor: 'rgba(255,255,255,0.3)',
-                                  backgroundColor: 'rgba(255,255,255,0.03)',
-                                }
-                          }
+                          sx={{
+                            borderRadius: 2,
+                            color: '#fff',
+                            bgcolor: 'rgba(10,22,47,0.88)',
+                            boxShadow: '0 0 0 1px rgba(255,255,255,0.08), inset 0 1px 0 rgba(255,255,255,0.08)',
+                            '& .MuiOutlinedInput-notchedOutline': {
+                              borderColor: 'rgba(191,225,255,0.4)',
+                            },
+                            '&:hover .MuiOutlinedInput-notchedOutline': {
+                              borderColor: 'rgba(191,225,255,0.65)',
+                            },
+                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                              borderColor: 'rgba(191,225,255,0.92)',
+                              boxShadow: '0 0 0 3px rgba(173,216,255,0.2)',
+                            },
+                            '& .MuiSelect-select': {
+                              fontWeight: 700,
+                            },
+                            '& .MuiSvgIcon-root': {
+                              color: '#dbeafe',
+                            },
+                          }}
+                          MenuProps={{
+                            PaperProps: {
+                              sx: {
+                                bgcolor: '#132447',
+                                color: '#fff',
+                                border: '1px solid rgba(191,225,255,0.3)',
+                                mt: 0.5,
+                              },
+                            },
+                          }}
                         >
-                          {tier} ({safetyCounts[tier] || 0})
-                        </Button>
-                      ))}
+                          {safetyTiers.map((tier) => (
+                            <MenuItem key={tier} value={tier}>
+                              {tier} ({safetyCounts[tier] || 0})
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
                     </Stack>
                   )}
                 </Paper>
