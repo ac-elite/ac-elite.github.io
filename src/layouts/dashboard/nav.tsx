@@ -14,6 +14,7 @@ import { RouterLink } from 'src/routes/components';
 
 import { Logo } from 'src/components/logo';
 import { Scrollbar } from 'src/components/scrollbar';
+import { LicenseSafetyGuideButton } from 'src/components/license-safety-guide/license-safety-guide';
 
 import type { NavItem } from '../nav-config-dashboard';
 
@@ -117,6 +118,10 @@ export function NavContent({ data, slots, sx }: NavContentProps) {
         }}
       >
         <Logo />
+      </Box>
+
+      <Box sx={{ mb: 2.25 }}>
+        <LicenseSafetyGuideButton />
       </Box>
 
       {slots?.topArea}

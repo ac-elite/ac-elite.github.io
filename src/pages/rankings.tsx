@@ -54,6 +54,68 @@ const gridMove = keyframes`
   100% { background-position: 48px 48px, 48px 48px, 96px 0; }
 `;
 
+function getPodiumChipSx(position: number) {
+  if (position === 1) {
+    return {
+      color: '#fef3c7',
+      border: '1px solid rgba(245, 158, 11, 0.55)',
+      background: 'linear-gradient(135deg, rgba(245,158,11,0.38), rgba(245,158,11,0.14))',
+      backdropFilter: 'blur(10px)',
+      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.22)',
+    };
+  }
+  if (position === 2) {
+    return {
+      color: '#e2e8f0',
+      border: '1px solid rgba(148, 163, 184, 0.55)',
+      background: 'linear-gradient(135deg, rgba(148,163,184,0.35), rgba(148,163,184,0.12))',
+      backdropFilter: 'blur(10px)',
+      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.2)',
+    };
+  }
+  if (position === 3) {
+    return {
+      color: '#ffedd5',
+      border: '1px solid rgba(194, 101, 31, 0.6)',
+      background: 'linear-gradient(135deg, rgba(194,101,31,0.36), rgba(194,101,31,0.14))',
+      backdropFilter: 'blur(10px)',
+      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.2)',
+    };
+  }
+  return {
+    bgcolor: 'rgba(255,255,255,0.12)',
+    color: '#fff',
+  };
+}
+
+function getPodiumRowSx(position: number) {
+  if (position === 1) {
+    return {
+      background:
+        'linear-gradient(90deg, rgba(245,158,11,0.22) 0%, rgba(245,158,11,0.08) 60%, rgba(245,158,11,0.04) 100%)',
+      borderLeft: '2px solid rgba(245, 158, 11, 0.7)',
+      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.08)',
+    };
+  }
+  if (position === 2) {
+    return {
+      background:
+        'linear-gradient(90deg, rgba(148,163,184,0.2) 0%, rgba(148,163,184,0.08) 60%, rgba(148,163,184,0.03) 100%)',
+      borderLeft: '2px solid rgba(148, 163, 184, 0.75)',
+      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.07)',
+    };
+  }
+  if (position === 3) {
+    return {
+      background:
+        'linear-gradient(90deg, rgba(194,101,31,0.22) 0%, rgba(194,101,31,0.08) 60%, rgba(194,101,31,0.03) 100%)',
+      borderLeft: '2px solid rgba(194, 101, 31, 0.75)',
+      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.07)',
+    };
+  }
+  return {};
+}
+
 function getVisiblePages(current: number, total: number) {
   const pages: (number | '...')[] = [];
   for (let i = 1; i <= total; i += 1) {
@@ -462,7 +524,11 @@ export default function Page() {
                               onClick={() => {
                                 window.location.href = `${APP_BASE_URL}?driver=${encodeURIComponent(item.driver.guid)}#driver-search`;
                               }}
-                              sx={{ cursor: 'pointer', '&:hover': { bgcolor: 'rgba(255,255,255,0.06)' } }}
+                              sx={{
+                                cursor: 'pointer',
+                                '&:hover': { bgcolor: 'rgba(255,255,255,0.06)' },
+                                ...getPodiumRowSx(pos),
+                              }}
                             >
                               <TableCell>
                                 <Chip
@@ -471,25 +537,44 @@ export default function Page() {
                                   sx={{
                                     minWidth: 38,
                                     fontWeight: 700,
-                                    bgcolor: 'rgba(255,255,255,0.12)',
-                                    color: '#fff',
+                                    ...getPodiumChipSx(pos),
                                   }}
                                 />
                               </TableCell>
                               <TableCell sx={{ fontWeight: 700 }}>{item.driver.name || 'Unknown'}</TableCell>
                               <TableCell>
-                                <Chip
-                                  size="small"
-                                  label={`${item.license} | ${Math.round(item.paceScore).toLocaleString()}`}
-                                  sx={{ fontWeight: 700, ...getLicenseBadgeSx(item.license) }}
-                                />
+                                <Stack direction="row" spacing={1} alignItems="center">
+                                  <Chip
+                                    size="small"
+                                    label={item.license}
+                                    sx={{
+                                      minWidth: 96,
+                                      fontWeight: 700,
+                                      justifyContent: 'center',
+                                      ...getLicenseBadgeSx(item.license),
+                                    }}
+                                  />
+                                  <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.secondary' }}>
+                                    {Math.round(item.paceScore).toLocaleString()}
+                                  </Typography>
+                                </Stack>
                               </TableCell>
                               <TableCell>
-                                <Chip
-                                  size="small"
-                                  label={`${item.srTier} | ${item.sr.toFixed(2)}`}
-                                  sx={{ fontWeight: 700, ...getSRBadgeSx(item.srTier) }}
-                                />
+                                <Stack direction="row" spacing={1} alignItems="center">
+                                  <Chip
+                                    size="small"
+                                    label={item.srTier}
+                                    sx={{
+                                      minWidth: 62,
+                                      fontWeight: 700,
+                                      justifyContent: 'center',
+                                      ...getSRBadgeSx(item.srTier),
+                                    }}
+                                  />
+                                  <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.secondary' }}>
+                                    {item.sr.toFixed(2)}
+                                  </Typography>
+                                </Stack>
                               </TableCell>
                               <TableCell align="right">{(item.driver.kilometers || 0).toLocaleString()}</TableCell>
                             </TableRow>

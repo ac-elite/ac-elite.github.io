@@ -15,7 +15,7 @@ export type RankDriver = {
 
 export const CAR = 'tatuusfa1';
 
-const SR_CONFIG = {
+export const SR_CONFIG = {
   SR_BASE: 1.0,
   SR_SCALE: 8.99,
   SR_MIN: 1.0,
@@ -66,7 +66,7 @@ const LICENSE_CONFIG = {
   } as Record<number, number>,
 };
 
-const LICENSE_TIERS: Record<string, { minKm: number; minScore: number; minTracks?: number }> = {
+export const LICENSE_TIERS: Record<string, { minKm: number; minScore: number; minTracks?: number }> = {
   Elite: { minKm: 6000, minScore: 3700, minTracks: 8 },
   'Diamond+': { minKm: 5000, minScore: 3100, minTracks: 6 },
   Diamond: { minKm: 5000, minScore: 2500, minTracks: 6 },

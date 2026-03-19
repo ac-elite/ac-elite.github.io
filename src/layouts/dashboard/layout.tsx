@@ -3,10 +3,12 @@ import type { Breakpoint } from '@mui/material/styles';
 import { useState } from 'react';
 
 import Box from '@mui/material/Box';
+import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import { useTheme } from '@mui/material/styles';
 
 import { Logo } from 'src/components/logo';
+import { LicenseSafetyGuideButton } from 'src/components/license-safety-guide/license-safety-guide';
 
 import { NavMobile, NavDesktop } from './nav';
 import { layoutClasses } from '../core/classes';
@@ -60,22 +62,25 @@ export function DashboardLayout({
       }}
     >
       <Logo />
-      <Button
-        onClick={() => setOpenMobileNav(true)}
-        size="small"
-        sx={{
-          minWidth: 0,
-          px: 1.5,
-          py: 0.75,
-          borderRadius: 1.25,
-          color: 'rgba(255,255,255,0.9)',
-          border: '1px solid rgba(255,255,255,0.24)',
-          bgcolor: 'rgba(255,255,255,0.05)',
-          '&:hover': { bgcolor: 'rgba(255,255,255,0.12)' },
-        }}
-      >
-        Menu
-      </Button>
+      <Stack direction="row" spacing={1} alignItems="center">
+        <LicenseSafetyGuideButton compact />
+        <Button
+          onClick={() => setOpenMobileNav(true)}
+          size="small"
+          sx={{
+            minWidth: 0,
+            px: 1.5,
+            py: 0.75,
+            borderRadius: 1.25,
+            color: 'rgba(255,255,255,0.9)',
+            border: '1px solid rgba(255,255,255,0.24)',
+            bgcolor: 'rgba(255,255,255,0.05)',
+            '&:hover': { bgcolor: 'rgba(255,255,255,0.12)' },
+          }}
+        >
+          Menu
+        </Button>
+      </Stack>
     </Box>
   );
 
