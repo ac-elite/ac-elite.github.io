@@ -110,17 +110,20 @@ export function NavContent({ data, slots, sx }: NavContentProps) {
       <Box
         sx={{
           mt: 0.5,
-          mb: 3,
+          mb: 3.5,
           px: 0.25,
           py: 0.25,
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
           borderRadius: 1.5,
-        bgcolor: '#17213B',
+          bgcolor: '#17213B',
         }}
       >
-        <Logo />
+        <Logo sx={{ width: 100, height: 100 }} />
       </Box>
 
-      <Box sx={{ mb: 2.25 }}>
+      <Box sx={{ mb: 2.75 }}>
         <LicenseSafetyGuideButton />
       </Box>
 
