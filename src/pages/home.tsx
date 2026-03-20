@@ -805,9 +805,12 @@ function DriverSearchSection({
                       '&:hover fieldset': {
                         borderColor: 'rgba(255,255,255,0.42)',
                       },
+                      '&.Mui-focused': {
+                        boxShadow: '0 0 0 3px rgba(147, 197, 253, 0.28)',
+                      },
                       '&.Mui-focused fieldset': {
-                        borderColor: 'rgba(191,225,255,0.9)',
-                        boxShadow: '0 0 0 2px rgba(191,225,255,0.2)',
+                        borderColor: 'rgba(191,225,255,0.92)',
+                        borderWidth: 2,
                       },
                     },
                     '& .MuiInputBase-input::placeholder': {

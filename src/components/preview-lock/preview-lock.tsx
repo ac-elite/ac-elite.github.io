@@ -25,11 +25,6 @@ export function PreviewLock({ storageKey, title, description, children }: Previe
     return window.localStorage.getItem(storageKey) === PREVIEW_PASSWORD;
   });
 
-  const helper = useMemo(
-    () => error || 'Ask AC Elite admins for the preview password.',
-    [error]
-  );
-
   if (unlocked) return <>{children}</>;
 
   return (
@@ -64,7 +59,6 @@ export function PreviewLock({ storageKey, title, description, children }: Previe
             label="Preview password"
             autoComplete="off"
             error={Boolean(error)}
-            helperText={helper}
             sx={{ minWidth: { xs: '100%', sm: 320 } }}
           />
           <Button

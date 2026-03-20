@@ -87,7 +87,7 @@ export default function Page() {
             <PreviewLock
               storageKey="acelite-preview-setup-store"
               title="Setup Store Preview Locked"
-              description="This section is in preview state with mock data. Unlock to review structure, cards, and table flow before launch."
+              description="This section is in preview state with mock data."
             >
               <Grid container spacing={2}>
                 {mockSetups.map((setup) => (

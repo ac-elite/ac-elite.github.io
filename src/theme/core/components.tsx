@@ -61,8 +61,63 @@ const MuiCardHeader: Components<Theme>['MuiCardHeader'] = {
 
 const MuiOutlinedInput: Components<Theme>['MuiOutlinedInput'] = {
   styleOverrides: {
-    notchedOutline: ({ theme }) => ({
-      borderColor: varAlpha(theme.vars.palette.grey['500Channel'], 0.2),
+    root: ({ theme }) => ({
+      '& .MuiOutlinedInput-notchedOutline': {
+        borderColor: varAlpha(theme.vars.palette.common.whiteChannel, 0.32),
+      },
+      '&:hover .MuiOutlinedInput-notchedOutline': {
+        borderColor: varAlpha(theme.vars.palette.common.whiteChannel, 0.52),
+      },
+      '&.Mui-focused': {
+        boxShadow: '0 0 0 3px rgba(147, 197, 253, 0.28)',
+      },
+      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+        borderColor: '#93c5fd',
+        borderWidth: 2,
+      },
+      '&.Mui-error .MuiOutlinedInput-notchedOutline': {
+        borderColor: theme.vars.palette.error.main,
+      },
+      '&.Mui-error.Mui-focused': {
+        boxShadow: '0 0 0 3px rgba(248, 113, 113, 0.22)',
+      },
+      '&.Mui-disabled .MuiOutlinedInput-notchedOutline': {
+        borderColor: varAlpha(theme.vars.palette.common.whiteChannel, 0.14),
+      },
+    }),
+    input: ({ theme }) => ({
+      '&::placeholder': {
+        opacity: 1,
+        color: varAlpha(theme.vars.palette.common.whiteChannel, 0.55),
+      },
+    }),
+  },
+};
+
+const MuiInputLabel: Components<Theme>['MuiInputLabel'] = {
+  styleOverrides: {
+    root: ({ theme }) => ({
+      color: varAlpha(theme.vars.palette.common.whiteChannel, 0.72),
+      '&.Mui-focused': {
+        color: '#bfdbfe',
+      },
+      '&.Mui-disabled': {
+        color: varAlpha(theme.vars.palette.common.whiteChannel, 0.38),
+      },
+      '&.Mui-error': {
+        color: theme.vars.palette.error.main,
+      },
+    }),
+  },
+};
+
+const MuiFormHelperText: Components<Theme>['MuiFormHelperText'] = {
+  styleOverrides: {
+    root: ({ theme }) => ({
+      color: varAlpha(theme.vars.palette.common.whiteChannel, 0.72),
+      '&.Mui-error': {
+        color: theme.vars.palette.error.main,
+      },
     }),
   },
 };
@@ -167,5 +222,7 @@ export const components = {
   MuiTableCell,
   MuiCardHeader,
   MuiOutlinedInput,
+  MuiInputLabel,
+  MuiFormHelperText,
   MuiFormControlLabel,
 };

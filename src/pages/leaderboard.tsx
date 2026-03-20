@@ -210,9 +210,12 @@ export default function Page() {
                           '&:hover .MuiOutlinedInput-notchedOutline': {
                             borderColor: 'rgba(191,225,255,0.65)',
                           },
+                          '&.Mui-focused': {
+                            boxShadow: '0 0 0 3px rgba(173, 216, 255, 0.22)',
+                          },
                           '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                            borderColor: 'rgba(191,225,255,0.92)',
-                            boxShadow: '0 0 0 3px rgba(173,216,255,0.2)',
+                            borderColor: 'rgba(191,225,255,0.95)',
+                            borderWidth: 2,
                           },
                           '& .MuiSelect-select': {
                             fontWeight: 700,

@@ -61,7 +61,7 @@ export default function Page() {
             <PreviewLock
               storageKey="acelite-preview-livery-showcase"
               title="Livery Showcase Preview Locked"
-              description="This page is currently a private mock preview. Unlock to review the livery library layout."
+              description="This page is currently a private mock preview"
             >
               <Stack spacing={3}>
                 <Stack spacing={1.2}>
