@@ -8,6 +8,7 @@ import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 
 import { CONFIG } from 'src/config-global';
+import { GLASS_PANEL_COMPACT_SX } from 'src/lib/glass';
 
 import { PreviewLock } from 'src/components/preview-lock/preview-lock';
 import { PageGridOverlay } from 'src/components/page-background/page-grid-overlay';
@@ -94,15 +95,11 @@ export default function Page() {
                   <Grid key={`${setup.name}-${setup.track}`} size={{ xs: 12, md: 4 }} sx={{ display: 'flex' }}>
                     <Paper
                       sx={{
-                        p: 2,
+                        ...GLASS_PANEL_COMPACT_SX,
                         height: '100%',
                         width: '100%',
                         display: 'flex',
                         flexDirection: 'column',
-                        borderRadius: 3,
-                        border: '1px solid rgba(255,255,255,0.18)',
-                        background: 'linear-gradient(135deg, rgba(19,36,71,0.72) 0%, rgba(35,31,32,0.45) 100%)',
-                        backdropFilter: 'blur(14px)',
                       }}
                     >
                       <Stack spacing={1} sx={{ height: '100%' }}>
@@ -125,25 +122,10 @@ export default function Page() {
                         </Box>
                         <Button
                           variant="contained"
+                          color="primary"
                           size="small"
                           fullWidth
-                          sx={{
-                            px: 2.25,
-                            borderRadius: 2.4,
-                            color: '#ffffff',
-                            fontWeight: 700,
-                            border: '1px solid rgba(255,255,255,0.22)',
-                            background:
-                              'linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(173,216,255,0.1) 100%)',
-                            backdropFilter: 'blur(12px)',
-                            boxShadow:
-                              '0 10px 30px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.22)',
-                            '&:hover': {
-                              background:
-                                'linear-gradient(135deg, rgba(255,255,255,0.28) 0%, rgba(173,216,255,0.16) 100%)',
-                              borderColor: 'rgba(255,255,255,0.3)',
-                            },
-                          }}
+                          sx={{ px: 2.25, borderRadius: 2.4 }}
                         >
                           Buy
                         </Button>

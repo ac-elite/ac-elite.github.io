@@ -65,18 +65,11 @@ export function DashboardLayout({
       <Stack direction="row" spacing={1} alignItems="center">
         <LicenseSafetyGuideButton compact />
         <Button
+          variant="outlined"
+          color="secondary"
           onClick={() => setOpenMobileNav(true)}
           size="small"
-          sx={{
-            minWidth: 0,
-            px: 1.5,
-            py: 0.75,
-            borderRadius: 1.25,
-            color: 'rgba(255,255,255,0.9)',
-            border: '1px solid rgba(255,255,255,0.24)',
-            bgcolor: 'rgba(255,255,255,0.05)',
-            '&:hover': { bgcolor: 'rgba(255,255,255,0.12)' },
-          }}
+          sx={{ minWidth: 0, px: 1.5, py: 0.75, borderRadius: 1.25 }}
         >
           Menu
         </Button>

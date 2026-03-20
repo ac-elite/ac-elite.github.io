@@ -18,7 +18,10 @@ import { useTheme, keyframes } from '@mui/material/styles';
 import { CONFIG } from 'src/config-global';
 import { fetchJson } from 'src/lib/fetch-json';
 import { getDriverProfileHref } from 'src/lib/routes';
-import { formatNumber, getSRBadgeSx, getLicenseBadgeSx } from 'src/lib/ac-elite-data';
+import { GLASS_CARD_SX, GLASS_PANEL_SX, GLASS_INNER_PANEL_SX } from 'src/lib/glass';
+import { formatNumber, getSRBadgeSx, getLicenseBadgeSx, ROLE_CHIP_SX, type DiscordRole } from 'src/lib/ac-elite-data';
+
+import { PageGridOverlay } from 'src/components/page-background/page-grid-overlay';
 
 type CarLap = { laptime?: number; laps?: number; ts?: number };
 type DriverLeaderboard = Record<string, Record<string, CarLap>>;
@@ -172,10 +175,57 @@ const LICENSE_TIER_ORDER = [
   'Bronze',
 ] as const;
 
-const gridMove = keyframes`
-  0% { background-position: 0 0, 0 0, 0 0; }
-  100% { background-position: 50px 50px, 50px 50px, 100px 0; }
+/** Hero CTA: subtle “breathing” glass glow (matches grid energy, stays on-brand). */
+const heroPrimaryPulse = keyframes`
+  0%, 100% {
+    box-shadow: 0 2px 10px rgba(0,0,0,0.24), inset 0 1px 0 rgba(255,255,255,0.16);
+    border-color: rgba(255,255,255,0.22);
+  }
+  50% {
+    box-shadow: 0 2px 12px rgba(0,0,0,0.26), inset 0 1px 0 rgba(255,255,255,0.24);
+    border-color: rgba(255,255,255,0.3);
+  }
 `;
+
+const heroOutlinePulse = keyframes`
+  0%, 100% {
+    border-color: rgba(255,255,255,0.28);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
+  }
+  50% {
+    border-color: rgba(255,255,255,0.38);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.12);
+  }
+`;
+
+/** Soft highlight on “leaderboard.” — white-forward, not loud accent color. */
+const heroWordShimmer = keyframes`
+  0%, 100% {
+    text-shadow: 0 0 18px rgba(255,255,255,0.12), 0 0 36px rgba(23,33,59,0.45);
+    opacity: 0.96;
+  }
+  50% {
+    text-shadow: 0 0 26px rgba(255,255,255,0.2), 0 0 48px rgba(255,255,255,0.05);
+    opacity: 1;
+  }
+`;
+
+const heroKeywordPulse = keyframes`
+  0%, 100% {
+    color: rgba(255,255,255,0.97);
+    text-shadow: 0 0 18px rgba(255,255,255,0.14), 0 0 34px rgba(147,197,253,0.12);
+  }
+  50% {
+    color: #ffffff;
+    text-shadow: 0 0 24px rgba(255,255,255,0.22), 0 0 44px rgba(191,219,254,0.18);
+  }
+`;
+
+const reducedMotionNone = {
+  '@media (prefers-reduced-motion: reduce)': {
+    animation: 'none',
+  },
+} as const;
 
 const trackNames: Record<string, string> = {
   ks_barcelona_layout_gp: 'Barcelona - GP',
@@ -284,9 +334,9 @@ function getSyncStatus(lastSync?: string): SyncStatus {
   return { label: 'Stale', color: '#ef4444', ageText: ago };
 }
 
-function getRoleLabel(role: TeamRole) {
+function getRoleLabel(role: TeamRole): DiscordRole | null {
   if (!role) return null;
-  return role.charAt(0).toUpperCase() + role.slice(1);
+  return (role.charAt(0).toUpperCase() + role.slice(1)) as DiscordRole;
 }
 
 function safetyRating(driver: RankDriver) {
@@ -455,27 +505,6 @@ function getTeamRole(guid: string, roles: TeamRoles): TeamRole {
   return null;
 }
 
-function AnimatedLinesBackground({ opacity = 0.5 }: { opacity?: number }) {
-  return (
-    <Box
-      aria-hidden
-      sx={{
-        position: 'absolute',
-        inset: 0,
-        pointerEvents: 'none',
-        opacity,
-        backgroundImage:
-          'linear-gradient(rgba(255,255,255,0.11) 1px, transparent 1px),' +
-          'linear-gradient(90deg, rgba(255,255,255,0.11) 1px, transparent 1px),' +
-          'repeating-linear-gradient(45deg, transparent, transparent 88px, rgba(147,197,253,0.2) 88px, rgba(147,197,253,0.2) 90px)',
-        backgroundSize: '44px 44px, 44px 44px, 100% 100%',
-        animation: `${gridMove} 18s linear infinite`,
-        mixBlendMode: 'screen',
-      }}
-    />
-  );
-}
-
 function HeroSection({
   totalDrivers,
   totalLaps,
@@ -505,10 +534,10 @@ function HeroSection({
         overflow: 'hidden',
       }}
     >
-      <AnimatedLinesBackground opacity={0.42} />
+      <PageGridOverlay opacity={0.42} />
 
       <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
-        <Grid container spacing={6} alignItems="center">
+        <Grid container spacing={{ xs: 4, md: 6 }} alignItems="center">
           <Grid size={{ xs: 12, md: 7 }}>
             <Stack spacing={3}>
               <Stack spacing={1}>
@@ -529,14 +558,34 @@ function HeroSection({
                   sx={{
                     fontWeight: 800,
                     letterSpacing: 0.5,
-                    textShadow:
-                      '0 0 14px rgba(0,0,0,0.7), 0 0 32px rgba(15,23,42,0.9)',
+                    textShadow: '0 0 16px rgba(0,0,0,0.72), 0 0 36px rgba(15,23,42,0.92)',
                   }}
                 >
-                  Track your stats.
+                  Track your{' '}
+                  <Box
+                    component="span"
+                    sx={{
+                      color: 'rgba(255,255,255,0.97)',
+                      fontWeight: 900,
+                      animation: `${heroKeywordPulse} 5.2s ease-in-out infinite`,
+                      ...reducedMotionNone,
+                    }}
+                  >
+                    stats
+                  </Box>
+                  .
                   <br />
                   Dominate the{' '}
-                  <Box component="span" sx={{ color: 'warning.main' }}>
+                  <Box
+                    component="span"
+                    sx={{
+                      color: 'rgba(255,255,255,0.98)',
+                      fontWeight: 900,
+                      animation: `${heroKeywordPulse} 5.2s ease-in-out 1.2s infinite, ${heroWordShimmer} 5.5s ease-in-out 1.2s infinite`,
+                      textShadow: '0 0 28px rgba(255,255,255,0.16)',
+                      ...reducedMotionNone,
+                    }}
+                  >
                     leaderboard.
                   </Box>
                 </Typography>
@@ -546,7 +595,7 @@ function HeroSection({
                 </Typography>
               </Stack>
 
-              <Stack direction="row" spacing={2} flexWrap="wrap">
+              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.25} flexWrap="wrap" alignItems={{ xs: 'stretch', sm: 'center' }}>
                 <Button
                   variant="contained"
                   color="primary"
@@ -554,18 +603,11 @@ function HeroSection({
                   sx={{
                     px: 3.5,
                     borderRadius: 3,
-                    color: '#ffffff',
-                    border: '1px solid rgba(255,255,255,0.22)',
-                    background:
-                      'linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(173,216,255,0.1) 100%)',
-                    backdropFilter: 'blur(12px)',
-                    boxShadow:
-                      '0 10px 32px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.25)',
-                    '&:hover': {
-                      background:
-                        'linear-gradient(135deg, rgba(255,255,255,0.28) 0%, rgba(173,216,255,0.16) 100%)',
-                      borderColor: 'rgba(255,255,255,0.3)',
-                    },
+                    minHeight: { xs: 46, sm: 48 },
+                    width: { xs: '100%', sm: 'auto' },
+                    maxWidth: { xs: 320, sm: 'none' },
+                    animation: `${heroPrimaryPulse} 4.5s ease-in-out infinite`,
+                    ...reducedMotionNone,
                   }}
                   href="https://discord.gg/d2EbxGYBbj"
                   target="_blank"
@@ -575,20 +617,17 @@ function HeroSection({
                 </Button>
 
                 <Button
-                  variant="outlined"
-                  color="inherit"
+                  variant="contained"
+                  color="secondary"
                   size="large"
                   sx={{
                     px: 3.5,
                     borderRadius: 3,
-                    color: '#fff',
-                    borderColor: 'rgba(255,255,255,0.5)',
-                    backgroundColor: 'rgba(255,255,255,0.04)',
-                    backdropFilter: 'blur(10px)',
-                    '&:hover': {
-                      borderColor: 'rgba(255,255,255,0.72)',
-                      backgroundColor: 'rgba(255,255,255,0.1)',
-                    },
+                    minHeight: { xs: 46, sm: 48 },
+                    width: { xs: '100%', sm: 'auto' },
+                    maxWidth: { xs: 320, sm: 'none' },
+                    animation: `${heroOutlinePulse} 5.5s ease-in-out infinite`,
+                    ...reducedMotionNone,
                   }}
                   href={`${APP_BASE_URL}dashboard`}
                 >
@@ -602,12 +641,7 @@ function HeroSection({
           <Grid size={{ xs: 12, md: 5 }}>
             <Box
               sx={{
-                borderRadius: 4,
-                p: 2.5,
-                background: 'linear-gradient(145deg, rgba(19,36,71,0.7), rgba(35,31,32,0.4))',
-                border: '1px solid rgba(255,255,255,0.2)',
-                backdropFilter: 'blur(14px)',
-                boxShadow: '0 24px 60px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.08)',
+                ...GLASS_PANEL_SX,
               }}
             >
               <Stack spacing={2}>
@@ -628,10 +662,7 @@ function HeroSection({
 
                 <Box
                   sx={{
-                    borderRadius: 2,
-                    p: 1.5,
-                    border: '1px solid rgba(255,255,255,0.16)',
-                    background: 'linear-gradient(150deg, rgba(23,33,59,0.72), rgba(23,33,59,0.52))',
+                    ...GLASS_INNER_PANEL_SX,
                   }}
                 >
                   <Stack direction="row" alignItems="center" spacing={1}>
@@ -663,15 +694,11 @@ function HeroSection({
                     <Grid key={item.label} size={{ xs: 6 }}>
                       <Box
                         sx={{
-                          borderRadius: 2,
-                          px: 1.5,
-                          py: 1.35,
+                          ...GLASS_INNER_PANEL_SX,
                           minHeight: 78,
                           display: 'flex',
                           flexDirection: 'column',
                           justifyContent: 'center',
-                          border: '1px solid rgba(255,255,255,0.16)',
-                          bgcolor: 'rgba(15,28,56,0.5)',
                         }}
                       >
                         <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.68)' }}>
@@ -696,15 +723,15 @@ function HeroSection({
             borderRadius: 2.5,
             px: { xs: 2, md: 2.5 },
             py: { xs: 1.5, md: 1.75 },
-            border: '1px solid rgba(245,158,11,0.45)',
+            border: '1px solid rgba(245,196,53,0.45)',
             background:
-              'linear-gradient(135deg, rgba(245,158,11,0.16) 0%, rgba(217,119,6,0.08) 100%), rgba(15,23,42,0.4)',
+              'linear-gradient(135deg, rgba(245,196,53,0.2) 0%, rgba(245,196,53,0.08) 42%, rgba(31,44,73,0.34) 100%), rgba(15,23,42,0.48)',
             backdropFilter: 'blur(12px)',
-            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.08)',
+            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.14)',
           }}
         >
           <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.95)' }}>
-            <Box component="span" sx={{ fontWeight: 800, color: '#fbbf24' }}>
+            <Box component="span" sx={{ fontWeight: 800, color: '#f6d365' }}>
               Note:
             </Box>{' '}
             License and Safety Rating calculations are currently work in progress. Values and thresholds may change
@@ -766,14 +793,8 @@ function DriverSearchSection({
         <Paper
           elevation={0}
           sx={{
+            ...GLASS_PANEL_SX,
             mb: 4,
-            p: { xs: 2.75, md: 3.25 },
-            borderRadius: 3,
-            border: '1px solid rgba(255,255,255,0.2)',
-            background:
-              'linear-gradient(135deg, rgba(19,36,71,0.62) 0%, rgba(35,31,32,0.46) 100%)',
-            backdropFilter: 'blur(18px)',
-            boxShadow: '0 24px 60px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.1)',
           }}
         >
           <Grid container spacing={2} alignItems="stretch">
@@ -823,13 +844,12 @@ function DriverSearchSection({
                 {!loading && !error && matches.length > 0 && (
                   <Paper
                     sx={{
+                      ...GLASS_CARD_SX,
                       mt: 1,
                       borderRadius: 2,
                       maxHeight: 280,
                       overflowY: 'auto',
-                      border: '1px solid rgba(255,255,255,0.24)',
-                      bgcolor: 'rgba(12,24,50,0.78)',
-                      backdropFilter: 'blur(14px)',
+                      boxShadow: '0 8px 26px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.08)',
                     }}
                   >
                     <List dense disablePadding>
@@ -849,11 +869,15 @@ function DriverSearchSection({
                             primary={
                               <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
                                 <Typography variant="body2">{driver.name}</Typography>
-                                {driver.teamRole && (
+                                {driver.teamRole && getRoleLabel(driver.teamRole) && (
                                   <Chip
                                     size="small"
                                     label={getRoleLabel(driver.teamRole)}
-                                    color={driver.teamRole === 'creator' ? 'secondary' : 'info'}
+                                    sx={{
+                                      fontWeight: 700,
+                                      fontSize: '0.72rem',
+                                      ...ROLE_CHIP_SX[getRoleLabel(driver.teamRole)!],
+                                    }}
                                   />
                                 )}
                                 <Chip
@@ -888,22 +912,7 @@ function DriverSearchSection({
                   variant="contained"
                   color="primary"
                   fullWidth
-                  sx={{
-                    minHeight: 50,
-                    borderRadius: 2,
-                    color: '#fff',
-                    border: '1px solid rgba(255,255,255,0.22)',
-                    background:
-                      'linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(173,216,255,0.1) 100%)',
-                    backdropFilter: 'blur(12px)',
-                    boxShadow:
-                      '0 10px 30px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.22)',
-                    '&:hover': {
-                      background:
-                        'linear-gradient(135deg, rgba(255,255,255,0.28) 0%, rgba(173,216,255,0.16) 100%)',
-                      borderColor: 'rgba(255,255,255,0.3)',
-                    },
-                  }}
+                  sx={{ minHeight: 50, borderRadius: 2 }}
                   href={`${APP_BASE_URL}dashboard`}
                 >
                   Open full stats page
@@ -911,11 +920,7 @@ function DriverSearchSection({
 
                 <Box
                   sx={{
-                    borderRadius: 1.75,
-                    p: 1.5,
-                    border: '1px solid rgba(255,255,255,0.16)',
-                    bgcolor: 'rgba(9,20,42,0.35)',
-                    backdropFilter: 'blur(10px)',
+                    ...GLASS_INNER_PANEL_SX,
                   }}
                 >
                   <Stack spacing={0.35}>
@@ -967,7 +972,7 @@ function DashboardSection({ drivers }: { drivers: DriverView[] }) {
         overflow: 'hidden',
       }}
     >
-      <AnimatedLinesBackground opacity={0.2} />
+      <PageGridOverlay opacity={0.2} />
 
       <Container maxWidth="lg">
         <Stack spacing={3} sx={{ mb: 4 }}>
@@ -1003,11 +1008,7 @@ function DashboardSection({ drivers }: { drivers: DriverView[] }) {
             <Grid key={card.title} size={{ xs: 12, md: 4 }}>
               <Box
                 sx={{
-                  borderRadius: 3,
-                  p: 2.5,
-                  bgcolor: 'rgba(23,33,59,0.9)',
-                  border: '1px solid rgba(148,163,184,0.45)',
-                  boxShadow: '0 18px 45px rgba(0,0,0,0.7), 0 0 24px rgba(23,33,59,0.16)',
+                  ...GLASS_PANEL_SX,
                 }}
               >
                 <Typography variant="subtitle2" sx={{ color: 'text.secondary', mb: 1 }}>

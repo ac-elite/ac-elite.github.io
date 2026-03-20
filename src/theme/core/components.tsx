@@ -22,6 +22,75 @@ const MuiButton: Components<Theme>['MuiButton'] = {
     disableElevation: true,
   },
   styleOverrides: {
+    root: {
+      textTransform: 'none' as const,
+      fontWeight: 700,
+      transition: 'box-shadow 220ms ease, border-color 220ms ease, background 220ms ease',
+    },
+    /** Main CTA — glassy but opaque enough for clear contrast. */
+    containedPrimary: ({ theme }) => ({
+      color: theme.palette.primary.contrastText,
+      background: `linear-gradient(135deg, #2a3c63 0%, #21355b 52%, ${theme.palette.primary.dark} 100%)`,
+      border: '1px solid rgba(255,255,255,0.24)',
+      boxShadow: '0 2px 10px rgba(0,0,0,0.24), inset 0 1px 0 rgba(255,255,255,0.16)',
+      '&:hover': {
+        background: `linear-gradient(135deg, #304775 0%, #26406f 52%, #1a2c4f 100%)`,
+        borderColor: 'rgba(255,255,255,0.3)',
+        boxShadow: '0 2px 12px rgba(0,0,0,0.26), inset 0 1px 0 rgba(255,255,255,0.2)',
+      },
+      '&:disabled': {
+        color: varAlpha(theme.vars.palette.common.whiteChannel, 0.45),
+        background: varAlpha(theme.vars.palette.grey['800Channel'], 0.55),
+        borderColor: varAlpha(theme.vars.palette.common.whiteChannel, 0.1),
+      },
+    }),
+    /** Secondary filled — graphite, distinct from primary gradient. */
+    containedSecondary: ({ theme }) => ({
+      color: theme.palette.secondary.contrastText,
+      background: `linear-gradient(135deg, #3a3437 0%, ${theme.palette.secondary.light} 55%, ${theme.palette.secondary.main} 100%)`,
+      border: '1px solid rgba(255,255,255,0.2)',
+      boxShadow: '0 2px 10px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.1)',
+      '&:hover': {
+        background: `linear-gradient(135deg, #453d41 0%, #3a3437 55%, ${theme.palette.secondary.dark} 100%)`,
+        borderColor: 'rgba(255,255,255,0.28)',
+        boxShadow: '0 2px 12px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.14)',
+      },
+      '&:disabled': {
+        color: varAlpha(theme.vars.palette.common.whiteChannel, 0.45),
+        background: varAlpha(theme.vars.palette.grey['800Channel'], 0.5),
+        borderColor: varAlpha(theme.vars.palette.common.whiteChannel, 0.1),
+      },
+    }),
+    outlinedPrimary: ({ theme }) => ({
+      color: 'rgba(255,255,255,0.94)',
+      borderColor: 'rgba(255,255,255,0.34)',
+      backgroundColor: '#283756',
+      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.08)',
+      '&:hover': {
+        borderColor: 'rgba(255,255,255,0.5)',
+        backgroundColor: '#304166',
+        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.12)',
+      },
+      '&:disabled': {
+        color: varAlpha(theme.vars.palette.common.whiteChannel, 0.35),
+        borderColor: varAlpha(theme.vars.palette.common.whiteChannel, 0.12),
+      },
+    }),
+    outlinedSecondary: ({ theme }) => ({
+      color: 'rgba(255,255,255,0.88)',
+      borderColor: 'rgba(255,255,255,0.26)',
+      backgroundColor: '#2a303f',
+      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)',
+      '&:hover': {
+        borderColor: 'rgba(255,255,255,0.4)',
+        backgroundColor: '#323a4b',
+        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.1)',
+      },
+      '&:disabled': {
+        color: varAlpha(theme.vars.palette.common.whiteChannel, 0.35),
+        borderColor: varAlpha(theme.vars.palette.common.whiteChannel, 0.12),
+      },
+    }),
     containedInherit: ({ theme }) => ({
       color: theme.vars.palette.common.white,
       backgroundColor: theme.vars.palette.grey[800],
@@ -134,11 +203,20 @@ const MuiPaper: Components<Theme>['MuiPaper'] = {
 
 const MuiTableCell: Components<Theme>['MuiTableCell'] = {
   styleOverrides: {
+    root: ({ theme }) => ({
+      borderColor: varAlpha(theme.vars.palette.common.whiteChannel, 0.1),
+    }),
     head: ({ theme }) => ({
-      fontSize: theme.typography.pxToRem(14),
-      color: theme.vars.palette.text.secondary,
-      fontWeight: theme.typography.fontWeightSemiBold,
-      backgroundColor: theme.vars.palette.background.neutral,
+      fontSize: theme.typography.pxToRem(13),
+      color: varAlpha(theme.vars.palette.common.whiteChannel, 0.88),
+      fontWeight: 800,
+      letterSpacing: 0.3,
+      backgroundColor: 'rgba(148,163,184,0.12)',
+      boxShadow: 'inset 0 -1px 0 rgba(255,255,255,0.1)',
+      whiteSpace: 'nowrap' as const,
+    }),
+    body: () => ({
+      backgroundColor: 'rgba(18,31,56,0.58)',
     }),
   },
 };

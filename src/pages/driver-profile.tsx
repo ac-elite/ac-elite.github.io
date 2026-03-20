@@ -17,6 +17,7 @@ import TableContainer from '@mui/material/TableContainer';
 
 import { CONFIG } from 'src/config-global';
 import { fetchJson } from 'src/lib/fetch-json';
+import { GLASS_INNER_PANEL_SX, GLASS_PANEL_SX, GLASS_TABLE_WRAPPER_SX } from 'src/lib/glass';
 import {
   CAR,
   getDriverSR,
@@ -24,9 +25,11 @@ import {
   getSRBadgeSx,
   formatNumber,
   formatLaptime,
+  ROLE_CHIP_SX,
   SR_CHIP_WIDTH,
   getPodiumChipSx,
   type RankDriver,
+  type DiscordRole,
   getDriverLicense,
   computeLicenseMap,
   getLicenseBadgeSx,
@@ -37,6 +40,12 @@ import {
 import { ErrorPanel } from 'src/components/data-state/error-panel';
 import { LoadingPanel } from 'src/components/data-state/loading-panel';
 import { PageGridOverlay } from 'src/components/page-background/page-grid-overlay';
+
+type TeamRoles = {
+  creator: string[];
+  admin: string[];
+  moderator: string[];
+};
 
 type LeaderboardRow = {
   guid: string;
@@ -61,6 +70,7 @@ export default function Page() {
   const [error, setError] = useState<string | null>(null);
   const [rankData, setRankData] = useState<RankDriver[]>([]);
   const [leaderboardData, setLeaderboardData] = useState<Record<string, any>>({});
+  const [teamRoles, setTeamRoles] = useState<TeamRoles>({ creator: [], admin: [], moderator: [] });
 
   useEffect(() => {
     let mounted = true;
@@ -68,13 +78,15 @@ export default function Page() {
       setLoading(true);
       setError(null);
       try {
-        const [rank, leaderboard] = await Promise.all([
+        const [rank, leaderboard, roles] = await Promise.all([
           fetchJson<RankDriver[]>('/data/rank.json'),
           fetchJson<Record<string, any>>('/data/leaderboard.json'),
+          fetchJson<TeamRoles>('/data/team-roles.json'),
         ]);
         if (!mounted) return;
         setRankData(rank);
         setLeaderboardData(leaderboard);
+        setTeamRoles(roles);
       } catch (e) {
         if (!mounted) return;
         setError(e instanceof Error ? e.message : 'Unknown error');
@@ -137,6 +149,15 @@ export default function Page() {
     [trackRows]
   );
 
+  const driverRoles = useMemo<DiscordRole[]>(() => {
+    if (!driverGuid) return [];
+    const roles: DiscordRole[] = [];
+    if (teamRoles.creator.includes(driverGuid)) roles.push('Creator');
+    if (teamRoles.admin.includes(driverGuid)) roles.push('Admin');
+    if (teamRoles.moderator.includes(driverGuid)) roles.push('Moderator');
+    return roles;
+  }, [driverGuid, teamRoles]);
+
   return (
     <>
       <title>{`Driver Profile - ${CONFIG.appName}`}</title>
@@ -174,31 +195,32 @@ export default function Page() {
 
             {!loading && !error && driver && license && sr && (
               <>
-                <Paper
-                  sx={{
-                    p: 2.5,
-                    borderRadius: 3,
-                    border: '1px solid rgba(255,255,255,0.18)',
-                    background:
-                      'linear-gradient(135deg, rgba(19,36,71,0.72) 0%, rgba(35,31,32,0.45) 100%)',
-                    backdropFilter: 'blur(14px)',
-                  }}
-                >
-                  <Stack spacing={1.25}>
-                    <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.78)' }}>
+                <Paper sx={GLASS_PANEL_SX}>
+                  <Stack spacing={0.5} sx={{ mb: 2 }}>
+                    <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.6)', lineHeight: 1.4 }}>
                       Driver profile
                     </Typography>
-                    <Typography variant="h4" sx={{ fontWeight: 800 }}>
-                      {driver.name || 'Unknown Driver'}
-                    </Typography>
+                    <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" useFlexGap>
+                      <Typography variant="h4" sx={{ fontWeight: 800 }}>
+                        {driver.name || 'Unknown Driver'}
+                      </Typography>
+                      {driverRoles.map((role) => (
+                        <Chip
+                          key={role}
+                          size="small"
+                          label={role}
+                          sx={{ fontWeight: 700, fontSize: '0.72rem', ...ROLE_CHIP_SX[role] }}
+                        />
+                      ))}
+                    </Stack>
                     <Typography variant="body2" sx={{ color: 'text.secondary', fontFamily: 'monospace' }}>
                       {driver.guid}
                     </Typography>
                   </Stack>
 
-                  <Grid container spacing={1.5} sx={{ mt: 1 }}>
+                  <Grid container spacing={1.5}>
                     <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                      <Paper sx={{ p: 1.25, bgcolor: 'rgba(23,33,59,0.55)', border: '1px solid rgba(148,163,184,0.35)' }}>
+                      <Paper sx={GLASS_INNER_PANEL_SX}>
                         <Typography variant="caption" sx={{ color: 'text.secondary' }}>
                           License
                         </Typography>
@@ -220,7 +242,7 @@ export default function Page() {
                       </Paper>
                     </Grid>
                     <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                      <Paper sx={{ p: 1.25, bgcolor: 'rgba(23,33,59,0.55)', border: '1px solid rgba(148,163,184,0.35)' }}>
+                      <Paper sx={GLASS_INNER_PANEL_SX}>
                         <Typography variant="caption" sx={{ color: 'text.secondary' }}>
                           Safety Rating
                         </Typography>
@@ -242,7 +264,7 @@ export default function Page() {
                       </Paper>
                     </Grid>
                     <Grid size={{ xs: 12, sm: 6, md: 2 }}>
-                      <Paper sx={{ p: 1.25, bgcolor: 'rgba(23,33,59,0.55)', border: '1px solid rgba(148,163,184,0.35)' }}>
+                      <Paper sx={GLASS_INNER_PANEL_SX}>
                         <Typography variant="caption" sx={{ color: 'text.secondary' }}>
                           Total KM
                         </Typography>
@@ -252,7 +274,7 @@ export default function Page() {
                       </Paper>
                     </Grid>
                     <Grid size={{ xs: 12, sm: 6, md: 2 }}>
-                      <Paper sx={{ p: 1.25, bgcolor: 'rgba(23,33,59,0.55)', border: '1px solid rgba(148,163,184,0.35)' }}>
+                      <Paper sx={GLASS_INNER_PANEL_SX}>
                         <Typography variant="caption" sx={{ color: 'text.secondary' }}>
                           Tracks Driven
                         </Typography>
@@ -262,7 +284,7 @@ export default function Page() {
                       </Paper>
                     </Grid>
                     <Grid size={{ xs: 12, sm: 6, md: 2 }}>
-                      <Paper sx={{ p: 1.25, bgcolor: 'rgba(23,33,59,0.55)', border: '1px solid rgba(148,163,184,0.35)' }}>
+                      <Paper sx={GLASS_INNER_PANEL_SX}>
                         <Typography variant="caption" sx={{ color: 'text.secondary' }}>
                           Total Laps
                         </Typography>
@@ -274,16 +296,7 @@ export default function Page() {
                   </Grid>
                 </Paper>
 
-                <Paper
-                  sx={{
-                    borderRadius: 3,
-                    border: '1px solid rgba(255,255,255,0.18)',
-                    background:
-                      'linear-gradient(135deg, rgba(19,36,71,0.72) 0%, rgba(35,31,32,0.45) 100%)',
-                    backdropFilter: 'blur(14px)',
-                    overflow: 'hidden',
-                  }}
-                >
+                <Paper sx={GLASS_TABLE_WRAPPER_SX}>
                   <TableContainer>
                     <Table size="small">
                       <TableHead>
@@ -305,7 +318,7 @@ export default function Page() {
                           </TableRow>
                         )}
                         {trackRows.map((row) => (
-                          <TableRow key={`${row.trackId}-${row.position}`} sx={{ '&:hover': { bgcolor: 'rgba(255,255,255,0.05)' } }}>
+                          <TableRow key={`${row.trackId}-${row.position}`}>
                             <TableCell sx={{ fontWeight: 700 }}>{row.trackName}</TableCell>
                             <TableCell>
                               <Chip

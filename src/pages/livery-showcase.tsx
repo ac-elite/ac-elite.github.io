@@ -3,10 +3,10 @@ import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import Container from '@mui/material/Container';
-import { keyframes } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 
 import { CONFIG } from 'src/config-global';
+import { GLASS_PANEL_TIGHT_SX, GLASS_INNER_PANEL_SX } from 'src/lib/glass';
 
 import { PreviewLock } from 'src/components/preview-lock/preview-lock';
 import { PageGridOverlay } from 'src/components/page-background/page-grid-overlay';
@@ -23,11 +23,6 @@ const mockModTeamLiveries = [
   { name: 'Admin Tactical Blue', owner: 'Grimlord', image: '/assets/illustrations/f1-livery-placeholder.svg' },
   { name: 'Moderator Velocity', owner: 'CarterReza', image: '/assets/illustrations/f1-livery-placeholder.svg' },
 ] as const;
-
-const gridMove = keyframes`
-  0% { background-position: 0 0, 0 0, 0 0; }
-  100% { background-position: 48px 48px, 48px 48px, 96px 0; }
-`;
 
 export default function Page() {
   return (
@@ -76,23 +71,17 @@ export default function Page() {
                       <Grid key={livery.name} size={{ xs: 12, sm: 6, md: 4 }}>
                         <Paper
                           sx={{
-                            p: 1.5,
-                            borderRadius: 3,
-                            border: '1px solid rgba(255,255,255,0.18)',
-                            background: 'linear-gradient(135deg, rgba(19,36,71,0.72) 0%, rgba(35,31,32,0.45) 100%)',
-                            backdropFilter: 'blur(14px)',
+                            ...GLASS_PANEL_TIGHT_SX,
                           }}
                         >
                           <Stack spacing={1}>
                             <Box
                               sx={{
+                                ...GLASS_INNER_PANEL_SX,
                                 width: '100%',
                                 height: 170,
                                 p: 0.6,
                                 position: 'relative',
-                                borderRadius: 2,
-                                border: '1px solid rgba(255,255,255,0.22)',
-                                bgcolor: '#17213B',
                                 overflow: 'hidden',
                                 '&::before': {
                                   content: '""',
@@ -102,7 +91,6 @@ export default function Page() {
                                   backgroundImage:
                                     'linear-gradient(rgba(255,255,255,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px)',
                                   backgroundSize: '24px 24px, 24px 24px',
-                                  animation: `${gridMove} 18s linear infinite`,
                                   pointerEvents: 'none',
                                 },
                               }}
@@ -142,23 +130,17 @@ export default function Page() {
                       <Grid key={`${livery.name}-${livery.owner}`} size={{ xs: 12, sm: 6, md: 4 }}>
                         <Paper
                           sx={{
-                            p: 1.5,
-                            borderRadius: 3,
-                            border: '1px solid rgba(255,255,255,0.18)',
-                            background: 'linear-gradient(135deg, rgba(19,36,71,0.72) 0%, rgba(35,31,32,0.45) 100%)',
-                            backdropFilter: 'blur(14px)',
+                            ...GLASS_PANEL_TIGHT_SX,
                           }}
                         >
                           <Stack spacing={1}>
                             <Box
                               sx={{
+                                ...GLASS_INNER_PANEL_SX,
                                 width: '100%',
                                 height: 170,
                                 p: 0.6,
                                 position: 'relative',
-                                borderRadius: 2,
-                                border: '1px solid rgba(255,255,255,0.22)',
-                                bgcolor: '#17213B',
                                 overflow: 'hidden',
                                 '&::before': {
                                   content: '""',
@@ -168,7 +150,6 @@ export default function Page() {
                                   backgroundImage:
                                     'linear-gradient(rgba(255,255,255,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px)',
                                   backgroundSize: '24px 24px, 24px 24px',
-                                  animation: `${gridMove} 18s linear infinite`,
                                   pointerEvents: 'none',
                                 },
                               }}

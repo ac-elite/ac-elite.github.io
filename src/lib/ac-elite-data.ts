@@ -17,6 +17,29 @@ export const CAR = 'tatuusfa1';
 export const LICENSE_CHIP_WIDTH = 96;
 export const SR_CHIP_WIDTH = 62;
 
+export const ROLE_CHIP_SX = {
+  Creator: {
+    color: '#fff',
+    background: 'linear-gradient(135deg, #FF6B6B 0%, #ED4245 100%)',
+    border: '1px solid rgba(237,66,69,0.72)',
+    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.22)',
+  },
+  Admin: {
+    color: '#fff',
+    background: 'linear-gradient(135deg, #A855F7 0%, #7C3AED 100%)',
+    border: '1px solid rgba(168,85,247,0.72)',
+    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.22)',
+  },
+  Moderator: {
+    color: '#0a2e14',
+    background: 'linear-gradient(135deg, #4ADE80 0%, #22C55E 100%)',
+    border: '1px solid rgba(74,222,128,0.72)',
+    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.3)',
+  },
+} as const satisfies Record<string, SxProps<Theme>>;
+
+export type DiscordRole = keyof typeof ROLE_CHIP_SX;
+
 export function formatNumber(value: number) {
   return value.toLocaleString();
 }
@@ -364,35 +387,52 @@ export function calculateGap(fastestLap: number, currentLap: number) {
 
 export function getLicenseBadgeSx(license: string): SxProps<Theme> {
   const textColor = '#111827';
+  const glass = (start: string, end: string, border: string, color = textColor): SxProps<Theme> => ({
+    color,
+    background: `linear-gradient(135deg, ${start} 0%, ${end} 100%)`,
+    border: `1px solid ${border}`,
+    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.3)',
+  });
+
   const styles: Record<string, SxProps<Theme>> = {
-    // Unified dark text for consistency; backgrounds are tuned for contrast.
-    Elite: { bgcolor: '#C084FC', color: textColor },
-    'Diamond+': { bgcolor: '#60A5FA', color: textColor },
-    Diamond: { bgcolor: '#22D3EE', color: textColor },
-    'Platinum+': { bgcolor: '#F1F5F9', color: textColor },
-    Platinum: { bgcolor: '#D7E1EB', color: textColor },
-    'Gold+': { bgcolor: '#FDE047', color: textColor },
-    Gold: { bgcolor: '#FACC15', color: textColor },
-    'Silver+': { bgcolor: '#A8B9CC', color: textColor },
-    Silver: { bgcolor: '#C9D5E1', color: textColor },
-    'Bronze+': { bgcolor: '#FB923C', color: textColor },
-    Bronze: { bgcolor: '#F97316', color: textColor },
-    Rookie: { bgcolor: '#B2BDC8', color: textColor },
+    Elite: glass('#D8B4FE', '#C084FC', 'rgba(216,180,254,0.9)'),
+    'Diamond+': {
+      color: '#0b1f3a',
+      background: 'linear-gradient(135deg, #93C5FD 0%, #60A5FA 52%, #A5F3FC 100%)',
+      border: '1px solid rgba(191,219,254,0.92)',
+      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.42), 0 0 0 1px rgba(147,197,253,0.22)',
+    },
+    Diamond: glass('#67E8F9', '#22D3EE', 'rgba(103,232,249,0.8)'),
+    'Platinum+': glass('#F8FAFC', '#E2E8F0', 'rgba(226,232,240,0.95)'),
+    Platinum: glass('#E2E8F0', '#CBD5E1', 'rgba(203,213,225,0.86)'),
+    'Gold+': glass('#FEF08A', '#FDE047', 'rgba(254,240,138,0.88)'),
+    Gold: glass('#FDE047', '#FACC15', 'rgba(250,204,21,0.86)'),
+    'Silver+': glass('#C9D5E1', '#A8B9CC', 'rgba(201,213,225,0.84)'),
+    Silver: glass('#D9E2EC', '#C9D5E1', 'rgba(201,213,225,0.82)'),
+    'Bronze+': glass('#FDBA74', '#FB923C', 'rgba(251,146,60,0.86)'),
+    Bronze: glass('#FB923C', '#F97316', 'rgba(249,115,22,0.84)'),
+    Rookie: glass('#CBD5E1', '#B2BDC8', 'rgba(178,189,200,0.82)'),
   };
   return styles[license] || styles.Bronze;
 }
 
 export function getSRBadgeSx(tier: string): SxProps<Theme> {
   const textColor = '#111827';
+  const glass = (start: string, end: string, border: string, color = textColor): SxProps<Theme> => ({
+    color,
+    background: `linear-gradient(135deg, ${start} 0%, ${end} 100%)`,
+    border: `1px solid ${border}`,
+    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.3)',
+  });
+
   const first = tier.charAt(0);
-  // LFM-like SR palette with consistent dark text for readability.
-  if (first === 'S') return { bgcolor: '#22C55E', color: textColor };
-  if (first === 'A') return { bgcolor: '#7C3AED', color: textColor };
-  if (first === 'B') return { bgcolor: '#EAF239', color: textColor };
-  if (first === 'C') return { bgcolor: '#D1D5DB', color: textColor };
-  if (first === 'D') return { bgcolor: '#EA7A2D', color: textColor };
-  if (first === 'E') return { bgcolor: '#9CA3AF', color: textColor };
-  return { bgcolor: '#FF1F2D', color: textColor };
+  if (first === 'S') return glass('#4ADE80', '#22C55E', 'rgba(74,222,128,0.86)');
+  if (first === 'A') return glass('#A78BFA', '#7C3AED', 'rgba(167,139,250,0.84)');
+  if (first === 'B') return glass('#FDE047', '#EAF239', 'rgba(234,242,57,0.86)');
+  if (first === 'C') return glass('#E5E7EB', '#D1D5DB', 'rgba(209,213,219,0.84)');
+  if (first === 'D') return glass('#FDBA74', '#EA7A2D', 'rgba(253,186,116,0.84)');
+  if (first === 'E') return glass('#D1D5DB', '#9CA3AF', 'rgba(209,213,219,0.8)');
+  return glass('#FB7185', '#FF1F2D', 'rgba(251,113,133,0.86)');
 }
 
 export function getOverallCombinedScore(paceScore: number, sr: number, maxPaceScore: number) {

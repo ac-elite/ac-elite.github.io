@@ -18,7 +18,7 @@ export function ErrorPanel({ error, title = 'Failed to load data', onRetry }: Er
         </Typography>
         <Typography color="text.secondary">{error}</Typography>
         {onRetry && (
-          <Button variant="outlined" size="small" onClick={onRetry}>
+          <Button variant="outlined" color="primary" size="small" onClick={onRetry}>
             Retry
           </Button>
         )}

@@ -31,22 +31,25 @@ type LicenseSafetyGuideButtonProps = {
 
 const GUIDE_LICENSE_CHIP_WIDTH = LICENSE_CHIP_WIDTH;
 const GUIDE_SR_CHIP_WIDTH = SR_CHIP_WIDTH;
+/** Safety table: wider than chip so “SR License” fits on one line with comfortable padding */
+const GUIDE_SR_TABLE_LICENSE_COL_PX = 128;
+/** License tier table: room for chip + label column header */
+const GUIDE_LICENSE_TABLE_TIER_COL_PX = 112;
 
-function formatLicenseRequirement(
-  tier: { minKm: number; minScore: number; minTracks?: number },
-  tierName: string
-) {
-  if (tierName === 'Bronze') return `${formatNumber(tier.minKm)} km (qualified)`;
+const LICENSE_TABLE_GRID = `${GUIDE_LICENSE_TABLE_TIER_COL_PX}px minmax(88px, 1fr) minmax(92px, 1fr) minmax(64px, 1fr)`;
 
-  const parts = [`${formatNumber(tier.minKm)} km`];
-  if (tier.minScore > 0) {
-    parts.push(`score >= ${formatNumber(tier.minScore)}`);
-  }
-  if (tier.minTracks) {
-    parts.push(`${tier.minTracks} tracks`);
-  }
+function formatLicenseTableKm(tier: { minKm: number }) {
+  return `${formatNumber(tier.minKm)}+`;
+}
 
-  return parts.join(', ');
+function formatLicenseTableScore(tierName: string, minScore: number) {
+  if (tierName === 'Bronze') return 'Qualified';
+  return formatNumber(minScore);
+}
+
+function formatLicenseTableTracks(minTracks?: number) {
+  if (minTracks == null) return '—';
+  return String(minTracks);
 }
 
 export function LicenseSafetyGuideButton({ compact = false }: LicenseSafetyGuideButtonProps) {
@@ -57,6 +60,7 @@ export function LicenseSafetyGuideButton({ compact = false }: LicenseSafetyGuide
     <>
       <Button
         variant="contained"
+        color="primary"
         size={compact ? 'small' : 'medium'}
         onClick={() => setOpen(true)}
         sx={{
@@ -65,16 +69,6 @@ export function LicenseSafetyGuideButton({ compact = false }: LicenseSafetyGuide
           px: compact ? 1.3 : 1.8,
           py: compact ? 0.75 : 1,
           borderRadius: 2,
-          color: '#111827',
-          fontWeight: 800,
-          textTransform: 'none',
-          border: '1px solid rgba(245,196,53,0.8)',
-          background: 'linear-gradient(135deg, #f6d365 0%, #f2b431 100%)',
-          boxShadow: '0 10px 24px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.45)',
-          '&:hover': {
-            background: 'linear-gradient(135deg, #f9de87 0%, #f4bf47 100%)',
-            borderColor: 'rgba(245,196,53,0.95)',
-          },
         }}
       >
         {compact ? 'License / SR' : 'License / SR (BETA)'}
@@ -98,23 +92,25 @@ export function LicenseSafetyGuideButton({ compact = false }: LicenseSafetyGuide
           },
         }}
       >
-        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ px: 3, pt: 2.5, pb: 1.5 }}>
+        <Stack direction="row" alignItems="flex-start" justifyContent="space-between" sx={{ px: { xs: 2, sm: 3 }, pt: { xs: 2, sm: 2.5 }, pb: 1.5, gap: 1.25 }}>
           <Typography
-            variant="h5"
+            variant="h6"
             sx={{
               fontWeight: 800,
               color: 'warning.main',
-              letterSpacing: 0.4,
-              textTransform: 'uppercase',
+              letterSpacing: { xs: 0.2, sm: 0.4 },
+              textTransform: { xs: 'none', sm: 'uppercase' },
+              lineHeight: 1.25,
+              pr: 1,
             }}
           >
-            AC Elite License / Safety Rating / How it works
+            AC Elite License / Safety Rating
           </Typography>
           <IconButton
             onClick={() => setOpen(false)}
             sx={{
-              width: 36,
-              height: 36,
+              width: { xs: 34, sm: 36 },
+              height: { xs: 34, sm: 36 },
               borderRadius: '50%',
               color: 'rgba(255,255,255,0.72)',
               border: '1px solid rgba(255,255,255,0.18)',
@@ -127,7 +123,10 @@ export function LicenseSafetyGuideButton({ compact = false }: LicenseSafetyGuide
           </IconButton>
         </Stack>
 
-        <Box sx={{ px: 3, pb: 1 }}>
+        <Box sx={{ px: { xs: 2, sm: 3 }, pb: 1 }}>
+          <Typography variant="caption" sx={{ display: 'block', mb: 1, color: 'rgba(255,255,255,0.72)' }}>
+            How it works
+          </Typography>
           <Tabs
             value={activeTab}
             onChange={(_, value: GuideTab) => setActiveTab(value)}
@@ -173,7 +172,7 @@ export function LicenseSafetyGuideButton({ compact = false }: LicenseSafetyGuide
           </Tabs>
         </Box>
 
-        <DialogContent sx={{ px: 3, pt: 1, pb: 3, maxHeight: '72vh' }}>
+        <DialogContent sx={{ px: { xs: 2, sm: 3 }, pt: 1, pb: { xs: 2.25, sm: 3 }, maxHeight: '72vh' }}>
           {activeTab === 'license' && (
             <Stack spacing={2.2}>
               <Typography variant="h6" sx={{ fontWeight: 700, color: '#dbeafe' }}>
@@ -191,66 +190,118 @@ export function LicenseSafetyGuideButton({ compact = false }: LicenseSafetyGuide
                 plus the required number of tracks where shown.
               </Typography>
 
-              <Stack spacing={1}>
-                {LICENSE_TIER_ORDER.map((name) => (
+              <Box
+                sx={{
+                  borderRadius: 2,
+                  border: '1px solid rgba(148,163,184,0.24)',
+                  overflow: 'hidden',
+                  maxWidth: '100%',
+                  overflowX: 'auto',
+                }}
+              >
+                <Box
+                  sx={{
+                    display: 'grid',
+                    gridTemplateColumns: LICENSE_TABLE_GRID,
+                    gap: 1,
+                    px: 2,
+                    py: 1.1,
+                    minWidth: { xs: 320, sm: 0 },
+                    bgcolor: 'rgba(148,163,184,0.12)',
+                  }}
+                >
+                  <Typography
+                    variant="caption"
+                    sx={{ fontWeight: 800, color: 'rgba(255,255,255,0.78)', whiteSpace: 'nowrap' }}
+                  >
+                    License
+                  </Typography>
+                  <Typography variant="caption" sx={{ fontWeight: 800, color: 'rgba(255,255,255,0.78)' }}>
+                    Min km
+                  </Typography>
+                  <Typography variant="caption" sx={{ fontWeight: 800, color: 'rgba(255,255,255,0.78)' }}>
+                    Min score
+                  </Typography>
+                  <Typography variant="caption" sx={{ fontWeight: 800, color: 'rgba(255,255,255,0.78)' }}>
+                    Tracks
+                  </Typography>
+                </Box>
+
+                <Stack divider={<Box sx={{ borderTop: '1px solid rgba(148,163,184,0.12)' }} />}>
+                  {LICENSE_TIER_ORDER.map((name) => {
+                    const tier = LICENSE_TIERS[name];
+                    return (
+                      <Box
+                        key={name}
+                        sx={{
+                          display: 'grid',
+                          gridTemplateColumns: LICENSE_TABLE_GRID,
+                          gap: 1,
+                          px: 2,
+                          py: 1.2,
+                          alignItems: 'center',
+                          minWidth: { xs: 320, sm: 0 },
+                          bgcolor: 'rgba(23,33,59,0.36)',
+                        }}
+                      >
+                        <Chip
+                          size="small"
+                          label={name}
+                          sx={{
+                            fontWeight: 800,
+                            width: GUIDE_LICENSE_CHIP_WIDTH,
+                            justifyContent: 'center',
+                            ...getLicenseBadgeSx(name),
+                          }}
+                        />
+                        <Typography variant="body1" sx={{ color: '#dbeafe', fontWeight: 700 }}>
+                          {formatLicenseTableKm(tier)}
+                        </Typography>
+                        <Typography variant="body1" sx={{ color: '#dbeafe', fontWeight: 700 }}>
+                          {formatLicenseTableScore(name, tier.minScore)}
+                        </Typography>
+                        <Typography variant="body1" sx={{ color: '#dbeafe', fontWeight: 700 }}>
+                          {formatLicenseTableTracks(tier.minTracks)}
+                        </Typography>
+                      </Box>
+                    );
+                  })}
+
                   <Box
-                    key={name}
                     sx={{
                       display: 'grid',
-                      gridTemplateColumns: { xs: '1fr', sm: `${GUIDE_LICENSE_CHIP_WIDTH}px 1fr` },
-                      gap: 1.25,
+                      gridTemplateColumns: LICENSE_TABLE_GRID,
+                      gap: 1,
+                      px: 2,
+                      py: 1.2,
                       alignItems: 'center',
-                      borderRadius: 1.6,
-                      px: 1.2,
-                      py: 1.1,
-                      border: '1px solid rgba(148,163,184,0.2)',
-                      bgcolor: 'rgba(23,33,59,0.38)',
+                      minWidth: { xs: 320, sm: 0 },
+                      bgcolor: 'rgba(23,33,59,0.36)',
                     }}
                   >
                     <Chip
                       size="small"
-                      label={name}
+                      label="Rookie"
                       sx={{
                         fontWeight: 800,
                         width: GUIDE_LICENSE_CHIP_WIDTH,
                         justifyContent: 'center',
-                        ...getLicenseBadgeSx(name),
+                        ...getLicenseBadgeSx('Rookie'),
                       }}
                     />
-                    <Typography variant="body1" sx={{ color: '#dbeafe', fontWeight: 600 }}>
-                      {formatLicenseRequirement(LICENSE_TIERS[name], name)}
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        gridColumn: '2 / -1',
+                        color: 'rgba(219,234,254,0.92)',
+                        fontWeight: 600,
+                      }}
+                    >
+                      Under 100 km driven — no formal tier until you reach the Bronze threshold.
                     </Typography>
                   </Box>
-                ))}
-
-                <Box
-                  sx={{
-                    display: 'grid',
-                    gridTemplateColumns: { xs: '1fr', sm: `${GUIDE_LICENSE_CHIP_WIDTH}px 1fr` },
-                    gap: 1.25,
-                    alignItems: 'center',
-                    borderRadius: 1.6,
-                    px: 1.2,
-                    py: 1.1,
-                    border: '1px solid rgba(148,163,184,0.2)',
-                    bgcolor: 'rgba(23,33,59,0.38)',
-                  }}
-                >
-                  <Chip
-                    size="small"
-                    label="Rookie"
-                    sx={{
-                      fontWeight: 800,
-                      width: GUIDE_LICENSE_CHIP_WIDTH,
-                      justifyContent: 'center',
-                      ...getLicenseBadgeSx('Rookie'),
-                    }}
-                  />
-                  <Typography variant="body1" sx={{ color: '#dbeafe', fontWeight: 600 }}>
-                    Under 100 km driven
-                  </Typography>
-                </Box>
-              </Stack>
+                </Stack>
+              </Box>
             </Stack>
           )}
 
@@ -274,14 +325,17 @@ export function LicenseSafetyGuideButton({ compact = false }: LicenseSafetyGuide
                 <Box
                   sx={{
                     display: 'grid',
-                    gridTemplateColumns: `${GUIDE_SR_CHIP_WIDTH}px minmax(110px, 1fr) minmax(100px, 1fr)`,
+                    gridTemplateColumns: `${GUIDE_SR_TABLE_LICENSE_COL_PX}px minmax(110px, 1fr) minmax(100px, 1fr)`,
                     gap: 1,
-                    px: 1.5,
+                    px: 2,
                     py: 1.1,
                     bgcolor: 'rgba(148,163,184,0.12)',
                   }}
                 >
-                  <Typography variant="caption" sx={{ fontWeight: 800, color: 'rgba(255,255,255,0.78)' }}>
+                  <Typography
+                    variant="caption"
+                    sx={{ fontWeight: 800, color: 'rgba(255,255,255,0.78)', whiteSpace: 'nowrap' }}
+                  >
                     SR License
                   </Typography>
                   <Typography variant="caption" sx={{ fontWeight: 800, color: 'rgba(255,255,255,0.78)' }}>
@@ -298,9 +352,9 @@ export function LicenseSafetyGuideButton({ compact = false }: LicenseSafetyGuide
                       key={tier.name}
                       sx={{
                         display: 'grid',
-                        gridTemplateColumns: `${GUIDE_SR_CHIP_WIDTH}px minmax(110px, 1fr) minmax(100px, 1fr)`,
+                        gridTemplateColumns: `${GUIDE_SR_TABLE_LICENSE_COL_PX}px minmax(110px, 1fr) minmax(100px, 1fr)`,
                         gap: 1,
-                        px: 1.5,
+                        px: 2,
                         py: 1.2,
                         alignItems: 'center',
                         bgcolor: 'rgba(23,33,59,0.36)',
@@ -328,9 +382,9 @@ export function LicenseSafetyGuideButton({ compact = false }: LicenseSafetyGuide
                   <Box
                     sx={{
                       display: 'grid',
-                      gridTemplateColumns: `${GUIDE_SR_CHIP_WIDTH}px minmax(110px, 1fr) minmax(100px, 1fr)`,
+                      gridTemplateColumns: `${GUIDE_SR_TABLE_LICENSE_COL_PX}px minmax(110px, 1fr) minmax(100px, 1fr)`,
                       gap: 1,
-                      px: 1.5,
+                      px: 2,
                       py: 1.2,
                       alignItems: 'center',
                       bgcolor: 'rgba(23,33,59,0.36)',

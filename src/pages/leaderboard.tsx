@@ -20,6 +20,7 @@ import TableContainer from '@mui/material/TableContainer';
 import { CONFIG } from 'src/config-global';
 import { fetchJson } from 'src/lib/fetch-json';
 import { getDriverProfileHref } from 'src/lib/routes';
+import { GLASS_PANEL_SX, GLASS_TABLE_WRAPPER_SX, GLASS_TABLE_PAGINATION_SX } from 'src/lib/glass';
 import {
   CAR,
   getDriverSR,
@@ -183,12 +184,7 @@ export default function Page() {
               <>
                 <Paper
                   sx={{
-                    p: 2.5,
-                    borderRadius: 3,
-                    border: '1px solid rgba(255,255,255,0.18)',
-                    background:
-                      'linear-gradient(135deg, rgba(19,36,71,0.72) 0%, rgba(35,31,32,0.45) 100%)',
-                    backdropFilter: 'blur(14px)',
+                    ...GLASS_PANEL_SX,
                   }}
                 >
                   <Stack spacing={1.25}>
@@ -258,16 +254,18 @@ export default function Page() {
 
                 <Paper
                   sx={{
-                    borderRadius: 3,
-                    border: '1px solid rgba(255,255,255,0.18)',
-                    background:
-                      'linear-gradient(135deg, rgba(19,36,71,0.72) 0%, rgba(35,31,32,0.45) 100%)',
-                    backdropFilter: 'blur(14px)',
-                    overflow: 'hidden',
+                    ...GLASS_TABLE_WRAPPER_SX,
                   }}
                 >
                   <TableContainer>
-                    <Table size="small">
+                    <Table
+                      size="small"
+                      sx={{
+                        '& .MuiTableBody-root .MuiTableRow-root:hover': {
+                          backgroundColor: 'rgba(255,255,255,0.04)',
+                        },
+                      }}
+                    >
                       <TableHead>
                         <TableRow>
                           <TableCell>#</TableCell>
@@ -302,7 +300,6 @@ export default function Page() {
                               key={`${entry.guid}-${entry.laptime}-${index}`}
                               sx={{
                                 cursor: 'pointer',
-                                '&:hover': { bgcolor: 'rgba(255,255,255,0.06)' },
                                 ...getPodiumRowSx(absolutePos),
                               }}
                               onClick={() => {
@@ -372,64 +369,47 @@ export default function Page() {
                 </Paper>
 
                 {totalPages > 1 && (
-                  <Stack direction="row" spacing={1} justifyContent="center" flexWrap="wrap">
-                    <Button
-                      disabled={safePage <= 1}
-                      onClick={() => setPage(safePage - 1)}
-                      variant="outlined"
-                      size="small"
-                      sx={{
-                        color: 'rgba(255,255,255,0.9)',
-                        borderColor: 'rgba(255,255,255,0.3)',
-                        backgroundColor: 'rgba(255,255,255,0.03)',
-                      }}
-                    >
-                      Prev
-                    </Button>
-                    {Array.from({ length: totalPages }, (_, idx) => idx + 1)
-                      .filter((p) => p === 1 || p === totalPages || (p >= safePage - 1 && p <= safePage + 1))
-                      .map((p, idx, arr) => (
-                        <Box key={p} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          {idx > 0 && p - arr[idx - 1] > 1 && (
-                            <Typography sx={{ px: 0.5, color: 'rgba(255,255,255,0.65)' }}>...</Typography>
-                          )}
-                          <Button
-                            onClick={() => setPage(p)}
-                            size="small"
-                            variant={p === safePage ? 'contained' : 'outlined'}
-                            sx={
-                              p === safePage
-                                ? {
-                                    color: '#fff',
-                                    border: '1px solid rgba(255,255,255,0.22)',
-                                    background:
-                                      'linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(173,216,255,0.1) 100%)',
-                                  }
-                                : {
-                                    color: 'rgba(255,255,255,0.9)',
-                                    borderColor: 'rgba(255,255,255,0.3)',
-                                    backgroundColor: 'rgba(255,255,255,0.03)',
-                                  }
-                            }
-                          >
-                            {p}
-                          </Button>
-                        </Box>
-                      ))}
-                    <Button
-                      disabled={safePage >= totalPages}
-                      onClick={() => setPage(safePage + 1)}
-                      variant="outlined"
-                      size="small"
-                      sx={{
-                        color: 'rgba(255,255,255,0.9)',
-                        borderColor: 'rgba(255,255,255,0.3)',
-                        backgroundColor: 'rgba(255,255,255,0.03)',
-                      }}
-                    >
-                      Next
-                    </Button>
-                  </Stack>
+                  <Paper sx={GLASS_TABLE_PAGINATION_SX}>
+                    <Stack direction="row" spacing={1} justifyContent="center" flexWrap="wrap">
+                      <Button
+                        disabled={safePage <= 1}
+                        onClick={() => setPage(safePage - 1)}
+                        variant="contained"
+                        color="secondary"
+                        size="small"
+                        sx={{ minWidth: 78, fontWeight: 800 }}
+                      >
+                        Prev
+                      </Button>
+                      {Array.from({ length: totalPages }, (_, idx) => idx + 1)
+                        .filter((p) => p === 1 || p === totalPages || (p >= safePage - 1 && p <= safePage + 1))
+                        .map((p, idx, arr) => (
+                          <Box key={p} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            {idx > 0 && p - arr[idx - 1] > 1 && (
+                              <Typography sx={{ px: 0.5, color: 'rgba(255,255,255,0.65)' }}>...</Typography>
+                            )}
+                            <Button
+                              onClick={() => setPage(p)}
+                              size="small"
+                              variant={p === safePage ? 'contained' : 'outlined'}
+                              color={p === safePage ? 'primary' : 'secondary'}
+                            >
+                              {p}
+                            </Button>
+                          </Box>
+                        ))}
+                      <Button
+                        disabled={safePage >= totalPages}
+                        onClick={() => setPage(safePage + 1)}
+                        variant="contained"
+                        color="secondary"
+                        size="small"
+                        sx={{ minWidth: 78, fontWeight: 800 }}
+                      >
+                        Next
+                      </Button>
+                    </Stack>
+                  </Paper>
                 )}
               </>
             )}

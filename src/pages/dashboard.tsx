@@ -9,6 +9,7 @@ import Typography from '@mui/material/Typography';
 
 import { CONFIG } from 'src/config-global';
 import { fetchJson } from 'src/lib/fetch-json';
+import { GLASS_CARD_SX, GLASS_CARD_INNER_SX } from 'src/lib/glass';
 import { formatNumber, getTrackDisplayName } from 'src/lib/ac-elite-data';
 
 import { ErrorPanel } from 'src/components/data-state/error-panel';
@@ -273,7 +274,7 @@ export default function Page() {
           {!loading && !error && (
             <Grid container spacing={2.5}>
               <Grid size={{ xs: 12, sm: 6 }}>
-                <Paper sx={{ p: 2.75, border: '1px solid rgba(148,163,184,0.3)' }}>
+                <Paper sx={{ ...GLASS_CARD_SX, p: 2.75 }}>
                   <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.78)' }}>
                     Total Drivers
                   </Typography>
@@ -284,7 +285,7 @@ export default function Page() {
               </Grid>
 
               <Grid size={{ xs: 12, sm: 6 }}>
-                <Paper sx={{ p: 2.75, border: '1px solid rgba(148,163,184,0.3)' }}>
+                <Paper sx={{ ...GLASS_CARD_SX, p: 2.75 }}>
                   <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.78)' }}>
                     Active Drivers (100+ KM)
                   </Typography>
@@ -295,7 +296,7 @@ export default function Page() {
               </Grid>
 
               <Grid size={{ xs: 12, sm: 6 }}>
-                <Paper sx={{ p: 2.75, border: '1px solid rgba(148,163,184,0.3)' }}>
+                <Paper sx={{ ...GLASS_CARD_SX, p: 2.75 }}>
                   <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.78)' }}>
                     Total Tracks
                   </Typography>
@@ -306,7 +307,7 @@ export default function Page() {
               </Grid>
 
               <Grid size={{ xs: 12, sm: 6 }}>
-                <Paper sx={{ p: 2.75, border: '1px solid rgba(148,163,184,0.3)' }}>
+                <Paper sx={{ ...GLASS_CARD_SX, p: 2.75 }}>
                   <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.78)' }}>
                     Avg KM per Driver
                   </Typography>
@@ -317,7 +318,7 @@ export default function Page() {
               </Grid>
 
               <Grid size={{ xs: 12, sm: 6 }}>
-                <Paper sx={{ p: 2.75, border: '1px solid rgba(148,163,184,0.3)' }}>
+                <Paper sx={{ ...GLASS_CARD_SX, p: 2.75 }}>
                   <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.78)' }}>
                     Total Laps
                   </Typography>
@@ -328,7 +329,7 @@ export default function Page() {
               </Grid>
 
               <Grid size={{ xs: 12, sm: 6 }}>
-                <Paper sx={{ p: 2.75, border: '1px solid rgba(148,163,184,0.3)' }}>
+                <Paper sx={{ ...GLASS_CARD_SX, p: 2.75 }}>
                   <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.78)' }}>
                     Incidents / 100 KM
                   </Typography>
@@ -339,7 +340,7 @@ export default function Page() {
               </Grid>
 
               <Grid size={{ xs: 12, sm: 6 }}>
-                <Paper sx={{ p: 2.75, border: '1px solid rgba(148,163,184,0.3)' }}>
+                <Paper sx={{ ...GLASS_CARD_SX, p: 2.75 }}>
                   <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.78)' }}>
                     Total KM
                   </Typography>
@@ -350,7 +351,7 @@ export default function Page() {
               </Grid>
 
               <Grid size={{ xs: 12 }}>
-                <Paper sx={{ p: 2.75, border: '1px solid rgba(148,163,184,0.3)' }}>
+                <Paper sx={{ ...GLASS_CARD_SX, p: 2.75 }}>
                   <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.78)' }}>
                     Session Totals
                   </Typography>
@@ -391,12 +392,7 @@ export default function Page() {
                         direction="row"
                         justifyContent="space-between"
                         alignItems="center"
-                        sx={{
-                          p: 1.1,
-                          borderRadius: 1.5,
-                          border: '1px solid rgba(148,163,184,0.28)',
-                          bgcolor: 'rgba(15,26,52,0.45)',
-                        }}
+                        sx={{ ...GLASS_CARD_INNER_SX, p: 1.1, borderRadius: 1.5 }}
                       >
                         <Typography variant="body2" sx={{ fontWeight: 600 }}>
                           #{idx + 1} {driver.name}
@@ -411,7 +407,7 @@ export default function Page() {
               </Grid>
 
               <Grid size={{ xs: 12, md: 6 }}>
-                <Paper sx={{ p: 2.75, border: '1px solid rgba(148,163,184,0.3)' }}>
+                <Paper sx={{ ...GLASS_CARD_SX, p: 2.75 }}>
                   <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.78)' }}>
                     Most Active Tracks
                   </Typography>
@@ -422,12 +418,7 @@ export default function Page() {
                         direction="row"
                         justifyContent="space-between"
                         alignItems="center"
-                        sx={{
-                          p: 1.1,
-                          borderRadius: 1.5,
-                          border: '1px solid rgba(148,163,184,0.28)',
-                          bgcolor: 'rgba(15,26,52,0.45)',
-                        }}
+                        sx={{ ...GLASS_CARD_INNER_SX, p: 1.1, borderRadius: 1.5 }}
                       >
                         <Box>
                           <Typography variant="body2" sx={{ fontWeight: 600 }}>

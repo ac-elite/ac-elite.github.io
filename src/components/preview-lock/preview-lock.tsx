@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
@@ -6,6 +6,8 @@ import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
+
+import { GLASS_PANEL_SX } from 'src/lib/glass';
 
 type PreviewLockProps = {
   storageKey: string;
@@ -30,11 +32,8 @@ export function PreviewLock({ storageKey, title, description, children }: Previe
   return (
     <Paper
       sx={{
+        ...GLASS_PANEL_SX,
         p: 3,
-        borderRadius: 3,
-        border: '1px solid rgba(255,255,255,0.22)',
-        background: 'linear-gradient(135deg, rgba(19,36,71,0.82) 0%, rgba(35,31,32,0.52) 100%)',
-        backdropFilter: 'blur(14px)',
       }}
     >
       <Stack spacing={2}>
@@ -59,10 +58,13 @@ export function PreviewLock({ storageKey, title, description, children }: Previe
             label="Preview password"
             autoComplete="off"
             error={Boolean(error)}
+            helperText={error || undefined}
             sx={{ minWidth: { xs: '100%', sm: 320 } }}
           />
           <Button
             variant="contained"
+            color="primary"
+            size="small"
             onClick={() => {
               if (value.trim() !== PREVIEW_PASSWORD) {
                 setError('Wrong password. Please try again.');

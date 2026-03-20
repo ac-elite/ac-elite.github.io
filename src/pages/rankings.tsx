@@ -20,6 +20,7 @@ import TableContainer from '@mui/material/TableContainer';
 import { CONFIG } from 'src/config-global';
 import { fetchJson } from 'src/lib/fetch-json';
 import { getDriverProfileHref } from 'src/lib/routes';
+import { GLASS_PANEL_SX, GLASS_TABLE_WRAPPER_SX, GLASS_TABLE_PAGINATION_SX } from 'src/lib/glass';
 import {
   SR_TIERS,
   getDriverSR,
@@ -105,64 +106,47 @@ function Paginate({
   const pages = getVisiblePages(page, totalPages);
 
   return (
-    <Stack direction="row" spacing={1} justifyContent="center" flexWrap="wrap">
-      <Button
-        disabled={page <= 1}
-        onClick={() => onChange(page - 1)}
-        variant="outlined"
-        size="small"
-        sx={{
-          color: 'rgba(255,255,255,0.9)',
-          borderColor: 'rgba(255,255,255,0.3)',
-          backgroundColor: 'rgba(255,255,255,0.03)',
-        }}
-      >
-        Prev
-      </Button>
-      {pages.map((p, idx) =>
-        p === '...' ? (
-          <Typography key={`dots-${idx}`} sx={{ px: 1.25, py: 0.75 }}>
-            ...
-          </Typography>
-        ) : (
-          <Button
-            key={p}
-            onClick={() => onChange(p)}
-            size="small"
-            variant={p === page ? 'contained' : 'outlined'}
-            sx={
-              p === page
-                ? {
-                    color: '#fff',
-                    border: '1px solid rgba(255,255,255,0.22)',
-                    background:
-                      'linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(173,216,255,0.1) 100%)',
-                  }
-                : {
-                    color: 'rgba(255,255,255,0.9)',
-                    borderColor: 'rgba(255,255,255,0.3)',
-                    backgroundColor: 'rgba(255,255,255,0.03)',
-                  }
-            }
-          >
-            {p}
-          </Button>
-        )
-      )}
-      <Button
-        disabled={page >= totalPages}
-        onClick={() => onChange(page + 1)}
-        variant="outlined"
-        size="small"
-        sx={{
-          color: 'rgba(255,255,255,0.9)',
-          borderColor: 'rgba(255,255,255,0.3)',
-          backgroundColor: 'rgba(255,255,255,0.03)',
-        }}
-      >
-        Next
-      </Button>
-    </Stack>
+    <Paper sx={GLASS_TABLE_PAGINATION_SX}>
+      <Stack direction="row" spacing={1} justifyContent="center" flexWrap="wrap">
+        <Button
+          disabled={page <= 1}
+          onClick={() => onChange(page - 1)}
+          variant="contained"
+          color="secondary"
+          size="small"
+          sx={{ minWidth: 78, fontWeight: 800 }}
+        >
+          Prev
+        </Button>
+        {pages.map((p, idx) =>
+          p === '...' ? (
+            <Typography key={`dots-${idx}`} sx={{ px: 1.25, py: 0.75 }}>
+              ...
+            </Typography>
+          ) : (
+            <Button
+              key={p}
+              onClick={() => onChange(p)}
+              size="small"
+              variant={p === page ? 'contained' : 'outlined'}
+              color={p === page ? 'primary' : 'secondary'}
+            >
+              {p}
+            </Button>
+          )
+        )}
+        <Button
+          disabled={page >= totalPages}
+          onClick={() => onChange(page + 1)}
+          variant="contained"
+          color="secondary"
+          size="small"
+          sx={{ minWidth: 78, fontWeight: 800 }}
+        >
+          Next
+        </Button>
+      </Stack>
+    </Paper>
   );
 }
 
@@ -329,12 +313,7 @@ export default function Page() {
               <>
                 <Paper
                   sx={{
-                    p: 2.5,
-                    borderRadius: 3,
-                    border: '1px solid rgba(255,255,255,0.18)',
-                    background:
-                      'linear-gradient(135deg, rgba(19,36,71,0.72) 0%, rgba(35,31,32,0.45) 100%)',
-                    backdropFilter: 'blur(14px)',
+                    ...GLASS_PANEL_SX,
                   }}
                 >
                   <Stack direction="row" gap={1} flexWrap="wrap">
@@ -347,21 +326,8 @@ export default function Page() {
                         key={item.key}
                         size="small"
                         variant={tab === item.key ? 'contained' : 'outlined'}
+                        color={tab === item.key ? 'primary' : 'secondary'}
                         onClick={() => setTab(item.key as RankingsTab)}
-                        sx={
-                          tab === item.key
-                            ? {
-                                color: '#fff',
-                                border: '1px solid rgba(255,255,255,0.22)',
-                                background:
-                                  'linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(173,216,255,0.1) 100%)',
-                              }
-                            : {
-                                color: 'rgba(255,255,255,0.9)',
-                                borderColor: 'rgba(255,255,255,0.3)',
-                                backgroundColor: 'rgba(255,255,255,0.03)',
-                              }
-                        }
                       >
                         {item.label}
                       </Button>
@@ -515,16 +481,18 @@ export default function Page() {
 
                 <Paper
                   sx={{
-                    borderRadius: 3,
-                    border: '1px solid rgba(255,255,255,0.18)',
-                    background:
-                      'linear-gradient(135deg, rgba(19,36,71,0.72) 0%, rgba(35,31,32,0.45) 100%)',
-                    backdropFilter: 'blur(14px)',
-                    overflow: 'hidden',
+                    ...GLASS_TABLE_WRAPPER_SX,
                   }}
                 >
                   <TableContainer>
-                    <Table size="small">
+                    <Table
+                      size="small"
+                      sx={{
+                        '& .MuiTableBody-root .MuiTableRow-root:hover': {
+                          backgroundColor: 'rgba(255,255,255,0.04)',
+                        },
+                      }}
+                    >
                       <TableHead>
                         <TableRow>
                           <TableCell>#</TableCell>
@@ -553,7 +521,6 @@ export default function Page() {
                               }}
                               sx={{
                                 cursor: 'pointer',
-                                '&:hover': { bgcolor: 'rgba(255,255,255,0.06)' },
                                 ...getPodiumRowSx(pos),
                               }}
                             >

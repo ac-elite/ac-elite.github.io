@@ -11,6 +11,7 @@ import Typography from '@mui/material/Typography';
 import { CONFIG } from 'src/config-global';
 import { fetchJson } from 'src/lib/fetch-json';
 import { getDriverProfileHref } from 'src/lib/routes';
+import { GLASS_PANEL_SX, GLASS_INNER_ROW_SX } from 'src/lib/glass';
 import {
   CAR,
   getDriverSR,
@@ -62,12 +63,8 @@ function CategoryCard({
   return (
     <Paper
       sx={{
-        p: 2.5,
+        ...GLASS_PANEL_SX,
         height: '100%',
-        borderRadius: 3,
-        border: '1px solid rgba(255,255,255,0.18)',
-        background: 'linear-gradient(135deg, rgba(19,36,71,0.72) 0%, rgba(35,31,32,0.45) 100%)',
-        backdropFilter: 'blur(14px)',
       }}
     >
       <Stack spacing={1.5}>
@@ -88,17 +85,7 @@ function CategoryCard({
                 window.location.href = getDriverProfileHref(entry.guid);
               }}
               sx={{
-                borderRadius: 2,
-                px: 1.2,
-                py: 1,
-                border: '1px solid rgba(148,163,184,0.28)',
-                bgcolor: 'rgba(12,24,49,0.45)',
-                cursor: 'pointer',
-                transition: 'all 120ms ease',
-                '&:hover': {
-                  bgcolor: 'rgba(15,30,58,0.58)',
-                  borderColor: 'rgba(191,225,255,0.36)',
-                },
+                ...GLASS_INNER_ROW_SX,
               }}
             >
               <Stack spacing={0.8}>
@@ -209,12 +196,8 @@ function TeamRoleColumn({
   return (
     <Paper
       sx={{
-        p: 2.25,
+        ...GLASS_PANEL_SX,
         height: '100%',
-        borderRadius: 3,
-        border: '1px solid rgba(255,255,255,0.18)',
-        background: 'linear-gradient(135deg, rgba(19,36,71,0.72) 0%, rgba(35,31,32,0.45) 100%)',
-        backdropFilter: 'blur(14px)',
       }}
     >
       <Typography variant="h6" sx={{ fontWeight: 800, mb: 1.25 }}>
@@ -233,17 +216,7 @@ function TeamRoleColumn({
               window.location.href = getDriverProfileHref(member.guid);
             }}
             sx={{
-              borderRadius: 2,
-              px: 1.2,
-              py: 1,
-              border: '1px solid rgba(148,163,184,0.28)',
-              bgcolor: 'rgba(12,24,49,0.45)',
-              cursor: 'pointer',
-              transition: 'all 120ms ease',
-              '&:hover': {
-                bgcolor: 'rgba(15,30,58,0.58)',
-                borderColor: 'rgba(191,225,255,0.36)',
-              },
+              ...GLASS_INNER_ROW_SX,
             }}
           >
             <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
