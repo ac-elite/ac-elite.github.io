@@ -2,6 +2,7 @@ import type { SxProps, Theme } from '@mui/material/styles';
 
 import Box from '@mui/material/Box';
 import Alert from '@mui/material/Alert';
+import Button from '@mui/material/Button';
 
 export type UpdateBarProps = {
   sx?: SxProps<Theme>;
@@ -21,20 +22,21 @@ export function UpdateBar({ sx, compact = false }: UpdateBarProps) {
           backdropFilter: 'blur(10px)',
           display: 'flex',
           alignItems: 'center',
+          flexDirection: 'column',
           '& .MuiAlert-icon': {
             color: '#93c5fd',
-            alignSelf: 'center',
-            mt: 0,
-            mb: 0,
+            mr: 0,
           },
           '& .MuiAlert-message': {
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'center',
-            textAlign: 'left',
-            gap: 0.65,
-            fontSize: compact ? '0.84rem' : '0.9rem',
+            alignItems: 'center',
+            textAlign: 'center',
+            gap: 0.5,
+            fontSize: compact ? '0.8rem' : '0.86rem',
             lineHeight: 1.4,
+            width: '100%',
           },
           borderRadius: 1.75,
           px: compact ? 1.25 : 1.5,
@@ -44,9 +46,33 @@ export function UpdateBar({ sx, compact = false }: UpdateBarProps) {
         ...(Array.isArray(sx) ? sx : [sx]),
       ]}
     >
-      <Box component="span" sx={{ fontWeight: 600 }}>
-        Found a bug or have feedback? Report it to the AC Elite team so we can improve the site faster.
+      <Box component="span" sx={{ fontWeight: 600, maxWidth: 260 }}>
+        Found a bug? Share feedback on Discord.
       </Box>
+      <Button
+        variant="outlined"
+        color="primary"
+        size="small"
+        href="https://discord.gg/d2EbxGYBbj"
+        target="_blank"
+        rel="noreferrer"
+        sx={{
+          minHeight: 30,
+          mt: 0.5,
+          px: 1.25,
+          fontWeight: 700,
+          textTransform: 'none',
+          borderColor: 'rgba(147,197,253,0.55)',
+          color: 'rgba(219,234,254,0.98)',
+          bgcolor: 'rgba(59,130,246,0.08)',
+          '&:hover': {
+            borderColor: 'rgba(147,197,253,0.8)',
+            bgcolor: 'rgba(59,130,246,0.16)',
+          },
+        }}
+      >
+        Join Discord
+      </Button>
     </Alert>
   );
 }
