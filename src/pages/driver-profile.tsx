@@ -1,5 +1,5 @@
-import { useParams } from 'react-router-dom';
 import { useMemo, useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
@@ -17,6 +17,7 @@ import TableContainer from '@mui/material/TableContainer';
 
 import { CONFIG } from 'src/config-global';
 import { fetchJson } from 'src/lib/fetch-json';
+import { getLeaderboardTrackSearch } from 'src/lib/routes';
 import { type TeamRoles, getDiscordRolesForGuid } from 'src/lib/team-roles';
 import { GLASS_PANEL_SX, GLASS_INNER_PANEL_SX, GLASS_TABLE_WRAPPER_SX } from 'src/lib/glass';
 import {
@@ -54,6 +55,7 @@ type TrackStatRow = {
 };
 
 export default function Page() {
+  const navigate = useNavigate();
   const { driverGuid = '' } = useParams();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -310,7 +312,17 @@ export default function Page() {
                           </TableRow>
                         )}
                         {trackRows.map((row) => (
-                          <TableRow key={`${row.trackId}-${row.position}`}>
+                          <TableRow
+                            key={`${row.trackId}-${row.position}`}
+                            hover
+                            onClick={() =>
+                              navigate({
+                                pathname: '/leaderboard',
+                                search: getLeaderboardTrackSearch(row.trackId),
+                              })
+                            }
+                            sx={{ cursor: 'pointer' }}
+                          >
                             <TableCell sx={{ fontWeight: 700 }}>{row.trackName}</TableCell>
                             <TableCell>
                               <Chip

@@ -1,3 +1,4 @@
+import { useSearchParams } from 'react-router';
 import { useMemo, useState, useEffect } from 'react';
 
 import Box from '@mui/material/Box';
@@ -22,9 +23,9 @@ import { fetchJson } from 'src/lib/fetch-json';
 import { getDriverProfileHref } from 'src/lib/routes';
 import {
   GLASS_PANEL_SX,
+  getPodiumRowSx,
   GLASS_TABLE_WRAPPER_SX,
   GLASS_TABLE_PAGINATION_SX,
-  getPodiumRowSx,
 } from 'src/lib/glass';
 import {
   CAR,
@@ -34,13 +35,13 @@ import {
   SR_CHIP_WIDTH,
   formatLaptime,
   getPodiumChipSx,
-  type LeaderboardCarRow,
   type RankDriver,
   getDriverLicense,
   computeLicenseMap,
   getLicenseBadgeSx,
   LICENSE_CHIP_WIDTH,
   getTrackDisplayName,
+  type LeaderboardCarRow,
 } from 'src/lib/ac-elite-data';
 
 import { ErrorPanel } from 'src/components/data-state/error-panel';
@@ -50,6 +51,7 @@ import { PageGridOverlay } from 'src/components/page-background/page-grid-overla
 const LEADERBOARD_PER_PAGE = 20;
 
 export default function Page() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [rankData, setRankData] = useState<RankDriver[]>([]);
@@ -92,8 +94,23 @@ export default function Page() {
   );
 
   useEffect(() => {
-    if (!currentTrack && tracks.length > 0) setCurrentTrack(tracks[0]);
-  }, [currentTrack, tracks]);
+    if (tracks.length === 0) return;
+
+    const param = searchParams.get('track');
+    if (param && tracks.includes(param)) {
+      setCurrentTrack(param);
+      return;
+    }
+
+    if (param && !tracks.includes(param)) {
+      const next = tracks[0];
+      setCurrentTrack(next);
+      setSearchParams({ track: next }, { replace: true });
+      return;
+    }
+
+    setCurrentTrack((prev) => (prev && tracks.includes(prev) ? prev : tracks[0]));
+  }, [tracks, searchParams, setSearchParams]);
 
   useEffect(() => {
     setPage(1);
@@ -166,7 +183,11 @@ export default function Page() {
                     <FormControl size="small" sx={{ maxWidth: 420, width: '100%' }}>
                       <Select
                         value={currentTrack}
-                        onChange={(event) => setCurrentTrack(event.target.value)}
+                        onChange={(event) => {
+                          const next = event.target.value;
+                          setCurrentTrack(next);
+                          setSearchParams({ track: next }, { replace: true });
+                        }}
                         sx={{
                           borderRadius: 2,
                           color: '#fff',
