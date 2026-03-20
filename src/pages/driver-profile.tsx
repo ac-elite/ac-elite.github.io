@@ -17,15 +17,16 @@ import TableContainer from '@mui/material/TableContainer';
 
 import { CONFIG } from 'src/config-global';
 import { fetchJson } from 'src/lib/fetch-json';
-import { GLASS_INNER_PANEL_SX, GLASS_PANEL_SX, GLASS_TABLE_WRAPPER_SX } from 'src/lib/glass';
+import { type TeamRoles, getDiscordRolesForGuid } from 'src/lib/team-roles';
+import { GLASS_PANEL_SX, GLASS_INNER_PANEL_SX, GLASS_TABLE_WRAPPER_SX } from 'src/lib/glass';
 import {
   CAR,
   getDriverSR,
   calculateGap,
   getSRBadgeSx,
   formatNumber,
-  formatLaptime,
   ROLE_CHIP_SX,
+  formatLaptime,
   SR_CHIP_WIDTH,
   getPodiumChipSx,
   type RankDriver,
@@ -41,7 +42,6 @@ import {
 import { ErrorPanel } from 'src/components/data-state/error-panel';
 import { LoadingPanel } from 'src/components/data-state/loading-panel';
 import { PageGridOverlay } from 'src/components/page-background/page-grid-overlay';
-import { EMPTY_TEAM_ROLES, getDiscordRolesForGuid, type TeamRoles } from 'src/lib/team-roles';
 
 type TrackStatRow = {
   trackId: string;

@@ -12,6 +12,7 @@ import { CONFIG } from 'src/config-global';
 import { fetchJson } from 'src/lib/fetch-json';
 import { getDriverProfileHref } from 'src/lib/routes';
 import { GLASS_PANEL_SX, GLASS_INNER_ROW_SX } from 'src/lib/glass';
+import { type TeamRoles, EMPTY_TEAM_ROLES } from 'src/lib/team-roles';
 import {
   CAR,
   type CarLap,
@@ -29,7 +30,6 @@ import {
 import { ErrorPanel } from 'src/components/data-state/error-panel';
 import { LoadingPanel } from 'src/components/data-state/loading-panel';
 import { PageGridOverlay } from 'src/components/page-background/page-grid-overlay';
-import { EMPTY_TEAM_ROLES, type TeamRoles } from 'src/lib/team-roles';
 
 type FameEntry = {
   guid: string;

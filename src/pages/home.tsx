@@ -20,30 +20,30 @@ import { fetchJson } from 'src/lib/fetch-json';
 import { getDriverProfileHref } from 'src/lib/routes';
 import { GLASS_CARD_SX, GLASS_PANEL_SX, GLASS_INNER_PANEL_SX } from 'src/lib/glass';
 import {
+  getSyncHealth,
+  type SyncHealth,
+  type SiteMetadata,
+  getEffectiveLastSync,
+} from 'src/lib/sync-utils';
+import {
+  getTeamRole,
+  type TeamRole,
+  type TeamRoles,
+  EMPTY_TEAM_ROLES,
+  teamRoleToDiscordRole,
+} from 'src/lib/team-roles';
+import {
   CAR,
-  computeLicenseMap,
-  formatNumber,
-  getLicenseBadgeSx,
-  getSRBadgeSx,
   getSRTier,
-  getTrackDisplayName,
+  formatNumber,
+  getSRBadgeSx,
   ROLE_CHIP_SX,
   safetyRating,
   type RankDriver,
+  computeLicenseMap,
+  getLicenseBadgeSx,
+  getTrackDisplayName,
 } from 'src/lib/ac-elite-data';
-import {
-  getEffectiveLastSync,
-  getSyncHealth,
-  type SiteMetadata,
-  type SyncHealth,
-} from 'src/lib/sync-utils';
-import {
-  EMPTY_TEAM_ROLES,
-  getTeamRole,
-  teamRoleToDiscordRole,
-  type TeamRole,
-  type TeamRoles,
-} from 'src/lib/team-roles';
 
 import { PageGridOverlay } from 'src/components/page-background/page-grid-overlay';
 

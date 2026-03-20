@@ -10,8 +10,8 @@ import Typography from '@mui/material/Typography';
 import { CONFIG } from 'src/config-global';
 import { fetchJson } from 'src/lib/fetch-json';
 import { GLASS_CARD_SX, GLASS_CARD_INNER_SX } from 'src/lib/glass';
-import { CAR, formatLaptime, formatNumber, getTrackDisplayName, type RankDriver } from 'src/lib/ac-elite-data';
 import { getEffectiveLastSync, getSyncHealth, type SiteMetadata } from 'src/lib/sync-utils';
+import { CAR, formatLaptime, formatNumber, getTrackDisplayName, type RankDriver } from 'src/lib/ac-elite-data';
 
 import { ErrorPanel } from 'src/components/data-state/error-panel';
 import { LoadingPanel } from 'src/components/data-state/loading-panel';
