@@ -14,24 +14,23 @@ import DialogContent from '@mui/material/DialogContent';
 import {
   SR_TIERS,
   SR_CONFIG,
+  formatNumber,
   getSRBadgeSx,
   LICENSE_TIERS,
+  SR_CHIP_WIDTH,
   getLicenseBadgeSx,
+  LICENSE_CHIP_WIDTH,
   LICENSE_TIER_ORDER,
 } from 'src/lib/ac-elite-data';
 
-type GuideTab = 'licence' | 'safety';
+type GuideTab = 'license' | 'safety';
 
 type LicenseSafetyGuideButtonProps = {
   compact?: boolean;
 };
 
-const GUIDE_LICENSE_CHIP_WIDTH = 96;
-const GUIDE_SR_CHIP_WIDTH = 64;
-
-function formatNumber(value: number) {
-  return value.toLocaleString();
-}
+const GUIDE_LICENSE_CHIP_WIDTH = LICENSE_CHIP_WIDTH;
+const GUIDE_SR_CHIP_WIDTH = SR_CHIP_WIDTH;
 
 function formatLicenseRequirement(
   tier: { minKm: number; minScore: number; minTracks?: number },
@@ -52,7 +51,7 @@ function formatLicenseRequirement(
 
 export function LicenseSafetyGuideButton({ compact = false }: LicenseSafetyGuideButtonProps) {
   const [open, setOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<GuideTab>('licence');
+  const [activeTab, setActiveTab] = useState<GuideTab>('license');
 
   return (
     <>
@@ -142,7 +141,7 @@ export function LicenseSafetyGuideButton({ compact = false }: LicenseSafetyGuide
             }}
           >
             <Tab
-              value="licence"
+              value="license"
               label="License"
               sx={{
                 minHeight: 48,
@@ -175,7 +174,7 @@ export function LicenseSafetyGuideButton({ compact = false }: LicenseSafetyGuide
         </Box>
 
         <DialogContent sx={{ px: 3, pt: 1, pb: 3, maxHeight: '72vh' }}>
-          {activeTab === 'licence' && (
+          {activeTab === 'license' && (
             <Stack spacing={2.2}>
               <Typography variant="h6" sx={{ fontWeight: 700, color: '#dbeafe' }}>
                 Your license (pace/skill) is based on your leaderboard pace and total distance driven.

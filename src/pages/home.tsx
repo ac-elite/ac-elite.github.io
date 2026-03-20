@@ -16,7 +16,9 @@ import ListItemButton from '@mui/material/ListItemButton';
 import { useTheme, keyframes } from '@mui/material/styles';
 
 import { CONFIG } from 'src/config-global';
-import { getSRBadgeSx, getLicenseBadgeSx } from 'src/lib/ac-elite-data';
+import { fetchJson } from 'src/lib/fetch-json';
+import { getDriverProfileHref } from 'src/lib/routes';
+import { formatNumber, getSRBadgeSx, getLicenseBadgeSx } from 'src/lib/ac-elite-data';
 
 type CarLap = { laptime?: number; laps?: number; ts?: number };
 type DriverLeaderboard = Record<string, Record<string, CarLap>>;
@@ -207,10 +209,6 @@ function formatTrackName(trackId: string) {
   return trackNames[trackId] || trackId.replace(/_/g, ' ').trim();
 }
 
-function formatNumber(value: number) {
-  return value.toLocaleString();
-}
-
 function formatTimeAgo(isoString?: string) {
   if (!isoString) return 'Unknown';
   const timestamp = new Date(isoString).getTime();
@@ -289,13 +287,6 @@ function getSyncStatus(lastSync?: string): SyncStatus {
 function getRoleLabel(role: TeamRole) {
   if (!role) return null;
   return role.charAt(0).toUpperCase() + role.slice(1);
-}
-
-async function fetchJson<T>(url: string): Promise<T> {
-  const requestUrl = url.startsWith('/') ? `${APP_BASE_URL}${url.replace(/^\//, '')}` : url;
-  const res = await fetch(requestUrl, { cache: 'no-store' });
-  if (!res.ok) throw new Error(`Failed to fetch ${url}: ${res.status} ${res.statusText}`);
-  return (await res.json()) as T;
 }
 
 function safetyRating(driver: RankDriver) {
@@ -631,7 +622,7 @@ function HeroSection({
                     One view. All key data.
                   </Typography>
                   <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5 }}>
-                    Live KMR-powered insights for driver search, safety rating, and licence progression.
+                    Live KMR-powered insights for driver search, safety rating, and license progression.
                   </Typography>
                 </Box>
 
@@ -716,7 +707,7 @@ function HeroSection({
             <Box component="span" sx={{ fontWeight: 800, color: '#fbbf24' }}>
               Note:
             </Box>{' '}
-            Licence and Safety Rating calculations are currently work in progress. Values and thresholds may change
+            License and Safety Rating calculations are currently work in progress. Values and thresholds may change
             while we continue tuning.
           </Typography>
         </Box>
@@ -767,7 +758,7 @@ function DriverSearchSection({
               Search drivers and view their profile
             </Typography>
             <Typography variant="body1" sx={{ maxWidth: 680, color: 'text.secondary' }}>
-              This search now uses live data from your previous version (`rank.json`) with real Safety Rating and licence calculations.
+              This search now uses live data from your previous version (`rank.json`) with real Safety Rating and License calculations.
             </Typography>
           </Stack>
         </Stack>
@@ -843,7 +834,7 @@ function DriverSearchSection({
                         <ListItemButton
                           key={driver.guid}
                           onClick={() => {
-                            window.location.href = `${APP_BASE_URL}driver/${encodeURIComponent(driver.guid)}`;
+                            window.location.href = getDriverProfileHref(driver.guid);
                           }}
                           sx={{
                             px: 1.75,
@@ -993,7 +984,7 @@ function DashboardSection({ drivers }: { drivers: DriverView[] }) {
             {
               title: 'Top Safety Driver',
               value: topSr ? `${topSr.name} (${topSr.safetyTier} | ${topSr.safety.toFixed(2)})` : 'No data',
-              detail: topSr ? `KM: ${formatNumber(Math.round(topSr.kilometers))}` : 'Waiting for data',
+              detail: topSr ? `Total KM: ${formatNumber(Math.round(topSr.kilometers))}` : 'Waiting for data',
             },
             {
               title: 'Highest Pace Score',

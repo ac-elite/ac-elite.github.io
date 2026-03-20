@@ -6,19 +6,27 @@ import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import Container from '@mui/material/Container';
-import { keyframes } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 
 import { CONFIG } from 'src/config-global';
+import { fetchJson } from 'src/lib/fetch-json';
+import { getDriverProfileHref } from 'src/lib/routes';
 import {
   CAR,
   getDriverSR,
+  formatNumber,
   getSRBadgeSx,
+  SR_CHIP_WIDTH,
   type RankDriver,
   getDriverLicense,
   computeLicenseMap,
   getLicenseBadgeSx,
+  LICENSE_CHIP_WIDTH,
 } from 'src/lib/ac-elite-data';
+
+import { ErrorPanel } from 'src/components/data-state/error-panel';
+import { LoadingPanel } from 'src/components/data-state/loading-panel';
+import { PageGridOverlay } from 'src/components/page-background/page-grid-overlay';
 
 type TeamRoles = {
   creator: string[];
@@ -41,26 +49,6 @@ type FameEntry = {
   license: string;
   srTier: string;
 };
-
-const APP_BASE_URL = import.meta.env.BASE_URL;
-
-async function fetchJson<T>(url: string): Promise<T> {
-  const requestUrl = url.startsWith('/') ? `${APP_BASE_URL}${url.replace(/^\//, '')}` : url;
-  const res = await fetch(requestUrl, { cache: 'no-store' });
-  if (!res.ok) throw new Error(`Failed to fetch ${url}: ${res.status} ${res.statusText}`);
-  return (await res.json()) as T;
-}
-
-function formatNumber(value: number) {
-  return value.toLocaleString();
-}
-
-const gridMove = keyframes`
-  0% { background-position: 0 0, 0 0, 0 0; }
-  100% { background-position: 48px 48px, 48px 48px, 96px 0; }
-`;
-const LICENSE_CHIP_WIDTH = 96;
-const SR_CHIP_WIDTH = 62;
 
 function CategoryCard({
   title,
@@ -97,7 +85,7 @@ function CategoryCard({
             <Box
               key={`${entry.guid}-${title}`}
               onClick={() => {
-                window.location.href = `${APP_BASE_URL}driver/${encodeURIComponent(entry.guid)}`;
+                window.location.href = getDriverProfileHref(entry.guid);
               }}
               sx={{
                 borderRadius: 2,
@@ -242,7 +230,7 @@ function TeamRoleColumn({
           <Box
             key={`${title}-${member.guid}`}
             onClick={() => {
-              window.location.href = `${APP_BASE_URL}driver/${encodeURIComponent(member.guid)}`;
+              window.location.href = getDriverProfileHref(member.guid);
             }}
             sx={{
               borderRadius: 2,
@@ -480,21 +468,7 @@ export default function Page() {
           overflow: 'hidden',
         }}
       >
-        <Box
-          aria-hidden
-          sx={{
-            position: 'absolute',
-            inset: 0,
-            pointerEvents: 'none',
-            opacity: 0.22,
-            backgroundImage:
-              'linear-gradient(rgba(255,255,255,0.08) 1px, transparent 1px),' +
-              'linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px),' +
-              'repeating-linear-gradient(45deg, transparent, transparent 88px, rgba(147,197,253,0.15) 88px, rgba(147,197,253,0.15) 90px)',
-            backgroundSize: '48px 48px, 48px 48px, 100% 100%',
-            animation: `${gridMove} 22s linear infinite`,
-          }}
-        />
+        <PageGridOverlay />
 
         <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1 }}>
           <Stack spacing={3}>
@@ -507,22 +481,9 @@ export default function Page() {
               </Typography>
             </Stack>
 
-            {loading && (
-              <Paper sx={{ p: 3 }}>
-                <Typography>Loading Hall of Fame data...</Typography>
-              </Paper>
-            )}
+            {loading && <LoadingPanel message="Loading Hall of Fame data..." />}
 
-            {!loading && error && (
-              <Paper sx={{ p: 3 }}>
-                <Typography color="error" fontWeight={700}>
-                  Failed to load data
-                </Typography>
-                <Typography color="text.secondary" sx={{ mt: 1 }}>
-                  {error}
-                </Typography>
-              </Paper>
-            )}
+            {!loading && error && <ErrorPanel error={error} />}
 
             {!loading && !error && (
               <>

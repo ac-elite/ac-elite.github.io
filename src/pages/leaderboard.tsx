@@ -13,24 +13,32 @@ import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import Container from '@mui/material/Container';
-import { keyframes } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import FormControl from '@mui/material/FormControl';
 import TableContainer from '@mui/material/TableContainer';
 
 import { CONFIG } from 'src/config-global';
+import { fetchJson } from 'src/lib/fetch-json';
+import { getDriverProfileHref } from 'src/lib/routes';
 import {
   CAR,
   getDriverSR,
   calculateGap,
   getSRBadgeSx,
+  SR_CHIP_WIDTH,
   formatLaptime,
+  getPodiumChipSx,
   type RankDriver,
   getDriverLicense,
   computeLicenseMap,
   getLicenseBadgeSx,
+  LICENSE_CHIP_WIDTH,
   getTrackDisplayName,
 } from 'src/lib/ac-elite-data';
+
+import { ErrorPanel } from 'src/components/data-state/error-panel';
+import { LoadingPanel } from 'src/components/data-state/loading-panel';
+import { PageGridOverlay } from 'src/components/page-background/page-grid-overlay';
 
 type LeaderboardRow = {
   laptime: number;
@@ -40,53 +48,6 @@ type LeaderboardRow = {
 };
 
 const LEADERBOARD_PER_PAGE = 20;
-const APP_BASE_URL = import.meta.env.BASE_URL;
-
-async function fetchJson<T>(url: string): Promise<T> {
-  const requestUrl = url.startsWith('/') ? `${APP_BASE_URL}${url.replace(/^\//, '')}` : url;
-  const res = await fetch(requestUrl, { cache: 'no-store' });
-  if (!res.ok) throw new Error(`Failed to fetch ${url}: ${res.status} ${res.statusText}`);
-  return (await res.json()) as T;
-}
-
-const gridMove = keyframes`
-  0% { background-position: 0 0, 0 0, 0 0; }
-  100% { background-position: 48px 48px, 48px 48px, 96px 0; }
-`;
-
-function getPodiumChipSx(position: number) {
-  if (position === 0) {
-    return {
-      color: '#fef3c7',
-      border: '1px solid rgba(245, 158, 11, 0.55)',
-      background: 'linear-gradient(135deg, rgba(245,158,11,0.38), rgba(245,158,11,0.14))',
-      backdropFilter: 'blur(10px)',
-      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.22)',
-    };
-  }
-  if (position === 1) {
-    return {
-      color: '#e2e8f0',
-      border: '1px solid rgba(148, 163, 184, 0.55)',
-      background: 'linear-gradient(135deg, rgba(148,163,184,0.35), rgba(148,163,184,0.12))',
-      backdropFilter: 'blur(10px)',
-      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.2)',
-    };
-  }
-  if (position === 2) {
-    return {
-      color: '#ffedd5',
-      border: '1px solid rgba(194, 101, 31, 0.6)',
-      background: 'linear-gradient(135deg, rgba(194,101,31,0.36), rgba(194,101,31,0.14))',
-      backdropFilter: 'blur(10px)',
-      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.2)',
-    };
-  }
-  return {
-    bgcolor: 'rgba(255,255,255,0.12)',
-    color: '#fff',
-  };
-}
 
 function getPodiumRowSx(position: number) {
   if (position === 0) {
@@ -201,21 +162,7 @@ export default function Page() {
           overflow: 'hidden',
         }}
       >
-        <Box
-          aria-hidden
-          sx={{
-            position: 'absolute',
-            inset: 0,
-            pointerEvents: 'none',
-            opacity: 0.22,
-            backgroundImage:
-              'linear-gradient(rgba(255,255,255,0.08) 1px, transparent 1px),' +
-              'linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px),' +
-              'repeating-linear-gradient(45deg, transparent, transparent 88px, rgba(147,197,253,0.15) 88px, rgba(147,197,253,0.15) 90px)',
-            backgroundSize: '48px 48px, 48px 48px, 100% 100%',
-            animation: `${gridMove} 22s linear infinite`,
-          }}
-        />
+        <PageGridOverlay />
 
         <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1 }}>
           <Stack spacing={3}>
@@ -228,22 +175,9 @@ export default function Page() {
               </Typography>
             </Stack>
 
-            {loading && (
-              <Paper sx={{ p: 3 }}>
-                <Typography>Loading leaderboard data...</Typography>
-              </Paper>
-            )}
+            {loading && <LoadingPanel message="Loading leaderboard data..." />}
 
-            {!loading && error && (
-              <Paper sx={{ p: 3 }}>
-                <Typography color="error" fontWeight={700}>
-                  Failed to load data
-                </Typography>
-                <Typography color="text.secondary" sx={{ mt: 1 }}>
-                  {error}
-                </Typography>
-              </Paper>
-            )}
+            {!loading && error && <ErrorPanel error={error} />}
 
             {!loading && !error && (
               <>
@@ -335,12 +269,12 @@ export default function Page() {
                         <TableRow>
                           <TableCell>#</TableCell>
                           <TableCell>Driver</TableCell>
-                          <TableCell>Licence</TableCell>
+                          <TableCell>License</TableCell>
                           <TableCell>Safety Rating</TableCell>
                           <TableCell>Lap Time</TableCell>
                           <TableCell align="right">Gap</TableCell>
                           <TableCell align="right">Laps</TableCell>
-                          <TableCell align="right">KM</TableCell>
+                          <TableCell align="right">Total KM</TableCell>
                         </TableRow>
                       </TableHead>
                       <TableBody>
@@ -369,7 +303,7 @@ export default function Page() {
                                 ...getPodiumRowSx(absolutePos),
                               }}
                               onClick={() => {
-                                window.location.href = `${APP_BASE_URL}driver/${encodeURIComponent(entry.guid)}`;
+                                window.location.href = getDriverProfileHref(entry.guid);
                               }}
                             >
                               <TableCell>
@@ -379,7 +313,7 @@ export default function Page() {
                                   sx={{
                                     minWidth: 38,
                                     fontWeight: 700,
-                                    ...getPodiumChipSx(absolutePos),
+                                    ...getPodiumChipSx(absolutePos, true),
                                   }}
                                 />
                               </TableCell>
@@ -390,7 +324,7 @@ export default function Page() {
                                     size="small"
                                     label={license.license}
                                     sx={{
-                                      minWidth: 96,
+                                      minWidth: LICENSE_CHIP_WIDTH,
                                       fontWeight: 700,
                                       justifyContent: 'center',
                                       ...getLicenseBadgeSx(license.license),
@@ -407,7 +341,7 @@ export default function Page() {
                                     size="small"
                                     label={sr.tier}
                                     sx={{
-                                      minWidth: 62,
+                                      minWidth: SR_CHIP_WIDTH,
                                       fontWeight: 700,
                                       justifyContent: 'center',
                                       ...getSRBadgeSx(sr.tier),

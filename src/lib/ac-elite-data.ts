@@ -14,6 +14,48 @@ export type RankDriver = {
 };
 
 export const CAR = 'tatuusfa1';
+export const LICENSE_CHIP_WIDTH = 96;
+export const SR_CHIP_WIDTH = 62;
+
+export function formatNumber(value: number) {
+  return value.toLocaleString();
+}
+
+export function getPodiumChipSx(position: number, zeroIndexed = false): SxProps<Theme> {
+  const rank = zeroIndexed ? position + 1 : position;
+
+  if (rank === 1) {
+    return {
+      color: '#fef3c7',
+      border: '1px solid rgba(245, 158, 11, 0.55)',
+      background: 'linear-gradient(135deg, rgba(245,158,11,0.38), rgba(245,158,11,0.14))',
+      backdropFilter: 'blur(10px)',
+      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.22)',
+    };
+  }
+  if (rank === 2) {
+    return {
+      color: '#e2e8f0',
+      border: '1px solid rgba(148, 163, 184, 0.55)',
+      background: 'linear-gradient(135deg, rgba(148,163,184,0.35), rgba(148,163,184,0.12))',
+      backdropFilter: 'blur(10px)',
+      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.2)',
+    };
+  }
+  if (rank === 3) {
+    return {
+      color: '#ffedd5',
+      border: '1px solid rgba(194, 101, 31, 0.6)',
+      background: 'linear-gradient(135deg, rgba(194,101,31,0.36), rgba(194,101,31,0.14))',
+      backdropFilter: 'blur(10px)',
+      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.2)',
+    };
+  }
+  return {
+    bgcolor: 'rgba(255,255,255,0.12)',
+    color: '#fff',
+  };
+}
 
 export const SR_CONFIG = {
   SR_BASE: 1.0,

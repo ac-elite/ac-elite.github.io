@@ -152,7 +152,7 @@ export function NavContent({ data, slots, sx }: NavContentProps) {
             {data.map((item) => {
               const isActived = item.path === pathname;
               const isDisabled = Boolean(item.disabled);
-              const navButtonProps = isDisabled ? {} : { component: RouterLink, href: item.path };
+              const navButtonProps = { component: RouterLink, href: item.path };
 
               return (
                 <ListItem disableGutters disablePadding key={item.title}>
@@ -179,10 +179,10 @@ export function NavContent({ data, slots, sx }: NavContentProps) {
                         },
                         ...(isDisabled && {
                           opacity: 0.62,
-                          cursor: 'default',
+                          cursor: 'pointer',
                           '&:hover': {
-                            bgcolor: 'transparent',
-                            color: varAlpha(theme.vars.palette.common.whiteChannel, 0.72),
+                            bgcolor: varAlpha(theme.vars.palette.common.whiteChannel, 0.06),
+                            color: varAlpha(theme.vars.palette.common.whiteChannel, 0.82),
                           },
                         }),
                         ...(isActived && {

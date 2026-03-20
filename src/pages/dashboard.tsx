@@ -4,13 +4,16 @@ import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
-import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
-import { keyframes } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 
 import { CONFIG } from 'src/config-global';
-import { getTrackDisplayName } from 'src/lib/ac-elite-data';
+import { fetchJson } from 'src/lib/fetch-json';
+import { formatNumber, getTrackDisplayName } from 'src/lib/ac-elite-data';
+
+import { ErrorPanel } from 'src/components/data-state/error-panel';
+import { LoadingPanel } from 'src/components/data-state/loading-panel';
+import { PageGridOverlay } from 'src/components/page-background/page-grid-overlay';
 
 type RankDriver = {
   guid: string;
@@ -31,19 +34,7 @@ type Metadata = {
   error?: string;
 };
 
-const APP_BASE_URL = import.meta.env.BASE_URL;
 const CAR = 'tatuusfa1';
-
-async function fetchJson<T>(url: string): Promise<T> {
-  const requestUrl = url.startsWith('/') ? `${APP_BASE_URL}${url.replace(/^\//, '')}` : url;
-  const res = await fetch(requestUrl, { cache: 'no-store' });
-  if (!res.ok) throw new Error(`Failed to fetch ${url}: ${res.status} ${res.statusText}`);
-  return (await res.json()) as T;
-}
-
-function formatNumber(value: number) {
-  return value.toLocaleString();
-}
 
 function formatLaptime(ms?: number) {
   if (!ms || !Number.isFinite(ms)) return '—';
@@ -114,11 +105,6 @@ function getSyncBadge(lastSync?: string) {
   if (diffMs <= day) return { label: 'Delayed', color: '#f59e0b' };
   return { label: 'Stale', color: '#ef4444' };
 }
-
-const gridMove = keyframes`
-  0% { background-position: 0 0, 0 0; }
-  100% { background-position: 48px 48px, 48px 48px; }
-`;
 
 export default function Page() {
   const [loading, setLoading] = useState(true);
@@ -264,22 +250,7 @@ export default function Page() {
           overflow: 'hidden',
         }}
       >
-        <Box
-          aria-hidden
-          sx={{
-            position: 'absolute',
-            inset: 0,
-            pointerEvents: 'none',
-            opacity: 0.45,
-            backgroundImage:
-              'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),' +
-              'linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px),' +
-              'repeating-linear-gradient(45deg, transparent, transparent 92px, rgba(147,197,253,0.16) 92px, rgba(147,197,253,0.16) 94px)',
-            backgroundSize: '48px 48px, 48px 48px, 100% 100%',
-            animation: `${gridMove} 20s linear infinite`,
-            mixBlendMode: 'screen',
-          }}
-        />
+        <PageGridOverlay />
 
       <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
         <Stack spacing={3.5}>
@@ -295,43 +266,9 @@ export default function Page() {
             </Typography>
           </Stack>
 
-          {loading && (
-            <Paper sx={{ p: 3, border: '1px solid rgba(148,163,184,0.3)' }}>
-              <Typography>Loading data…</Typography>
-            </Paper>
-          )}
+          {loading && <LoadingPanel message="Loading data..." />}
 
-          {!loading && error && (
-            <Paper sx={{ p: 3, border: '1px solid rgba(148,163,184,0.3)' }}>
-              <Typography color="error" fontWeight={700}>
-                Failed to load data
-              </Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                {error}
-              </Typography>
-              <Button
-                sx={{
-                  mt: 2,
-                  color: '#fff',
-                  border: '1px solid rgba(255,255,255,0.22)',
-                  background:
-                    'linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(173,216,255,0.1) 100%)',
-                  backdropFilter: 'blur(12px)',
-                  boxShadow:
-                    '0 10px 30px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.22)',
-                  '&:hover': {
-                    background:
-                      'linear-gradient(135deg, rgba(255,255,255,0.28) 0%, rgba(173,216,255,0.16) 100%)',
-                    borderColor: 'rgba(255,255,255,0.3)',
-                  },
-                }}
-                variant="contained"
-                onClick={() => window.location.reload()}
-              >
-                Retry
-              </Button>
-            </Paper>
-          )}
+          {!loading && error && <ErrorPanel error={error} onRetry={() => window.location.reload()} />}
 
           {!loading && !error && (
             <Grid container spacing={2.5}>
