@@ -1,6 +1,13 @@
 import type { Theme, SxProps } from '@mui/material/styles';
 
 export type CarLap = { laptime?: number; laps?: number; ts?: number };
+/** One driver row under a car id in `leaderboard.json` (e.g. per track). */
+export type LeaderboardCarRow = {
+  guid: string;
+  laptime?: number;
+  laps?: number;
+  name?: string;
+};
 export type DriverLeaderboard = Record<string, Record<string, CarLap>>;
 
 export type RankDriver = {
@@ -10,6 +17,13 @@ export type RankDriver = {
   kilometers?: number;
   collisions?: number;
   infr?: number;
+  /** Unix ts (seconds or ms) from rank sync — used for “last update” UI. */
+  last_seen?: number;
+  /** Session stats when present in rank.json */
+  wins?: number;
+  podiums?: number;
+  poles?: number;
+  flaps?: number;
   leaderboard?: DriverLeaderboard;
 };
 
@@ -121,7 +135,8 @@ const LICENSE_CONFIG = {
   // Around 30 laps per track means "full confidence".
   // This keeps anti-cheese protection while being less punitive for consistently quick drivers.
   CONFIDENCE_FULL_LAPS: 30,
-  // Reaching this many distinct tracks gives full participation scaling.
+  // Full pace participation at this many distinct tracks (min(1, count / N)). Even 8 keeps a round bar and
+  // matches legacy feel; Elite minTracks (10) stays the separate, stricter badge requirement.
   PARTICIPATION_FULL_TRACKS: 8,
   // Keep at 0 by default; raise to e.g. 5 if you want a hard lap floor.
   MIN_LAPS_FOR_SCORING: 6,
@@ -154,16 +169,20 @@ function getTrackConfidence(laps: number) {
   return Math.min(1, Math.sqrt(laps / LICENSE_CONFIG.CONFIDENCE_FULL_LAPS));
 }
 
+/**
+ * Pace + km + tracks: km/score ladder unchanged.
+ * minTracks uses even steps of 2 (easy to explain): Silver 2 → Gold 4 → Platinum 6 → Diamond 8 → Elite 10.
+ */
 export const LICENSE_TIERS: Record<string, { minKm: number; minScore: number; minTracks?: number }> = {
-  Elite: { minKm: 6000, minScore: 3700, minTracks: 8 },
-  'Diamond+': { minKm: 5000, minScore: 3100, minTracks: 6 },
-  Diamond: { minKm: 5000, minScore: 2500, minTracks: 6 },
-  'Platinum+': { minKm: 3500, minScore: 2000, minTracks: 5 },
-  Platinum: { minKm: 3500, minScore: 1500, minTracks: 5 },
-  'Gold+': { minKm: 2000, minScore: 1150, minTracks: 4 },
+  Elite: { minKm: 6000, minScore: 4000, minTracks: 10 },
+  'Diamond+': { minKm: 5000, minScore: 3000, minTracks: 8 },
+  Diamond: { minKm: 5000, minScore: 2500, minTracks: 8 },
+  'Platinum+': { minKm: 4000, minScore: 2000, minTracks: 6 },
+  Platinum: { minKm: 4000, minScore: 1500, minTracks: 6 },
+  'Gold+': { minKm: 2000, minScore: 1200, minTracks: 4 },
   Gold: { minKm: 2000, minScore: 800, minTracks: 4 },
-  'Silver+': { minKm: 1000, minScore: 600, minTracks: 3 },
-  Silver: { minKm: 1000, minScore: 400, minTracks: 3 },
+  'Silver+': { minKm: 1000, minScore: 600, minTracks: 2 },
+  Silver: { minKm: 1000, minScore: 400, minTracks: 2 },
   'Bronze+': { minKm: 100, minScore: 200 },
   Bronze: { minKm: 100, minScore: 0 },
 };
@@ -375,7 +394,8 @@ export function getTrackDisplayName(trackId: string) {
   return trackNames[trackId] || trackId.replace(/_/g, ' ').trim();
 }
 
-export function formatLaptime(ms: number) {
+export function formatLaptime(ms?: number | null) {
+  if (ms == null || !Number.isFinite(ms)) return '—';
   const min = Math.floor(ms / 60000);
   const sec = ((ms / 1000) % 60).toFixed(3).padStart(6, '0');
   return `${min}:${sec}`;

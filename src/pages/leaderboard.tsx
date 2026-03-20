@@ -20,7 +20,12 @@ import TableContainer from '@mui/material/TableContainer';
 import { CONFIG } from 'src/config-global';
 import { fetchJson } from 'src/lib/fetch-json';
 import { getDriverProfileHref } from 'src/lib/routes';
-import { GLASS_PANEL_SX, GLASS_TABLE_WRAPPER_SX, GLASS_TABLE_PAGINATION_SX } from 'src/lib/glass';
+import {
+  GLASS_PANEL_SX,
+  GLASS_TABLE_WRAPPER_SX,
+  GLASS_TABLE_PAGINATION_SX,
+  getPodiumRowSx,
+} from 'src/lib/glass';
 import {
   CAR,
   getDriverSR,
@@ -29,6 +34,7 @@ import {
   SR_CHIP_WIDTH,
   formatLaptime,
   getPodiumChipSx,
+  type LeaderboardCarRow,
   type RankDriver,
   getDriverLicense,
   computeLicenseMap,
@@ -41,42 +47,7 @@ import { ErrorPanel } from 'src/components/data-state/error-panel';
 import { LoadingPanel } from 'src/components/data-state/loading-panel';
 import { PageGridOverlay } from 'src/components/page-background/page-grid-overlay';
 
-type LeaderboardRow = {
-  laptime: number;
-  name?: string;
-  laps?: number;
-  guid: string;
-};
-
 const LEADERBOARD_PER_PAGE = 20;
-
-function getPodiumRowSx(position: number) {
-  if (position === 0) {
-    return {
-      background:
-        'linear-gradient(90deg, rgba(245,158,11,0.22) 0%, rgba(245,158,11,0.08) 60%, rgba(245,158,11,0.04) 100%)',
-      borderLeft: '2px solid rgba(245, 158, 11, 0.7)',
-      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.08)',
-    };
-  }
-  if (position === 1) {
-    return {
-      background:
-        'linear-gradient(90deg, rgba(148,163,184,0.2) 0%, rgba(148,163,184,0.08) 60%, rgba(148,163,184,0.03) 100%)',
-      borderLeft: '2px solid rgba(148, 163, 184, 0.75)',
-      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.07)',
-    };
-  }
-  if (position === 2) {
-    return {
-      background:
-        'linear-gradient(90deg, rgba(194,101,31,0.22) 0%, rgba(194,101,31,0.08) 60%, rgba(194,101,31,0.03) 100%)',
-      borderLeft: '2px solid rgba(194, 101, 31, 0.75)',
-      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.07)',
-    };
-  }
-  return {};
-}
 
 export default function Page() {
   const [loading, setLoading] = useState(true);
@@ -136,7 +107,7 @@ export default function Page() {
 
   const licenseMap = useMemo(() => computeLicenseMap(rankData), [rankData]);
 
-  const rows = useMemo<LeaderboardRow[]>(() => {
+  const rows = useMemo<LeaderboardCarRow[]>(() => {
     const data = leaderboardData?.[currentTrack]?.[CAR];
     if (!Array.isArray(data)) return [];
     return [...data].sort((a, b) => (a.laptime || 0) - (b.laptime || 0));
@@ -301,7 +272,9 @@ export default function Page() {
                               key={`${entry.guid}-${entry.laptime}-${index}`}
                               sx={{
                                 cursor: 'pointer',
-                                ...getPodiumRowSx(absolutePos),
+                                ...(absolutePos < 3
+                                  ? getPodiumRowSx((absolutePos + 1) as 1 | 2 | 3)
+                                  : {}),
                               }}
                               onClick={() => {
                                 window.location.href = getDriverProfileHref(entry.guid);
@@ -357,7 +330,9 @@ export default function Page() {
                                 {formatLaptime(entry.laptime)}
                               </TableCell>
                               <TableCell align="right" sx={{ fontFamily: 'monospace' }}>
-                                {calculateGap(fastestLap, entry.laptime)}
+                                {typeof entry.laptime === 'number'
+                                  ? calculateGap(fastestLap, entry.laptime)
+                                  : '—'}
                               </TableCell>
                               <TableCell align="right">{(entry.laps || 0).toLocaleString()}</TableCell>
                               <TableCell align="right">{(driver.kilometers || 0).toLocaleString()}</TableCell>

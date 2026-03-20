@@ -19,40 +19,33 @@ import { CONFIG } from 'src/config-global';
 import { fetchJson } from 'src/lib/fetch-json';
 import { getDriverProfileHref } from 'src/lib/routes';
 import { GLASS_CARD_SX, GLASS_PANEL_SX, GLASS_INNER_PANEL_SX } from 'src/lib/glass';
-import { formatNumber, getSRBadgeSx, getLicenseBadgeSx, ROLE_CHIP_SX, type DiscordRole } from 'src/lib/ac-elite-data';
+import {
+  CAR,
+  computeLicenseMap,
+  formatNumber,
+  getLicenseBadgeSx,
+  getSRBadgeSx,
+  getSRTier,
+  getTrackDisplayName,
+  ROLE_CHIP_SX,
+  safetyRating,
+  type RankDriver,
+} from 'src/lib/ac-elite-data';
+import {
+  getEffectiveLastSync,
+  getSyncHealth,
+  type SiteMetadata,
+  type SyncHealth,
+} from 'src/lib/sync-utils';
+import {
+  EMPTY_TEAM_ROLES,
+  getTeamRole,
+  teamRoleToDiscordRole,
+  type TeamRole,
+  type TeamRoles,
+} from 'src/lib/team-roles';
 
 import { PageGridOverlay } from 'src/components/page-background/page-grid-overlay';
-
-type CarLap = { laptime?: number; laps?: number; ts?: number };
-type DriverLeaderboard = Record<string, Record<string, CarLap>>;
-type TeamRole = 'creator' | 'admin' | 'moderator' | null;
-
-type RankDriver = {
-  guid: string;
-  name?: string;
-  points?: number;
-  kilometers?: number;
-  collisions?: number;
-  infr?: number;
-  last_seen?: number;
-  leaderboard?: DriverLeaderboard;
-};
-
-type TeamRoles = {
-  creator: string[];
-  admin: string[];
-  moderator: string[];
-};
-
-type Metadata = {
-  lastSync?: string;
-};
-
-type SyncStatus = {
-  label: 'Live' | 'Delayed' | 'Stale' | 'Unknown';
-  color: string;
-  ageText: string;
-};
 
 type DriverView = {
   guid: string;
@@ -70,110 +63,7 @@ type DriverView = {
   teamRole: TeamRole;
 };
 
-const CAR = 'tatuusfa1';
-
-const SR_CONFIG = {
-  SR_BASE: 1.0,
-  SR_SCALE: 8.99,
-  SR_MIN: 1.0,
-  SR_MAX: 9.99,
-  SR_START: 2.5,
-  // SR is only fully trusted once a driver has enough distance.
-  // This prevents very low-km drivers from instantly sitting at extreme SR values.
-  CONFIDENCE_FULL_KM: 3000,
-  COLLISION_WEIGHT: 1.0,
-  INFRACTION_WEIGHT: 2.0,
-};
-
 const APP_BASE_URL = import.meta.env.BASE_URL;
-
-const SR_TIERS = [
-  { name: 'S', minSR: 3.0, minKm: 3000 },
-  { name: 'A1', minSR: 2.9, minKm: 2000 },
-  { name: 'A2', minSR: 2.8, minKm: 2000 },
-  { name: 'A3', minSR: 2.7, minKm: 2000 },
-  { name: 'B1', minSR: 2.6, minKm: 1500 },
-  { name: 'B2', minSR: 2.5, minKm: 1500 },
-  { name: 'B3', minSR: 2.4, minKm: 1500 },
-  { name: 'C1', minSR: 2.3, minKm: 1000 },
-  { name: 'C2', minSR: 2.2, minKm: 1000 },
-  { name: 'C3', minSR: 2.1, minKm: 1000 },
-  { name: 'D1', minSR: 2.0, minKm: 500 },
-  { name: 'D2', minSR: 1.9, minKm: 500 },
-  { name: 'D3', minSR: 1.8, minKm: 500 },
-  { name: 'E1', minSR: 1.7, minKm: 100 },
-  { name: 'E2', minSR: 1.6, minKm: 100 },
-  { name: 'E3', minSR: 1.5, minKm: 100 },
-];
-
-const LICENSE_CONFIG = {
-  MIN_KM: 100,
-  TRACK_MIN_DRIVERS: 5,
-  TRACK_WEIGHT_BASE: 1.0,
-  TRACK_WEIGHT_SCALE: 0.02,
-  TRACK_WEIGHT_MAX: 2.0,
-  // Around 50 laps per track means "full confidence".
-  CONFIDENCE_FULL_LAPS: 50,
-  // Reaching this many distinct tracks gives full participation scaling.
-  PARTICIPATION_FULL_TRACKS: 8,
-  // Keep at 0 by default; raise to e.g. 5 if you want a hard lap floor.
-  MIN_LAPS_FOR_SCORING: 0,
-  CONSISTENCY_BONUS_PER_TRACK: 2,
-  CONSISTENCY_BONUS_MAX: 50,
-  // Final fine-tune: reward drivers that are consistently high on each leaderboard.
-  POSITION_QUALITY_WEIGHT: 0.8,
-  POSITION_STABILITY_WEIGHT: 0.15,
-  // Extra signal: how often a driver finishes in the top group.
-  POSITION_TOP_FINISH_WEIGHT: 0.25,
-  TOP_FINISH_CUTOFF_POSITION: 5,
-  POSITION_FACTOR_BASE: 0.9,
-  POSITION_FACTOR_SCALE: 0.3,
-  POSITION_MULTIPLIERS: {
-    1: 2.0,
-    2: 1.7,
-    3: 1.5,
-    4: 1.3,
-    5: 1.2,
-    6: 1.1,
-    7: 1.1,
-    8: 1.1,
-    9: 1.1,
-    10: 1.1,
-  } as Record<number, number>,
-};
-
-function getTrackConfidence(laps: number) {
-  if (!Number.isFinite(laps) || laps <= 0) return 0;
-  return Math.min(1, Math.sqrt(laps / LICENSE_CONFIG.CONFIDENCE_FULL_LAPS));
-}
-
-const LICENSE_TIERS: Record<string, { minKm: number; minScore: number; minTracks?: number }> = {
-  Elite: { minKm: 6000, minScore: 3700, minTracks: 8 },
-  'Diamond+': { minKm: 5000, minScore: 3100, minTracks: 6 },
-  Diamond: { minKm: 5000, minScore: 2500, minTracks: 6 },
-  'Platinum+': { minKm: 3500, minScore: 2000, minTracks: 5 },
-  Platinum: { minKm: 3500, minScore: 1500, minTracks: 5 },
-  'Gold+': { minKm: 2000, minScore: 1150, minTracks: 4 },
-  Gold: { minKm: 2000, minScore: 800, minTracks: 4 },
-  'Silver+': { minKm: 1000, minScore: 600, minTracks: 3 },
-  Silver: { minKm: 1000, minScore: 400, minTracks: 3 },
-  'Bronze+': { minKm: 100, minScore: 200 },
-  Bronze: { minKm: 100, minScore: 0 },
-};
-
-const LICENSE_TIER_ORDER = [
-  'Elite',
-  'Diamond+',
-  'Diamond',
-  'Platinum+',
-  'Platinum',
-  'Gold+',
-  'Gold',
-  'Silver+',
-  'Silver',
-  'Bronze+',
-  'Bronze',
-] as const;
 
 /** Hero CTA: subtle “breathing” glass glow (matches grid energy, stays on-brand). */
 const heroPrimaryPulse = keyframes`
@@ -222,284 +112,6 @@ const sectionKickerSx = {
   fontWeight: 700,
 };
 
-const trackNames: Record<string, string> = {
-  ks_barcelona_layout_gp: 'Barcelona - GP',
-  ks_barcelona_layout_moto: 'Barcelona - Moto',
-  ks_black_cat_county_layout_short: 'Black Cat County - Short',
-  ks_brands_hatch_gp: 'Brands Hatch - GP',
-  imola_: 'Imola',
-  ks_laguna_seca_: 'Laguna Seca',
-  magione_: 'Magione',
-  monza_: 'Monza',
-  ks_monza66_junior: 'Monza 1966 - Junior',
-  ks_monza66_road: 'Monza 1966 - Road',
-  mugello_: 'Mugello',
-  ks_nordschleife_nordschleife: 'Nordschleife',
-  ks_nordschleife_endurance: 'Nordschleife Endurance',
-  ks_nurburgring_layout_gp_a: 'Nurburgring GP',
-  ks_nurburgring_layout_gp_b: 'Nurburgring GP - GT',
-  ks_red_bull_ring_layout_gp: 'Red Bull Ring - GP',
-  ks_silverstone_gp: 'Silverstone - GP',
-  ks_silverstone_national: 'Silverstone - National',
-  spa_: 'Spa',
-  ks_vallelunga_extended_circuit: 'Vallelunga - Extended',
-  ks_vallelunga_classic_circuit: 'Vallelunga - Classic',
-  ks_zandvoort_: 'Zandvoort',
-  rt_suzuka_suzukagp: 'Suzuka GP',
-  canada_2021_: 'Montreal (Canada)',
-  acu_unitedstates_a: 'COTA (USA)',
-};
-
-function formatTrackName(trackId: string) {
-  return trackNames[trackId] || trackId.replace(/_/g, ' ').trim();
-}
-
-function formatTimeAgo(isoString?: string) {
-  if (!isoString) return 'Unknown';
-  const timestamp = new Date(isoString).getTime();
-  if (!Number.isFinite(timestamp)) return 'Unknown';
-
-  const diffMs = Date.now() - timestamp;
-  if (diffMs < 0) return 'just now';
-
-  const minute = 60 * 1000;
-  const hour = 60 * minute;
-  const day = 24 * hour;
-
-  if (diffMs < minute) return 'just now';
-  if (diffMs < hour) {
-    const minutes = Math.floor(diffMs / minute);
-    return `${minutes} minute${minutes === 1 ? '' : 's'} ago`;
-  }
-  if (diffMs < day) {
-    const hours = Math.floor(diffMs / hour);
-    return `${hours} hour${hours === 1 ? '' : 's'} ago`;
-  }
-  const days = Math.floor(diffMs / day);
-  return `${days} day${days === 1 ? '' : 's'} ago`;
-}
-
-function parseTimestamp(input?: string | number) {
-  if (input == null) return undefined;
-  if (typeof input === 'number') {
-    // Support seconds and milliseconds unix timestamps
-    const ms = input < 1_000_000_000_000 ? input * 1000 : input;
-    return Number.isFinite(ms) ? ms : undefined;
-  }
-  const ms = new Date(input).getTime();
-  return Number.isFinite(ms) ? ms : undefined;
-}
-
-function getEffectiveLastSync(metadataLastSync: string | undefined, drivers: RankDriver[]) {
-  const metadataMs = parseTimestamp(metadataLastSync);
-  const rankLastSeenMs = drivers.reduce<number | undefined>((latest, driver) => {
-    const ts = parseTimestamp(driver.last_seen);
-    if (!ts) return latest;
-    if (!latest || ts > latest) return ts;
-    return latest;
-  }, undefined);
-
-  const best = [metadataMs, rankLastSeenMs].filter((x): x is number => Boolean(x)).sort((a, b) => b - a)[0];
-  return best ? new Date(best).toISOString() : undefined;
-}
-
-function getSyncStatus(lastSync?: string): SyncStatus {
-  if (!lastSync) {
-    return { label: 'Unknown', color: '#f59e0b', ageText: 'Unknown' };
-  }
-
-  const timestamp = new Date(lastSync).getTime();
-  if (!Number.isFinite(timestamp)) {
-    return { label: 'Unknown', color: '#f59e0b', ageText: 'Unknown' };
-  }
-
-  const diffMs = Date.now() - timestamp;
-  const hour = 60 * 60 * 1000;
-  const day = 24 * hour;
-  const ago = formatTimeAgo(lastSync);
-
-  if (diffMs <= 2 * hour) {
-    return { label: 'Live', color: '#22c55e', ageText: ago };
-  }
-
-  if (diffMs <= day) {
-    return { label: 'Delayed', color: '#f59e0b', ageText: ago };
-  }
-
-  return { label: 'Stale', color: '#ef4444', ageText: ago };
-}
-
-function getRoleLabel(role: TeamRole): DiscordRole | null {
-  if (!role) return null;
-  return (role.charAt(0).toUpperCase() + role.slice(1)) as DiscordRole;
-}
-
-function safetyRating(driver: RankDriver) {
-  const km = driver.kilometers || 0;
-  if (km <= 0) return SR_CONFIG.SR_START;
-  const crashes = driver.collisions || 0;
-  const infr = driver.infr || 0;
-  const c100 = (crashes / km) * 100;
-  const i100 = (infr / km) * 100;
-  if (!Number.isFinite(c100) || !Number.isFinite(i100)) return SR_CONFIG.SR_START;
-  const weighted = c100 * SR_CONFIG.COLLISION_WEIGHT + i100 * SR_CONFIG.INFRACTION_WEIGHT;
-  const rawSr = SR_CONFIG.SR_BASE + SR_CONFIG.SR_SCALE / (1 + weighted);
-
-  // Confidence rises with distance, so low-km SR stays closer to SR_START.
-  const confidence = Math.min(1, Math.sqrt(km / SR_CONFIG.CONFIDENCE_FULL_KM));
-  const confidenceAdjustedSr = SR_CONFIG.SR_START + (rawSr - SR_CONFIG.SR_START) * confidence;
-
-  return Math.min(SR_CONFIG.SR_MAX, Math.max(SR_CONFIG.SR_MIN, confidenceAdjustedSr));
-}
-
-function getSRTier(sr: number, km: number) {
-  for (const tier of SR_TIERS) {
-    if (sr >= tier.minSR && km >= tier.minKm) return tier.name;
-  }
-  return 'F';
-}
-
-function computeFullLeaderboardScores(drivers: RankDriver[]) {
-  const paceScores = new Array(drivers.length).fill(0) as number[];
-  const trackCounts = new Array(drivers.length).fill(0) as number[];
-  const positionRatios = drivers.map(() => [] as number[]);
-  const topFinishCounts = new Array(drivers.length).fill(0) as number[];
-  const tracks = new Set<string>();
-
-  for (const driver of drivers) {
-    const lb = driver.leaderboard || {};
-    for (const [trackId, cars] of Object.entries(lb)) {
-      if (cars?.[CAR]?.laptime != null) tracks.add(trackId);
-    }
-  }
-
-  for (const trackId of tracks) {
-    const entries: { driverIndex: number; laptime: number; laps: number }[] = [];
-
-    drivers.forEach((driver, idx) => {
-      const carData = driver.leaderboard?.[trackId]?.[CAR];
-      const laptime = carData?.laptime;
-      if (typeof laptime !== 'number') return;
-      const laps = typeof carData?.laps === 'number' ? carData.laps : 0;
-      entries.push({ driverIndex: idx, laptime, laps });
-    });
-
-    entries.sort((a, b) => a.laptime - b.laptime);
-    if (entries.length < LICENSE_CONFIG.TRACK_MIN_DRIVERS) continue;
-
-    const extra = entries.length - LICENSE_CONFIG.TRACK_MIN_DRIVERS;
-    const trackWeight = Math.min(
-      LICENSE_CONFIG.TRACK_WEIGHT_MAX,
-      LICENSE_CONFIG.TRACK_WEIGHT_BASE + extra * LICENSE_CONFIG.TRACK_WEIGHT_SCALE
-    );
-
-    entries.forEach((entry, position) => {
-      const pos1 = position + 1;
-      const baseScore = entries.length > 1 ? ((entries.length - position) / entries.length) * 100 : 100;
-      const multiplier = LICENSE_CONFIG.POSITION_MULTIPLIERS[pos1] || 1.0;
-
-      trackCounts[entry.driverIndex] += 1;
-
-      if (entry.laps < LICENSE_CONFIG.MIN_LAPS_FOR_SCORING) return;
-
-      const confidence = getTrackConfidence(entry.laps);
-      if (confidence <= 0) return;
-
-      const score = baseScore * multiplier * trackWeight * confidence;
-      paceScores[entry.driverIndex] += score;
-
-      // 0 means P1, 1 means last place. Used for consistency fine-tuning.
-      const ratio = entries.length > 1 ? position / (entries.length - 1) : 0;
-      positionRatios[entry.driverIndex].push(ratio);
-
-      if (pos1 <= LICENSE_CONFIG.TOP_FINISH_CUTOFF_POSITION) {
-        topFinishCounts[entry.driverIndex] += 1;
-      }
-    });
-  }
-
-  paceScores.forEach((score, idx) => {
-    const bonus = Math.min(
-      LICENSE_CONFIG.CONSISTENCY_BONUS_MAX,
-      trackCounts[idx] * LICENSE_CONFIG.CONSISTENCY_BONUS_PER_TRACK
-    );
-    const participationFactor = Math.min(1, trackCounts[idx] / LICENSE_CONFIG.PARTICIPATION_FULL_TRACKS);
-    const baseScore = (score + bonus) * participationFactor;
-
-    // Position quality/stability factor:
-    // - quality rewards being near the top more often
-    // - stability rewards less spread in placements
-    const ratios = positionRatios[idx];
-    if (!ratios.length) {
-      paceScores[idx] = baseScore;
-      return;
-    }
-
-    const avgRatio = ratios.reduce((sum, value) => sum + value, 0) / ratios.length;
-    const quality = 1 - avgRatio;
-
-    const variance = ratios.reduce((sum, value) => sum + (value - avgRatio) ** 2, 0) / ratios.length;
-    const stdDev = Math.sqrt(variance);
-    const stability = Math.max(0, 1 - stdDev * 2);
-
-    const topFinishRate = topFinishCounts[idx] / ratios.length;
-    const combined =
-      quality * LICENSE_CONFIG.POSITION_QUALITY_WEIGHT +
-      stability * LICENSE_CONFIG.POSITION_STABILITY_WEIGHT +
-      topFinishRate * LICENSE_CONFIG.POSITION_TOP_FINISH_WEIGHT;
-    const positionFactor = LICENSE_CONFIG.POSITION_FACTOR_BASE + LICENSE_CONFIG.POSITION_FACTOR_SCALE * combined;
-
-    paceScores[idx] = baseScore * positionFactor;
-  });
-
-  return { paceScores, trackCounts };
-}
-
-function computeLicenseMap(drivers: RankDriver[]) {
-  const map = new Map<string, { license: string; paceScore: number }>();
-  if (!drivers.length) return map;
-
-  const { paceScores, trackCounts } = computeFullLeaderboardScores(drivers);
-
-  const qualified = drivers
-    .map((driver, idx) => ({
-      driver,
-      score: (driver.kilometers || 0) >= LICENSE_CONFIG.MIN_KM ? paceScores[idx] || 0 : -1,
-      tracks: trackCounts[idx] || 0,
-    }))
-    .filter((x) => (x.driver.kilometers || 0) >= LICENSE_CONFIG.MIN_KM)
-    .sort((a, b) => b.score - a.score);
-
-  for (const item of qualified) {
-    const km = item.driver.kilometers || 0;
-    let license = 'Bronze';
-
-    for (const name of LICENSE_TIER_ORDER) {
-      const tier = LICENSE_TIERS[name];
-      const meetsTracks = tier.minTracks == null || item.tracks >= tier.minTracks;
-      if (km >= tier.minKm && item.score >= tier.minScore && meetsTracks) {
-        license = name;
-        break;
-      }
-    }
-
-    map.set(item.driver.guid, { license, paceScore: item.score });
-  }
-
-  for (const driver of drivers) {
-    if (!map.has(driver.guid)) map.set(driver.guid, { license: 'Rookie', paceScore: 0 });
-  }
-
-  return map;
-}
-
-function getTeamRole(guid: string, roles: TeamRoles): TeamRole {
-  if (roles.creator.includes(guid)) return 'creator';
-  if (roles.admin.includes(guid)) return 'admin';
-  if (roles.moderator.includes(guid)) return 'moderator';
-  return null;
-}
-
 function HeroSection({
   totalDrivers,
   totalLaps,
@@ -509,7 +121,7 @@ function HeroSection({
   totalDrivers: number;
   totalLaps: number;
   activeTracks: number;
-  syncStatus: SyncStatus;
+  syncStatus: SyncHealth;
 }) {
   const theme = useTheme();
   const isMdUp = useMediaQuery(theme.breakpoints.up('md'));
@@ -852,14 +464,14 @@ function DriverSearchSection({
                             primary={
                               <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
                                 <Typography variant="body2">{driver.name}</Typography>
-                                {driver.teamRole && getRoleLabel(driver.teamRole) && (
+                                {driver.teamRole && teamRoleToDiscordRole(driver.teamRole) && (
                                   <Chip
                                     size="small"
-                                    label={getRoleLabel(driver.teamRole)}
+                                    label={teamRoleToDiscordRole(driver.teamRole)}
                                     sx={{
                                       fontWeight: 700,
                                       fontSize: '0.72rem',
-                                      ...ROLE_CHIP_SX[getRoleLabel(driver.teamRole)!],
+                                      ...ROLE_CHIP_SX[teamRoleToDiscordRole(driver.teamRole)!],
                                     }}
                                   />
                                 )}
@@ -1017,12 +629,8 @@ export default function Page() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [rankData, setRankData] = useState<RankDriver[]>([]);
-  const [teamRoles, setTeamRoles] = useState<TeamRoles>({
-    creator: [],
-    admin: [],
-    moderator: [],
-  });
-  const [metadata, setMetadata] = useState<Metadata>({});
+  const [teamRoles, setTeamRoles] = useState<TeamRoles>(EMPTY_TEAM_ROLES);
+  const [metadata, setMetadata] = useState<SiteMetadata>({});
 
   useEffect(() => {
     let mounted = true;
@@ -1034,7 +642,7 @@ export default function Page() {
         const [rank, roles, meta] = await Promise.all([
           fetchJson<RankDriver[]>('/data/rank.json'),
           fetchJson<TeamRoles>('/data/team-roles.json'),
-          fetchJson<Metadata>('/data/metadata.json'),
+          fetchJson<SiteMetadata>('/data/metadata.json'),
         ]);
 
         if (!mounted) return;
@@ -1085,7 +693,7 @@ export default function Page() {
 
         if (laps > favoriteTrackLaps) {
           favoriteTrackLaps = laps;
-          favoriteTrack = formatTrackName(trackId);
+          favoriteTrack = getTrackDisplayName(trackId);
         }
       }
 
@@ -1122,7 +730,7 @@ export default function Page() {
 
     return { totalDrivers, totalLaps, activeTracks: trackIds.size };
   }, [drivers, rankData]);
-  const syncStatus = getSyncStatus(getEffectiveLastSync(metadata.lastSync, rankData));
+  const syncStatus = getSyncHealth(getEffectiveLastSync(metadata.lastSync, rankData));
 
   return (
     <>

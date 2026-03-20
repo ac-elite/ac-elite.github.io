@@ -10,102 +10,12 @@ import Typography from '@mui/material/Typography';
 import { CONFIG } from 'src/config-global';
 import { fetchJson } from 'src/lib/fetch-json';
 import { GLASS_CARD_SX, GLASS_CARD_INNER_SX } from 'src/lib/glass';
-import { formatNumber, getTrackDisplayName } from 'src/lib/ac-elite-data';
+import { CAR, formatLaptime, formatNumber, getTrackDisplayName, type RankDriver } from 'src/lib/ac-elite-data';
+import { getEffectiveLastSync, getSyncHealth, type SiteMetadata } from 'src/lib/sync-utils';
 
 import { ErrorPanel } from 'src/components/data-state/error-panel';
 import { LoadingPanel } from 'src/components/data-state/loading-panel';
 import { PageGridOverlay } from 'src/components/page-background/page-grid-overlay';
-
-type RankDriver = {
-  guid: string;
-  name?: string;
-  kilometers?: number;
-  collisions?: number;
-  infr?: number;
-  wins?: number;
-  podiums?: number;
-  poles?: number;
-  flaps?: number;
-  last_seen?: number;
-};
-
-type Metadata = {
-  lastSync?: string;
-  status?: string;
-  error?: string;
-};
-
-const CAR = 'tatuusfa1';
-
-function formatLaptime(ms?: number) {
-  if (!ms || !Number.isFinite(ms)) return '—';
-  const min = Math.floor(ms / 60000);
-  const sec = ((ms / 1000) % 60).toFixed(3).padStart(6, '0');
-  return `${min}:${sec}`;
-}
-
-function formatTimeAgo(isoString?: string) {
-  if (!isoString) return 'Unknown';
-  const timestamp = new Date(isoString).getTime();
-  if (!Number.isFinite(timestamp)) return 'Unknown';
-
-  const diffMs = Date.now() - timestamp;
-  if (diffMs < 0) return 'just now';
-
-  const minute = 60 * 1000;
-  const hour = 60 * minute;
-  const day = 24 * hour;
-
-  if (diffMs < minute) return 'just now';
-  if (diffMs < hour) {
-    const minutes = Math.floor(diffMs / minute);
-    return `${minutes} minute${minutes === 1 ? '' : 's'} ago`;
-  }
-  if (diffMs < day) {
-    const hours = Math.floor(diffMs / hour);
-    return `${hours} hour${hours === 1 ? '' : 's'} ago`;
-  }
-  const days = Math.floor(diffMs / day);
-  return `${days} day${days === 1 ? '' : 's'} ago`;
-}
-
-function parseTimestamp(input?: string | number) {
-  if (input == null) return undefined;
-  if (typeof input === 'number') {
-    const ms = input < 1_000_000_000_000 ? input * 1000 : input;
-    return Number.isFinite(ms) ? ms : undefined;
-  }
-  const ms = new Date(input).getTime();
-  return Number.isFinite(ms) ? ms : undefined;
-}
-
-function getEffectiveLastSync(metadataLastSync: string | undefined, drivers: RankDriver[]) {
-  const metadataMs = parseTimestamp(metadataLastSync);
-  const rankLastSeenMs = drivers.reduce<number | undefined>((latest, driver) => {
-    const ts = parseTimestamp(driver.last_seen);
-    if (!ts) return latest;
-    if (!latest || ts > latest) return ts;
-    return latest;
-  }, undefined);
-
-  const best = [metadataMs, rankLastSeenMs].filter((x): x is number => Boolean(x)).sort((a, b) => b - a)[0];
-  return best ? new Date(best).toISOString() : undefined;
-}
-
-function getSyncBadge(lastSync?: string) {
-  if (!lastSync) return { label: 'Unknown', color: '#f59e0b' };
-
-  const timestamp = new Date(lastSync).getTime();
-  if (!Number.isFinite(timestamp)) return { label: 'Unknown', color: '#f59e0b' };
-
-  const diffMs = Date.now() - timestamp;
-  const hour = 60 * 60 * 1000;
-  const day = 24 * hour;
-
-  if (diffMs <= 2 * hour) return { label: 'Live', color: '#22c55e' };
-  if (diffMs <= day) return { label: 'Delayed', color: '#f59e0b' };
-  return { label: 'Stale', color: '#ef4444' };
-}
 
 export default function Page() {
   const [loading, setLoading] = useState(true);
@@ -113,7 +23,7 @@ export default function Page() {
 
   const [rankData, setRankData] = useState<RankDriver[]>([]);
   const [leaderboardData, setLeaderboardData] = useState<Record<string, any>>({});
-  const [metadata, setMetadata] = useState<Metadata>({});
+  const [metadata, setMetadata] = useState<SiteMetadata>({});
 
   useEffect(() => {
     let mounted = true;
@@ -125,7 +35,7 @@ export default function Page() {
         const [rank, leaderboard, meta] = await Promise.all([
           fetchJson<RankDriver[]>('/data/rank.json'),
           fetchJson<Record<string, any>>('/data/leaderboard.json'),
-          fetchJson<Metadata>('/data/metadata.json'),
+          fetchJson<SiteMetadata>('/data/metadata.json'),
         ]);
 
         if (!mounted) return;
@@ -231,8 +141,7 @@ export default function Page() {
   );
 
   const effectiveLastSync = getEffectiveLastSync(metadata?.lastSync, rankData);
-  const lastSyncText = formatTimeAgo(effectiveLastSync);
-  const syncBadge = getSyncBadge(effectiveLastSync);
+  const syncHealth = getSyncHealth(effectiveLastSync);
 
   return (
     <>
@@ -260,10 +169,10 @@ export default function Page() {
               Stats
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              <Box component="span" sx={{ color: syncBadge.color, fontWeight: 700 }}>
-                {syncBadge.label}
+              <Box component="span" sx={{ color: syncHealth.color, fontWeight: 700 }}>
+                {syncHealth.label}
               </Box>{' '}
-              Data sync • Last update: {lastSyncText}
+              Data sync • Last update: {syncHealth.ageText}
             </Typography>
           </Stack>
 

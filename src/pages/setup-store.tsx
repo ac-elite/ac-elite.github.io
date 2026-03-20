@@ -8,6 +8,7 @@ import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 
 import { CONFIG } from 'src/config-global';
+import { CAR } from 'src/lib/ac-elite-data';
 import { GLASS_PANEL_COMPACT_SX } from 'src/lib/glass';
 
 import { PreviewLock } from 'src/components/preview-lock/preview-lock';
@@ -16,7 +17,7 @@ import { PageGridOverlay } from 'src/components/page-background/page-grid-overla
 const mockSetups = [
   {
     name: 'Aggressive Qualy',
-    car: 'tatuusfa1',
+    car: CAR,
     track: 'Imola',
     author: 'Grimlord',
     type: 'Qualy',
@@ -24,7 +25,7 @@ const mockSetups = [
   },
   {
     name: 'Race Long Stint',
-    car: 'tatuusfa1',
+    car: CAR,
     track: 'Spa',
     author: 'DIEnamic',
     type: 'Race',
@@ -32,7 +33,7 @@ const mockSetups = [
   },
   {
     name: 'Wet Safety Base',
-    car: 'tatuusfa1',
+    car: CAR,
     track: 'Silverstone',
     author: 'CarterReza',
     type: 'Race',
@@ -40,7 +41,7 @@ const mockSetups = [
   },
   {
     name: 'Balanced Sprint',
-    car: 'tatuusfa1',
+    car: CAR,
     track: 'Barcelona',
     author: 'olaelekzion810',
     type: 'Race',
@@ -48,7 +49,7 @@ const mockSetups = [
   },
   {
     name: 'Low Drag Rocket',
-    car: 'tatuusfa1',
+    car: CAR,
     track: 'Monza',
     author: 'Oliver Bell',
     type: 'Qualy',

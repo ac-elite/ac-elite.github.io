@@ -35,24 +35,13 @@ import {
   getLicenseBadgeSx,
   LICENSE_CHIP_WIDTH,
   getTrackDisplayName,
+  type LeaderboardCarRow,
 } from 'src/lib/ac-elite-data';
 
 import { ErrorPanel } from 'src/components/data-state/error-panel';
 import { LoadingPanel } from 'src/components/data-state/loading-panel';
 import { PageGridOverlay } from 'src/components/page-background/page-grid-overlay';
-
-type TeamRoles = {
-  creator: string[];
-  admin: string[];
-  moderator: string[];
-};
-
-type LeaderboardRow = {
-  guid: string;
-  laptime?: number;
-  laps?: number;
-  name?: string;
-};
+import { EMPTY_TEAM_ROLES, getDiscordRolesForGuid, type TeamRoles } from 'src/lib/team-roles';
 
 type TrackStatRow = {
   trackId: string;
@@ -115,7 +104,7 @@ export default function Page() {
     const rows: TrackStatRow[] = [];
     for (const [trackId, trackData] of Object.entries(leaderboardData || {})) {
       const carRows = Array.isArray((trackData as Record<string, any>)?.[CAR])
-        ? ([...(trackData as Record<string, any>)[CAR]] as LeaderboardRow[]).filter(
+        ? ([...(trackData as Record<string, any>)[CAR]] as LeaderboardCarRow[]).filter(
             (item) => typeof item?.laptime === 'number'
           )
         : [];
@@ -149,14 +138,10 @@ export default function Page() {
     [trackRows]
   );
 
-  const driverRoles = useMemo<DiscordRole[]>(() => {
-    if (!driverGuid) return [];
-    const roles: DiscordRole[] = [];
-    if (teamRoles.creator.includes(driverGuid)) roles.push('Creator');
-    if (teamRoles.admin.includes(driverGuid)) roles.push('Admin');
-    if (teamRoles.moderator.includes(driverGuid)) roles.push('Moderator');
-    return roles;
-  }, [driverGuid, teamRoles]);
+  const driverRoles = useMemo<DiscordRole[]>(
+    () => (driverGuid ? getDiscordRolesForGuid(driverGuid, teamRoles) : []),
+    [driverGuid, teamRoles]
+  );
 
   return (
     <>

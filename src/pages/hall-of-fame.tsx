@@ -14,6 +14,7 @@ import { getDriverProfileHref } from 'src/lib/routes';
 import { GLASS_PANEL_SX, GLASS_INNER_ROW_SX } from 'src/lib/glass';
 import {
   CAR,
+  type CarLap,
   getDriverSR,
   formatNumber,
   getSRBadgeSx,
@@ -28,19 +29,7 @@ import {
 import { ErrorPanel } from 'src/components/data-state/error-panel';
 import { LoadingPanel } from 'src/components/data-state/loading-panel';
 import { PageGridOverlay } from 'src/components/page-background/page-grid-overlay';
-
-type TeamRoles = {
-  creator: string[];
-  admin: string[];
-  moderator: string[];
-};
-
-type DriverWithStats = RankDriver & {
-  wins?: number;
-  podiums?: number;
-  poles?: number;
-  flaps?: number;
-};
+import { EMPTY_TEAM_ROLES, type TeamRoles } from 'src/lib/team-roles';
 
 type FameEntry = {
   guid: string;
@@ -181,7 +170,7 @@ function TeamRoleColumn({
 }: {
   title: string;
   guids: string[];
-  allDrivers: DriverWithStats[];
+  allDrivers: RankDriver[];
 }) {
   const byGuid = useMemo(() => new Map(allDrivers.map((d) => [d.guid, d])), [allDrivers]);
   const licenseMap = useMemo(() => computeLicenseMap(allDrivers), [allDrivers]);
@@ -190,7 +179,7 @@ function TeamRoleColumn({
     () =>
       guids
         .map((guid) => byGuid.get(guid))
-        .filter((driver): driver is DriverWithStats => Boolean(driver))
+        .filter((driver): driver is RankDriver => Boolean(driver))
         .map((driver) => {
           const license = getDriverLicense(driver, licenseMap).license;
           const sr = getDriverSR(driver);
@@ -266,8 +255,8 @@ function TeamRoleColumn({
 export default function Page() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [drivers, setDrivers] = useState<DriverWithStats[]>([]);
-  const [teamRoles, setTeamRoles] = useState<TeamRoles>({ creator: [], admin: [], moderator: [] });
+  const [drivers, setDrivers] = useState<RankDriver[]>([]);
+  const [teamRoles, setTeamRoles] = useState<TeamRoles>(EMPTY_TEAM_ROLES);
 
   useEffect(() => {
     let mounted = true;
@@ -276,7 +265,7 @@ export default function Page() {
       setError(null);
       try {
         const [rank, roles] = await Promise.all([
-          fetchJson<DriverWithStats[]>('/data/rank.json'),
+          fetchJson<RankDriver[]>('/data/rank.json'),
           fetchJson<TeamRoles>('/data/team-roles.json'),
         ]);
         if (!mounted) return;
@@ -306,7 +295,7 @@ export default function Page() {
         let totalLaps = 0;
         let tracksDriven = 0;
         for (const [, cars] of Object.entries(driver.leaderboard || {})) {
-          const carData = cars?.[CAR];
+          const carData = (cars as Record<string, CarLap> | undefined)?.[CAR];
           if (!carData) continue;
           totalLaps += carData.laps || 0;
           if (typeof carData.laptime === 'number') tracksDriven += 1;
