@@ -216,6 +216,12 @@ const reducedMotionNone = {
   },
 } as const;
 
+const sectionKickerSx = {
+  color: 'rgba(255,255,255,0.75)',
+  textTransform: 'uppercase' as const,
+  fontWeight: 700,
+};
+
 const trackNames: Record<string, string> = {
   ks_barcelona_layout_gp: 'Barcelona - GP',
   ks_barcelona_layout_moto: 'Barcelona - Moto',
@@ -532,12 +538,7 @@ function HeroSection({
               <Stack spacing={1} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: { xs: 'center', md: 'flex-start' } }}>
                 <Typography
                   variant="overline"
-                  sx={{
-                    letterSpacing: 4,
-                    textTransform: 'uppercase',
-                    color: 'rgba(255,255,255,0.82)',
-                    fontWeight: 700,
-                  }}
+                  sx={sectionKickerSx}
                 >
                   AC Elite Simracing
                 </Typography>
@@ -580,7 +581,7 @@ function HeroSection({
                 </Typography>
 
                 <Typography variant="body1" sx={{ maxWidth: 540, color: 'text.secondary' }}>
-                  Live drivers, live stats, and live progress from your AC Elite data.
+                Live drivers, live stats, real-time progress from AC Elite.
                 </Typography>
               </Stack>
 
@@ -628,7 +629,7 @@ function HeroSection({
                 <Box>
                   <Typography
                     variant="overline"
-                    sx={{ textTransform: 'uppercase', color: 'rgba(255,255,255,0.75)', fontWeight: 700 }}
+                    sx={sectionKickerSx}
                   >
                     Race Intelligence
                   </Typography>
@@ -759,14 +760,14 @@ function DriverSearchSection({
       <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
         <Stack spacing={3} sx={{ mb: 3, textAlign: { xs: 'center', md: 'left' }, alignItems: { xs: 'center', md: 'flex-start' } }}>
           <Stack spacing={1} sx={{ alignItems: { xs: 'center', md: 'flex-start' } }}>
-            <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.82)', letterSpacing: 3 }}>
+            <Typography variant="overline" sx={sectionKickerSx}>
               Driver statistics
             </Typography>
             <Typography variant="h4" sx={{ fontWeight: 700 }}>
               Search drivers and view their profile
             </Typography>
             <Typography variant="body1" sx={{ maxWidth: 680, color: 'text.secondary' }}>
-              This search now uses live data from your previous version (`rank.json`) with real Safety Rating and License calculations.
+              This search uses live AC Elite data with real-time Safety Rating and License calculations.
             </Typography>
           </Stack>
         </Stack>
@@ -775,7 +776,7 @@ function DriverSearchSection({
           elevation={0}
           sx={{
             ...GLASS_PANEL_SX,
-            mb: 4,
+            mb: { xs: 2, md: 4 },
             textAlign: { xs: 'center', md: 'left' },
           }}
         >
@@ -957,15 +958,15 @@ function DashboardSection({ drivers }: { drivers: DriverView[] }) {
       <PageGridOverlay opacity={0.2} />
 
       <Container maxWidth="lg">
-        <Stack spacing={3} sx={{ mb: 4, textAlign: { xs: 'center', md: 'left' }, alignItems: { xs: 'center', md: 'flex-start' } }}>
-          <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.82)' }}>
+        <Stack spacing={3} sx={{ mb: { xs: 2, md: 4 }, textAlign: { xs: 'center', md: 'left' }, alignItems: { xs: 'center', md: 'flex-start' } }}>
+          <Typography variant="overline" sx={sectionKickerSx}>
             Community highlights
           </Typography>
           <Typography variant="h4" sx={{ fontWeight: 700 }}>
             Real-time summary from live data
           </Typography>
           <Typography variant="body1" sx={{ maxWidth: 640, color: 'text.secondary' }}>
-            These cards are generated from the same rank data and formulas used in your previous website version.
+            Live community highlights based on current AC Elite performance data.
           </Typography>
         </Stack>
 
