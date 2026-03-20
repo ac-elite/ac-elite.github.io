@@ -59,6 +59,8 @@ const gridMove = keyframes`
   0% { background-position: 0 0, 0 0, 0 0; }
   100% { background-position: 48px 48px, 48px 48px, 96px 0; }
 `;
+const LICENSE_CHIP_WIDTH = 96;
+const SR_CHIP_WIDTH = 62;
 
 function CategoryCard({
   title,
@@ -136,8 +138,26 @@ function CategoryCard({
                   </Typography>
 
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
-                    <Chip size="small" label={entry.license} sx={{ fontWeight: 700, ...getLicenseBadgeSx(entry.license) }} />
-                    <Chip size="small" label={entry.srTier} sx={{ fontWeight: 700, ...getSRBadgeSx(entry.srTier) }} />
+                    <Chip
+                      size="small"
+                      label={entry.license}
+                      sx={{
+                        minWidth: LICENSE_CHIP_WIDTH,
+                        justifyContent: 'center',
+                        fontWeight: 700,
+                        ...getLicenseBadgeSx(entry.license),
+                      }}
+                    />
+                    <Chip
+                      size="small"
+                      label={entry.srTier}
+                      sx={{
+                        minWidth: SR_CHIP_WIDTH,
+                        justifyContent: 'center',
+                        fontWeight: 700,
+                        ...getSRBadgeSx(entry.srTier),
+                      }}
+                    />
                   </Box>
                 </Box>
 
@@ -242,8 +262,26 @@ function TeamRoleColumn({
               {member.name}
             </Typography>
             <Stack direction="row" spacing={1} sx={{ mt: 0.6 }}>
-              <Chip size="small" label={member.license} sx={{ fontWeight: 700, ...getLicenseBadgeSx(member.license) }} />
-              <Chip size="small" label={member.srTier} sx={{ fontWeight: 700, ...getSRBadgeSx(member.srTier) }} />
+              <Chip
+                size="small"
+                label={member.license}
+                sx={{
+                  minWidth: LICENSE_CHIP_WIDTH,
+                  justifyContent: 'center',
+                  fontWeight: 700,
+                  ...getLicenseBadgeSx(member.license),
+                }}
+              />
+              <Chip
+                size="small"
+                label={member.srTier}
+                sx={{
+                  minWidth: SR_CHIP_WIDTH,
+                  justifyContent: 'center',
+                  fontWeight: 700,
+                  ...getSRBadgeSx(member.srTier),
+                }}
+              />
             </Stack>
           </Box>
         ))}

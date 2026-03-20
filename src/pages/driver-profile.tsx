@@ -64,6 +64,8 @@ const gridMove = keyframes`
   0% { background-position: 0 0, 0 0, 0 0; }
   100% { background-position: 48px 48px, 48px 48px, 96px 0; }
 `;
+const LICENSE_CHIP_WIDTH = 96;
+const SR_CHIP_WIDTH = 62;
 
 function getPositionChipSx(position: number) {
   if (position === 1) {
@@ -274,7 +276,16 @@ export default function Page() {
                           Licence
                         </Typography>
                         <Stack direction="row" spacing={1} alignItems="center" sx={{ mt: 0.4 }}>
-                          <Chip size="small" label={license.license} sx={{ fontWeight: 700, ...getLicenseBadgeSx(license.license) }} />
+                          <Chip
+                            size="small"
+                            label={license.license}
+                            sx={{
+                              minWidth: LICENSE_CHIP_WIDTH,
+                              justifyContent: 'center',
+                              fontWeight: 700,
+                              ...getLicenseBadgeSx(license.license),
+                            }}
+                          />
                           <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.secondary' }}>
                             {Math.round(license.paceScore).toLocaleString()}
                           </Typography>
@@ -287,7 +298,16 @@ export default function Page() {
                           Safety Rating
                         </Typography>
                         <Stack direction="row" spacing={1} alignItems="center" sx={{ mt: 0.4 }}>
-                          <Chip size="small" label={sr.tier} sx={{ fontWeight: 700, ...getSRBadgeSx(sr.tier) }} />
+                          <Chip
+                            size="small"
+                            label={sr.tier}
+                            sx={{
+                              minWidth: SR_CHIP_WIDTH,
+                              justifyContent: 'center',
+                              fontWeight: 700,
+                              ...getSRBadgeSx(sr.tier),
+                            }}
+                          />
                           <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.secondary' }}>
                             {sr.sr.toFixed(2)}
                           </Typography>
