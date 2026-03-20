@@ -195,12 +195,19 @@ export default function Page() {
 
             {!loading && !error && driver && license && sr && (
               <>
-                <Paper sx={GLASS_PANEL_SX}>
-                  <Stack spacing={0.5} sx={{ mb: 2 }}>
+                <Paper sx={{ ...GLASS_PANEL_SX, textAlign: { xs: 'center', md: 'left' } }}>
+                  <Stack spacing={0.5} sx={{ mb: 2, alignItems: { xs: 'center', md: 'flex-start' } }}>
                     <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.6)', lineHeight: 1.4 }}>
                       Driver profile
                     </Typography>
-                    <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" useFlexGap>
+                    <Stack
+                      direction="row"
+                      spacing={1}
+                      alignItems="center"
+                      justifyContent={{ xs: 'center', md: 'flex-start' }}
+                      flexWrap="wrap"
+                      useFlexGap
+                    >
                       <Typography variant="h4" sx={{ fontWeight: 800 }}>
                         {driver.name || 'Unknown Driver'}
                       </Typography>
@@ -220,11 +227,11 @@ export default function Page() {
 
                   <Grid container spacing={1.5}>
                     <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                      <Paper sx={GLASS_INNER_PANEL_SX}>
+                      <Paper sx={{ ...GLASS_INNER_PANEL_SX, textAlign: { xs: 'center', md: 'left' } }}>
                         <Typography variant="caption" sx={{ color: 'text.secondary' }}>
                           License
                         </Typography>
-                        <Stack direction="row" spacing={1} alignItems="center" sx={{ mt: 0.4 }}>
+                        <Stack direction="row" spacing={1} alignItems="center" justifyContent={{ xs: 'center', md: 'flex-start' }} sx={{ mt: 0.4 }}>
                           <Chip
                             size="small"
                             label={license.license}
@@ -242,11 +249,11 @@ export default function Page() {
                       </Paper>
                     </Grid>
                     <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                      <Paper sx={GLASS_INNER_PANEL_SX}>
+                      <Paper sx={{ ...GLASS_INNER_PANEL_SX, textAlign: { xs: 'center', md: 'left' } }}>
                         <Typography variant="caption" sx={{ color: 'text.secondary' }}>
                           Safety Rating
                         </Typography>
-                        <Stack direction="row" spacing={1} alignItems="center" sx={{ mt: 0.4 }}>
+                        <Stack direction="row" spacing={1} alignItems="center" justifyContent={{ xs: 'center', md: 'flex-start' }} sx={{ mt: 0.4 }}>
                           <Chip
                             size="small"
                             label={sr.tier}
@@ -264,7 +271,7 @@ export default function Page() {
                       </Paper>
                     </Grid>
                     <Grid size={{ xs: 12, sm: 6, md: 2 }}>
-                      <Paper sx={GLASS_INNER_PANEL_SX}>
+                      <Paper sx={{ ...GLASS_INNER_PANEL_SX, textAlign: { xs: 'center', md: 'left' } }}>
                         <Typography variant="caption" sx={{ color: 'text.secondary' }}>
                           Total KM
                         </Typography>
@@ -274,7 +281,7 @@ export default function Page() {
                       </Paper>
                     </Grid>
                     <Grid size={{ xs: 12, sm: 6, md: 2 }}>
-                      <Paper sx={GLASS_INNER_PANEL_SX}>
+                      <Paper sx={{ ...GLASS_INNER_PANEL_SX, textAlign: { xs: 'center', md: 'left' } }}>
                         <Typography variant="caption" sx={{ color: 'text.secondary' }}>
                           Tracks Driven
                         </Typography>
@@ -284,7 +291,7 @@ export default function Page() {
                       </Paper>
                     </Grid>
                     <Grid size={{ xs: 12, sm: 6, md: 2 }}>
-                      <Paper sx={GLASS_INNER_PANEL_SX}>
+                      <Paper sx={{ ...GLASS_INNER_PANEL_SX, textAlign: { xs: 'center', md: 'left' } }}>
                         <Typography variant="caption" sx={{ color: 'text.secondary' }}>
                           Total Laps
                         </Typography>

@@ -21,7 +21,8 @@
     "re:build-npm": "npm run clean && npm install && npm run build",
     "tsc:dev": "yarn dev & yarn tsc:watch",
     "tsc:watch": "tsc --noEmit --watch",
-    "tsc:print": "npx tsc --showConfig"
+    "tsc:print": "npx tsc --showConfig",
+    "git:sync": "git pull --rebase --autostash && git add . && (git diff --cached --quiet || git commit -m \"V2 - Update\") && git push"
   },
   "engines": {
     "node": ">=20"

@@ -65,6 +65,7 @@ function CategoryCard({
       sx={{
         ...GLASS_PANEL_SX,
         height: '100%',
+        textAlign: { xs: 'center', md: 'left' },
       }}
     >
       <Stack spacing={1.5}>
@@ -92,9 +93,10 @@ function CategoryCard({
                 <Box
                   sx={{
                     display: 'grid',
-                    gridTemplateColumns: 'auto minmax(0, 1fr) auto',
+                    gridTemplateColumns: { xs: '1fr', md: 'auto minmax(0, 1fr) auto' },
                     alignItems: 'center',
                     gap: 1,
+                    justifyItems: { xs: 'center', md: 'stretch' },
                   }}
                 >
                   <Chip
@@ -108,11 +110,19 @@ function CategoryCard({
                     }}
                   />
 
-                  <Typography variant="subtitle2" sx={{ fontWeight: 700 }} noWrap>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 700, textAlign: { xs: 'center', md: 'left' } }} noWrap>
                     {entry.name}
                   </Typography>
 
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 0.75,
+                      flexWrap: 'wrap',
+                      justifyContent: { xs: 'center', md: 'flex-end' },
+                    }}
+                  >
                     <Chip
                       size="small"
                       label={entry.license}
@@ -140,9 +150,10 @@ function CategoryCard({
                   sx={{
                     display: 'flex',
                     alignItems: 'baseline',
-                    justifyContent: 'space-between',
+                    justifyContent: { xs: 'center', md: 'space-between' },
                     gap: 1,
                     flexWrap: 'wrap',
+                    textAlign: { xs: 'center', md: 'left' },
                   }}
                 >
                   <Typography variant="body2" sx={{ color: '#dbeafe', fontWeight: 700 }}>
@@ -198,6 +209,7 @@ function TeamRoleColumn({
       sx={{
         ...GLASS_PANEL_SX,
         height: '100%',
+        textAlign: { xs: 'center', md: 'left' },
       }}
     >
       <Typography variant="h6" sx={{ fontWeight: 800, mb: 1.25 }}>
@@ -219,10 +231,10 @@ function TeamRoleColumn({
               ...GLASS_INNER_ROW_SX,
             }}
           >
-            <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+            <Typography variant="subtitle2" sx={{ fontWeight: 700, textAlign: { xs: 'center', md: 'left' } }}>
               {member.name}
             </Typography>
-            <Stack direction="row" spacing={1} sx={{ mt: 0.6 }}>
+            <Stack direction="row" spacing={1} justifyContent={{ xs: 'center', md: 'flex-start' }} sx={{ mt: 0.6 }}>
               <Chip
                 size="small"
                 label={member.license}
@@ -445,7 +457,7 @@ export default function Page() {
 
         <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1 }}>
           <Stack spacing={3}>
-            <Stack spacing={1}>
+            <Stack spacing={1} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: { xs: 'center', md: 'flex-start' } }}>
               <Typography variant="h4" fontWeight={800}>
                 Hall of Fame
               </Typography>
@@ -472,7 +484,7 @@ export default function Page() {
                   ))}
                 </Grid>
 
-                <Box sx={{ pt: 1 }}>
+                <Box sx={{ pt: 1, textAlign: { xs: 'center', md: 'left' } }}>
                   <Typography variant="h5" sx={{ fontWeight: 800, mb: 1.5 }}>
                     Team Spotlight
                   </Typography>

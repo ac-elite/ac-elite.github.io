@@ -539,8 +539,8 @@ function HeroSection({
       <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
         <Grid container spacing={{ xs: 4, md: 6 }} alignItems="center">
           <Grid size={{ xs: 12, md: 7 }}>
-            <Stack spacing={3}>
-              <Stack spacing={1}>
+            <Stack spacing={3} alignItems={{ xs: 'center', md: 'flex-start' }}>
+              <Stack spacing={1} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: { xs: 'center', md: 'flex-start' } }}>
                 <Typography
                   variant="overline"
                   sx={{
@@ -595,7 +595,14 @@ function HeroSection({
                 </Typography>
               </Stack>
 
-              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.25} flexWrap="wrap" alignItems={{ xs: 'stretch', sm: 'center' }}>
+              <Stack
+                direction={{ xs: 'column', sm: 'row' }}
+                spacing={1.25}
+                flexWrap="wrap"
+                alignItems={{ xs: 'center', sm: 'center' }}
+                justifyContent={{ xs: 'center', sm: 'flex-start' }}
+                sx={{ width: '100%' }}
+              >
                 <Button
                   variant="contained"
                   color="primary"
@@ -642,6 +649,7 @@ function HeroSection({
             <Box
               sx={{
                 ...GLASS_PANEL_SX,
+                textAlign: { xs: 'center', md: 'left' },
               }}
             >
               <Stack spacing={2}>
@@ -665,7 +673,7 @@ function HeroSection({
                     ...GLASS_INNER_PANEL_SX,
                   }}
                 >
-                  <Stack direction="row" alignItems="center" spacing={1}>
+                  <Stack direction="row" alignItems="center" spacing={1} justifyContent={{ xs: 'center', md: 'flex-start' }}>
                     <Box
                       sx={{
                         width: 9,
@@ -699,6 +707,7 @@ function HeroSection({
                           display: 'flex',
                           flexDirection: 'column',
                           justifyContent: 'center',
+                          alignItems: { xs: 'center', md: 'flex-start' },
                         }}
                       >
                         <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.68)' }}>
@@ -730,7 +739,7 @@ function HeroSection({
             boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.14)',
           }}
         >
-          <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.95)' }}>
+          <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.95)', textAlign: { xs: 'center', md: 'left' } }}>
             <Box component="span" sx={{ fontWeight: 800, color: '#f6d365' }}>
               Note:
             </Box>{' '}
@@ -768,7 +777,7 @@ function DriverSearchSection({
       component="section"
       sx={{
         position: 'relative',
-        py: { xs: 6, md: 8 },
+        py: 4,
         background: 'linear-gradient(180deg, rgba(31,44,73,0.98) 0%, rgba(23,33,59,0.98) 100%)',
         borderTop: '1px solid rgba(255,255,255,0.08)',
         borderBottom: '1px solid rgba(255,255,255,0.08)',
@@ -776,8 +785,8 @@ function DriverSearchSection({
       }}
     >
       <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
-        <Stack spacing={3} sx={{ mb: 3 }}>
-          <Stack spacing={1}>
+        <Stack spacing={3} sx={{ mb: 3, textAlign: { xs: 'center', md: 'left' }, alignItems: { xs: 'center', md: 'flex-start' } }}>
+          <Stack spacing={1} sx={{ alignItems: { xs: 'center', md: 'flex-start' } }}>
             <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.82)', letterSpacing: 3 }}>
               Driver statistics
             </Typography>
@@ -795,11 +804,12 @@ function DriverSearchSection({
           sx={{
             ...GLASS_PANEL_SX,
             mb: 4,
+            textAlign: { xs: 'center', md: 'left' },
           }}
         >
           <Grid container spacing={2} alignItems="stretch">
             <Grid size={{ xs: 12, md: 9 }}>
-              <Stack spacing={1.5}>
+              <Stack spacing={1.5} sx={{ alignItems: { xs: 'center', md: 'flex-start' } }}>
                 <Typography variant="subtitle2" sx={{ color: 'text.secondary' }}>
                   Search driver
                 </Typography>
@@ -907,7 +917,7 @@ function DriverSearchSection({
             </Grid>
 
             <Grid size={{ xs: 12, md: 3 }}>
-              <Stack spacing={1.25} sx={{ height: 1 }}>
+              <Stack spacing={1.25} sx={{ height: 1, alignItems: { xs: 'center', md: 'stretch' } }}>
                 <Button
                   variant="contained"
                   color="primary"
@@ -967,7 +977,7 @@ function DashboardSection({ drivers }: { drivers: DriverView[] }) {
       component="section"
       sx={{
         position: 'relative',
-        py: { xs: 6, md: 10 },
+        py: 4,
         background: 'radial-gradient(circle at 50% 0%, rgba(23,33,59,0.18) 0, transparent 60%), #17213B',
         overflow: 'hidden',
       }}
@@ -975,7 +985,7 @@ function DashboardSection({ drivers }: { drivers: DriverView[] }) {
       <PageGridOverlay opacity={0.2} />
 
       <Container maxWidth="lg">
-        <Stack spacing={3} sx={{ mb: 4 }}>
+        <Stack spacing={3} sx={{ mb: 4, textAlign: { xs: 'center', md: 'left' }, alignItems: { xs: 'center', md: 'flex-start' } }}>
           <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.82)' }}>
             Community highlights
           </Typography>
@@ -1009,6 +1019,7 @@ function DashboardSection({ drivers }: { drivers: DriverView[] }) {
               <Box
                 sx={{
                   ...GLASS_PANEL_SX,
+                  textAlign: { xs: 'center', md: 'left' },
                 }}
               >
                 <Typography variant="subtitle2" sx={{ color: 'text.secondary', mb: 1 }}>

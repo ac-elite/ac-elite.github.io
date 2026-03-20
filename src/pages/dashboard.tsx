@@ -255,7 +255,7 @@ export default function Page() {
 
       <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
         <Stack spacing={3.5}>
-          <Stack spacing={0.75}>
+          <Stack spacing={0.75} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: { xs: 'center', md: 'flex-start' } }}>
             <Typography variant="h4" fontWeight={800} sx={{ letterSpacing: 0.5 }}>
               Stats
             </Typography>
@@ -274,7 +274,7 @@ export default function Page() {
           {!loading && !error && (
             <Grid container spacing={2.5}>
               <Grid size={{ xs: 12, sm: 6 }}>
-                <Paper sx={{ ...GLASS_CARD_SX, p: 2.75 }}>
+                <Paper sx={{ ...GLASS_CARD_SX, p: 2.75, textAlign: { xs: 'center', md: 'left' } }}>
                   <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.78)' }}>
                     Total Drivers
                   </Typography>
@@ -285,7 +285,7 @@ export default function Page() {
               </Grid>
 
               <Grid size={{ xs: 12, sm: 6 }}>
-                <Paper sx={{ ...GLASS_CARD_SX, p: 2.75 }}>
+                <Paper sx={{ ...GLASS_CARD_SX, p: 2.75, textAlign: { xs: 'center', md: 'left' } }}>
                   <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.78)' }}>
                     Active Drivers (100+ KM)
                   </Typography>
@@ -296,7 +296,7 @@ export default function Page() {
               </Grid>
 
               <Grid size={{ xs: 12, sm: 6 }}>
-                <Paper sx={{ ...GLASS_CARD_SX, p: 2.75 }}>
+                <Paper sx={{ ...GLASS_CARD_SX, p: 2.75, textAlign: { xs: 'center', md: 'left' } }}>
                   <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.78)' }}>
                     Total Tracks
                   </Typography>
@@ -307,7 +307,7 @@ export default function Page() {
               </Grid>
 
               <Grid size={{ xs: 12, sm: 6 }}>
-                <Paper sx={{ ...GLASS_CARD_SX, p: 2.75 }}>
+                <Paper sx={{ ...GLASS_CARD_SX, p: 2.75, textAlign: { xs: 'center', md: 'left' } }}>
                   <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.78)' }}>
                     Avg KM per Driver
                   </Typography>
@@ -318,7 +318,7 @@ export default function Page() {
               </Grid>
 
               <Grid size={{ xs: 12, sm: 6 }}>
-                <Paper sx={{ ...GLASS_CARD_SX, p: 2.75 }}>
+                <Paper sx={{ ...GLASS_CARD_SX, p: 2.75, textAlign: { xs: 'center', md: 'left' } }}>
                   <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.78)' }}>
                     Total Laps
                   </Typography>
@@ -329,7 +329,7 @@ export default function Page() {
               </Grid>
 
               <Grid size={{ xs: 12, sm: 6 }}>
-                <Paper sx={{ ...GLASS_CARD_SX, p: 2.75 }}>
+                <Paper sx={{ ...GLASS_CARD_SX, p: 2.75, textAlign: { xs: 'center', md: 'left' } }}>
                   <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.78)' }}>
                     Incidents / 100 KM
                   </Typography>
@@ -340,7 +340,7 @@ export default function Page() {
               </Grid>
 
               <Grid size={{ xs: 12, sm: 6 }}>
-                <Paper sx={{ ...GLASS_CARD_SX, p: 2.75 }}>
+                <Paper sx={{ ...GLASS_CARD_SX, p: 2.75, textAlign: { xs: 'center', md: 'left' } }}>
                   <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.78)' }}>
                     Total KM
                   </Typography>
@@ -351,14 +351,14 @@ export default function Page() {
               </Grid>
 
               <Grid size={{ xs: 12 }}>
-                <Paper sx={{ ...GLASS_CARD_SX, p: 2.75 }}>
+                <Paper sx={{ ...GLASS_CARD_SX, p: 2.75, textAlign: { xs: 'center', md: 'left' } }}>
                   <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.78)' }}>
                     Session Totals
                   </Typography>
                   <Stack
                     direction={{ xs: 'column', sm: 'row' }}
                     spacing={{ xs: 1.5, sm: 3 }}
-                    sx={{ mt: 1.25 }}
+                    sx={{ mt: 1.25, alignItems: { xs: 'center', sm: 'flex-start' } }}
                   >
                     <Typography variant="body2">
                       Wins: <Box component="span" sx={{ fontWeight: 700 }}>{formatNumber(quickStats.totalWins)}</Box>

@@ -167,7 +167,7 @@ export default function Page() {
 
         <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1 }}>
           <Stack spacing={3}>
-            <Stack spacing={1}>
+            <Stack spacing={1} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: { xs: 'center', md: 'flex-start' } }}>
               <Typography variant="h4" fontWeight={800}>
                 Leaderboard
               </Typography>
@@ -185,9 +185,10 @@ export default function Page() {
                 <Paper
                   sx={{
                     ...GLASS_PANEL_SX,
+                    textAlign: { xs: 'center', md: 'left' },
                   }}
                 >
-                  <Stack spacing={1.25}>
+                  <Stack spacing={1.25} sx={{ alignItems: { xs: 'center', md: 'flex-start' } }}>
                     <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.75)', letterSpacing: 0.3 }}>
                       Track filter
                     </Typography>

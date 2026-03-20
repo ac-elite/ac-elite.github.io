@@ -34,10 +34,11 @@ export function PreviewLock({ storageKey, title, description, children }: Previe
       sx={{
         ...GLASS_PANEL_SX,
         p: 3,
+        textAlign: { xs: 'center', md: 'left' },
       }}
     >
-      <Stack spacing={2}>
-        <Box>
+      <Stack spacing={2} sx={{ alignItems: { xs: 'center', md: 'flex-start' } }}>
+        <Box sx={{ width: '100%' }}>
           <Typography variant="h5" sx={{ fontWeight: 800 }}>
             {title}
           </Typography>
@@ -46,7 +47,13 @@ export function PreviewLock({ storageKey, title, description, children }: Previe
           </Typography>
         </Box>
 
-        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.2} alignItems="flex-start">
+        <Stack
+          direction={{ xs: 'column', sm: 'row' }}
+          spacing={1.2}
+          alignItems={{ xs: 'center', sm: 'flex-start' }}
+          justifyContent={{ xs: 'center', sm: 'flex-start' }}
+          sx={{ width: '100%' }}
+        >
           <TextField
             type="password"
             value={value}

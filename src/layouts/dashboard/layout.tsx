@@ -8,6 +8,7 @@ import Button from '@mui/material/Button';
 import { useTheme } from '@mui/material/styles';
 
 import { Logo } from 'src/components/logo';
+import { UpdateBar } from 'src/components/update-bar/update-bar';
 import { LicenseSafetyGuideButton } from 'src/components/license-safety-guide/license-safety-guide';
 
 import { NavMobile, NavDesktop } from './nav';
@@ -51,29 +52,31 @@ export function DashboardLayout({
         top: 0,
         zIndex: 'var(--layout-header-zIndex)',
         display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
+        flexDirection: 'column',
+        alignItems: 'stretch',
+        justifyContent: 'center',
         px: 2,
         py: 1.25,
-        bgcolor: 'rgba(23,33,59,0.9)',
-        backdropFilter: 'blur(10px)',
+        bgcolor: '#17213B',
         borderBottom: '1px solid rgba(255,255,255,0.12)',
         [theme.breakpoints.up(layoutQuery)]: { display: 'none' },
       }}
     >
-      <Logo />
-      <Stack direction="row" spacing={1} alignItems="center">
-        <LicenseSafetyGuideButton compact />
-        <Button
-          variant="outlined"
-          color="secondary"
-          onClick={() => setOpenMobileNav(true)}
-          size="small"
-          sx={{ minWidth: 0, px: 1.5, py: 0.75, borderRadius: 1.25 }}
-        >
-          Menu
-        </Button>
-      </Stack>
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1 }}>
+        <Logo />
+        <Stack direction="row" spacing={1} alignItems="center">
+          <LicenseSafetyGuideButton compact />
+          <Button
+            variant="outlined"
+            color="secondary"
+            onClick={() => setOpenMobileNav(true)}
+            size="small"
+            sx={{ minWidth: 0, px: 1.5, py: 0.75, borderRadius: 1.25 }}
+          >
+            Menu
+          </Button>
+        </Stack>
+      </Box>
     </Box>
   );
 
@@ -88,12 +91,21 @@ export function DashboardLayout({
        *************************************** */
       sidebarSection={
         <>
-          <NavDesktop data={navData} layoutQuery={layoutQuery} />
+          <NavDesktop
+            data={navData}
+            layoutQuery={layoutQuery}
+            slots={{
+              bottomArea: <UpdateBar compact sx={{ mx: 1, my: 1 }} />,
+            }}
+          />
           <NavMobile
             data={navData}
             open={openMobileNav}
             onClose={() => setOpenMobileNav(false)}
             sx={{ bgcolor: '#17213B' }}
+            slots={{
+              bottomArea: <UpdateBar compact sx={{ mx: 1, my: 1 }} />,
+            }}
           />
         </>
       }

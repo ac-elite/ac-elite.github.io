@@ -44,7 +44,7 @@ export default function Page() {
 
         <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1 }}>
           <Stack spacing={3}>
-            <Stack spacing={1}>
+            <Stack spacing={1} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: { xs: 'center', md: 'flex-start' } }}>
               <Typography variant="h4" fontWeight={800}>
                 Livery Showcase
               </Typography>
@@ -59,7 +59,7 @@ export default function Page() {
               description="This page is currently a private mock preview"
             >
               <Stack spacing={3}>
-                <Stack spacing={1.2}>
+                <Stack spacing={1.2} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: { xs: 'center', md: 'flex-start' } }}>
                   <Typography variant="h6" sx={{ fontWeight: 800 }}>
                     General liveries
                   </Typography>
@@ -118,7 +118,7 @@ export default function Page() {
                   </Grid>
                 </Stack>
 
-                <Stack spacing={1.2}>
+                <Stack spacing={1.2} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: { xs: 'center', md: 'flex-start' } }}>
                   <Typography variant="h6" sx={{ fontWeight: 800 }}>
                     Mod Team liveries
                   </Typography>

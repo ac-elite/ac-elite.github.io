@@ -296,7 +296,7 @@ export default function Page() {
 
         <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1 }}>
           <Stack spacing={3}>
-            <Stack spacing={1}>
+            <Stack spacing={1} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: { xs: 'center', md: 'flex-start' } }}>
               <Typography variant="h4" fontWeight={800}>
                 Rankings
               </Typography>
@@ -314,9 +314,10 @@ export default function Page() {
                 <Paper
                   sx={{
                     ...GLASS_PANEL_SX,
+                    textAlign: { xs: 'center', md: 'left' },
                   }}
                 >
-                  <Stack direction="row" gap={1} flexWrap="wrap">
+                  <Stack direction="row" gap={1} flexWrap="wrap" justifyContent={{ xs: 'center', md: 'flex-start' }}>
                     {[
                       { key: 'overall', label: 'Overall' },
                       { key: 'license', label: 'By License' },

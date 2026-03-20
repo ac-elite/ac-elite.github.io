@@ -76,7 +76,7 @@ export default function Page() {
 
         <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1 }}>
           <Stack spacing={3}>
-            <Stack spacing={1}>
+            <Stack spacing={1} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: { xs: 'center', md: 'flex-start' } }}>
               <Typography variant="h4" fontWeight={800}>
                 Setup Store
               </Typography>
