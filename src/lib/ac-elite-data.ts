@@ -118,12 +118,13 @@ const LICENSE_CONFIG = {
   TRACK_WEIGHT_BASE: 1.0,
   TRACK_WEIGHT_SCALE: 0.02,
   TRACK_WEIGHT_MAX: 2.0,
-  // Around 50 laps per track means "full confidence".
-  CONFIDENCE_FULL_LAPS: 50,
+  // Around 30 laps per track means "full confidence".
+  // This keeps anti-cheese protection while being less punitive for consistently quick drivers.
+  CONFIDENCE_FULL_LAPS: 30,
   // Reaching this many distinct tracks gives full participation scaling.
   PARTICIPATION_FULL_TRACKS: 8,
   // Keep at 0 by default; raise to e.g. 5 if you want a hard lap floor.
-  MIN_LAPS_FOR_SCORING: 0,
+  MIN_LAPS_FOR_SCORING: 6,
   CONSISTENCY_BONUS_PER_TRACK: 2,
   CONSISTENCY_BONUS_MAX: 50,
   // Final fine-tune: reward drivers that are consistently high on each leaderboard.

@@ -187,17 +187,6 @@ const heroPrimaryPulse = keyframes`
   }
 `;
 
-const heroOutlinePulse = keyframes`
-  0%, 100% {
-    border-color: rgba(255,255,255,0.28);
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
-  }
-  50% {
-    border-color: rgba(255,255,255,0.38);
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.12);
-  }
-`;
-
 /** Soft highlight on “leaderboard.” — white-forward, not loud accent color. */
 const heroWordShimmer = keyframes`
   0%, 100% {
@@ -623,23 +612,6 @@ function HeroSection({
                   Join the community
                 </Button>
 
-                <Button
-                  variant="contained"
-                  color="secondary"
-                  size="large"
-                  sx={{
-                    px: 3.5,
-                    borderRadius: 3,
-                    minHeight: { xs: 46, sm: 48 },
-                    width: { xs: '100%', sm: 'auto' },
-                    maxWidth: { xs: 320, sm: 'none' },
-                    animation: `${heroOutlinePulse} 5.5s ease-in-out infinite`,
-                    ...reducedMotionNone,
-                  }}
-                  href={`${APP_BASE_URL}dashboard`}
-                >
-                  Open stats
-                </Button>
               </Stack>
 
             </Stack>
@@ -727,7 +699,7 @@ function HeroSection({
 
         <Box
           sx={{
-            mt: { xs: 3, md: 4 },
+            mt: { xs: 4, md: 4 },
             mb: 0,
             borderRadius: 2.5,
             px: { xs: 2, md: 2.5 },
