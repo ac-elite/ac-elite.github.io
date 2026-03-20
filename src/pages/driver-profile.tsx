@@ -296,7 +296,7 @@ export default function Page() {
                           <TableCell>Track</TableCell>
                           <TableCell>Position</TableCell>
                           <TableCell>Lap Time</TableCell>
-                          <TableCell>Gap</TableCell>
+                          <TableCell>Gap to P1</TableCell>
                           <TableCell align="right">Laps</TableCell>
                           <TableCell align="right">Grid Size</TableCell>
                         </TableRow>
