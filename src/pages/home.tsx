@@ -739,6 +739,9 @@ export default function Page() {
         name="description"
         content="AC Elite | Simracing community. Track your stats, search drivers, and compete on leaderboards."
       />
+      <meta property="og:title" content="AC Elite | Simracing Community" />
+      <meta property="og:description" content="Track your stats, search drivers, and compete on leaderboards." />
+      <meta property="og:url" content="https://ac-elite.github.io/" />
 
       <HeroSection
         totalDrivers={community.totalDrivers}

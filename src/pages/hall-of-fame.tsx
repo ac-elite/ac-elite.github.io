@@ -431,6 +431,9 @@ export default function Page() {
     <>
       <title>{`Hall of Fame - ${CONFIG.appName}`}</title>
       <meta name="description" content="AC Elite Hall of Fame with standout drivers and team members." />
+      <meta property="og:title" content="Hall of Fame - AC Elite" />
+      <meta property="og:description" content="AC Elite Hall of Fame with standout drivers and team members." />
+      <meta property="og:url" content="https://ac-elite.github.io/hall-of-fame" />
 
       <Box
         sx={{

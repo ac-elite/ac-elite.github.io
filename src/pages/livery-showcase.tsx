@@ -1,34 +1,126 @@
+import { useState, type ReactNode } from 'react';
+
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
+import Link from '@mui/material/Link';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 
-import { CONFIG } from 'src/config-global';
-import { GLASS_PANEL_TIGHT_SX, GLASS_INNER_PANEL_SX } from 'src/lib/glass';
+import { RouterLink } from 'src/routes/components';
 
-import { PreviewLock } from 'src/components/preview-lock/preview-lock';
+import { CONFIG } from 'src/config-global';
+import { getDriverProfileHref } from 'src/lib/routes';
+import { GLASS_PANEL_TIGHT_SX, GLASS_INNER_PANEL_SX } from 'src/lib/glass';
+import { liveriesAssetUrl, TEAM_LIVERY_ENTRIES } from 'src/lib/driver-liveries';
+
+import { LiveryEnlargeDialog } from 'src/components/livery/livery-enlarge-dialog';
 import { PageGridOverlay } from 'src/components/page-background/page-grid-overlay';
 
-const mockGeneralLiveries = [
-  { name: 'General Midnight Blue', image: '/assets/illustrations/f1-livery-placeholder.svg' },
-  { name: 'General Carbon Storm', image: '/assets/illustrations/f1-livery-placeholder.svg' },
-  { name: 'General Silver Arrow', image: '/assets/illustrations/f1-livery-placeholder.svg' },
-  { name: 'General Sunset Orange', image: '/assets/illustrations/f1-livery-placeholder.svg' },
+function publicAsset(path: string) {
+  const base = import.meta.env.BASE_URL;
+  const root = base.endsWith('/') ? base.slice(0, -1) : base;
+  return `${root}${path.startsWith('/') ? path : `/${path}`}`;
+}
+
+/** Taller frame + slight zoom so showroom-style shots fill the card (source images often have extra padding). */
+const LIVERY_THUMB_FRAME_HEIGHT = { xs: 200, sm: 228, md: 252 } as const;
+
+const liveryThumbImageSx = {
+  width: 1,
+  height: 1,
+  objectFit: 'cover' as const,
+  objectPosition: '50% 48%',
+  display: 'block',
+  pointerEvents: 'none' as const,
+  transform: 'scale(1.32)',
+  transformOrigin: 'center center',
+  '@media (prefers-reduced-motion: reduce)': {
+    transform: 'none',
+  },
+};
+
+/** Default pack */
+const generalLiveries = [
+  {
+    name: 'Car 1',
+    image: publicAsset('/assets/liveries/car1.jpg'),
+    alt: 'AC Elite default pack livery (Car 1)',
+    subtitle: 'Default livery pack · Car 1',
+  },
 ] as const;
 
-const mockModTeamLiveries = [
-  { name: 'Creator Signature', owner: 'DIEnamic', image: '/assets/illustrations/f1-livery-placeholder.svg' },
-  { name: 'Admin Tactical Blue', owner: 'Grimlord', image: '/assets/illustrations/f1-livery-placeholder.svg' },
-  { name: 'Moderator Velocity', owner: 'CarterReza', image: '/assets/illustrations/f1-livery-placeholder.svg' },
-] as const;
+type ImagePreviewState = {
+  src: string;
+  alt: string;
+  title: string;
+  subtitle?: string;
+  /** Links to `/driver/:guid` in dialog footer when set. */
+  profileGuid?: string;
+};
+
+function LiveryThumbButton({
+  preview,
+  onOpen,
+  children,
+  sx,
+}: {
+  preview: ImagePreviewState;
+  onOpen: (p: ImagePreviewState) => void;
+  children: ReactNode;
+  sx?: object;
+}) {
+  return (
+    <Box
+      component="button"
+      type="button"
+      onClick={() => onOpen(preview)}
+      aria-label={`Enlarge image: ${preview.title}`}
+      sx={{
+        border: 'none',
+        background: 'none',
+        padding: 0,
+        margin: 0,
+        width: '100%',
+        height: '100%',
+        minWidth: 0,
+        display: 'block',
+        cursor: 'zoom-in',
+        borderRadius: 'inherit',
+        color: 'inherit',
+        font: 'inherit',
+        textAlign: 'inherit',
+        transition: 'transform 0.18s ease, box-shadow 0.18s ease',
+        '&:hover': {
+          transform: 'scale(1.02)',
+        },
+        '&:focus-visible': {
+          outline: '2px solid',
+          outlineColor: 'primary.main',
+          outlineOffset: 2,
+        },
+        ...sx,
+      }}
+    >
+      {children}
+    </Box>
+  );
+}
 
 export default function Page() {
+  const [imagePreview, setImagePreview] = useState<ImagePreviewState | null>(null);
+
   return (
     <>
       <title>{`Livery Showcase - ${CONFIG.appName}`}</title>
-      <meta name="description" content="AC Elite livery showcase preview." />
+      <meta
+        name="description"
+        content="Browse AC Elite liveries: official default pack paints and AC Elite team designs. Click any image for a full-size view."
+      />
+      <meta property="og:title" content="Livery Showcase - AC Elite" />
+      <meta property="og:description" content="Official and team livery designs for the AC Elite simracing community." />
+      <meta property="og:url" content="https://ac-elite.github.io/livery-showcase" />
 
       <Box
         sx={{
@@ -44,146 +136,172 @@ export default function Page() {
 
         <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1 }}>
           <Stack spacing={3}>
-            <Stack spacing={1} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: { xs: 'center', md: 'flex-start' } }}>
+            <Stack spacing={1} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: 'stretch' }}>
               <Typography variant="h4" fontWeight={800}>
                 Livery Showcase
               </Typography>
               <Typography color="text.secondary">
-                Library preview with two livery groups: General and Mod Team.
+                Official default-pack paints and AC Elite team liveries.
+                view.
               </Typography>
             </Stack>
 
-            <PreviewLock
-              storageKey="acelite-preview-livery-showcase"
-              title="Livery Showcase Preview Locked"
-              description="This page is currently a private mock preview"
-            >
-              <Stack spacing={3}>
-                <Stack spacing={1.2} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: { xs: 'center', md: 'flex-start' } }}>
-                  <Typography variant="h6" sx={{ fontWeight: 800 }}>
-                    General liveries
-                  </Typography>
-                  <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                    Default liveries randomly assigned to drivers who join with livery pack installed.
-                  </Typography>
-                  <Grid container spacing={2}>
-                    {mockGeneralLiveries.map((livery) => (
-                      <Grid key={livery.name} size={{ xs: 12, sm: 6, md: 4 }}>
-                        <Paper
-                          sx={{
-                            ...GLASS_PANEL_TIGHT_SX,
-                          }}
-                        >
-                          <Stack spacing={1}>
-                            <Box
+            <Stack spacing={3}>
+              <Stack spacing={1.2} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: 'stretch' }}>
+                <Typography variant="h6" sx={{ fontWeight: 800 }}>
+                  Official pack
+                </Typography>
+                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                  Included with the standard AC Elite livery pack.
+                </Typography>
+                <Grid container spacing={2} sx={{ width: 1 }}>
+                  {generalLiveries.map((livery) => (
+                    <Grid key={livery.name} size={{ xs: 12, sm: 6, md: 4 }}>
+                      <Paper
+                        sx={{
+                          ...GLASS_PANEL_TIGHT_SX,
+                          width: 1,
+                        }}
+                      >
+                        <Stack spacing={1}>
+                          <Box
+                            sx={{
+                              ...GLASS_INNER_PANEL_SX,
+                              width: 1,
+                              height: LIVERY_THUMB_FRAME_HEIGHT,
+                              p: 0,
+                              position: 'relative',
+                              overflow: 'hidden',
+                            }}
+                          >
+                            <LiveryThumbButton
+                              preview={{
+                                src: livery.image,
+                                alt: livery.alt,
+                                title: livery.name,
+                                subtitle: livery.subtitle,
+                              }}
+                              onOpen={setImagePreview}
                               sx={{
-                                ...GLASS_INNER_PANEL_SX,
-                                width: '100%',
-                                height: 170,
-                                p: 0.6,
                                 position: 'relative',
-                                overflow: 'hidden',
-                                '&::before': {
-                                  content: '""',
-                                  position: 'absolute',
-                                  inset: 0,
-                                  opacity: 0.26,
-                                  backgroundImage:
-                                    'linear-gradient(rgba(255,255,255,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px)',
-                                  backgroundSize: '24px 24px, 24px 24px',
-                                  pointerEvents: 'none',
-                                },
+                                minHeight: 0,
+                                width: 1,
+                                height: 1,
                               }}
                             >
-                              <Box
-                                component="img"
-                                src={livery.image}
-                                alt={livery.name}
-                                sx={{
-                                  width: '100%',
-                                  height: '100%',
-                                  objectFit: 'contain',
-                                  position: 'relative',
-                                  zIndex: 1,
-                                }}
-                              />
-                            </Box>
-                            <Typography variant="subtitle2" sx={{ fontWeight: 800 }}>
-                              {livery.name}
-                            </Typography>
-                          </Stack>
-                        </Paper>
-                      </Grid>
-                    ))}
-                  </Grid>
-                </Stack>
-
-                <Stack spacing={1.2} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: { xs: 'center', md: 'flex-start' } }}>
-                  <Typography variant="h6" sx={{ fontWeight: 800 }}>
-                    Mod Team liveries
-                  </Typography>
-                  <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                    Personal liveries made specifically for admins, moderators, and creators.
-                  </Typography>
-                  <Grid container spacing={2}>
-                    {mockModTeamLiveries.map((livery) => (
-                      <Grid key={`${livery.name}-${livery.owner}`} size={{ xs: 12, sm: 6, md: 4 }}>
-                        <Paper
-                          sx={{
-                            ...GLASS_PANEL_TIGHT_SX,
-                          }}
-                        >
-                          <Stack spacing={1}>
-                            <Box
-                              sx={{
-                                ...GLASS_INNER_PANEL_SX,
-                                width: '100%',
-                                height: 170,
-                                p: 0.6,
-                                position: 'relative',
-                                overflow: 'hidden',
-                                '&::before': {
-                                  content: '""',
-                                  position: 'absolute',
-                                  inset: 0,
-                                  opacity: 0.26,
-                                  backgroundImage:
-                                    'linear-gradient(rgba(255,255,255,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px)',
-                                  backgroundSize: '24px 24px, 24px 24px',
-                                  pointerEvents: 'none',
-                                },
-                              }}
-                            >
-                              <Box
-                                component="img"
-                                src={livery.image}
-                                alt={livery.name}
-                                sx={{
-                                  width: '100%',
-                                  height: '100%',
-                                  objectFit: 'contain',
-                                  position: 'relative',
-                                  zIndex: 1,
-                                }}
-                              />
-                            </Box>
-                            <Typography variant="subtitle2" sx={{ fontWeight: 800 }}>
-                              {livery.name}
-                            </Typography>
-                            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                              For: {livery.owner}
-                            </Typography>
-                          </Stack>
-                        </Paper>
-                      </Grid>
-                    ))}
-                  </Grid>
-                </Stack>
+                              <Box component="img" src={livery.image} alt={livery.alt} sx={liveryThumbImageSx} />
+                            </LiveryThumbButton>
+                          </Box>
+                          <Typography variant="subtitle2" sx={{ fontWeight: 800 }}>
+                            {livery.name}
+                          </Typography>
+                        </Stack>
+                      </Paper>
+                    </Grid>
+                  ))}
+                </Grid>
               </Stack>
-            </PreviewLock>
+
+              <Stack spacing={1.2} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: 'stretch' }}>
+                <Typography variant="h6" sx={{ fontWeight: 800 }}>
+                  AC Elite Team
+                </Typography>
+                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                  Team and collaborator liveries for admins, moderators, and creators.
+                </Typography>
+                <Grid container spacing={2} sx={{ width: 1 }}>
+                  {TEAM_LIVERY_ENTRIES.map((livery) => {
+                    const image = liveriesAssetUrl(livery.steamGuid);
+                    return (
+                      <Grid key={livery.steamGuid} size={{ xs: 12, sm: 6, md: 4 }}>
+                        <Paper
+                          sx={{
+                            ...GLASS_PANEL_TIGHT_SX,
+                            width: 1,
+                          }}
+                        >
+                          <Stack spacing={1}>
+                            <Box
+                              sx={{
+                                ...GLASS_INNER_PANEL_SX,
+                                width: 1,
+                                height: LIVERY_THUMB_FRAME_HEIGHT,
+                                p: 0,
+                                position: 'relative',
+                                overflow: 'hidden',
+                              }}
+                            >
+                              <LiveryThumbButton
+                                preview={{
+                                  src: image,
+                                  alt: livery.alt,
+                                  title: livery.showcaseTitle,
+                                  subtitle: livery.owner,
+                                  profileGuid: livery.steamGuid,
+                                }}
+                                onOpen={setImagePreview}
+                                sx={{
+                                  position: 'relative',
+                                  minHeight: 0,
+                                  width: 1,
+                                  height: 1,
+                                }}
+                              >
+                                <Box
+                                  component="img"
+                                  src={image}
+                                  alt={livery.alt}
+                                  loading="lazy"
+                                  sx={liveryThumbImageSx}
+                                />
+                              </LiveryThumbButton>
+                            </Box>
+                            <Typography variant="subtitle2" sx={{ fontWeight: 800, px: 0.25 }}>
+                              {livery.showcaseTitle}
+                            </Typography>
+                            <Link
+                              component={RouterLink}
+                              href={getDriverProfileHref(livery.steamGuid)}
+                              variant="body2"
+                              underline="hover"
+                              color="text.secondary"
+                              sx={{ px: 0.25, display: 'block' }}
+                            >
+                              {livery.owner}
+                            </Link>
+                          </Stack>
+                        </Paper>
+                      </Grid>
+                    );
+                  })}
+                </Grid>
+              </Stack>
+            </Stack>
           </Stack>
         </Container>
       </Box>
+
+      <LiveryEnlargeDialog
+        open={imagePreview !== null}
+        onClose={() => setImagePreview(null)}
+        title={imagePreview?.title ?? ''}
+        src={imagePreview?.src ?? ''}
+        alt={imagePreview?.alt ?? ''}
+        subtitle={imagePreview?.subtitle}
+        footer={
+          imagePreview?.profileGuid ? (
+            <Link
+              component={RouterLink}
+              href={getDriverProfileHref(imagePreview.profileGuid)}
+              variant="body2"
+              underline="hover"
+              color="text.secondary"
+            >
+              Driver profile
+            </Link>
+          ) : null
+        }
+      />
     </>
   );
 }

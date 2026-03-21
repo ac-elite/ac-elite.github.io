@@ -258,6 +258,9 @@ export default function Page() {
     <>
       <title>{`Rankings - ${CONFIG.appName}`}</title>
       <meta name="description" content="AC Elite rankings by overall, license tier, and safety tier." />
+      <meta property="og:title" content="Rankings - AC Elite" />
+      <meta property="og:description" content="AC Elite rankings by overall, license tier, and safety tier." />
+      <meta property="og:url" content="https://ac-elite.github.io/rankings" />
 
       <Box
         sx={{

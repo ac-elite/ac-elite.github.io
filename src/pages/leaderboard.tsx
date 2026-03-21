@@ -139,7 +139,10 @@ export default function Page() {
   return (
     <>
       <title>{`Leaderboard - ${CONFIG.appName}`}</title>
-      <meta name="description" content="AC Elite leaderboard by track." />
+      <meta name="description" content="AC Elite leaderboard by track. Compare lap times and find the fastest drivers." />
+      <meta property="og:title" content="Leaderboard - AC Elite" />
+      <meta property="og:description" content="AC Elite leaderboard by track. Compare lap times and find the fastest drivers." />
+      <meta property="og:url" content="https://ac-elite.github.io/leaderboard" />
 
       <Box
         sx={{

@@ -19,6 +19,7 @@ import { CONFIG } from 'src/config-global';
 import { fetchJson } from 'src/lib/fetch-json';
 import { getLeaderboardTrackSearch } from 'src/lib/routes';
 import { type TeamRoles, getDiscordRolesForGuid } from 'src/lib/team-roles';
+import { liveriesAssetUrl, getTeamLiveryMeta } from 'src/lib/driver-liveries';
 import { GLASS_PANEL_SX, GLASS_INNER_PANEL_SX, GLASS_TABLE_WRAPPER_SX } from 'src/lib/glass';
 import {
   CAR,
@@ -42,6 +43,7 @@ import {
 
 import { ErrorPanel } from 'src/components/data-state/error-panel';
 import { LoadingPanel } from 'src/components/data-state/loading-panel';
+import { LiveryEnlargeDialog } from 'src/components/livery/livery-enlarge-dialog';
 import { PageGridOverlay } from 'src/components/page-background/page-grid-overlay';
 
 type TrackStatRow = {
@@ -145,10 +147,18 @@ export default function Page() {
     [driverGuid, teamRoles]
   );
 
+  const teamLiveryMeta = useMemo(
+    () => (driver ? getTeamLiveryMeta(driver.guid) : undefined),
+    [driver]
+  );
+  const [teamLiveryDialogOpen, setTeamLiveryDialogOpen] = useState(false);
+
   return (
     <>
       <title>{`Driver Profile - ${CONFIG.appName}`}</title>
       <meta name="description" content="AC Elite driver profile and per-track leaderboard performance." />
+      <meta property="og:title" content="Driver Profile - AC Elite" />
+      <meta property="og:description" content="AC Elite driver profile and per-track leaderboard performance." />
 
       <Box
         sx={{
@@ -347,6 +357,73 @@ export default function Page() {
                     </Table>
                   </TableContainer>
                 </Paper>
+
+                {teamLiveryMeta ? (
+                  <>
+                    <Paper
+                      sx={{
+                        ...GLASS_PANEL_SX,
+                        p: 2,
+                        width: 1,
+                      }}
+                    >
+                      <Stack spacing={1.25} alignItems="stretch">
+                        <Typography
+                          variant="overline"
+                          sx={{
+                            color: 'rgba(255,255,255,0.55)',
+                            lineHeight: 1.4,
+                            textAlign: { xs: 'center', md: 'left' },
+                          }}
+                        >
+                          Team livery
+                        </Typography>
+                        <Box
+                          component="button"
+                          type="button"
+                          onClick={() => setTeamLiveryDialogOpen(true)}
+                          aria-label="View team livery full size"
+                          sx={{
+                            p: 0,
+                            m: 0,
+                            width: 1,
+                            minWidth: 0,
+                            border: '1px solid rgba(255,255,255,0.14)',
+                            borderRadius: 1.25,
+                            overflow: 'hidden',
+                            cursor: 'zoom-in',
+                            bgcolor: 'rgba(0,0,0,0.2)',
+                            display: 'block',
+                            lineHeight: 0,
+                            '&:focus-visible': {
+                              outline: '2px solid',
+                              outlineColor: 'primary.main',
+                              outlineOffset: 2,
+                            },
+                          }}
+                        >
+                          <Box
+                            component="img"
+                            src={liveriesAssetUrl(driver.guid)}
+                            alt={teamLiveryMeta.alt}
+                            sx={{
+                              width: '100%',
+                              height: 'auto',
+                              display: 'block',
+                            }}
+                          />
+                        </Box>
+                      </Stack>
+                    </Paper>
+                    <LiveryEnlargeDialog
+                      open={teamLiveryDialogOpen}
+                      onClose={() => setTeamLiveryDialogOpen(false)}
+                      title={driver.name || 'Team livery'}
+                      src={liveriesAssetUrl(driver.guid)}
+                      alt={teamLiveryMeta.alt}
+                    />
+                  </>
+                ) : null}
               </>
             )}
           </Stack>

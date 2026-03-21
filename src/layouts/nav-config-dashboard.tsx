@@ -61,17 +61,15 @@ export const navData = [
     icon: icon('ic-hof-racing'),
   },
   {
+    title: 'Livery Showcase',
+    path: '/livery-showcase',
+    icon: icon('ic-livery-racing'),
+  },
+  {
     title: 'Setup Store',
     path: '/setup-store',
     icon: icon('ic-setup-racing'),
     info: comingSoonBadge,
     disabled: true,
-  },
-  {
-    title: 'Livery Showcase',
-    path: '/livery-showcase',
-    icon: icon('ic-livery-racing'),
-    info: comingSoonBadge,
-    disabled: true,
-  },
+  }
 ];

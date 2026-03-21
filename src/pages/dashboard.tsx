@@ -146,9 +146,10 @@ export default function Page() {
   return (
     <>
       <title>{`Stats - ${CONFIG.appName}`}</title>
-
-      <meta name="description" content="AC Elite Stats (v2)" />
-      <meta name="keywords" content="react,material,kit,stats,ac elite" />
+      <meta name="description" content="AC Elite community stats: driver counts, lap totals, and track activity." />
+      <meta property="og:title" content="Stats - AC Elite" />
+      <meta property="og:description" content="AC Elite community stats: driver counts, lap totals, and track activity." />
+      <meta property="og:url" content="https://ac-elite.github.io/dashboard" />
 
       <Box
         sx={{
