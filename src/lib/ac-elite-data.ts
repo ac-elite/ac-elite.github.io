@@ -456,6 +456,49 @@ export function getSRBadgeSx(tier: string): SxProps<Theme> {
   return glass('#FB7185', '#FF1F2D', 'rgba(251,113,133,0.86)');
 }
 
+/** Medal-style tinted panel for license tier — used on driver profile stat cards. */
+export function getLicensePanelSx(license: string): SxProps<Theme> {
+  const medal = (rgb: string, opacity = 0.38, borderOpacity = 0.85): SxProps<Theme> => ({
+    background: `linear-gradient(135deg, rgba(${rgb},${opacity}) 0%, rgba(${rgb},${opacity * 0.55}) 55%, rgba(${rgb},${opacity * 0.28}) 100%)`,
+    border: `1.5px solid rgba(${rgb},${borderOpacity * 0.7})`,
+    borderLeft: `3.5px solid rgba(${rgb},${borderOpacity})`,
+    boxShadow: `inset 0 1px 0 rgba(255,255,255,0.14), 0 0 18px rgba(${rgb},${opacity * 0.6}), 0 0 4px rgba(${rgb},${opacity * 0.35})`,
+  });
+  const map: Record<string, SxProps<Theme>> = {
+    Elite: medal('192,132,252', 0.42, 0.9),
+    'Diamond+': medal('96,165,250', 0.4, 0.85),
+    Diamond: medal('34,211,238', 0.38, 0.82),
+    'Platinum+': medal('226,232,240', 0.28, 0.65),
+    Platinum: medal('203,213,225', 0.25, 0.6),
+    'Gold+': medal('253,224,71', 0.38, 0.82),
+    Gold: medal('250,204,21', 0.36, 0.78),
+    'Silver+': medal('168,185,204', 0.24, 0.58),
+    Silver: medal('201,213,225', 0.22, 0.55),
+    'Bronze+': medal('251,146,60', 0.36, 0.78),
+    Bronze: medal('249,115,22', 0.34, 0.75),
+    Rookie: medal('178,189,200', 0.18, 0.48),
+  };
+  return map[license] || map.Bronze;
+}
+
+/** Medal-style tinted panel for safety rating tier. */
+export function getSRPanelSx(tier: string): SxProps<Theme> {
+  const medal = (rgb: string, opacity = 0.38, borderOpacity = 0.85): SxProps<Theme> => ({
+    background: `linear-gradient(135deg, rgba(${rgb},${opacity}) 0%, rgba(${rgb},${opacity * 0.55}) 55%, rgba(${rgb},${opacity * 0.28}) 100%)`,
+    border: `1.5px solid rgba(${rgb},${borderOpacity * 0.7})`,
+    borderLeft: `3.5px solid rgba(${rgb},${borderOpacity})`,
+    boxShadow: `inset 0 1px 0 rgba(255,255,255,0.14), 0 0 18px rgba(${rgb},${opacity * 0.6}), 0 0 4px rgba(${rgb},${opacity * 0.35})`,
+  });
+  const first = tier.charAt(0);
+  if (first === 'S') return medal('34,197,94', 0.42, 0.9);
+  if (first === 'A') return medal('124,58,237', 0.4, 0.85);
+  if (first === 'B') return medal('234,242,57', 0.36, 0.78);
+  if (first === 'C') return medal('209,213,219', 0.22, 0.55);
+  if (first === 'D') return medal('234,122,45', 0.36, 0.78);
+  if (first === 'E') return medal('156,163,175', 0.18, 0.48);
+  return medal('251,113,133', 0.36, 0.78);
+}
+
 export function getOverallCombinedScore(paceScore: number, sr: number, maxPaceScore: number) {
   const paceNorm = maxPaceScore > 0 ? paceScore / maxPaceScore : 0;
   const srNorm = Math.max(0, Math.min(1, (sr - 1.0) / (9.99 - 1.0)));

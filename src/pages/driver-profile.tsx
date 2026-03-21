@@ -26,6 +26,7 @@ import {
   getDriverSR,
   calculateGap,
   getSRBadgeSx,
+  getSRPanelSx,
   formatNumber,
   ROLE_CHIP_SX,
   formatLaptime,
@@ -36,6 +37,7 @@ import {
   getDriverLicense,
   computeLicenseMap,
   getLicenseBadgeSx,
+  getLicensePanelSx,
   LICENSE_CHIP_WIDTH,
   getTrackDisplayName,
   type LeaderboardCarRow,
@@ -224,8 +226,8 @@ export default function Page() {
 
                   <Grid container spacing={1.5}>
                     <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                      <Paper sx={{ ...GLASS_INNER_PANEL_SX, textAlign: { xs: 'center', md: 'left' } }}>
-                        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                      <Paper sx={[GLASS_INNER_PANEL_SX, getLicensePanelSx(license.license), { textAlign: { xs: 'center', md: 'left' } }] as any}>
+                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.7)' }}>
                           License
                         </Typography>
                         <Stack direction="row" spacing={1} alignItems="center" justifyContent={{ xs: 'center', md: 'flex-start' }} sx={{ mt: 0.4 }}>
@@ -239,15 +241,15 @@ export default function Page() {
                               ...getLicenseBadgeSx(license.license),
                             }}
                           />
-                          <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.secondary' }}>
+                          <Typography variant="body2" sx={{ fontWeight: 700, color: 'rgba(255,255,255,0.85)' }}>
                             {Math.round(license.paceScore).toLocaleString()}
                           </Typography>
                         </Stack>
                       </Paper>
                     </Grid>
                     <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                      <Paper sx={{ ...GLASS_INNER_PANEL_SX, textAlign: { xs: 'center', md: 'left' } }}>
-                        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                      <Paper sx={[GLASS_INNER_PANEL_SX, getSRPanelSx(sr.tier), { textAlign: { xs: 'center', md: 'left' } }] as any}>
+                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.7)' }}>
                           Safety Rating
                         </Typography>
                         <Stack direction="row" spacing={1} alignItems="center" justifyContent={{ xs: 'center', md: 'flex-start' }} sx={{ mt: 0.4 }}>
@@ -261,7 +263,7 @@ export default function Page() {
                               ...getSRBadgeSx(sr.tier),
                             }}
                           />
-                          <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.secondary' }}>
+                          <Typography variant="body2" sx={{ fontWeight: 700, color: 'rgba(255,255,255,0.85)' }}>
                             {sr.sr.toFixed(2)}
                           </Typography>
                         </Stack>
