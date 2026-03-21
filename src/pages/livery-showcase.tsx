@@ -207,7 +207,7 @@ export default function Page() {
                   AC Elite Team
                 </Typography>
                 <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                  Team and collaborator liveries for admins, moderators, and creators.
+                  Team and collaborator liveries.
                 </Typography>
                 <Grid container spacing={2} sx={{ width: 1 }}>
                   {TEAM_LIVERY_ENTRIES.map((livery) => {
