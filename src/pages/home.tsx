@@ -282,7 +282,7 @@ function HeroSection({
                     { label: 'Total drivers', value: formatNumber(totalDrivers) },
                     { label: 'Logged laps', value: formatNumber(totalLaps) },
                     { label: 'Active tracks', value: formatNumber(activeTracks) },
-                    { label: 'Driver search', value: 'Steam64 + name' },
+                    { label: 'Driver search', value: 'By name or numeric ID' },
                   ].map((item) => (
                     <Grid key={item.label} size={{ xs: 6 }}>
                       <Box
@@ -349,10 +349,17 @@ function DriverSearchSection({
   const [query, setQuery] = useState('');
 
   const matches = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return [];
+    const trimmed = query.trim();
+    const qName = trimmed.toLowerCase();
+    if (!qName) return [];
+    /** Steam64-style IDs are digits only; avoid treating mixed text as a GUID substring. */
+    const guidQuery = /^\d+$/.test(trimmed);
     return drivers
-      .filter((driver) => driver.name.toLowerCase().includes(q) || driver.guid.includes(q))
+      .filter((driver) => {
+        const nameHit = driver.name.toLowerCase().includes(qName);
+        const guidHit = guidQuery && driver.guid.includes(trimmed);
+        return nameHit || guidHit;
+      })
       .slice(0, 8);
   }, [drivers, query]);
 
@@ -405,7 +412,7 @@ function DriverSearchSection({
                   onChange={(event) => {
                     setQuery(event.target.value);
                   }}
-                  placeholder="Driver name or Steam64 ID..."
+                  placeholder="Search by driver name or numeric ID…"
                   variant="outlined"
                   size="medium"
                   autoComplete="off"
@@ -486,11 +493,6 @@ function DriverSearchSection({
                                   sx={{ fontWeight: 700, ...getSRBadgeSx(driver.safetyTier) }}
                                 />
                               </Stack>
-                            }
-                            secondary={
-                              <Typography variant="caption" sx={{ fontFamily: 'monospace' }}>
-                                {driver.guid}
-                              </Typography>
                             }
                           />
                         </ListItemButton>

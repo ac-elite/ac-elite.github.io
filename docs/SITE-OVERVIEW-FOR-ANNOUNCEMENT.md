@@ -27,7 +27,7 @@ Use this as source context to generate an announcement post for the AC Elite Dis
   - Live / Delayed / Stale / Unknown
   - Human-readable "last update" time (e.g. "30 minutes ago")
 - Driver search:
-  - Search by driver name or Steam64 ID
+  - Search by driver name or numeric ID
   - Deep linking support from leaderboard/rankings to a driver profile
 - Driver profile panel includes:
   - License tier + pace score

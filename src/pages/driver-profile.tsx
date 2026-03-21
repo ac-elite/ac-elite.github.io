@@ -187,7 +187,8 @@ export default function Page() {
                   Driver not found
                 </Typography>
                 <Typography color="text.secondary" sx={{ mt: 0.75 }}>
-                  Could not find a driver with GUID: {driverGuid}
+                  This driver is not in the current AC Elite data. Check the link or use the driver search on the home
+                  page.
                 </Typography>
               </Paper>
             )}
@@ -219,9 +220,6 @@ export default function Page() {
                         />
                       ))}
                     </Stack>
-                    <Typography variant="body2" sx={{ color: 'text.secondary', fontFamily: 'monospace' }}>
-                      {driver.guid}
-                    </Typography>
                   </Stack>
 
                   <Grid container spacing={1.5}>
