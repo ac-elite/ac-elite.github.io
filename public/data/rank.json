@@ -529,9 +529,9 @@
  {
   "guid": "76561199664649696",
   "name": "olalekezion810",
-  "points": 2790.398,
-  "kilometers": 35480.5,
-  "collisions": 1184,
+  "points": 2797.8149999999996,
+  "kilometers": 35509.3,
+  "collisions": 1185,
   "leaderboard": {
    "ks_zandvoort_": {
     "tatuusfa1": {
@@ -592,8 +592,8 @@
    "imola_": {
     "tatuusfa1": {
      "laptime": 103104,
-     "laps": 285,
-     "ts": 1774134597751
+     "laps": 289,
+     "ts": 1774200652100
     },
     "rss_formula_rss_3_v6": {
      "laptime": 93477,
@@ -658,11 +658,11 @@
     }
    }
   },
-  "last_seen": 1774135758110,
-  "wins": 162,
-  "podiums": 325,
+  "last_seen": 1774200742748,
+  "wins": 163,
+  "podiums": 326,
   "poles": 81,
-  "flaps": 149,
+  "flaps": 150,
   "infr": 70
  },
  {
@@ -6487,9 +6487,9 @@
  {
   "guid": "76561199067031859",
   "name": "Saba",
-  "points": 379.707,
-  "kilometers": 19843.9,
-  "collisions": 1379,
+  "points": 379.28499999999997,
+  "kilometers": 19867.9,
+  "collisions": 1386,
   "leaderboard": {
    "ks_zandvoort_": {
     "tatuusfa1": {
@@ -6550,8 +6550,8 @@
    "imola_": {
     "tatuusfa1": {
      "laptime": 103395,
-     "laps": 43,
-     "ts": 1774134597701
+     "laps": 45,
+     "ts": 1774200452805
     },
     "rss_formula_rss_3_v6": {
      "laptime": 95911,
@@ -6609,7 +6609,7 @@
     }
    }
   },
-  "last_seen": 1774135783983,
+  "last_seen": 1774200742748,
   "wins": 53,
   "podiums": 125,
   "poles": 70,
@@ -13091,7 +13091,7 @@
     }
    }
   },
-  "last_seen": 1771088162612,
+  "last_seen": 1774198273119,
   "wins": 2,
   "podiums": 6,
   "poles": 2,
@@ -26129,6 +26129,28 @@
   "infr": 0
  },
  {
+  "guid": "76561198845299751",
+  "name": "Gerard Goossens",
+  "points": 76.111,
+  "kilometers": 260.2,
+  "collisions": 7,
+  "leaderboard": {
+   "imola_": {
+    "tatuusfa1": {
+     "laptime": 111360,
+     "laps": 34,
+     "ts": 1774200711315
+    }
+   }
+  },
+  "last_seen": 1774200742748,
+  "wins": 1,
+  "podiums": 2,
+  "poles": 0,
+  "flaps": 1,
+  "infr": 0
+ },
+ {
   "guid": "76561198450798647",
   "name": "JoMilan04",
   "points": 76.091,
@@ -29098,28 +29120,6 @@
   "infr": 1
  },
  {
-  "guid": "76561198845299751",
-  "name": "Gerard Goossens",
-  "points": 72.153,
-  "kilometers": 211.1,
-  "collisions": 6,
-  "leaderboard": {
-   "imola_": {
-    "tatuusfa1": {
-     "laptime": 111660,
-     "laps": 27,
-     "ts": 1774192470997
-    }
-   }
-  },
-  "last_seen": 1774197052683,
-  "wins": 1,
-  "podiums": 1,
-  "poles": 0,
-  "flaps": 1,
-  "infr": 0
- },
- {
   "guid": "76561198216085103",
   "name": "Raijin",
   "points": 72.149,
@@ -30327,6 +30327,49 @@
   "wins": 0,
   "podiums": 0,
   "poles": 0,
+  "flaps": 0,
+  "infr": 2
+ },
+ {
+  "guid": "76561199500429336",
+  "name": "Traliccio",
+  "points": 70.854,
+  "kilometers": 473.4,
+  "collisions": 62,
+  "leaderboard": {
+   "ks_silverstone_gp": {
+    "tatuusfa1": {
+     "laptime": 125088,
+     "laps": 8,
+     "ts": 1765838467848
+    }
+   },
+   "ks_nurburgring_layout_gp_a": {
+    "tatuusfa1": {
+     "laptime": 117735,
+     "laps": 10,
+     "ts": 1766768282022
+    }
+   },
+   "ks_red_bull_ring_layout_gp": {
+    "tatuusfa1": {
+     "laptime": 90814,
+     "laps": 15,
+     "ts": 1770760330484
+    }
+   },
+   "imola_": {
+    "tatuusfa1": {
+     "laptime": 108388,
+     "laps": 3,
+     "ts": 1774200353050
+    }
+   }
+  },
+  "last_seen": 1774200441537,
+  "wins": 0,
+  "podiums": 1,
+  "poles": 1,
   "flaps": 0,
   "infr": 2
  },
@@ -38655,42 +38698,6 @@
   "poles": 0,
   "flaps": 0,
   "infr": 0
- },
- {
-  "guid": "76561199500429336",
-  "name": "Traliccio",
-  "points": 64.601,
-  "kilometers": 447.4,
-  "collisions": 56,
-  "leaderboard": {
-   "ks_silverstone_gp": {
-    "tatuusfa1": {
-     "laptime": 125088,
-     "laps": 8,
-     "ts": 1765838467848
-    }
-   },
-   "ks_nurburgring_layout_gp_a": {
-    "tatuusfa1": {
-     "laptime": 117735,
-     "laps": 10,
-     "ts": 1766768282022
-    }
-   },
-   "ks_red_bull_ring_layout_gp": {
-    "tatuusfa1": {
-     "laptime": 90814,
-     "laps": 15,
-     "ts": 1770760330484
-    }
-   }
-  },
-  "last_seen": 1772570033644,
-  "wins": 0,
-  "podiums": 1,
-  "poles": 0,
-  "flaps": 0,
-  "infr": 2
  },
  {
   "guid": "76561199047000471",
@@ -108837,6 +108844,21 @@
   "poles": 0,
   "flaps": 0,
   "infr": 1
+ },
+ {
+  "guid": "76561198743645571",
+  "name": "Alessandro Butera",
+  "points": 49.539,
+  "kilometers": 2.5,
+  "collisions": 1,
+  "leaderboard": {
+  },
+  "last_seen": 1774200742748,
+  "wins": 0,
+  "podiums": 0,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 0
  },
  {
   "guid": "76561198799557810",
