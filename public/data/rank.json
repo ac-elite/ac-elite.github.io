@@ -129,8 +129,8 @@
  {
   "guid": "76561198828350593",
   "name": "Grimlord",
-  "points": 4458.807000000001,
-  "kilometers": 21895.5,
+  "points": 4458.807,
+  "kilometers": 21899.8,
   "collisions": 571,
   "leaderboard": {
    "ks_zandvoort_": {
@@ -246,7 +246,7 @@
     }
    }
   },
-  "last_seen": 1774132968905,
+  "last_seen": 1774211592927,
   "wins": 125,
   "podiums": 348,
   "poles": 109,
@@ -383,8 +383,8 @@
  {
   "guid": "76561198328304798",
   "name": "CarterReza",
-  "points": 2993.915,
-  "kilometers": 24132.1,
+  "points": 2993.904,
+  "kilometers": 24132.6,
   "collisions": 258,
   "leaderboard": {
    "ks_zandvoort_": {
@@ -519,7 +519,7 @@
     }
    }
   },
-  "last_seen": 1774207325855,
+  "last_seen": 1774207793180,
   "wins": 108,
   "podiums": 170,
   "poles": 291,
@@ -4902,9 +4902,9 @@
  {
   "guid": "76561199147007110",
   "name": "VikingLord",
-  "points": 581.367,
-  "kilometers": 8696.6,
-  "collisions": 862,
+  "points": 579.673,
+  "kilometers": 8733.1,
+  "collisions": 868,
   "leaderboard": {
    "monza_": {
     "tatuusfa1": {
@@ -4958,8 +4958,8 @@
    "imola_": {
     "tatuusfa1": {
      "laptime": 103901,
-     "laps": 14,
-     "ts": 1761412535725
+     "laps": 15,
+     "ts": 1774207984332
     },
     "rss_formula_rss_3_v6": {
      "laptime": 92781,
@@ -5031,7 +5031,7 @@
     }
    }
   },
-  "last_seen": 1774207511719,
+  "last_seen": 1774208543059,
   "wins": 15,
   "podiums": 55,
   "poles": 29,
@@ -14598,8 +14598,8 @@
  {
   "guid": "76561197969647265",
   "name": "Fox",
-  "points": 120.746,
-  "kilometers": 1970.7,
+  "points": 121.166,
+  "kilometers": 1985.4,
   "collisions": 119,
   "leaderboard": {
    "ks_laguna_seca_": {
@@ -14619,8 +14619,8 @@
    "imola_": {
     "tatuusfa1": {
      "laptime": 108690,
-     "laps": 2,
-     "ts": 1774206918820
+     "laps": 3,
+     "ts": 1774210484782
     },
     "rss_formula_rss_3_v6": {
      "laptime": 95294,
@@ -14657,7 +14657,7 @@
     }
    }
   },
-  "last_seen": 1774207240951,
+  "last_seen": 1774210611768,
   "wins": 4,
   "podiums": 10,
   "poles": 1,
@@ -42103,49 +42103,6 @@
   "infr": 0
  },
  {
-  "guid": "76561199509205621",
-  "name": "greek_vr46",
-  "points": 62.358000000000004,
-  "kilometers": 504.3,
-  "collisions": 55,
-  "leaderboard": {
-   "ks_silverstone_gp": {
-    "tatuusfa1": {
-     "laptime": 133227,
-     "laps": 4,
-     "ts": 1766085867623
-    }
-   },
-   "ks_nurburgring_layout_gp_a": {
-    "tatuusfa1": {
-     "laptime": 122947,
-     "laps": 16,
-     "ts": 1766647992037
-    }
-   },
-   "ks_vallelunga_classic_circuit": {
-    "tatuusfa1": {
-     "laptime": 75667,
-     "laps": 5,
-     "ts": 1767021083434
-    }
-   },
-   "imola_": {
-    "tatuusfa1": {
-     "laptime": 112777,
-     "laps": 1,
-     "ts": 1773768144791
-    }
-   }
-  },
-  "last_seen": 1773768976096,
-  "wins": 0,
-  "podiums": 0,
-  "poles": 0,
-  "flaps": 0,
-  "infr": 1
- },
- {
   "guid": "76561198182294378",
   "name": "I owe $17 to the korean mafia",
   "points": 62.358,
@@ -42887,6 +42844,49 @@
   "last_seen": 1768558849776,
   "wins": 0,
   "podiums": 1,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 1
+ },
+ {
+  "guid": "76561199509205621",
+  "name": "greek_vr46",
+  "points": 61.919000000000004,
+  "kilometers": 518.6,
+  "collisions": 56,
+  "leaderboard": {
+   "ks_silverstone_gp": {
+    "tatuusfa1": {
+     "laptime": 133227,
+     "laps": 4,
+     "ts": 1766085867623
+    }
+   },
+   "ks_nurburgring_layout_gp_a": {
+    "tatuusfa1": {
+     "laptime": 122947,
+     "laps": 16,
+     "ts": 1766647992037
+    }
+   },
+   "ks_vallelunga_classic_circuit": {
+    "tatuusfa1": {
+     "laptime": 75667,
+     "laps": 5,
+     "ts": 1767021083434
+    }
+   },
+   "imola_": {
+    "tatuusfa1": {
+     "laptime": 112777,
+     "laps": 1,
+     "ts": 1773768144791
+    }
+   }
+  },
+  "last_seen": 1774208764764,
+  "wins": 0,
+  "podiums": 0,
   "poles": 0,
   "flaps": 0,
   "infr": 1
