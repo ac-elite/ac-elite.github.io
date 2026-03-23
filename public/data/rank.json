@@ -2,7 +2,7 @@
  {
   "guid": "76561198025621442",
   "name": "DIEnamic",
-  "points": 10158.96,
+  "points": 10158.36,
   "kilometers": 45213.3,
   "collisions": 1548,
   "leaderboard": {
@@ -126,7 +126,7 @@
     }
    }
   },
-  "last_seen": 1774302058818,
+  "last_seen": 1774303714410,
   "wins": 401,
   "podiums": 793,
   "poles": 69,
@@ -1084,7 +1084,7 @@
     }
    }
   },
-  "last_seen": 1774302058818,
+  "last_seen": 1774302292966,
   "wins": 19,
   "podiums": 123,
   "poles": 5,
@@ -1417,9 +1417,9 @@
  {
   "guid": "76561198802663250",
   "name": "Felipe Rodriguez",
-  "points": 1779.274,
-  "kilometers": 10036.5,
-  "collisions": 428,
+  "points": 1793.5030000000002,
+  "kilometers": 10066.7,
+  "collisions": 429,
   "leaderboard": {
    "ks_zandvoort_": {
     "tatuusfa1": {
@@ -1542,17 +1542,17 @@
    },
    "ks_vallelunga_extended_circuit": {
     "tatuusfa1": {
-     "laptime": 92915,
-     "laps": 11,
-     "ts": 1774301968747
+     "laptime": 92549,
+     "laps": 18,
+     "ts": 1774303288503
     }
    }
   },
-  "last_seen": 1774302058818,
-  "wins": 37,
-  "podiums": 124,
+  "last_seen": 1774303510046,
+  "wins": 38,
+  "podiums": 125,
   "poles": 11,
-  "flaps": 33,
+  "flaps": 34,
   "infr": 15
  },
  {
@@ -16612,6 +16612,49 @@
   "infr": 0
  },
  {
+  "guid": "76561199811638352",
+  "name": "jarctica",
+  "points": 106.067,
+  "kilometers": 292.6,
+  "collisions": 11,
+  "leaderboard": {
+   "ks_silverstone_gp": {
+    "tatuusfa1": {
+     "laptime": 123585,
+     "laps": 3,
+     "ts": 1771874319800
+    }
+   },
+   "ks_barcelona_layout_moto": {
+    "tatuusfa1": {
+     "laptime": 103172,
+     "laps": 15,
+     "ts": 1773330167135
+    }
+   },
+   "imola_": {
+    "tatuusfa1": {
+     "laptime": 107308,
+     "laps": 5,
+     "ts": 1774114490828
+    }
+   },
+   "ks_vallelunga_extended_circuit": {
+    "tatuusfa1": {
+     "laptime": 93755,
+     "laps": 12,
+     "ts": 1774303011860
+    }
+   }
+  },
+  "last_seen": 1774303067769,
+  "wins": 1,
+  "podiums": 4,
+  "poles": 0,
+  "flaps": 1,
+  "infr": 0
+ },
+ {
   "guid": "76561199155718173",
   "name": "BB Bobbi",
   "points": 105.81599999999999,
@@ -16782,49 +16825,6 @@
   "podiums": 0,
   "poles": 0,
   "flaps": 0,
-  "infr": 0
- },
- {
-  "guid": "76561199811638352",
-  "name": "jarctica",
-  "points": 104.787,
-  "kilometers": 278,
-  "collisions": 11,
-  "leaderboard": {
-   "ks_silverstone_gp": {
-    "tatuusfa1": {
-     "laptime": 123585,
-     "laps": 3,
-     "ts": 1771874319800
-    }
-   },
-   "ks_barcelona_layout_moto": {
-    "tatuusfa1": {
-     "laptime": 103172,
-     "laps": 15,
-     "ts": 1773330167135
-    }
-   },
-   "imola_": {
-    "tatuusfa1": {
-     "laptime": 107308,
-     "laps": 5,
-     "ts": 1774114490828
-    }
-   },
-   "ks_vallelunga_extended_circuit": {
-    "tatuusfa1": {
-     "laptime": 93755,
-     "laps": 8,
-     "ts": 1774302009588
-    }
-   }
-  },
-  "last_seen": 1774302058818,
-  "wins": 1,
-  "podiums": 4,
-  "poles": 0,
-  "flaps": 1,
   "infr": 0
  },
  {
