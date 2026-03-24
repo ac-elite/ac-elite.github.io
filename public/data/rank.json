@@ -5267,8 +5267,8 @@
  {
   "guid": "76561198379324541",
   "name": "MazaTribe",
-  "points": 535.971,
-  "kilometers": 4149.6,
+  "points": 545.748,
+  "kilometers": 4174.5,
   "collisions": 283,
   "leaderboard": {
    "mugello_": {
@@ -5392,17 +5392,17 @@
    },
    "ks_vallelunga_extended_circuit": {
     "tatuusfa1": {
-     "laptime": 96776,
-     "laps": 2,
-     "ts": 1774385115316
+     "laptime": 95578,
+     "laps": 7,
+     "ts": 1774386012209
     }
    }
   },
-  "last_seen": 1774385394335,
+  "last_seen": 1774386056379,
   "wins": 3,
-  "podiums": 28,
+  "podiums": 29,
   "poles": 2,
-  "flaps": 3,
+  "flaps": 4,
   "infr": 8
  },
  {
@@ -29906,6 +29906,28 @@
   "infr": 2
  },
  {
+  "guid": "76561197993849292",
+  "name": "Ruggianza",
+  "points": 71.50500000000001,
+  "kilometers": 136.5,
+  "collisions": 12,
+  "leaderboard": {
+   "ks_vallelunga_extended_circuit": {
+    "tatuusfa1": {
+     "laptime": 94830,
+     "laps": 23,
+     "ts": 1774386011467
+    }
+   }
+  },
+  "last_seen": 1774386056379,
+  "wins": 1,
+  "podiums": 1,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 0
+ },
+ {
   "guid": "76561198323387384",
   "name": "Flynn. C.",
   "points": 71.491,
@@ -37118,28 +37140,6 @@
   "podiums": 2,
   "poles": 0,
   "flaps": 1,
-  "infr": 0
- },
- {
-  "guid": "76561197993849292",
-  "name": "Ruggianza",
-  "points": 65.754,
-  "kilometers": 111.6,
-  "collisions": 12,
-  "leaderboard": {
-   "ks_vallelunga_extended_circuit": {
-    "tatuusfa1": {
-     "laptime": 94830,
-     "laps": 18,
-     "ts": 1774385175674
-    }
-   }
-  },
-  "last_seen": 1774385394335,
-  "wins": 0,
-  "podiums": 0,
-  "poles": 0,
-  "flaps": 0,
   "infr": 0
  },
  {
@@ -52442,28 +52442,6 @@
   "infr": 0
  },
  {
-  "guid": "76561198139438243",
-  "name": "Fabio Scaduto",
-  "points": 58.427,
-  "kilometers": 87.2,
-  "collisions": 7,
-  "leaderboard": {
-   "ks_barcelona_layout_moto": {
-    "tatuusfa1": {
-     "laptime": 105449,
-     "laps": 6,
-     "ts": 1773180343385
-    }
-   }
-  },
-  "last_seen": 1774385287534,
-  "wins": 0,
-  "podiums": 0,
-  "poles": 0,
-  "flaps": 0,
-  "infr": 0
- },
- {
   "guid": "76561198309461423",
   "name": "Federico Chifflet",
   "points": 58.423,
@@ -52501,6 +52479,28 @@
    }
   },
   "last_seen": 1766525865644,
+  "wins": 0,
+  "podiums": 0,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 0
+ },
+ {
+  "guid": "76561198139438243",
+  "name": "Fabio Scaduto",
+  "points": 58.397999999999996,
+  "kilometers": 86.8,
+  "collisions": 8,
+  "leaderboard": {
+   "ks_barcelona_layout_moto": {
+    "tatuusfa1": {
+     "laptime": 105449,
+     "laps": 6,
+     "ts": 1773180343385
+    }
+   }
+  },
+  "last_seen": 1774385605735,
   "wins": 0,
   "podiums": 0,
   "poles": 0,
@@ -54487,6 +54487,28 @@
    }
   },
   "last_seen": 1765039873619,
+  "wins": 0,
+  "podiums": 0,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 0
+ },
+ {
+  "guid": "76561198175750741",
+  "name": "ReptilienVieh",
+  "points": 57.817,
+  "kilometers": 44,
+  "collisions": 7,
+  "leaderboard": {
+   "ks_vallelunga_extended_circuit": {
+    "tatuusfa1": {
+     "laptime": 97709,
+     "laps": 7,
+     "ts": 1774385943128
+    }
+   }
+  },
+  "last_seen": 1774386024590,
   "wins": 0,
   "podiums": 0,
   "poles": 0,
@@ -87073,28 +87095,6 @@
   "infr": 0
  },
  {
-  "guid": "76561198175750741",
-  "name": "ReptilienVieh",
-  "points": 51.712,
-  "kilometers": 24.2,
-  "collisions": 5,
-  "leaderboard": {
-   "ks_vallelunga_extended_circuit": {
-    "tatuusfa1": {
-     "laptime": 100914,
-     "laps": 3,
-     "ts": 1774384564785
-    }
-   }
-  },
-  "last_seen": 1774385394335,
-  "wins": 0,
-  "podiums": 0,
-  "poles": 0,
-  "flaps": 0,
-  "infr": 0
- },
- {
   "guid": "76561198993372973",
   "name": "TEO",
   "points": 51.697,
@@ -106452,6 +106452,21 @@
   "wins": 0,
   "podiums": 0,
   "poles": 0,
+  "flaps": 0,
+  "infr": 0
+ },
+ {
+  "guid": "76561199811387092",
+  "name": "Clap",
+  "points": 49.694,
+  "kilometers": 7.4,
+  "collisions": 1,
+  "leaderboard": {
+  },
+  "last_seen": 1774385728803,
+  "wins": 0,
+  "podiums": 0,
+  "poles": 1,
   "flaps": 0,
   "infr": 0
  },
