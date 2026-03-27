@@ -135,6 +135,6 @@ jobs:
             echo "No changes to commit"
           else
             git -c user.email="github-actions[bot]@users.noreply.github.com" -c user.name="github-actions[bot]" commit -m "🔄 Sync KMR data - $(date -u +'%Y-%m-%d %H:%M:%S UTC')"
-            git pull --rebase
+            git pull --rebase --autostash
             git push
           fi

@@ -20,7 +20,7 @@ import { fetchJson } from 'src/lib/fetch-json';
 import { getLeaderboardTrackSearch } from 'src/lib/routes';
 import { type TeamRoles, getDiscordRolesForGuid } from 'src/lib/team-roles';
 import { liveriesAssetUrl, getTeamLiveryMeta } from 'src/lib/driver-liveries';
-import { fetchPrevRankData, computeDeltas, type DriverDelta } from 'src/lib/delta';
+import { computeDeltas, type DriverDelta, fetchPrevRankData } from 'src/lib/delta';
 import { GLASS_PANEL_SX, GLASS_INNER_PANEL_SX, GLASS_TABLE_WRAPPER_SX } from 'src/lib/glass';
 import {
   CAR,

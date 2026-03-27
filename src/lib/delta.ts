@@ -1,10 +1,10 @@
+import { fetchJson } from './fetch-json';
 import {
   getDriverSR,
+  type RankDriver,
   getDriverLicense,
   computeLicenseMap,
-  type RankDriver,
 } from './ac-elite-data';
-import { fetchJson } from './fetch-json';
 
 export type DriverDelta = {
   deltaPace: number;

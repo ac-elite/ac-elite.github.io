@@ -20,12 +20,12 @@ import TableContainer from '@mui/material/TableContainer';
 import { CONFIG } from 'src/config-global';
 import { fetchJson } from 'src/lib/fetch-json';
 import { getDriverProfileHref } from 'src/lib/routes';
-import { fetchPrevRankData, computeDeltas, type DriverDelta } from 'src/lib/delta';
+import { computeDeltas, type DriverDelta, fetchPrevRankData } from 'src/lib/delta';
 import {
   GLASS_PANEL_SX,
+  getPodiumRowSx,
   GLASS_TABLE_WRAPPER_SX,
   GLASS_TABLE_PAGINATION_SX,
-  getPodiumRowSx,
 } from 'src/lib/glass';
 import {
   SR_TIERS,
