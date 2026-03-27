@@ -30,6 +30,7 @@ import {
 import { ErrorPanel } from 'src/components/data-state/error-panel';
 import { LoadingPanel } from 'src/components/data-state/loading-panel';
 import { PageGridOverlay } from 'src/components/page-background/page-grid-overlay';
+import { useLicenseSafetyGuide } from 'src/components/license-safety-guide/license-safety-guide';
 
 type FameEntry = {
   guid: string;
@@ -49,6 +50,8 @@ function CategoryCard({
   description: string;
   entries: FameEntry[];
 }) {
+  const { openGuide } = useLicenseSafetyGuide();
+
   return (
     <Paper
       sx={{
@@ -115,20 +118,24 @@ function CategoryCard({
                     <Chip
                       size="small"
                       label={entry.license}
+                      onClick={(e) => { e.stopPropagation(); openGuide('license'); }}
                       sx={{
                         minWidth: LICENSE_CHIP_WIDTH,
                         justifyContent: 'center',
                         fontWeight: 700,
+                        cursor: 'pointer',
                         ...getLicenseBadgeSx(entry.license),
                       }}
                     />
                     <Chip
                       size="small"
                       label={entry.srTier}
+                      onClick={(e) => { e.stopPropagation(); openGuide('safety'); }}
                       sx={{
                         minWidth: SR_CHIP_WIDTH,
                         justifyContent: 'center',
                         fontWeight: 700,
+                        cursor: 'pointer',
                         ...getSRBadgeSx(entry.srTier),
                       }}
                     />
@@ -172,6 +179,7 @@ function TeamRoleColumn({
   guids: string[];
   allDrivers: RankDriver[];
 }) {
+  const { openGuide } = useLicenseSafetyGuide();
   const byGuid = useMemo(() => new Map(allDrivers.map((d) => [d.guid, d])), [allDrivers]);
   const licenseMap = useMemo(() => computeLicenseMap(allDrivers), [allDrivers]);
 
@@ -227,20 +235,24 @@ function TeamRoleColumn({
               <Chip
                 size="small"
                 label={member.license}
+                onClick={(e) => { e.stopPropagation(); openGuide('license'); }}
                 sx={{
                   minWidth: LICENSE_CHIP_WIDTH,
                   justifyContent: 'center',
                   fontWeight: 700,
+                  cursor: 'pointer',
                   ...getLicenseBadgeSx(member.license),
                 }}
               />
               <Chip
                 size="small"
                 label={member.srTier}
+                onClick={(e) => { e.stopPropagation(); openGuide('safety'); }}
                 sx={{
                   minWidth: SR_CHIP_WIDTH,
                   justifyContent: 'center',
                   fontWeight: 700,
+                  cursor: 'pointer',
                   ...getSRBadgeSx(member.srTier),
                 }}
               />

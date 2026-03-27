@@ -55,8 +55,19 @@ export function parseTimestamp(input?: string | number): number | undefined {
 
 export function formatTimeAgo(isoString?: string): string {
   if (!isoString) return 'Unknown';
-  const timestamp = new Date(isoString).getTime();
-  if (!Number.isFinite(timestamp)) return 'Unknown';
+  const parsed = new Date(isoString).getTime();
+  if (!Number.isFinite(parsed)) return 'Unknown';
+
+  // Accept legacy/local values that were saved with a trailing "Z" even though
+  // they were meant as local time. If parsed UTC lands in the future, try
+  // re-parsing without the timezone marker as a local datetime.
+  let timestamp = parsed;
+  if (parsed > Date.now() + 2 * 60 * 1000 && /Z$/i.test(isoString)) {
+    const localGuess = new Date(isoString.replace(/Z$/i, '')).getTime();
+    if (Number.isFinite(localGuess) && localGuess <= Date.now() + 2 * 60 * 1000) {
+      timestamp = localGuess;
+    }
+  }
 
   const diffMs = Date.now() - timestamp;
   if (diffMs < 0) return 'just now';

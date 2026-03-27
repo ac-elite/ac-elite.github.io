@@ -9,6 +9,8 @@ import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgr
 
 import { DashboardLayout } from 'src/layouts/dashboard';
 
+import { LicenseSafetyGuideProvider } from 'src/components/license-safety-guide/license-safety-guide';
+
 // ----------------------------------------------------------------------
 
 export const HomePage = lazy(() => import('src/pages/home'));
@@ -44,11 +46,13 @@ const renderFallback = () => (
 export const routesSection: RouteObject[] = [
   {
     element: (
-      <DashboardLayout>
-        <Suspense fallback={renderFallback()}>
-          <Outlet />
-        </Suspense>
-      </DashboardLayout>
+      <LicenseSafetyGuideProvider>
+        <DashboardLayout>
+          <Suspense fallback={renderFallback()}>
+            <Outlet />
+          </Suspense>
+        </DashboardLayout>
+      </LicenseSafetyGuideProvider>
     ),
     children: [
       // Home (AC Elite) is the default route

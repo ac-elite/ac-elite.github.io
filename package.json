@@ -22,7 +22,7 @@
     "tsc:dev": "yarn dev & yarn tsc:watch",
     "tsc:watch": "tsc --noEmit --watch",
     "tsc:print": "npx tsc --showConfig",
-    "git:sync": "git pull --rebase --autostash && git add -A && (git diff --cached --quiet || git commit -m \"V2 - Update\") && git push && git diff --quiet && git diff --cached --quiet"
+    "git:sync": "node scripts/git-sync.mjs"
   },
   "engines": {
     "node": ">=20"

@@ -21,6 +21,7 @@ import TableContainer from '@mui/material/TableContainer';
 import { CONFIG } from 'src/config-global';
 import { fetchJson } from 'src/lib/fetch-json';
 import { getDriverProfileHref } from 'src/lib/routes';
+import { fetchPrevRankData, computeDeltas, type DriverDelta } from 'src/lib/delta';
 import {
   GLASS_PANEL_SX,
   getPodiumRowSx,
@@ -44,18 +45,22 @@ import {
   type LeaderboardCarRow,
 } from 'src/lib/ac-elite-data';
 
+import { DeltaChip } from 'src/components/delta-chip/delta-chip';
 import { ErrorPanel } from 'src/components/data-state/error-panel';
 import { LoadingPanel } from 'src/components/data-state/loading-panel';
 import { PageGridOverlay } from 'src/components/page-background/page-grid-overlay';
+import { useLicenseSafetyGuide } from 'src/components/license-safety-guide/license-safety-guide';
 
 const LEADERBOARD_PER_PAGE = 20;
 
 export default function Page() {
+  const { openGuide } = useLicenseSafetyGuide();
   const [searchParams, setSearchParams] = useSearchParams();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [rankData, setRankData] = useState<RankDriver[]>([]);
   const [leaderboardData, setLeaderboardData] = useState<Record<string, any>>({});
+  const [deltas, setDeltas] = useState<Map<string, DriverDelta>>(new Map());
   const [currentTrack, setCurrentTrack] = useState('');
   const [page, setPage] = useState(1);
 
@@ -65,13 +70,15 @@ export default function Page() {
       setLoading(true);
       setError(null);
       try {
-        const [rank, leaderboard] = await Promise.all([
+        const [rank, leaderboard, prevRank] = await Promise.all([
           fetchJson<RankDriver[]>('/data/rank.json'),
           fetchJson<Record<string, any>>('/data/leaderboard.json'),
+          fetchPrevRankData(),
         ]);
         if (!mounted) return;
         setRankData(rank);
         setLeaderboardData(leaderboard);
+        setDeltas(computeDeltas(rank, prevRank));
       } catch (e) {
         if (!mounted) return;
         setError(e instanceof Error ? e.message : 'Unknown error');
@@ -290,6 +297,7 @@ export default function Page() {
                             ({ guid: entry.guid, name: entry.name, kilometers: 0, collisions: 0 } as RankDriver);
                           const license = getDriverLicense(driver, licenseMap);
                           const sr = getDriverSR(driver);
+                          const delta = deltas.get(entry.guid);
 
                           return (
                             <TableRow
@@ -321,16 +329,19 @@ export default function Page() {
                                   <Chip
                                     size="small"
                                     label={license.license}
+                                    onClick={(e) => { e.stopPropagation(); openGuide('license'); }}
                                     sx={{
                                       minWidth: LICENSE_CHIP_WIDTH,
                                       fontWeight: 700,
                                       justifyContent: 'center',
+                                      cursor: 'pointer',
                                       ...getLicenseBadgeSx(license.license),
                                     }}
                                   />
                                   <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.secondary' }}>
                                     {Math.round(license.paceScore).toLocaleString()}
                                   </Typography>
+                                  {delta ? <DeltaChip value={Math.round(delta.deltaPace)} /> : null}
                                 </Stack>
                               </TableCell>
                               <TableCell>
@@ -338,16 +349,19 @@ export default function Page() {
                                   <Chip
                                     size="small"
                                     label={sr.tier}
+                                    onClick={(e) => { e.stopPropagation(); openGuide('safety'); }}
                                     sx={{
                                       minWidth: SR_CHIP_WIDTH,
                                       fontWeight: 700,
                                       justifyContent: 'center',
+                                      cursor: 'pointer',
                                       ...getSRBadgeSx(sr.tier),
                                     }}
                                   />
                                   <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.secondary' }}>
                                     {sr.sr.toFixed(2)}
                                   </Typography>
+                                  {delta ? <DeltaChip value={delta.deltaSR} decimals={2} kind="sr" /> : null}
                                 </Stack>
                               </TableCell>
                               <TableCell sx={{ fontFamily: 'monospace', fontWeight: 700 }}>

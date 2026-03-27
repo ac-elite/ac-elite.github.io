@@ -11,6 +11,7 @@ import TextField from '@mui/material/TextField';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import ListItemText from '@mui/material/ListItemText';
+import Tooltip from '@mui/material/Tooltip';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import ListItemButton from '@mui/material/ListItemButton';
 import { useTheme, keyframes } from '@mui/material/styles';
@@ -21,6 +22,7 @@ import { getDriverProfileHref } from 'src/lib/routes';
 import { GLASS_CARD_SX, GLASS_PANEL_SX, GLASS_INNER_PANEL_SX } from 'src/lib/glass';
 import {
   getSyncHealth,
+  formatTimeAgo,
   type SyncHealth,
   type SiteMetadata,
   getEffectiveLastSync,
@@ -46,6 +48,14 @@ import {
 } from 'src/lib/ac-elite-data';
 
 import { PageGridOverlay } from 'src/components/page-background/page-grid-overlay';
+
+type ServerStatus = {
+  online: boolean;
+  clients: number;
+  maxclients: number;
+  track: string;
+  fetchedAt: string;
+};
 
 type DriverView = {
   guid: string;
@@ -117,11 +127,13 @@ function HeroSection({
   totalLaps,
   activeTracks,
   syncStatus,
+  serverStatus,
 }: {
   totalDrivers: number;
   totalLaps: number;
   activeTracks: number;
   syncStatus: SyncHealth;
+  serverStatus: ServerStatus | null;
 }) {
   const theme = useTheme();
   const isMdUp = useMediaQuery(theme.breakpoints.up('md'));
@@ -224,6 +236,71 @@ function HeroSection({
                 >
                   Join the community
                 </Button>
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  size="large"
+                  sx={{
+                    px: 3.5,
+                    borderRadius: 3,
+                    minHeight: { xs: 46, sm: 48 },
+                    width: { xs: '100%', sm: 'auto' },
+                    maxWidth: { xs: 320, sm: 'none' },
+                  }}
+                  href="https://acstuff.ru/s/q:race/online/join?httpPort=18283&ip=157.90.3.32"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Join the server
+                </Button>
+
+                {serverStatus && (
+                  <Tooltip
+                    title={`Server status synced ${formatTimeAgo(serverStatus.fetchedAt)}`}
+                    arrow
+                    placement="bottom"
+                  >
+                    <Stack
+                      direction="row"
+                      spacing={1}
+                      alignItems="center"
+                      sx={{
+                        px: 1.5,
+                        py: 0.6,
+                        borderRadius: 2,
+                        bgcolor: 'rgba(15,23,42,0.55)',
+                        border: '1px solid rgba(255,255,255,0.1)',
+                        backdropFilter: 'blur(6px)',
+                        width: { xs: '100%', sm: 'auto' },
+                        maxWidth: { xs: 320, sm: 'none' },
+                        justifyContent: 'center',
+                        cursor: 'default',
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          width: 8,
+                          height: 8,
+                          borderRadius: '50%',
+                          bgcolor: serverStatus.online
+                            ? serverStatus.clients > 0 ? '#4ADE80' : '#FBBF24'
+                            : '#FB7185',
+                          boxShadow: serverStatus.online
+                            ? serverStatus.clients > 0
+                              ? '0 0 6px rgba(74,222,128,0.5)'
+                              : '0 0 6px rgba(251,191,36,0.4)'
+                            : '0 0 6px rgba(251,113,133,0.4)',
+                          flexShrink: 0,
+                        }}
+                      />
+                      <Typography variant="caption" sx={{ fontWeight: 700, color: 'rgba(255,255,255,0.9)', whiteSpace: 'nowrap' }}>
+                        {serverStatus.online
+                          ? `${serverStatus.clients}/${serverStatus.maxclients} online`
+                          : 'Server offline'}
+                      </Typography>
+                    </Stack>
+                  </Tooltip>
+                )}
 
               </Stack>
 
@@ -633,6 +710,7 @@ export default function Page() {
   const [rankData, setRankData] = useState<RankDriver[]>([]);
   const [teamRoles, setTeamRoles] = useState<TeamRoles>(EMPTY_TEAM_ROLES);
   const [metadata, setMetadata] = useState<SiteMetadata>({});
+  const [serverStatus, setServerStatus] = useState<ServerStatus | null>(null);
 
   useEffect(() => {
     let mounted = true;
@@ -660,6 +738,11 @@ export default function Page() {
     }
 
     load();
+
+    fetchJson<ServerStatus>('/data/server-status.json')
+      .then((status) => { if (mounted) setServerStatus(status); })
+      .catch(() => {});
+
     return () => {
       mounted = false;
     };
@@ -750,6 +833,7 @@ export default function Page() {
         totalLaps={community.totalLaps}
         activeTracks={community.activeTracks}
         syncStatus={syncStatus}
+        serverStatus={serverStatus}
       />
       <DriverSearchSection
         drivers={drivers}

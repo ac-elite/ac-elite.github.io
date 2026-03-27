@@ -14,9 +14,11 @@ on:
   # Allow manual trigger
   workflow_dispatch:
 
-  # Also run on push to main (for initial setup)
+  # Run on source code changes (not data-only pushes)
   push:
     branches: [main]
+    paths-ignore:
+      - 'public/data/**'
 
 jobs:
   sync:
@@ -133,5 +135,6 @@ jobs:
             echo "No changes to commit"
           else
             git -c user.email="github-actions[bot]@users.noreply.github.com" -c user.name="github-actions[bot]" commit -m "🔄 Sync KMR data - $(date -u +'%Y-%m-%d %H:%M:%S UTC')"
+            git pull --rebase
             git push
           fi

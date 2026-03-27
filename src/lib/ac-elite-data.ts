@@ -499,8 +499,11 @@ export function getSRPanelSx(tier: string): SxProps<Theme> {
   return medal('251,113,133', 0.36, 0.78);
 }
 
+const PACE_WEIGHT = 0.85;
+const SR_WEIGHT = 0.15;
+
 export function getOverallCombinedScore(paceScore: number, sr: number, maxPaceScore: number) {
   const paceNorm = maxPaceScore > 0 ? paceScore / maxPaceScore : 0;
   const srNorm = Math.max(0, Math.min(1, (sr - 1.0) / (9.99 - 1.0)));
-  return 0.7 * paceNorm + 0.3 * srNorm;
+  return PACE_WEIGHT * paceNorm + SR_WEIGHT * srNorm;
 }

@@ -1,0 +1,66 @@
+name: Daily Rank Snapshot (24h)
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+permissions:
+  contents: write
+
+on:
+  workflow_run:
+    workflows: ["Sync KMR Data"]
+    types: [completed]
+    branches: [main]
+
+  workflow_dispatch:
+
+jobs:
+  snapshot:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.created_at != '')
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check if this is the first sync of the day
+        id: guard
+        run: |
+          HOUR=$(date -u +'%H')
+          if [ "$HOUR" = "00" ] || [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Skipping — snapshot only runs after the 00:xx UTC sync (current hour: $HOUR)"
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Checkout repository
+        if: steps.guard.outputs.run == 'true'
+        uses: actions/checkout@v4
+
+      - name: Create 24h snapshot
+        if: steps.guard.outputs.run == 'true'
+        run: |
+          SRC="public/data/rank.json"
+          DEST="public/data/rank-24h.json"
+
+          if [ ! -f "$SRC" ]; then
+            echo "No rank.json found, skipping snapshot"
+            exit 0
+          fi
+
+          cp "$SRC" "$DEST"
+          echo "Created 24h snapshot from rank.json"
+
+      - name: Commit and push snapshot
+        if: steps.guard.outputs.run == 'true'
+        run: |
+          git add public/data/rank-24h.json
+
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git -c user.email="github-actions[bot]@users.noreply.github.com" -c user.name="github-actions[bot]" commit -m "Daily 24h rank snapshot - $(date -u +'%Y-%m-%d %H:%M:%S UTC')"
+            git pull --rebase
+            git push
+          fi

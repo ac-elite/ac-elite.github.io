@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useContext, useCallback, createContext } from 'react';
 
 import Box from '@mui/material/Box';
 import Tab from '@mui/material/Tab';
@@ -23,10 +23,47 @@ import {
   LICENSE_TIER_ORDER,
 } from 'src/lib/ac-elite-data';
 
-type GuideTab = 'license' | 'safety';
+export type GuideTab = 'license' | 'safety';
 
 type LicenseSafetyGuideButtonProps = {
   compact?: boolean;
+};
+
+// --------------- Context ---------------
+
+type GuideContextValue = {
+  openGuide: (tab?: GuideTab) => void;
+};
+
+const GuideContext = createContext<GuideContextValue>({ openGuide: () => {} });
+
+export function useLicenseSafetyGuide() {
+  return useContext(GuideContext);
+}
+
+export function LicenseSafetyGuideProvider({ children }: { children: React.ReactNode }) {
+  const [open, setOpen] = useState(false);
+  const [initialTab, setInitialTab] = useState<GuideTab>('license');
+
+  const openGuide = useCallback((tab: GuideTab = 'license') => {
+    setInitialTab(tab);
+    setOpen(true);
+  }, []);
+
+  return (
+    <GuideContext.Provider value={{ openGuide }}>
+      {children}
+      <LicenseSafetyGuideDialog open={open} onClose={() => setOpen(false)} initialTab={initialTab} />
+    </GuideContext.Provider>
+  );
+}
+
+// --------------- Standalone dialog ---------------
+
+type LicenseSafetyGuideDialogProps = {
+  open: boolean;
+  onClose: () => void;
+  initialTab?: GuideTab;
 };
 
 const GUIDE_LICENSE_CHIP_WIDTH = LICENSE_CHIP_WIDTH;
@@ -53,30 +90,38 @@ function formatLicenseTableTracks(minTracks?: number) {
 }
 
 export function LicenseSafetyGuideButton({ compact = false }: LicenseSafetyGuideButtonProps) {
-  const [open, setOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<GuideTab>('license');
+  const { openGuide } = useLicenseSafetyGuide();
 
   return (
-    <>
-      <Button
-        variant="contained"
-        color="primary"
-        size={compact ? 'small' : 'medium'}
-        onClick={() => setOpen(true)}
-        sx={{
-          minWidth: compact ? 0 : undefined,
-          width: compact ? 'auto' : '100%',
-          px: compact ? 1.3 : 1.8,
-          py: compact ? 0.75 : 1,
-          borderRadius: 2,
-        }}
-      >
-        {compact ? 'License / SR' : 'License / SR (BETA)'}
-      </Button>
+    <Button
+      variant="contained"
+      color="primary"
+      size={compact ? 'small' : 'medium'}
+      onClick={() => openGuide('license')}
+      sx={{
+        minWidth: compact ? 0 : undefined,
+        width: compact ? 'auto' : '100%',
+        px: compact ? 1.3 : 1.8,
+        py: compact ? 0.75 : 1,
+        borderRadius: 2,
+      }}
+    >
+      {compact ? 'License / SR' : 'License / SR (BETA)'}
+    </Button>
+  );
+}
 
-      <Dialog
-        open={open}
-        onClose={() => setOpen(false)}
+function LicenseSafetyGuideDialog({ open, onClose, initialTab = 'license' }: LicenseSafetyGuideDialogProps) {
+  const [activeTab, setActiveTab] = useState<GuideTab>(initialTab);
+
+  useEffect(() => {
+    if (open) setActiveTab(initialTab);
+  }, [open, initialTab]);
+
+  return (
+    <Dialog
+      open={open}
+      onClose={onClose}
         fullWidth
         maxWidth="sm"
         PaperProps={{
@@ -107,7 +152,7 @@ export function LicenseSafetyGuideButton({ compact = false }: LicenseSafetyGuide
             AC Elite License / Safety Rating
           </Typography>
           <IconButton
-            onClick={() => setOpen(false)}
+            onClick={onClose}
             sx={{
               width: { xs: 34, sm: 36 },
               height: { xs: 34, sm: 36 },
@@ -413,6 +458,5 @@ export function LicenseSafetyGuideButton({ compact = false }: LicenseSafetyGuide
           )}
         </DialogContent>
       </Dialog>
-    </>
   );
 }

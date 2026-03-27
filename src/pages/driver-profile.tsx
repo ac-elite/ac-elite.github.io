@@ -20,6 +20,7 @@ import { fetchJson } from 'src/lib/fetch-json';
 import { getLeaderboardTrackSearch } from 'src/lib/routes';
 import { type TeamRoles, getDiscordRolesForGuid } from 'src/lib/team-roles';
 import { liveriesAssetUrl, getTeamLiveryMeta } from 'src/lib/driver-liveries';
+import { fetchPrevRankData, computeDeltas, type DriverDelta } from 'src/lib/delta';
 import { GLASS_PANEL_SX, GLASS_INNER_PANEL_SX, GLASS_TABLE_WRAPPER_SX } from 'src/lib/glass';
 import {
   CAR,
@@ -43,10 +44,12 @@ import {
   type LeaderboardCarRow,
 } from 'src/lib/ac-elite-data';
 
+import { DeltaChip } from 'src/components/delta-chip/delta-chip';
 import { ErrorPanel } from 'src/components/data-state/error-panel';
 import { LoadingPanel } from 'src/components/data-state/loading-panel';
 import { LiveryEnlargeDialog } from 'src/components/livery/livery-enlarge-dialog';
 import { PageGridOverlay } from 'src/components/page-background/page-grid-overlay';
+import { useLicenseSafetyGuide } from 'src/components/license-safety-guide/license-safety-guide';
 
 type TrackStatRow = {
   trackId: string;
@@ -60,12 +63,14 @@ type TrackStatRow = {
 
 export default function Page() {
   const navigate = useNavigate();
+  const { openGuide } = useLicenseSafetyGuide();
   const { driverGuid = '' } = useParams();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [rankData, setRankData] = useState<RankDriver[]>([]);
   const [leaderboardData, setLeaderboardData] = useState<Record<string, any>>({});
   const [teamRoles, setTeamRoles] = useState<TeamRoles>({ creator: [], admin: [], moderator: [] });
+  const [delta, setDelta] = useState<DriverDelta | null>(null);
 
   useEffect(() => {
     let mounted = true;
@@ -73,15 +78,18 @@ export default function Page() {
       setLoading(true);
       setError(null);
       try {
-        const [rank, leaderboard, roles] = await Promise.all([
+        const [rank, leaderboard, roles, prevRank] = await Promise.all([
           fetchJson<RankDriver[]>('/data/rank.json'),
           fetchJson<Record<string, any>>('/data/leaderboard.json'),
           fetchJson<TeamRoles>('/data/team-roles.json'),
+          fetchPrevRankData(),
         ]);
         if (!mounted) return;
         setRankData(rank);
         setLeaderboardData(leaderboard);
         setTeamRoles(roles);
+        const allDeltas = computeDeltas(rank, prevRank);
+        setDelta(allDeltas.get(driverGuid) || null);
       } catch (e) {
         if (!mounted) return;
         setError(e instanceof Error ? e.message : 'Unknown error');
@@ -93,7 +101,7 @@ export default function Page() {
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [driverGuid]);
 
   const driver = useMemo(
     () => rankData.find((item) => item.guid === driverGuid) || null,
@@ -232,16 +240,19 @@ export default function Page() {
                           <Chip
                             size="small"
                             label={license.license}
+                            onClick={() => openGuide('license')}
                             sx={{
                               minWidth: LICENSE_CHIP_WIDTH,
                               justifyContent: 'center',
                               fontWeight: 700,
+                              cursor: 'pointer',
                               ...getLicenseBadgeSx(license.license),
                             }}
                           />
                           <Typography variant="body2" sx={{ fontWeight: 700, color: 'rgba(255,255,255,0.85)' }}>
                             {Math.round(license.paceScore).toLocaleString()}
                           </Typography>
+                          {delta ? <DeltaChip value={Math.round(delta.deltaPace)} /> : null}
                         </Stack>
                       </Paper>
                     </Grid>
@@ -254,16 +265,19 @@ export default function Page() {
                           <Chip
                             size="small"
                             label={sr.tier}
+                            onClick={() => openGuide('safety')}
                             sx={{
                               minWidth: SR_CHIP_WIDTH,
                               justifyContent: 'center',
                               fontWeight: 700,
+                              cursor: 'pointer',
                               ...getSRBadgeSx(sr.tier),
                             }}
                           />
                           <Typography variant="body2" sx={{ fontWeight: 700, color: 'rgba(255,255,255,0.85)' }}>
                             {sr.sr.toFixed(2)}
                           </Typography>
+                          {delta ? <DeltaChip value={delta.deltaSR} decimals={2} kind="sr" /> : null}
                         </Stack>
                       </Paper>
                     </Grid>
