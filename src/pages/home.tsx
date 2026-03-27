@@ -7,11 +7,11 @@ import List from '@mui/material/List';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
+import Tooltip from '@mui/material/Tooltip';
 import TextField from '@mui/material/TextField';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import ListItemText from '@mui/material/ListItemText';
-import Tooltip from '@mui/material/Tooltip';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import ListItemButton from '@mui/material/ListItemButton';
 import { useTheme, keyframes } from '@mui/material/styles';
@@ -21,19 +21,19 @@ import { fetchJson } from 'src/lib/fetch-json';
 import { getDriverProfileHref } from 'src/lib/routes';
 import { GLASS_CARD_SX, GLASS_PANEL_SX, GLASS_INNER_PANEL_SX } from 'src/lib/glass';
 import {
-  getSyncHealth,
-  formatTimeAgo,
-  type SyncHealth,
-  type SiteMetadata,
-  getEffectiveLastSync,
-} from 'src/lib/sync-utils';
-import {
   getTeamRole,
   type TeamRole,
   type TeamRoles,
   EMPTY_TEAM_ROLES,
   teamRoleToDiscordRole,
 } from 'src/lib/team-roles';
+import {
+  getSyncHealth,
+  formatTimeAgo,
+  type SyncHealth,
+  type SiteMetadata,
+  getEffectiveLastSync,
+} from 'src/lib/sync-utils';
 import {
   CAR,
   getSRTier,
