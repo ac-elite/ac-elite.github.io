@@ -18,25 +18,37 @@ jobs:
   snapshot:
     if: >-
       github.event_name == 'workflow_dispatch' ||
-      (github.event.workflow_run.conclusion == 'success' &&
-       github.event.workflow_run.created_at != '')
+      github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check if this is the first sync of the day
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check if this is the first successful sync of the UTC day
         id: guard
         run: |
-          HOUR=$(date -u +'%H')
-          if [ "$HOUR" = "00" ] || [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "Manual run requested"
             echo "run=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "Skipping — snapshot only runs after the 00:xx UTC sync (current hour: $HOUR)"
-            echo "run=false" >> "$GITHUB_OUTPUT"
+            exit 0
           fi
 
-      - name: Checkout repository
-        if: steps.guard.outputs.run == 'true'
-        uses: actions/checkout@v4
+          TODAY_UTC=$(date -u +'%Y-%m-%d')
+          LAST_SNAPSHOT_DATE=$(git log -1 --format=%cs -- public/data/rank-24h.json || true)
+
+          if [ -z "$LAST_SNAPSHOT_DATE" ]; then
+            echo "No previous snapshot commit found, running now"
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          elif [ "$LAST_SNAPSHOT_DATE" != "$TODAY_UTC" ]; then
+            echo "No snapshot exists yet for $TODAY_UTC (last: $LAST_SNAPSHOT_DATE), running now"
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Snapshot already created for $TODAY_UTC, skipping"
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Create 24h snapshot
         if: steps.guard.outputs.run == 'true'
