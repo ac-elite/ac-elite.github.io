@@ -27,7 +27,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Check if this is the first successful sync of the UTC day
+      - name: Check if this is the first successful sync after 06:00 local
         id: guard
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
@@ -36,17 +36,26 @@ jobs:
             exit 0
           fi
 
-          TODAY_UTC=$(date -u +'%Y-%m-%d')
-          LAST_SNAPSHOT_DATE=$(git log -1 --format=%cs -- public/data/rank-24h.json || true)
+          TZ_NAME="Europe/Amsterdam"
+          TODAY_LOCAL=$(TZ="$TZ_NAME" date +'%Y-%m-%d')
+          HOUR_LOCAL=$(TZ="$TZ_NAME" date +'%H')
+          LAST_SNAPSHOT_EPOCH=$(git log -1 --format=%ct -- public/data/rank-24h.json || true)
+          LAST_SNAPSHOT_DATE=""
+          if [ -n "$LAST_SNAPSHOT_EPOCH" ]; then
+            LAST_SNAPSHOT_DATE=$(TZ="$TZ_NAME" date -d "@$LAST_SNAPSHOT_EPOCH" +'%Y-%m-%d')
+          fi
 
-          if [ -z "$LAST_SNAPSHOT_DATE" ]; then
+          if [ "$HOUR_LOCAL" -lt 6 ]; then
+            echo "Skipping — snapshot runs after 06:00 $TZ_NAME (current local hour: $HOUR_LOCAL)"
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          elif [ -z "$LAST_SNAPSHOT_DATE" ]; then
             echo "No previous snapshot commit found, running now"
             echo "run=true" >> "$GITHUB_OUTPUT"
-          elif [ "$LAST_SNAPSHOT_DATE" != "$TODAY_UTC" ]; then
-            echo "No snapshot exists yet for $TODAY_UTC (last: $LAST_SNAPSHOT_DATE), running now"
+          elif [ "$LAST_SNAPSHOT_DATE" != "$TODAY_LOCAL" ]; then
+            echo "No snapshot exists yet for $TODAY_LOCAL (last: $LAST_SNAPSHOT_DATE), running now"
             echo "run=true" >> "$GITHUB_OUTPUT"
           else
-            echo "Snapshot already created for $TODAY_UTC, skipping"
+            echo "Snapshot already created for $TODAY_LOCAL, skipping"
             echo "run=false" >> "$GITHUB_OUTPUT"
           fi
 
