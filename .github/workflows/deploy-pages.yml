@@ -10,7 +10,7 @@ on:
       - 'public/data/**'
   workflow_dispatch:
   workflow_run:
-    workflows: ["Sync KMR Data"]
+    workflows: ["Sync KMR Data", "Daily Rank Snapshot (24h)"]
     types: [completed]
     branches: [main]
 
