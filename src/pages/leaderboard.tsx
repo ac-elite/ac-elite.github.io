@@ -53,6 +53,15 @@ import { useLicenseSafetyGuide } from 'src/components/license-safety-guide/licen
 
 const LEADERBOARD_PER_PAGE = 20;
 
+type CurrentTrackData = {
+  track?: string;
+};
+
+function normalizeTrackId(track?: string): string {
+  if (!track) return '';
+  return track.replace('-layout', '_layout').replace(/-/g, '_');
+}
+
 export default function Page() {
   const { openGuide } = useLicenseSafetyGuide();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -61,6 +70,7 @@ export default function Page() {
   const [rankData, setRankData] = useState<RankDriver[]>([]);
   const [leaderboardData, setLeaderboardData] = useState<Record<string, any>>({});
   const [deltas, setDeltas] = useState<Map<string, DriverDelta>>(new Map());
+  const [preferredTrack, setPreferredTrack] = useState('');
   const [currentTrack, setCurrentTrack] = useState('');
   const [page, setPage] = useState(1);
 
@@ -70,15 +80,17 @@ export default function Page() {
       setLoading(true);
       setError(null);
       try {
-        const [rank, leaderboard, prevRank] = await Promise.all([
+        const [rank, leaderboard, prevRank, trackData] = await Promise.all([
           fetchJson<RankDriver[]>('/data/rank.json'),
           fetchJson<Record<string, any>>('/data/leaderboard.json'),
           fetchPrevRankData(),
+          fetchJson<CurrentTrackData>('/data/current-track.json').catch(() => null),
         ]);
         if (!mounted) return;
         setRankData(rank);
         setLeaderboardData(leaderboard);
         setDeltas(computeDeltas(rank, prevRank));
+        setPreferredTrack(normalizeTrackId(trackData?.track));
       } catch (e) {
         if (!mounted) return;
         setError(e instanceof Error ? e.message : 'Unknown error');
@@ -102,6 +114,7 @@ export default function Page() {
 
   useEffect(() => {
     if (tracks.length === 0) return;
+    const fallbackTrack = preferredTrack && tracks.includes(preferredTrack) ? preferredTrack : tracks[0];
 
     const param = searchParams.get('track');
     if (param && tracks.includes(param)) {
@@ -110,14 +123,14 @@ export default function Page() {
     }
 
     if (param && !tracks.includes(param)) {
-      const next = tracks[0];
+      const next = fallbackTrack;
       setCurrentTrack(next);
       setSearchParams({ track: next }, { replace: true });
       return;
     }
 
-    setCurrentTrack((prev) => (prev && tracks.includes(prev) ? prev : tracks[0]));
-  }, [tracks, searchParams, setSearchParams]);
+    setCurrentTrack((prev) => (prev && tracks.includes(prev) ? prev : fallbackTrack));
+  }, [tracks, preferredTrack, searchParams, setSearchParams]);
 
   useEffect(() => {
     setPage(1);
