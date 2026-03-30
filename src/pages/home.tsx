@@ -6,19 +6,25 @@ import Grid from '@mui/material/Grid';
 import List from '@mui/material/List';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
+import Table from '@mui/material/Table';
 import Button from '@mui/material/Button';
+import TableRow from '@mui/material/TableRow';
 import TextField from '@mui/material/TextField';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableHead from '@mui/material/TableHead';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import ListItemText from '@mui/material/ListItemText';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import ListItemButton from '@mui/material/ListItemButton';
+import TableContainer from '@mui/material/TableContainer';
 import { useTheme, keyframes } from '@mui/material/styles';
 
 import { CONFIG } from 'src/config-global';
 import { fetchJson } from 'src/lib/fetch-json';
 import { getDriverProfileHref } from 'src/lib/routes';
-import { GLASS_CARD_SX, GLASS_PANEL_SX, GLASS_INNER_PANEL_SX } from 'src/lib/glass';
+import { computeDeltas, type DriverDelta, fetchPrevRankData } from 'src/lib/delta';
 import {
   getSyncHealth,
   type SyncHealth,
@@ -33,19 +39,37 @@ import {
   teamRoleToDiscordRole,
 } from 'src/lib/team-roles';
 import {
+  GLASS_CARD_SX,
+  GLASS_PANEL_SX,
+  getPodiumRowSx,
+  GLASS_INNER_PANEL_SX,
+  GLASS_TABLE_WRAPPER_SX,
+  GLASS_TABLE_PAGINATION_SX,
+} from 'src/lib/glass';
+import {
   CAR,
   getSRTier,
+  getDriverSR,
+  calculateGap,
   formatNumber,
   getSRBadgeSx,
   ROLE_CHIP_SX,
   safetyRating,
+  formatLaptime,
+  SR_CHIP_WIDTH,
   type RankDriver,
+  getPodiumChipSx,
+  getDriverLicense,
   computeLicenseMap,
   getLicenseBadgeSx,
+  LICENSE_CHIP_WIDTH,
   getTrackDisplayName,
+  type LeaderboardCarRow,
 } from 'src/lib/ac-elite-data';
 
+import { DeltaChip } from 'src/components/delta-chip/delta-chip';
 import { PageGridOverlay } from 'src/components/page-background/page-grid-overlay';
+import { useLicenseSafetyGuide } from 'src/components/license-safety-guide/license-safety-guide';
 
 type DriverView = {
   guid: string;
@@ -63,7 +87,14 @@ type DriverView = {
   teamRole: TeamRole;
 };
 
+type CurrentTrackData = {
+  online: boolean;
+  track: string;
+  fetchedAt: string;
+};
+
 const APP_BASE_URL = import.meta.env.BASE_URL;
+const HOME_CURRENT_TRACK_PER_PAGE = 20;
 
 /** Hero CTA: subtle “breathing” glass glow (matches grid energy, stays on-brand). */
 const heroPrimaryPulse = keyframes`
@@ -117,11 +148,13 @@ function HeroSection({
   totalLaps,
   activeTracks,
   syncStatus,
+  currentTrack,
 }: {
   totalDrivers: number;
   totalLaps: number;
   activeTracks: number;
   syncStatus: SyncHealth;
+  currentTrack: CurrentTrackData | null;
 }) {
   const theme = useTheme();
   const isMdUp = useMediaQuery(theme.breakpoints.up('md'));
@@ -143,7 +176,7 @@ function HeroSection({
     >
       <PageGridOverlay opacity={0.42} />
 
-      <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
+      <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1 }}>
         <Grid container spacing={{ xs: 4, md: 6 }} alignItems="center">
           <Grid size={{ xs: 12, md: 7 }}>
             <Stack spacing={3} alignItems={{ xs: 'center', md: 'flex-start' }}>
@@ -241,7 +274,6 @@ function HeroSection({
                 >
                   Join the server
                 </Button>
-
               </Stack>
 
             </Stack>
@@ -354,6 +386,257 @@ function HeroSection({
   );
 }
 
+function CurrentTrackLeaderboardSection({
+  loading,
+  error,
+  currentTrack,
+  rows,
+  pagedRows,
+  fastestLap,
+  start,
+  safePage,
+  totalPages,
+  driversByGuid,
+  licenseMap,
+  deltas,
+  onPageChange,
+  onOpenGuide,
+}: {
+  loading: boolean;
+  error: string | null;
+  currentTrack: CurrentTrackData | null;
+  rows: LeaderboardCarRow[];
+  pagedRows: LeaderboardCarRow[];
+  fastestLap: number;
+  start: number;
+  safePage: number;
+  totalPages: number;
+  driversByGuid: Map<string, RankDriver>;
+  licenseMap: Map<string, { license: string; paceScore: number }>;
+  deltas: Map<string, DriverDelta>;
+  onPageChange: (page: number) => void;
+  onOpenGuide: (tab: 'license' | 'safety') => void;
+}) {
+  if (!currentTrack?.track) return null;
+  const syncedAt = Number.isNaN(new Date(currentTrack.fetchedAt).getTime())
+    ? currentTrack.fetchedAt
+    : new Date(currentTrack.fetchedAt).toLocaleString();
+
+  return (
+    <Box
+      component="section"
+      sx={{
+        position: 'relative',
+        py: 4,
+        background:
+          'radial-gradient(circle at 20% 0%, rgba(23,33,59,0.24) 0, transparent 50%),' +
+          'linear-gradient(180deg, #17213B 0%, #1f2c49 100%)',
+        overflow: 'hidden',
+      }}
+    >
+      <PageGridOverlay opacity={0.28} />
+
+      <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1 }}>
+        <Stack spacing={2.5}>
+          <Stack spacing={0.7} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: { xs: 'center', md: 'flex-start' } }}>
+            <Typography variant="overline" sx={sectionKickerSx}>
+              Live track leaderboard
+            </Typography>
+            <Typography variant="h4" fontWeight={800}>
+              Current track: {getTrackDisplayName(currentTrack.track)}
+            </Typography>
+            <Typography color="text.secondary">
+              Full leaderboard for {CAR} on the currently active server track.
+            </Typography>
+            <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.68)' }}>
+              Synced at {syncedAt}
+            </Typography>
+          </Stack>
+
+          <Paper sx={GLASS_TABLE_WRAPPER_SX}>
+            <TableContainer>
+              <Table
+                size="small"
+                sx={{
+                  '& .MuiTableBody-root .MuiTableRow-root:hover': {
+                    backgroundColor: 'rgba(255,255,255,0.04)',
+                  },
+                }}
+              >
+                <TableHead>
+                  <TableRow>
+                    <TableCell>#</TableCell>
+                    <TableCell>Driver</TableCell>
+                    <TableCell>License</TableCell>
+                    <TableCell>Safety Rating</TableCell>
+                    <TableCell>Lap Time</TableCell>
+                    <TableCell align="right">Gap</TableCell>
+                    <TableCell align="right">Laps</TableCell>
+                    <TableCell align="right">Total KM</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {loading && (
+                    <TableRow>
+                      <TableCell colSpan={8} align="center" sx={{ py: 4 }}>
+                        Loading leaderboard data...
+                      </TableCell>
+                    </TableRow>
+                  )}
+
+                  {!loading && error && (
+                    <TableRow>
+                      <TableCell colSpan={8} align="center" sx={{ py: 4, color: 'error.main' }}>
+                        Failed to load leaderboard data: {error}
+                      </TableCell>
+                    </TableRow>
+                  )}
+
+                  {!loading && !error && rows.length === 0 && (
+                    <TableRow>
+                      <TableCell colSpan={8} align="center" sx={{ py: 6 }}>
+                        No leaderboard data for this track yet.
+                      </TableCell>
+                    </TableRow>
+                  )}
+
+                  {!loading && !error && pagedRows.map((entry, index) => {
+                    const absolutePos = start + index;
+                    const driver =
+                      driversByGuid.get(entry.guid) ||
+                      ({ guid: entry.guid, name: entry.name, kilometers: 0, collisions: 0 } as RankDriver);
+                    const license = getDriverLicense(driver, licenseMap);
+                    const sr = getDriverSR(driver);
+                    const delta = deltas.get(entry.guid);
+
+                    return (
+                      <TableRow
+                        key={`${entry.guid}-${entry.laptime}-${index}`}
+                        sx={{
+                          cursor: 'pointer',
+                          ...(absolutePos < 3 ? getPodiumRowSx((absolutePos + 1) as 1 | 2 | 3) : {}),
+                        }}
+                        onClick={() => {
+                          window.location.href = getDriverProfileHref(entry.guid);
+                        }}
+                      >
+                        <TableCell>
+                          <Chip
+                            size="small"
+                            label={absolutePos + 1}
+                            sx={{
+                              minWidth: 38,
+                              fontWeight: 700,
+                              ...getPodiumChipSx(absolutePos, true),
+                            }}
+                          />
+                        </TableCell>
+                        <TableCell sx={{ fontWeight: 700 }}>{entry.name || driver.name || 'Unknown'}</TableCell>
+                        <TableCell>
+                          <Stack direction="row" spacing={1} alignItems="center">
+                            <Chip
+                              size="small"
+                              label={license.license}
+                              onClick={(e) => { e.stopPropagation(); onOpenGuide('license'); }}
+                              sx={{
+                                minWidth: LICENSE_CHIP_WIDTH,
+                                fontWeight: 700,
+                                justifyContent: 'center',
+                                cursor: 'pointer',
+                                ...getLicenseBadgeSx(license.license),
+                              }}
+                            />
+                            <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.secondary' }}>
+                              {Math.round(license.paceScore).toLocaleString()}
+                            </Typography>
+                            {delta ? <DeltaChip value={Math.round(delta.deltaPace)} /> : null}
+                          </Stack>
+                        </TableCell>
+                        <TableCell>
+                          <Stack direction="row" spacing={1} alignItems="center">
+                            <Chip
+                              size="small"
+                              label={sr.tier}
+                              onClick={(e) => { e.stopPropagation(); onOpenGuide('safety'); }}
+                              sx={{
+                                minWidth: SR_CHIP_WIDTH,
+                                fontWeight: 700,
+                                justifyContent: 'center',
+                                cursor: 'pointer',
+                                ...getSRBadgeSx(sr.tier),
+                              }}
+                            />
+                            <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.secondary' }}>
+                              {sr.sr.toFixed(2)}
+                            </Typography>
+                            {delta ? <DeltaChip value={delta.deltaSR} decimals={2} kind="sr" /> : null}
+                          </Stack>
+                        </TableCell>
+                        <TableCell sx={{ fontFamily: 'monospace', fontWeight: 700 }}>
+                          {formatLaptime(entry.laptime)}
+                        </TableCell>
+                        <TableCell align="right" sx={{ fontFamily: 'monospace' }}>
+                          {typeof entry.laptime === 'number' ? calculateGap(fastestLap, entry.laptime) : '—'}
+                        </TableCell>
+                        <TableCell align="right">{(entry.laps || 0).toLocaleString()}</TableCell>
+                        <TableCell align="right">{(driver.kilometers || 0).toLocaleString()}</TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Paper>
+
+          {!loading && !error && totalPages > 1 && (
+            <Paper sx={GLASS_TABLE_PAGINATION_SX}>
+              <Stack direction="row" spacing={1} justifyContent="center" flexWrap="wrap">
+                <Button
+                  disabled={safePage <= 1}
+                  onClick={() => onPageChange(safePage - 1)}
+                  variant="contained"
+                  color="secondary"
+                  size="small"
+                  sx={{ minWidth: 78, fontWeight: 800 }}
+                >
+                  Prev
+                </Button>
+                {Array.from({ length: totalPages }, (_, idx) => idx + 1)
+                  .filter((p) => p === 1 || p === totalPages || (p >= safePage - 1 && p <= safePage + 1))
+                  .map((p, idx, arr) => (
+                    <Box key={p} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      {idx > 0 && p - arr[idx - 1] > 1 && (
+                        <Typography sx={{ px: 0.5, color: 'rgba(255,255,255,0.65)' }}>...</Typography>
+                      )}
+                      <Button
+                        onClick={() => onPageChange(p)}
+                        size="small"
+                        variant={p === safePage ? 'contained' : 'outlined'}
+                        color={p === safePage ? 'primary' : 'secondary'}
+                      >
+                        {p}
+                      </Button>
+                    </Box>
+                  ))}
+                <Button
+                  disabled={safePage >= totalPages}
+                  onClick={() => onPageChange(safePage + 1)}
+                  variant="contained"
+                  color="secondary"
+                  size="small"
+                  sx={{ minWidth: 78, fontWeight: 800 }}
+                >
+                  Next
+                </Button>
+              </Stack>
+            </Paper>
+          )}
+        </Stack>
+      </Container>
+    </Box>
+  );
+}
+
 function DriverSearchSection({
   drivers,
   loading,
@@ -393,7 +676,7 @@ function DriverSearchSection({
         overflow: 'hidden',
       }}
     >
-      <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
+      <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1 }}>
         <Stack spacing={3} sx={{ mb: 3, textAlign: { xs: 'center', md: 'left' }, alignItems: { xs: 'center', md: 'flex-start' } }}>
           <Stack spacing={1} sx={{ alignItems: { xs: 'center', md: 'flex-start' } }}>
             <Typography variant="overline" sx={sectionKickerSx}>
@@ -558,98 +841,17 @@ function DriverSearchSection({
   );
 }
 
-function DashboardSection({ drivers }: { drivers: DriverView[] }) {
-  const topSr = useMemo(
-    () =>
-      drivers
-        .filter((driver) => driver.kilometers >= 500)
-        .sort((a, b) => b.safety - a.safety)[0],
-    [drivers]
-  );
-  const topPace = useMemo(
-    () => [...drivers].sort((a, b) => b.paceScore - a.paceScore)[0],
-    [drivers]
-  );
-  const mostActive = useMemo(
-    () => [...drivers].sort((a, b) => b.kilometers - a.kilometers)[0],
-    [drivers]
-  );
-
-  return (
-    <Box
-      id="dashboard"
-      component="section"
-      sx={{
-        position: 'relative',
-        py: 4,
-        background: 'radial-gradient(circle at 50% 0%, rgba(23,33,59,0.18) 0, transparent 60%), #17213B',
-        overflow: 'hidden',
-      }}
-    >
-      <PageGridOverlay opacity={0.2} />
-
-      <Container maxWidth="lg">
-        <Stack spacing={3} sx={{ mb: { xs: 2, md: 4 }, textAlign: { xs: 'center', md: 'left' }, alignItems: { xs: 'center', md: 'flex-start' } }}>
-          <Typography variant="overline" sx={sectionKickerSx}>
-            Community highlights
-          </Typography>
-          <Typography variant="h4" sx={{ fontWeight: 700 }}>
-            Real-time summary from live data
-          </Typography>
-          <Typography variant="body1" sx={{ maxWidth: 640, color: 'text.secondary' }}>
-            Live community highlights based on current AC Elite performance data.
-          </Typography>
-        </Stack>
-
-        <Grid container spacing={3}>
-          {[
-            {
-              title: 'Top Safety Driver',
-              value: topSr ? `${topSr.name} (${topSr.safetyTier} | ${topSr.safety.toFixed(2)})` : 'No data',
-              detail: topSr ? `Total KM: ${formatNumber(Math.round(topSr.kilometers))}` : 'Waiting for data',
-            },
-            {
-              title: 'Highest Pace Score',
-              value: topPace ? `${topPace.name} (${topPace.license})` : 'No data',
-              detail: topPace ? `Score: ${formatNumber(Math.round(topPace.paceScore))}` : 'Waiting for data',
-            },
-            {
-              title: 'Most Active Driver',
-              value: mostActive ? mostActive.name : 'No data',
-              detail: mostActive ? `${formatNumber(Math.round(mostActive.kilometers))} km driven` : 'Waiting for data',
-            },
-          ].map((card) => (
-            <Grid key={card.title} size={{ xs: 12, md: 4 }}>
-              <Box
-                sx={{
-                  ...GLASS_PANEL_SX,
-                  textAlign: { xs: 'center', md: 'left' },
-                }}
-              >
-                <Typography variant="subtitle2" sx={{ color: 'text.secondary', mb: 1 }}>
-                  {card.title}
-                </Typography>
-                <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>
-                  {card.value}
-                </Typography>
-                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                  {card.detail}
-                </Typography>
-              </Box>
-            </Grid>
-          ))}
-        </Grid>
-      </Container>
-    </Box>
-  );
-}
-
 export default function Page() {
+  const { openGuide } = useLicenseSafetyGuide();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [rankData, setRankData] = useState<RankDriver[]>([]);
+  const [leaderboardData, setLeaderboardData] = useState<Record<string, any>>({});
+  const [deltas, setDeltas] = useState<Map<string, DriverDelta>>(new Map());
   const [teamRoles, setTeamRoles] = useState<TeamRoles>(EMPTY_TEAM_ROLES);
   const [metadata, setMetadata] = useState<SiteMetadata>({});
+  const [currentTrack, setCurrentTrack] = useState<CurrentTrackData | null>(null);
+  const [currentTrackPage, setCurrentTrackPage] = useState(1);
 
   useEffect(() => {
     let mounted = true;
@@ -658,14 +860,18 @@ export default function Page() {
       setLoading(true);
       setError(null);
       try {
-        const [rank, roles, meta] = await Promise.all([
+        const [rank, leaderboard, roles, meta, prevRank] = await Promise.all([
           fetchJson<RankDriver[]>('/data/rank.json'),
+          fetchJson<Record<string, any>>('/data/leaderboard.json'),
           fetchJson<TeamRoles>('/data/team-roles.json'),
           fetchJson<SiteMetadata>('/data/metadata.json'),
+          fetchPrevRankData(),
         ]);
 
         if (!mounted) return;
         setRankData(rank);
+        setLeaderboardData(leaderboard);
+        setDeltas(computeDeltas(rank, prevRank));
         setTeamRoles(roles);
         setMetadata(meta);
       } catch (e) {
@@ -677,11 +883,50 @@ export default function Page() {
     }
 
     load();
+    fetchJson<CurrentTrackData>('/data/current-track.json')
+      .then((data) => {
+        if (mounted) setCurrentTrack(data);
+      })
+      .catch(() => {
+        if (mounted) setCurrentTrack(null);
+      });
 
     return () => {
       mounted = false;
     };
   }, []);
+
+  useEffect(() => {
+    setCurrentTrackPage(1);
+  }, [currentTrack?.track]);
+
+  const driversByGuid = useMemo(() => {
+    const map = new Map<string, RankDriver>();
+    rankData.forEach((driver) => map.set(driver.guid, driver));
+    return map;
+  }, [rankData]);
+
+  const leaderboardLicenseMap = useMemo(() => computeLicenseMap(rankData), [rankData]);
+
+  const currentTrackRows = useMemo<LeaderboardCarRow[]>(() => {
+    const currentTrackId = currentTrack?.track;
+    if (!currentTrackId) return [];
+    const candidateTrackIds = [
+      currentTrackId,
+      currentTrackId.replace('-layout', '_layout'),
+      currentTrackId.replace(/-/g, '_'),
+    ];
+    const matchedTrackId = candidateTrackIds.find((id, index) => candidateTrackIds.indexOf(id) === index && leaderboardData?.[id]);
+    const data = leaderboardData?.[matchedTrackId || currentTrackId]?.[CAR];
+    if (!Array.isArray(data)) return [];
+    return [...data].sort((a, b) => (a.laptime || 0) - (b.laptime || 0));
+  }, [currentTrack?.track, leaderboardData]);
+
+  const currentTrackFastestLap = currentTrackRows[0]?.laptime || 0;
+  const currentTrackTotalPages = Math.max(1, Math.ceil(currentTrackRows.length / HOME_CURRENT_TRACK_PER_PAGE));
+  const currentTrackSafePage = Math.min(Math.max(1, currentTrackPage), currentTrackTotalPages);
+  const currentTrackStart = (currentTrackSafePage - 1) * HOME_CURRENT_TRACK_PER_PAGE;
+  const currentTrackPagedRows = currentTrackRows.slice(currentTrackStart, currentTrackStart + HOME_CURRENT_TRACK_PER_PAGE);
 
   const drivers = useMemo<DriverView[]>(() => {
     if (!rankData.length) return [];
@@ -768,13 +1013,29 @@ export default function Page() {
         totalLaps={community.totalLaps}
         activeTracks={community.activeTracks}
         syncStatus={syncStatus}
+        currentTrack={currentTrack}
       />
       <DriverSearchSection
         drivers={drivers}
         loading={loading}
         error={error}
       />
-      <DashboardSection drivers={drivers} />
+      <CurrentTrackLeaderboardSection
+        loading={loading}
+        error={error}
+        currentTrack={currentTrack}
+        rows={currentTrackRows}
+        pagedRows={currentTrackPagedRows}
+        fastestLap={currentTrackFastestLap}
+        start={currentTrackStart}
+        safePage={currentTrackSafePage}
+        totalPages={currentTrackTotalPages}
+        driversByGuid={driversByGuid}
+        licenseMap={leaderboardLicenseMap}
+        deltas={deltas}
+        onPageChange={setCurrentTrackPage}
+        onOpenGuide={openGuide}
+      />
     </>
   );
 }

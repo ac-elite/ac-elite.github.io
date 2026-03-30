@@ -1,0 +1,86 @@
+name: Daily Current Track
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+permissions:
+  contents: write
+
+on:
+  # Run around 09:00 Europe/Amsterdam (DST-safe by checking local hour below)
+  schedule:
+    - cron: "5 7,8 * * *"
+
+  workflow_dispatch:
+
+concurrency:
+  group: current-track
+  cancel-in-progress: true
+
+jobs:
+  track:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Guard for 09:00 Europe/Amsterdam
+        id: guard
+        run: |
+          TZ_NAME="Europe/Amsterdam"
+          HOUR_LOCAL=$(TZ="$TZ_NAME" date +'%H')
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          elif [ "$HOUR_LOCAL" = "09" ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Skipping: local hour is $HOUR_LOCAL in $TZ_NAME"
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Fetch current track
+        if: steps.guard.outputs.run == 'true'
+        run: |
+          DEST="public/data/current-track.json"
+          mkdir -p public/data
+
+          HTTP_RESPONSE=$(curl -s --max-time 8 "http://157.90.3.32:18283/INFO" 2>/dev/null) || HTTP_RESPONSE=""
+
+          if [ -z "$HTTP_RESPONSE" ]; then
+            echo '{"online":false,"track":"","fetchedAt":"'"$(date -u +'%Y-%m-%dT%H:%M:%SZ')"'"}' > "$DEST"
+          else
+            echo "$HTTP_RESPONSE" | python3 -c "
+          import json, sys
+          def normalize_track_id(track):
+              if not isinstance(track, str):
+                  return ''
+              return track.replace('-layout', '_layout')
+          try:
+              data = json.load(sys.stdin)
+              track = normalize_track_id(data.get('track', ''))
+              out = {
+                  'online': True,
+                  'track': track,
+                  'fetchedAt': '$(date -u +%Y-%m-%dT%H:%M:%SZ)',
+              }
+              json.dump(out, sys.stdout, separators=(',', ':'))
+          except Exception:
+              json.dump({'online': False, 'track': '', 'fetchedAt': '$(date -u +%Y-%m-%dT%H:%M:%SZ)'}, sys.stdout, separators=(',', ':'))
+          " > "$DEST"
+          fi
+
+      - name: Commit and push
+        if: steps.guard.outputs.run == 'true'
+        run: |
+          git add public/data/current-track.json
+
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git -c user.email="github-actions[bot]@users.noreply.github.com" \
+                -c user.name="github-actions[bot]" \
+                commit -m "Daily current track update - $(date -u +'%Y-%m-%d %H:%M:%S UTC')"
+            git pull --rebase --autostash
+            git push
+          fi
