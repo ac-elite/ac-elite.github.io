@@ -163,7 +163,7 @@ export default function Page() {
       >
         <PageGridOverlay />
 
-      <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
+      <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1 }}>
         <Stack spacing={3.5}>
           <Stack spacing={0.75} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: { xs: 'center', md: 'flex-start' } }}>
             <Typography variant="h4" fontWeight={800} sx={{ letterSpacing: 0.5 }}>
