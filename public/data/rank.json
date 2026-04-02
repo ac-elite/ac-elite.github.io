@@ -7432,8 +7432,8 @@
  {
   "guid": "76561199479816450",
   "name": "okajima",
-  "points": 318.229,
-  "kilometers": 2470.2,
+  "points": 323.279,
+  "kilometers": 2501.5,
   "collisions": 81,
   "leaderboard": {
    "ks_zandvoort_": {
@@ -7508,13 +7508,13 @@
    },
    "ks_nurburgring_layout_gp_b": {
     "tatuusfa1": {
-     "laptime": 118222,
-     "laps": 5,
-     "ts": 1775023455259
+     "laptime": 117692,
+     "laps": 10,
+     "ts": 1775121317665
     }
    }
   },
-  "last_seen": 1775120549341,
+  "last_seen": 1775121373672,
   "wins": 15,
   "podiums": 29,
   "poles": 1,
@@ -190742,6 +190742,35 @@
   "infr": 2
  },
  {
+  "guid": "76561199064655635",
+  "name": "kaiser",
+  "points": 36.679,
+  "kilometers": 92.1,
+  "collisions": 8,
+  "leaderboard": {
+   "mugello_": {
+    "tatuusfa1": {
+     "laptime": 113033,
+     "laps": 5,
+     "ts": 1757695099638
+    }
+   },
+   "ks_nurburgring_layout_gp_b": {
+    "tatuusfa1": {
+     "laptime": 141067,
+     "laps": 1,
+     "ts": 1775120720389
+    }
+   }
+  },
+  "last_seen": 1775121409340,
+  "wins": 0,
+  "podiums": 0,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 2
+ },
+ {
   "guid": "76561199026087917",
   "name": "Windows 7 professional",
   "points": 36.672,
@@ -198901,28 +198930,6 @@
   "poles": 0,
   "flaps": 0,
   "infr": 0
- },
- {
-  "guid": "76561199064655635",
-  "name": "kaiser",
-  "points": 35.333000000000006,
-  "kilometers": 60.5,
-  "collisions": 5,
-  "leaderboard": {
-   "mugello_": {
-    "tatuusfa1": {
-     "laptime": 113033,
-     "laps": 5,
-     "ts": 1757695099638
-    }
-   }
-  },
-  "last_seen": 1775120549341,
-  "wins": 0,
-  "podiums": 0,
-  "poles": 0,
-  "flaps": 0,
-  "infr": 2
  },
  {
   "guid": "76561198292376493",
@@ -210556,42 +210563,6 @@
   "poles": 0,
   "flaps": 0,
   "infr": 0
- },
- {
-  "guid": "76561199524090828",
-  "name": "CorsicaF1",
-  "points": 33.42,
-  "kilometers": 101.6,
-  "collisions": 7,
-  "leaderboard": {
-   "mugello_": {
-    "tatuusfa1": {
-     "laptime": 119086,
-     "laps": 1,
-     "ts": 1757694037709
-    }
-   },
-   "ks_red_bull_ring_layout_gp": {
-    "tatuusfa1": {
-     "laptime": 101693,
-     "laps": 1,
-     "ts": 1762384065338
-    }
-   },
-   "ks_nurburgring_layout_gp_b": {
-    "tatuusfa1": {
-     "laptime": 125420,
-     "laps": 1,
-     "ts": 1775120204588
-    }
-   }
-  },
-  "last_seen": 1775120549341,
-  "wins": 0,
-  "podiums": 0,
-  "poles": 0,
-  "flaps": 0,
-  "infr": 2
  },
  {
   "guid": "76561199634931509",
@@ -222275,6 +222246,42 @@
   "poles": 0,
   "flaps": 0,
   "infr": 0
+ },
+ {
+  "guid": "76561199524090828",
+  "name": "CorsicaF1",
+  "points": 32.319,
+  "kilometers": 132,
+  "collisions": 10,
+  "leaderboard": {
+   "mugello_": {
+    "tatuusfa1": {
+     "laptime": 119086,
+     "laps": 1,
+     "ts": 1757694037709
+    }
+   },
+   "ks_red_bull_ring_layout_gp": {
+    "tatuusfa1": {
+     "laptime": 101693,
+     "laps": 1,
+     "ts": 1762384065338
+    }
+   },
+   "ks_nurburgring_layout_gp_b": {
+    "tatuusfa1": {
+     "laptime": 125420,
+     "laps": 2,
+     "ts": 1775120843347
+    }
+   }
+  },
+  "last_seen": 1775121409340,
+  "wins": 0,
+  "podiums": 0,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 2
  },
  {
   "guid": "76561198158438336",
