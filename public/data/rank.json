@@ -543,8 +543,8 @@
  {
   "guid": "76561198328304798",
   "name": "CarterReza",
-  "points": 2971.571,
-  "kilometers": 24160.2,
+  "points": 2972.41,
+  "kilometers": 24204.7,
   "collisions": 261,
   "leaderboard": {
    "ks_zandvoort_": {
@@ -585,8 +585,8 @@
    "ks_nurburgring_layout_gp_b": {
     "tatuusfa1": {
      "laptime": 111762,
-     "laps": 129,
-     "ts": 1759542942813
+     "laps": 132,
+     "ts": 1775320755149
     }
    },
    "ks_laguna_seca_": {
@@ -686,7 +686,7 @@
     }
    }
   },
-  "last_seen": 1775172011303,
+  "last_seen": 1775320946060,
   "wins": 109,
   "podiums": 171,
   "poles": 292,
@@ -1981,9 +1981,9 @@
  {
   "guid": "76561198845443064",
   "name": "Peter Paris",
-  "points": 1547.784,
-  "kilometers": 8397.2,
-  "collisions": 441,
+  "points": 1556.476,
+  "kilometers": 8453.2,
+  "collisions": 442,
   "leaderboard": {
    "ks_zandvoort_": {
     "tatuusfa1": {
@@ -2001,9 +2001,9 @@
    },
    "ks_nurburgring_layout_gp_b": {
     "tatuusfa1": {
-     "laptime": 114242,
-     "laps": 68,
-     "ts": 1775161391955
+     "laptime": 113700,
+     "laps": 74,
+     "ts": 1775320573753
     }
    },
    "ks_silverstone_gp": {
@@ -2105,9 +2105,9 @@
     }
    }
   },
-  "last_seen": 1775161451569,
-  "wins": 26,
-  "podiums": 104,
+  "last_seen": 1775320946060,
+  "wins": 27,
+  "podiums": 105,
   "poles": 8,
   "flaps": 8,
   "infr": 9,
@@ -18395,6 +18395,70 @@
   "infr": 1
  },
  {
+  "guid": "76561198058378519",
+  "name": "Oblak",
+  "points": 104.504,
+  "kilometers": 598.4,
+  "collisions": 33,
+  "leaderboard": {
+   "ks_laguna_seca_": {
+    "tatuusfa1": {
+     "laptime": 84374,
+     "laps": 13,
+     "ts": 1760204259951
+    }
+   },
+   "ks_silverstone_gp": {
+    "tatuusfa1": {
+     "laptime": 127745,
+     "laps": 1,
+     "ts": 1760277634552
+    }
+   },
+   "imola_": {
+    "tatuusfa1": {
+     "laptime": 108663,
+     "laps": 9,
+     "ts": 1761490109787
+    }
+   },
+   "mugello_": {
+    "tatuusfa1": {
+     "laptime": 109118,
+     "laps": 12,
+     "ts": 1764954736049
+    }
+   },
+   "canada_2021_": {
+    "tatuusfa1": {
+     "laptime": 101488,
+     "laps": 3,
+     "ts": 1769790619910
+    }
+   },
+   "acu_unitedstates_a": {
+    "tatuusfa1": {
+     "laptime": 130923,
+     "laps": 4,
+     "ts": 1770479639510
+    }
+   },
+   "ks_nurburgring_layout_gp_b": {
+    "tatuusfa1": {
+     "laptime": 118675,
+     "laps": 3,
+     "ts": 1775305959695
+    }
+   }
+  },
+  "last_seen": 1775306068549,
+  "wins": 2,
+  "podiums": 4,
+  "poles": 0,
+  "flaps": 1,
+  "infr": 0
+ },
+ {
   "guid": "76561198326298272",
   "name": "GaByZ1nho",
   "points": 104.37100000000001,
@@ -18678,70 +18742,6 @@
   "podiums": 3,
   "poles": 0,
   "flaps": 0,
-  "infr": 0
- },
- {
-  "guid": "76561198058378519",
-  "name": "Oblak",
-  "points": 103.048,
-  "kilometers": 581.3,
-  "collisions": 32,
-  "leaderboard": {
-   "ks_laguna_seca_": {
-    "tatuusfa1": {
-     "laptime": 84374,
-     "laps": 13,
-     "ts": 1760204259951
-    }
-   },
-   "ks_silverstone_gp": {
-    "tatuusfa1": {
-     "laptime": 127745,
-     "laps": 1,
-     "ts": 1760277634552
-    }
-   },
-   "imola_": {
-    "tatuusfa1": {
-     "laptime": 108663,
-     "laps": 9,
-     "ts": 1761490109787
-    }
-   },
-   "mugello_": {
-    "tatuusfa1": {
-     "laptime": 109118,
-     "laps": 12,
-     "ts": 1764954736049
-    }
-   },
-   "canada_2021_": {
-    "tatuusfa1": {
-     "laptime": 101488,
-     "laps": 3,
-     "ts": 1769790619910
-    }
-   },
-   "acu_unitedstates_a": {
-    "tatuusfa1": {
-     "laptime": 130923,
-     "laps": 4,
-     "ts": 1770479639510
-    }
-   },
-   "ks_nurburgring_layout_gp_b": {
-    "tatuusfa1": {
-     "laptime": 119764,
-     "laps": 2,
-     "ts": 1775305647987
-    }
-   }
-  },
-  "last_seen": 1775305679092,
-  "wins": 2,
-  "podiums": 4,
-  "poles": 0,
-  "flaps": 1,
   "infr": 0
  },
  {
@@ -54070,6 +54070,35 @@
   "infr": 0
  },
  {
+  "guid": "76561198151361405",
+  "name": "martin y belenn",
+  "points": 59.651,
+  "kilometers": 41.1,
+  "collisions": 4,
+  "leaderboard": {
+   "ks_vallelunga_extended_circuit": {
+    "tatuusfa1": {
+     "laptime": 95963,
+     "laps": 2,
+     "ts": 1774791983331
+    }
+   },
+   "ks_nurburgring_layout_gp_b": {
+    "tatuusfa1": {
+     "laptime": 119040,
+     "laps": 1,
+     "ts": 1775320444666
+    }
+   }
+  },
+  "last_seen": 1775320494972,
+  "wins": 1,
+  "podiums": 1,
+  "poles": 0,
+  "flaps": 1,
+  "infr": 0
+ },
+ {
   "guid": "76561198739043556",
   "name": "UsefulTerror297",
   "points": 59.64,
@@ -57610,6 +57639,28 @@
   },
   "last_seen": 1771209387658,
   "wins": 0,
+  "podiums": 1,
+  "poles": 0,
+  "flaps": 1,
+  "infr": 0
+ },
+ {
+  "guid": "76561198987826550",
+  "name": "Corsa",
+  "points": 58.484,
+  "kilometers": 49.3,
+  "collisions": 5,
+  "leaderboard": {
+   "ks_nurburgring_layout_gp_b": {
+    "tatuusfa1": {
+     "laptime": 124492,
+     "laps": 5,
+     "ts": 1775319252007
+    }
+   }
+  },
+  "last_seen": 1775319711012,
+  "wins": 1,
   "podiums": 1,
   "poles": 0,
   "flaps": 1,
@@ -66603,28 +66654,6 @@
   "poles": 0,
   "flaps": 0,
   "infr": 3
- },
- {
-  "guid": "76561198151361405",
-  "name": "martin y belenn",
-  "points": 56.39,
-  "kilometers": 28.6,
-  "collisions": 4,
-  "leaderboard": {
-   "ks_vallelunga_extended_circuit": {
-    "tatuusfa1": {
-     "laptime": 95963,
-     "laps": 2,
-     "ts": 1774791983331
-    }
-   }
-  },
-  "last_seen": 1774792505536,
-  "wins": 1,
-  "podiums": 1,
-  "poles": 0,
-  "flaps": 1,
-  "infr": 0
  },
  {
   "guid": "76561199227538483",
@@ -83387,6 +83416,28 @@
   "infr": 0
  },
  {
+  "guid": "76561199811144567",
+  "name": "Rende Jajca",
+  "points": 53.254,
+  "kilometers": 52.5,
+  "collisions": 7,
+  "leaderboard": {
+   "ks_nurburgring_layout_gp_b": {
+    "tatuusfa1": {
+     "laptime": 125080,
+     "laps": 2,
+     "ts": 1775319648396
+    }
+   }
+  },
+  "last_seen": 1775319761730,
+  "wins": 0,
+  "podiums": 0,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 0
+ },
+ {
   "guid": "76561199061984182",
   "name": "Akos Soltesz",
   "points": 53.252,
@@ -93847,6 +93898,28 @@
    }
   },
   "last_seen": 1767131166001,
+  "wins": 0,
+  "podiums": 0,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 0
+ },
+ {
+  "guid": "76561199378267447",
+  "name": "Zs",
+  "points": 51.975,
+  "kilometers": 31.6,
+  "collisions": 6,
+  "leaderboard": {
+   "ks_nurburgring_layout_gp_b": {
+    "tatuusfa1": {
+     "laptime": 123225,
+     "laps": 1,
+     "ts": 1775319625088
+    }
+   }
+  },
+  "last_seen": 1775319644707,
   "wins": 0,
   "podiums": 0,
   "poles": 0,
