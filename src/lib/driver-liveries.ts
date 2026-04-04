@@ -18,12 +18,12 @@ export const TEAM_LIVERY_ENTRIES: readonly TeamLiveryEntry[] = [
     owner: 'DIEnamic',
     alt: 'AC Elite team livery, car 10, by DIEnamic',
   },
-  {
-    steamGuid: '76561198124713255',
-    showcaseTitle: '#20 · Duwabbit',
-    owner: 'Duwabbit',
-    alt: 'AC Elite team livery, car 20, by Duwabbit',
-  },
+  // {
+  //   steamGuid: '76561198124713255',
+  //   showcaseTitle: '#20 · Duwabbit',
+  //   owner: 'Duwabbit',
+  //   alt: 'AC Elite team livery, car 20, by Duwabbit',
+  // },
   {
     steamGuid: '76561198212710700',
     showcaseTitle: '#69 · Stella',
