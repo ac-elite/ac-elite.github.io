@@ -3560,15 +3560,15 @@
  {
   "guid": "76561198253261997",
   "name": "Zheng Ting Lim",
-  "points": 904.936,
-  "kilometers": 13685.6,
+  "points": 905.278,
+  "kilometers": 13709.6,
   "collisions": 633,
   "leaderboard": {
    "ks_nurburgring_layout_gp_b": {
     "tatuusfa1": {
      "laptime": 112221,
-     "laps": 115,
-     "ts": 1775278363253
+     "laps": 116,
+     "ts": 1775278916596
     }
    },
    "ks_silverstone_gp": {
@@ -3677,7 +3677,7 @@
     }
    }
   },
-  "last_seen": 1775278395085,
+  "last_seen": 1775278958130,
   "wins": 37,
   "podiums": 71,
   "poles": 41,
@@ -3890,9 +3890,9 @@
  {
   "guid": "76561197995833363",
   "name": "MK-Ultra Racer",
-  "points": 866.491,
-  "kilometers": 4435.2,
-  "collisions": 130,
+  "points": 865.596,
+  "kilometers": 4443.9,
+  "collisions": 131,
   "leaderboard": {
    "ks_zandvoort_": {
     "tatuusfa1": {
@@ -3965,7 +3965,7 @@
     }
    }
   },
-  "last_seen": 1773768171593,
+  "last_seen": 1775296387742,
   "wins": 42,
   "podiums": 73,
   "poles": 23,
@@ -18681,6 +18681,70 @@
   "infr": 0
  },
  {
+  "guid": "76561198058378519",
+  "name": "Oblak",
+  "points": 103.048,
+  "kilometers": 581.3,
+  "collisions": 32,
+  "leaderboard": {
+   "ks_laguna_seca_": {
+    "tatuusfa1": {
+     "laptime": 84374,
+     "laps": 13,
+     "ts": 1760204259951
+    }
+   },
+   "ks_silverstone_gp": {
+    "tatuusfa1": {
+     "laptime": 127745,
+     "laps": 1,
+     "ts": 1760277634552
+    }
+   },
+   "imola_": {
+    "tatuusfa1": {
+     "laptime": 108663,
+     "laps": 9,
+     "ts": 1761490109787
+    }
+   },
+   "mugello_": {
+    "tatuusfa1": {
+     "laptime": 109118,
+     "laps": 12,
+     "ts": 1764954736049
+    }
+   },
+   "canada_2021_": {
+    "tatuusfa1": {
+     "laptime": 101488,
+     "laps": 3,
+     "ts": 1769790619910
+    }
+   },
+   "acu_unitedstates_a": {
+    "tatuusfa1": {
+     "laptime": 130923,
+     "laps": 4,
+     "ts": 1770479639510
+    }
+   },
+   "ks_nurburgring_layout_gp_b": {
+    "tatuusfa1": {
+     "laptime": 119764,
+     "laps": 2,
+     "ts": 1775305647987
+    }
+   }
+  },
+  "last_seen": 1775305679092,
+  "wins": 2,
+  "podiums": 4,
+  "poles": 0,
+  "flaps": 1,
+  "infr": 0
+ },
+ {
   "guid": "76561199252363501",
   "name": "Money",
   "points": 102.86099999999999,
@@ -20414,63 +20478,6 @@
   "poles": 0,
   "flaps": 0,
   "infr": 1
- },
- {
-  "guid": "76561198058378519",
-  "name": "Oblak",
-  "points": 96.70800000000001,
-  "kilometers": 560.4,
-  "collisions": 32,
-  "leaderboard": {
-   "ks_laguna_seca_": {
-    "tatuusfa1": {
-     "laptime": 84374,
-     "laps": 13,
-     "ts": 1760204259951
-    }
-   },
-   "ks_silverstone_gp": {
-    "tatuusfa1": {
-     "laptime": 127745,
-     "laps": 1,
-     "ts": 1760277634552
-    }
-   },
-   "imola_": {
-    "tatuusfa1": {
-     "laptime": 108663,
-     "laps": 9,
-     "ts": 1761490109787
-    }
-   },
-   "mugello_": {
-    "tatuusfa1": {
-     "laptime": 109118,
-     "laps": 12,
-     "ts": 1764954736049
-    }
-   },
-   "canada_2021_": {
-    "tatuusfa1": {
-     "laptime": 101488,
-     "laps": 3,
-     "ts": 1769790619910
-    }
-   },
-   "acu_unitedstates_a": {
-    "tatuusfa1": {
-     "laptime": 130923,
-     "laps": 4,
-     "ts": 1770479639510
-    }
-   }
-  },
-  "last_seen": 1770479698775,
-  "wins": 2,
-  "podiums": 4,
-  "poles": 0,
-  "flaps": 1,
-  "infr": 0
  },
  {
   "guid": "76561198343341714",
@@ -61490,7 +61497,7 @@
   "guid": "76561199050230275",
   "name": "Gabriel Goulart",
   "points": 57.402,
-  "kilometers": 12.6,
+  "kilometers": 18.5,
   "collisions": 7,
   "leaderboard": {
    "ks_laguna_seca_": {
@@ -61501,7 +61508,7 @@
     }
    }
   },
-  "last_seen": 1772656627193,
+  "last_seen": 1775280720885,
   "wins": 0,
   "podiums": 0,
   "poles": 0,
@@ -135322,6 +135329,21 @@
   "leaderboard": {
   },
   "last_seen": 1763925745727,
+  "wins": 0,
+  "podiums": 0,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 0
+ },
+ {
+  "guid": "76561199813407080",
+  "name": "thiratnkxngnu",
+  "points": 48.308,
+  "kilometers": 7.4,
+  "collisions": 4,
+  "leaderboard": {
+  },
+  "last_seen": 1775305129596,
   "wins": 0,
   "podiums": 0,
   "poles": 0,
