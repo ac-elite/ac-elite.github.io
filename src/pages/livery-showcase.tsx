@@ -1,19 +1,26 @@
-import { useState, type ReactNode } from 'react';
+import { useMemo, useState, useEffect, type ReactNode } from 'react';
 
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Link from '@mui/material/Link';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
+import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 
 import { RouterLink } from 'src/routes/components';
 
 import { CONFIG } from 'src/config-global';
+import { fetchJson } from 'src/lib/fetch-json';
 import { getDriverProfileHref } from 'src/lib/routes';
 import { GLASS_PANEL_TIGHT_SX, GLASS_INNER_PANEL_SX } from 'src/lib/glass';
-import { liveriesAssetUrl, TEAM_LIVERY_ENTRIES } from 'src/lib/driver-liveries';
+import { ACE_SKIN_PACK_DOWNLOAD_URL } from 'src/lib/ace-skin-pack-download';
+import { liveriesAssetUrl, promoLiveryAssetUrl, TEAM_LIVERY_ENTRIES } from 'src/lib/driver-liveries';
+import {
+  getAceSkinPackAuthorForEntryId,
+  flattenAceSkinPackOrderedEntries,
+} from 'src/lib/ace-skin-pack-teams';
 
 import { LiveryEnlargeDialog } from 'src/components/livery/livery-enlarge-dialog';
 import { PageGridOverlay } from 'src/components/page-background/page-grid-overlay';
@@ -45,7 +52,7 @@ const liveryThumbImageSx = {
 const generalLiveries = [
   {
     name: 'Car 1',
-    image: publicAsset('/assets/liveries/car1.jpg'),
+    image: promoLiveryAssetUrl('car1.jpg'),
     alt: 'AC Elite default pack livery (Car 1)',
     subtitle: 'Default livery pack · Car 1',
   },
@@ -58,6 +65,29 @@ type ImagePreviewState = {
   subtitle?: string;
   /** Links to `/driver/:guid` in dialog footer when set. */
   profileGuid?: string;
+};
+
+type AceSkinPackEntry = {
+  id: string;
+  title: string;
+  previewUrl: string;
+};
+
+type AceSkinPackManifest = {
+  generatedAt?: string;
+  entries: AceSkinPackEntry[];
+};
+
+type LiveryShowcaseSectionsConfig = {
+  officialPack: boolean;
+  aceSkinPack: boolean;
+  teamLiveries: boolean;
+};
+
+const DEFAULT_SECTIONS_CONFIG: LiveryShowcaseSectionsConfig = {
+  officialPack: true,
+  aceSkinPack: true,
+  teamLiveries: true,
 };
 
 function LiveryThumbButton({
@@ -110,6 +140,46 @@ function LiveryThumbButton({
 
 export default function Page() {
   const [imagePreview, setImagePreview] = useState<ImagePreviewState | null>(null);
+  const [aceSkinPack, setAceSkinPack] = useState<AceSkinPackEntry[] | null>(null);
+  const [sectionsConfig, setSectionsConfig] = useState<LiveryShowcaseSectionsConfig>(DEFAULT_SECTIONS_CONFIG);
+
+  useEffect(() => {
+    let mounted = true;
+    fetchJson<AceSkinPackManifest>('/data/ace-skin-pack.json')
+      .then((data) => {
+        if (mounted) setAceSkinPack(Array.isArray(data.entries) ? data.entries : []);
+      })
+      .catch(() => {
+        if (mounted) setAceSkinPack([]);
+      });
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    let mounted = true;
+    fetchJson<Partial<LiveryShowcaseSectionsConfig>>('/data/livery-showcase-sections.json')
+      .then((data) => {
+        if (!mounted || !data) return;
+        setSectionsConfig({
+          officialPack: typeof data.officialPack === 'boolean' ? data.officialPack : DEFAULT_SECTIONS_CONFIG.officialPack,
+          aceSkinPack: typeof data.aceSkinPack === 'boolean' ? data.aceSkinPack : DEFAULT_SECTIONS_CONFIG.aceSkinPack,
+          teamLiveries: typeof data.teamLiveries === 'boolean' ? data.teamLiveries : DEFAULT_SECTIONS_CONFIG.teamLiveries,
+        });
+      })
+      .catch(() => {
+        if (mounted) setSectionsConfig(DEFAULT_SECTIONS_CONFIG);
+      });
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const aceSkinPackOrdered = useMemo(() => {
+    if (!aceSkinPack?.length) return [];
+    return flattenAceSkinPackOrderedEntries(aceSkinPack);
+  }, [aceSkinPack]);
 
   return (
     <>
@@ -141,13 +211,13 @@ export default function Page() {
                 Livery Showcase
               </Typography>
               <Typography color="text.secondary">
-                Official default-pack paints and AC Elite team liveries.
-                view.
+                Official default-pack paints, the ACE Skin Pack, and AC Elite team liveries.
               </Typography>
             </Stack>
 
             <Stack spacing={3}>
-              <Stack spacing={1.2} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: 'stretch' }}>
+              {sectionsConfig.officialPack && (
+                <Stack spacing={1.2} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: 'stretch' }}>
                 <Typography variant="h6" sx={{ fontWeight: 800 }}>
                   Official pack
                 </Typography>
@@ -200,9 +270,127 @@ export default function Page() {
                     </Grid>
                   ))}
                 </Grid>
-              </Stack>
+                </Stack>
+              )}
 
-              <Stack spacing={1.2} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: 'stretch' }}>
+              {sectionsConfig.aceSkinPack && aceSkinPack && aceSkinPack.length > 0 && (
+                <Stack spacing={1.2} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: 'stretch' }}>
+                  <Typography variant="h6" sx={{ fontWeight: 800 }}>
+                    ACE Skin Pack
+                  </Typography>
+                  <Stack spacing={0.75}>
+                    <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                      The full ACE Skin Pack for Assetto Corsa: install it in your game to drive these liveries.
+                      Each card shows the author (linked to their driver profile). Order follows team pairs, not car number.
+                    </Typography>
+                    <Button
+                      component="a"
+                      href={ACE_SKIN_PACK_DOWNLOAD_URL}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      variant="outlined"
+                      size="small"
+                      sx={{
+                        alignSelf: { xs: 'center', md: 'flex-start' },
+                        mt: 0.25,
+                        textTransform: 'none',
+                        fontWeight: 700,
+                        borderColor: 'rgba(255, 255, 255, 0.45)',
+                        color: 'common.white',
+                        '&:hover': {
+                          borderColor: 'common.white',
+                          bgcolor: 'rgba(255, 255, 255, 0.08)',
+                        },
+                      }}
+                    >
+                      Download ACE Skin Pack
+                    </Button>
+                  </Stack>
+                  <Grid container spacing={2} sx={{ width: 1 }}>
+                    {aceSkinPackOrdered.map((entry) => {
+                      const src = publicAsset(entry.previewUrl);
+                      const alt = `AC Elite skin pack preview · ${entry.title}`;
+                      const author = getAceSkinPackAuthorForEntryId(entry.id);
+                      return (
+                        <Grid key={entry.id} size={{ xs: 12, sm: 6, md: 4 }}>
+                          <Paper
+                            sx={{
+                              ...GLASS_PANEL_TIGHT_SX,
+                              width: 1,
+                            }}
+                          >
+                            <Stack spacing={1}>
+                              <Box
+                                sx={{
+                                  ...GLASS_INNER_PANEL_SX,
+                                  width: 1,
+                                  height: LIVERY_THUMB_FRAME_HEIGHT,
+                                  p: 0,
+                                  position: 'relative',
+                                  overflow: 'hidden',
+                                }}
+                              >
+                                <LiveryThumbButton
+                                  preview={{
+                                    src,
+                                    alt,
+                                    title: entry.title,
+                                    subtitle: entry.id,
+                                  }}
+                                  onOpen={setImagePreview}
+                                  sx={{
+                                    position: 'relative',
+                                    minHeight: 0,
+                                    width: 1,
+                                    height: 1,
+                                  }}
+                                >
+                                  <Box
+                                    component="img"
+                                    src={src}
+                                    alt={alt}
+                                    loading="lazy"
+                                    sx={liveryThumbImageSx}
+                                  />
+                                </LiveryThumbButton>
+                              </Box>
+                              <Typography variant="subtitle2" sx={{ fontWeight: 800, px: 0.25 }}>
+                                {entry.title}
+                              </Typography>
+                              <Typography variant="caption" sx={{ color: 'text.secondary', px: 0.25, display: 'block' }}>
+                                Author:{' '}
+                                {author ? (
+                                  <Link
+                                    component={RouterLink}
+                                    href={getDriverProfileHref(author.guid)}
+                                    variant="caption"
+                                    underline="hover"
+                                    color="inherit"
+                                    sx={{ fontWeight: 700 }}
+                                  >
+                                    {author.displayName}
+                                  </Link>
+                                ) : (
+                                  '—'
+                                )}
+                              </Typography>
+                              <Typography
+                                variant="caption"
+                                sx={{ color: 'text.secondary', px: 0.25, display: 'block' }}
+                              >
+                                {entry.id}
+                              </Typography>
+                            </Stack>
+                          </Paper>
+                        </Grid>
+                      );
+                    })}
+                  </Grid>
+                </Stack>
+              )}
+
+              {sectionsConfig.teamLiveries && (
+                <Stack spacing={1.2} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: 'stretch' }}>
                 <Typography variant="h6" sx={{ fontWeight: 800 }}>
                   AC Elite Team
                 </Typography>
@@ -275,7 +463,8 @@ export default function Page() {
                     );
                   })}
                 </Grid>
-              </Stack>
+                </Stack>
+              )}
             </Stack>
           </Stack>
         </Container>

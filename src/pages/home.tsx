@@ -24,6 +24,7 @@ import { useTheme, keyframes } from '@mui/material/styles';
 import { CONFIG } from 'src/config-global';
 import { fetchJson } from 'src/lib/fetch-json';
 import { getDriverProfileHref } from 'src/lib/routes';
+import { ACE_SKIN_PACK_DOWNLOAD_URL } from 'src/lib/ace-skin-pack-download';
 import { computeDeltas, type DriverDelta, fetchPrevRankData } from 'src/lib/delta';
 import {
   getSyncHealth,
@@ -273,6 +274,25 @@ function HeroSection({
                   rel="noreferrer"
                 >
                   Join the server
+                </Button>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  size="large"
+                  sx={{
+                    px: 3.5,
+                    borderRadius: 3,
+                    minHeight: { xs: 46, sm: 48 },
+                    width: { xs: '100%', sm: 'auto' },
+                    maxWidth: { xs: 320, sm: 'none' },
+                    animation: `${heroPrimaryPulse} 4.5s ease-in-out infinite`,
+                    ...reducedMotionNone,
+                  }}
+                  href={ACE_SKIN_PACK_DOWNLOAD_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Download skin pack
                 </Button>
               </Stack>
 

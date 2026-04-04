@@ -1,6 +1,6 @@
 /**
- * Team livery images live at `public/assets/liveries/{steamGuid}.jpg`.
- * `car1.jpg` is the exception (official pack, not a driver skin).
+ * Team livery images live at `public/assets/liveries/team/{steamGuid}.jpg`.
+ * Promo/official showcase liveries live at `public/assets/liveries/promo/`.
  */
 
 export type TeamLiveryEntry = {
@@ -37,7 +37,13 @@ const TEAM_GUID_SET = new Set(TEAM_LIVERY_ENTRIES.map((e) => e.steamGuid));
 export function liveriesAssetUrl(steamGuid: string): string {
   const base = import.meta.env.BASE_URL;
   const root = base.endsWith('/') ? base.slice(0, -1) : base;
-  return `${root}/assets/liveries/${steamGuid}.jpg`;
+  return `${root}/assets/liveries/team/${steamGuid}.jpg`;
+}
+
+export function promoLiveryAssetUrl(fileName: string): string {
+  const base = import.meta.env.BASE_URL;
+  const root = base.endsWith('/') ? base.slice(0, -1) : base;
+  return `${root}/assets/liveries/promo/${fileName}`;
 }
 
 export function isTeamLiveryGuid(steamGuid: string): boolean {
