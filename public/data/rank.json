@@ -397,9 +397,9 @@
  {
   "guid": "76561199664649696",
   "name": "olalekezion810",
-  "points": 3521.6139999999996,
-  "kilometers": 38701.8,
-  "collisions": 1320,
+  "points": 3528.131,
+  "kilometers": 38766.3,
+  "collisions": 1321,
   "leaderboard": {
    "ks_zandvoort_": {
     "tatuusfa1": {
@@ -439,8 +439,8 @@
    "ks_nurburgring_layout_gp_b": {
     "tatuusfa1": {
      "laptime": 112233,
-     "laps": 327,
-     "ts": 1775394689342
+     "laps": 336,
+     "ts": 1775411792607
     }
    },
    "ks_laguna_seca_": {
@@ -533,9 +533,9 @@
     }
    }
   },
-  "last_seen": 1775394976065,
-  "wins": 204,
-  "podiums": 395,
+  "last_seen": 1775412400031,
+  "wins": 205,
+  "podiums": 397,
   "poles": 91,
   "flaps": 190,
   "infr": 70
@@ -686,7 +686,7 @@
     }
    }
   },
-  "last_seen": 1775410015461,
+  "last_seen": 1775410142811,
   "wins": 109,
   "podiums": 172,
   "poles": 292,
@@ -5192,6 +5192,56 @@
   "infr": 5
  },
  {
+  "guid": "76561198145693473",
+  "name": "Deano Drives",
+  "points": 602.175,
+  "kilometers": 1809.1,
+  "collisions": 61,
+  "leaderboard": {
+   "ks_brands_hatch_gp": {
+    "tatuusfa1": {
+     "laptime": 80664,
+     "laps": 18,
+     "ts": 1771706614703
+    }
+   },
+   "ks_laguna_seca_": {
+    "tatuusfa1": {
+     "laptime": 80270,
+     "laps": 14,
+     "ts": 1772893657277
+    }
+   },
+   "ks_barcelona_layout_moto": {
+    "tatuusfa1": {
+     "laptime": 99926,
+     "laps": 16,
+     "ts": 1773162662468
+    }
+   },
+   "ks_vallelunga_extended_circuit": {
+    "tatuusfa1": {
+     "laptime": 91155,
+     "laps": 134,
+     "ts": 1774568999075
+    }
+   },
+   "ks_nurburgring_layout_gp_b": {
+    "tatuusfa1": {
+     "laptime": 111454,
+     "laps": 97,
+     "ts": 1775412664016
+    }
+   }
+  },
+  "last_seen": 1775412708133,
+  "wins": 27,
+  "podiums": 39,
+  "poles": 10,
+  "flaps": 30,
+  "infr": 0
+ },
+ {
   "guid": "76561198858822043",
   "name": "isi",
   "points": 597.665,
@@ -5282,56 +5332,6 @@
   "poles": 1,
   "flaps": 3,
   "infr": 12
- },
- {
-  "guid": "76561198145693473",
-  "name": "Deano Drives",
-  "points": 593.394,
-  "kilometers": 1705.5,
-  "collisions": 60,
-  "leaderboard": {
-   "ks_brands_hatch_gp": {
-    "tatuusfa1": {
-     "laptime": 80664,
-     "laps": 18,
-     "ts": 1771706614703
-    }
-   },
-   "ks_laguna_seca_": {
-    "tatuusfa1": {
-     "laptime": 80270,
-     "laps": 14,
-     "ts": 1772893657277
-    }
-   },
-   "ks_barcelona_layout_moto": {
-    "tatuusfa1": {
-     "laptime": 99926,
-     "laps": 16,
-     "ts": 1773162662468
-    }
-   },
-   "ks_vallelunga_extended_circuit": {
-    "tatuusfa1": {
-     "laptime": 91155,
-     "laps": 134,
-     "ts": 1774568999075
-    }
-   },
-   "ks_nurburgring_layout_gp_b": {
-    "tatuusfa1": {
-     "laptime": 111454,
-     "laps": 87,
-     "ts": 1775409924434
-    }
-   }
-  },
-  "last_seen": 1775410015461,
-  "wins": 26,
-  "podiums": 38,
-  "poles": 10,
-  "flaps": 29,
-  "infr": 0
  },
  {
   "guid": "76561199126808955",
@@ -9555,6 +9555,49 @@
   "infr": 5
  },
  {
+  "guid": "76561198323761777",
+  "name": "Dieter Brehm",
+  "points": 223.603,
+  "kilometers": 1250.3,
+  "collisions": 64,
+  "leaderboard": {
+   "spa_": {
+    "tatuusfa1": {
+     "laptime": 140836,
+     "laps": 29,
+     "ts": 1767619724749
+    }
+   },
+   "ks_brands_hatch_gp": {
+    "tatuusfa1": {
+     "laptime": 83783,
+     "laps": 10,
+     "ts": 1765728896481
+    }
+   },
+   "ks_nurburgring_layout_gp_a": {
+    "tatuusfa1": {
+     "laptime": 117344,
+     "laps": 68,
+     "ts": 1766852191639
+    }
+   },
+   "ks_nurburgring_layout_gp_b": {
+    "tatuusfa1": {
+     "laptime": 115337,
+     "laps": 4,
+     "ts": 1775410422566
+    }
+   }
+  },
+  "last_seen": 1775411074694,
+  "wins": 5,
+  "podiums": 13,
+  "poles": 6,
+  "flaps": 5,
+  "infr": 1
+ },
+ {
   "guid": "76561198989387430",
   "name": "bite",
   "points": 223.215,
@@ -9864,49 +9907,6 @@
   "podiums": 6,
   "poles": 1,
   "flaps": 1,
-  "infr": 1
- },
- {
-  "guid": "76561198323761777",
-  "name": "Dieter Brehm",
-  "points": 219.93099999999998,
-  "kilometers": 1214.9,
-  "collisions": 64,
-  "leaderboard": {
-   "spa_": {
-    "tatuusfa1": {
-     "laptime": 140836,
-     "laps": 29,
-     "ts": 1767619724749
-    }
-   },
-   "ks_brands_hatch_gp": {
-    "tatuusfa1": {
-     "laptime": 83783,
-     "laps": 10,
-     "ts": 1765728896481
-    }
-   },
-   "ks_nurburgring_layout_gp_a": {
-    "tatuusfa1": {
-     "laptime": 117344,
-     "laps": 68,
-     "ts": 1766852191639
-    }
-   },
-   "ks_nurburgring_layout_gp_b": {
-    "tatuusfa1": {
-     "laptime": 116602,
-     "laps": 2,
-     "ts": 1775409597577
-    }
-   }
-  },
-  "last_seen": 1775410015461,
-  "wins": 5,
-  "podiums": 13,
-  "poles": 6,
-  "flaps": 5,
   "infr": 1
  },
  {
