@@ -141,7 +141,8 @@ function LiveryThumbButton({
 export default function Page() {
   const [imagePreview, setImagePreview] = useState<ImagePreviewState | null>(null);
   const [aceSkinPack, setAceSkinPack] = useState<AceSkinPackEntry[] | null>(null);
-  const [sectionsConfig, setSectionsConfig] = useState<LiveryShowcaseSectionsConfig>(DEFAULT_SECTIONS_CONFIG);
+  /** `null` until `/data/livery-showcase-sections.json` loads — avoids flashing defaults (all `true`) before fetch. */
+  const [sectionsConfig, setSectionsConfig] = useState<LiveryShowcaseSectionsConfig | null>(null);
 
   useEffect(() => {
     let mounted = true;
@@ -216,7 +217,7 @@ export default function Page() {
             </Stack>
 
             <Stack spacing={3}>
-              {sectionsConfig.officialPack && (
+              {sectionsConfig?.officialPack && (
                 <Stack spacing={1.2} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: 'stretch' }}>
                 <Typography variant="h6" sx={{ fontWeight: 800 }}>
                   Official pack
@@ -273,7 +274,7 @@ export default function Page() {
                 </Stack>
               )}
 
-              {sectionsConfig.aceSkinPack && aceSkinPack && aceSkinPack.length > 0 && (
+              {sectionsConfig?.aceSkinPack && aceSkinPack && aceSkinPack.length > 0 && (
                 <Stack spacing={1.2} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: 'stretch' }}>
                   <Typography variant="h6" sx={{ fontWeight: 800 }}>
                     ACE Skin Pack
@@ -389,7 +390,7 @@ export default function Page() {
                 </Stack>
               )}
 
-              {sectionsConfig.teamLiveries && (
+              {sectionsConfig?.teamLiveries && (
                 <Stack spacing={1.2} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: 'stretch' }}>
                 <Typography variant="h6" sx={{ fontWeight: 800 }}>
                   AC Elite Team
