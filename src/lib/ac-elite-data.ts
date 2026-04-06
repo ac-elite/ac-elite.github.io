@@ -406,6 +406,30 @@ export function calculateGap(fastestLap: number, currentLap: number) {
   return `+${((currentLap - fastestLap) / 1000).toFixed(3)}`;
 }
 
+/** Specular “glass” hover for license / SR chips (matches driver profile hero feel). */
+function withBadgeGlassHover(base: SxProps<Theme>): SxProps<Theme> {
+  return {
+    ...base,
+    transition: (theme: Theme) =>
+      theme.transitions.create(['transform', 'box-shadow', 'filter'], { duration: 180 }),
+    '@media (hover: hover)': {
+      '&:hover': {
+        transform: 'translateY(-1px)',
+        filter: 'brightness(1.08)',
+        boxShadow:
+          'inset 0 1px 0 rgba(255,255,255,0.48), 0 0 0 1px rgba(255,255,255,0.2), 0 10px 28px rgba(0,0,0,0.38), 0 0 20px rgba(255,255,255,0.14)',
+      },
+    },
+    '@media (prefers-reduced-motion: reduce)': {
+      transition: 'none',
+      '&:hover': {
+        transform: 'none',
+        filter: 'none',
+      },
+    },
+  };
+}
+
 export function getLicenseBadgeSx(license: string): SxProps<Theme> {
   const textColor = '#111827';
   const glass = (start: string, end: string, border: string, color = textColor): SxProps<Theme> => ({
@@ -434,7 +458,7 @@ export function getLicenseBadgeSx(license: string): SxProps<Theme> {
     Bronze: glass('#FB923C', '#F97316', 'rgba(249,115,22,0.84)'),
     Rookie: glass('#CBD5E1', '#B2BDC8', 'rgba(178,189,200,0.82)'),
   };
-  return styles[license] || styles.Bronze;
+  return withBadgeGlassHover(styles[license] || styles.Bronze);
 }
 
 export function getSRBadgeSx(tier: string): SxProps<Theme> {
@@ -447,13 +471,13 @@ export function getSRBadgeSx(tier: string): SxProps<Theme> {
   });
 
   const first = tier.charAt(0);
-  if (first === 'S') return glass('#4ADE80', '#22C55E', 'rgba(74,222,128,0.86)');
-  if (first === 'A') return glass('#A78BFA', '#7C3AED', 'rgba(167,139,250,0.84)');
-  if (first === 'B') return glass('#FDE047', '#EAF239', 'rgba(234,242,57,0.86)');
-  if (first === 'C') return glass('#E5E7EB', '#D1D5DB', 'rgba(209,213,219,0.84)');
-  if (first === 'D') return glass('#FDBA74', '#EA7A2D', 'rgba(253,186,116,0.84)');
-  if (first === 'E') return glass('#D1D5DB', '#9CA3AF', 'rgba(209,213,219,0.8)');
-  return glass('#FB7185', '#FF1F2D', 'rgba(251,113,133,0.86)');
+  if (first === 'S') return withBadgeGlassHover(glass('#4ADE80', '#22C55E', 'rgba(74,222,128,0.86)'));
+  if (first === 'A') return withBadgeGlassHover(glass('#A78BFA', '#7C3AED', 'rgba(167,139,250,0.84)'));
+  if (first === 'B') return withBadgeGlassHover(glass('#FDE047', '#EAF239', 'rgba(234,242,57,0.86)'));
+  if (first === 'C') return withBadgeGlassHover(glass('#E5E7EB', '#D1D5DB', 'rgba(209,213,219,0.84)'));
+  if (first === 'D') return withBadgeGlassHover(glass('#FDBA74', '#EA7A2D', 'rgba(253,186,116,0.84)'));
+  if (first === 'E') return withBadgeGlassHover(glass('#D1D5DB', '#9CA3AF', 'rgba(209,213,219,0.8)'));
+  return withBadgeGlassHover(glass('#FB7185', '#FF1F2D', 'rgba(251,113,133,0.86)'));
 }
 
 /** Medal-style tinted panel for license tier — used on driver profile stat cards. */

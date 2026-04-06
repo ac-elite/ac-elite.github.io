@@ -21,7 +21,12 @@ import { getSyncHealth } from 'src/lib/sync-utils';
 import { formatNumber } from 'src/lib/ac-elite-data';
 import { glassCardMotionSx } from 'src/lib/subtle-motion';
 import { STATUS_ACCENT, brandAccentBorderSx, statusAccentBorderSx } from 'src/lib/status-accent';
-import { GLASS_PANEL_SX, GLASS_INNER_PANEL_SX, GLASS_PANEL_COMPACT_SX, GLASS_TABLE_WRAPPER_SX } from 'src/lib/glass';
+import {
+  GLASS_CARD_SX,
+  GLASS_PANEL_SX,
+  GLASS_INNER_PANEL_SX,
+  GLASS_PANEL_COMPACT_SX,
+} from 'src/lib/glass';
 
 import { PreviewLock } from 'src/components/preview-lock/preview-lock';
 import { PageGridOverlay } from 'src/components/page-background/page-grid-overlay';
@@ -123,6 +128,28 @@ const SCHEDULE_KIND_ACCENT: Record<ScheduleKind, { dot: string; label: string }>
     label: 'Deploy',
   },
 };
+
+function scheduleHexToRgb(hex: string) {
+  const x = hex.replace('#', '');
+  const n = Number.parseInt(x.length === 6 ? x : x.slice(0, 6), 16);
+  return {
+    r: Math.floor(n / 65536) % 256,
+    g: Math.floor(n / 256) % 256,
+    b: n % 256,
+  };
+}
+
+/** Mobile timeline rail: tinted segment between this dot and the next (desktop rail uses the same hues). */
+function scheduleMobileRailGradient(fromHex: string, toHex: string) {
+  const a = scheduleHexToRgb(fromHex);
+  const b = scheduleHexToRgb(toHex);
+  return `linear-gradient(180deg, rgba(${a.r},${a.g},${a.b},0.62) 0%, rgba(${b.r},${b.g},${b.b},0.52) 100%)`;
+}
+
+function scheduleMobileRailGradientLast(fromHex: string) {
+  const a = scheduleHexToRgb(fromHex);
+  return `linear-gradient(180deg, rgba(${a.r},${a.g},${a.b},0.58) 0%, rgba(${a.r},${a.g},${a.b},0.12) 100%)`;
+}
 
 // ---------------------------------------------------------------------------
 // Data files we track
@@ -464,8 +491,14 @@ export default function Page() {
                         Schedule agenda
                       </Typography>
                       <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.4 }}>
-                        When workflows run: read left to right like a day planner — time on the
-                        left, details on the right.
+                        <Box component="span" sx={{ display: { xs: 'none', md: 'inline' } }}>
+                          When workflows run: read left to right like a day planner — time on the
+                          left, details on the right.
+                        </Box>
+                        <Box component="span" sx={{ display: { xs: 'inline', md: 'none' } }}>
+                          When workflows run: read top to bottom — time first, then what runs in each
+                          block.
+                        </Box>
                       </Typography>
                     </Box>
                     <Stack direction="row" spacing={0.75} flexWrap="wrap" useFlexGap>
@@ -507,25 +540,34 @@ export default function Page() {
                     <Stack spacing={0}>
                       {SCHEDULE.map((entry, idx) => {
                         const accent = SCHEDULE_KIND_ACCENT[entry.kind];
+                        const nextDot =
+                          idx < SCHEDULE.length - 1
+                            ? SCHEDULE_KIND_ACCENT[SCHEDULE[idx + 1].kind].dot
+                            : accent.dot;
+                        const mobileRailBg =
+                          idx < SCHEDULE.length - 1
+                            ? scheduleMobileRailGradient(accent.dot, nextDot)
+                            : scheduleMobileRailGradientLast(accent.dot);
                         return (
                           <Stack
                             key={entry.workflow}
-                            direction={{ xs: 'column', md: 'row' }}
-                            spacing={{ xs: 1.5, md: 0 }}
-                            alignItems={{ md: 'stretch' }}
+                            direction="row"
+                            spacing={{ xs: 1.25, md: 0 }}
+                            alignItems="stretch"
                             sx={{
                               position: 'relative',
                               pb: idx < SCHEDULE.length - 1 ? 2.5 : 0,
                             }}
                           >
-                            {/* Left: time column (agenda) */}
+                            {/* Desktop: time column */}
                             <Box
                               sx={{
-                                width: { md: 132 },
+                                display: { xs: 'none', md: 'block' },
+                                width: 132,
                                 flexShrink: 0,
-                                textAlign: { xs: 'left', md: 'right' },
-                                pr: { md: 2.5 },
-                                pt: { md: 0.5 },
+                                textAlign: 'right',
+                                pr: 2.5,
+                                pt: 0.5,
                               }}
                             >
                               <Typography
@@ -547,41 +589,45 @@ export default function Page() {
                                   display: 'block',
                                   mt: 0.35,
                                   maxWidth: 220,
-                                  ml: { xs: 0, md: 'auto' },
+                                  ml: 'auto',
                                 }}
                               >
                                 {entry.agendaSub}
                               </Typography>
                             </Box>
 
-                            {/* Timeline node + mobile rail */}
+                            {/* Mobile: rail — line centered in column, dot on the line */}
                             <Box
                               sx={{
-                                display: 'flex',
-                                justifyContent: { xs: 'flex-start', md: 'center' },
-                                width: { md: 32 },
+                                display: { xs: 'block', md: 'none' },
+                                width: 22,
                                 flexShrink: 0,
                                 position: 'relative',
+                                alignSelf: 'stretch',
                               }}
                             >
                               <Box
                                 sx={{
-                                  display: { xs: 'block', md: 'none' },
                                   position: 'absolute',
-                                  left: 7,
+                                  left: '50%',
+                                  transform: 'translateX(-50%)',
+                                  width: 3,
                                   top: 0,
-                                  bottom: idx < SCHEDULE.length - 1 ? -20 : 0,
-                                  width: 2,
-                                  bgcolor: 'rgba(148,163,184,0.25)',
+                                  bottom: idx < SCHEDULE.length - 1 ? -22 : 0,
+                                  borderRadius: 1,
+                                  background: mobileRailBg,
+                                  boxShadow: `0 0 12px ${accent.dot}22`,
                                 }}
                               />
                               <Box
                                 sx={{
+                                  position: 'absolute',
+                                  left: '50%',
+                                  top: 22,
+                                  transform: 'translate(-50%, -50%)',
                                   width: 16,
                                   height: 16,
                                   borderRadius: '50%',
-                                  flexShrink: 0,
-                                  mt: { xs: 0.25, md: 1 },
                                   bgcolor: accent.dot,
                                   boxShadow: `0 0 0 4px ${accent.dot}33, 0 0 18px ${accent.dot}44`,
                                   border: '2px solid rgba(15,23,42,0.9)',
@@ -590,8 +636,59 @@ export default function Page() {
                               />
                             </Box>
 
-                            {/* Right: card */}
+                            {/* Desktop: timeline node */}
+                            <Box
+                              sx={{
+                                display: { xs: 'none', md: 'flex' },
+                                width: 32,
+                                flexShrink: 0,
+                                justifyContent: 'center',
+                                position: 'relative',
+                                pt: 0.5,
+                              }}
+                            >
+                              <Box
+                                sx={{
+                                  width: 16,
+                                  height: 16,
+                                  borderRadius: '50%',
+                                  flexShrink: 0,
+                                  mt: 1,
+                                  bgcolor: accent.dot,
+                                  boxShadow: `0 0 0 4px ${accent.dot}33, 0 0 18px ${accent.dot}44`,
+                                  border: '2px solid rgba(15,23,42,0.9)',
+                                  zIndex: 1,
+                                }}
+                              />
+                            </Box>
+
+                            {/* Time (mobile) + card */}
                             <Box sx={{ flex: 1, minWidth: 0 }}>
+                              <Box sx={{ display: { xs: 'block', md: 'none' }, mb: 1.25 }}>
+                                <Typography
+                                  variant="h5"
+                                  sx={{
+                                    fontWeight: 900,
+                                    letterSpacing: '-0.02em',
+                                    fontFeatureSettings: '"tnum"',
+                                    color: 'common.white',
+                                    lineHeight: 1.1,
+                                  }}
+                                >
+                                  {entry.agendaWhen}
+                                </Typography>
+                                <Typography
+                                  variant="caption"
+                                  sx={{
+                                    color: 'text.secondary',
+                                    display: 'block',
+                                    mt: 0.35,
+                                    maxWidth: '100%',
+                                  }}
+                                >
+                                  {entry.agendaSub}
+                                </Typography>
+                              </Box>
                               <Box
                                 sx={{
                                   ...GLASS_INNER_PANEL_SX,
@@ -676,12 +773,23 @@ export default function Page() {
 
                   <TableContainer
                     sx={{
-                      ...GLASS_TABLE_WRAPPER_SX,
+                      ...GLASS_CARD_SX,
+                      maxWidth: '100%',
+                      overflowX: 'auto',
+                      overflowY: 'hidden',
+                      WebkitOverflowScrolling: 'touch',
                       borderRadius: 2,
                       boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)',
                     }}
                   >
-                    <Table size="small" sx={{ borderCollapse: 'separate', borderSpacing: 0 }}>
+                    <Table
+                      size="small"
+                      sx={{
+                        borderCollapse: 'separate',
+                        borderSpacing: 0,
+                        minWidth: 720,
+                      }}
+                    >
                       <TableHead>
                         <TableRow
                           sx={{
