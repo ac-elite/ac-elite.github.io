@@ -2,15 +2,15 @@
  {
   "guid": "76561198025621442",
   "name": "DIEnamic",
-  "points": 10989.423,
-  "kilometers": 48168.1,
-  "collisions": 1690,
+  "points": 11009.454,
+  "kilometers": 48242.1,
+  "collisions": 1692,
   "leaderboard": {
    "ks_zandvoort_": {
     "tatuusfa1": {
      "laptime": 95261,
-     "laps": 1394,
-     "ts": 1775487317042
+     "laps": 1407,
+     "ts": 1775490075828
     }
    },
    "monza_": {
@@ -126,9 +126,9 @@
     }
    }
   },
-  "last_seen": 1775487426257,
-  "wins": 438,
-  "podiums": 870,
+  "last_seen": 1775490380469,
+  "wins": 440,
+  "podiums": 872,
   "poles": 71,
   "flaps": 195,
   "infr": 22
@@ -533,7 +533,7 @@
     }
    }
   },
-  "last_seen": 1775484057260,
+  "last_seen": 1775490380469,
   "wins": 209,
   "podiums": 401,
   "poles": 92,
@@ -1698,15 +1698,15 @@
  {
   "guid": "76561198999518018",
   "name": "David O.",
-  "points": 1813.8300000000002,
-  "kilometers": 12447.1,
-  "collisions": 186,
+  "points": 1817.654,
+  "kilometers": 12522.1,
+  "collisions": 202,
   "leaderboard": {
    "ks_zandvoort_": {
     "tatuusfa1": {
      "laptime": 94796,
-     "laps": 126,
-     "ts": 1775487334591
+     "laps": 134,
+     "ts": 1775490282023
     }
    },
    "monza_": {
@@ -1780,9 +1780,9 @@
     }
    }
   },
-  "last_seen": 1775487426257,
-  "wins": 67,
-  "podiums": 146,
+  "last_seen": 1775490380469,
+  "wins": 68,
+  "podiums": 147,
   "poles": 41,
   "flaps": 65,
   "infr": 4
@@ -6902,15 +6902,15 @@
  {
   "guid": "76561199067031859",
   "name": "Saba",
-  "points": 408.907,
-  "kilometers": 20734.6,
-  "collisions": 1500,
+  "points": 412.863,
+  "kilometers": 20815.9,
+  "collisions": 1510,
   "leaderboard": {
    "ks_zandvoort_": {
     "tatuusfa1": {
      "laptime": 94456,
-     "laps": 380,
-     "ts": 1775487334441
+     "laps": 389,
+     "ts": 1775490073988
     }
    },
    "monza_": {
@@ -7031,11 +7031,11 @@
     }
    }
   },
-  "last_seen": 1775487426257,
+  "last_seen": 1775490380469,
   "wins": 56,
-  "podiums": 135,
-  "poles": 73,
-  "flaps": 63,
+  "podiums": 136,
+  "poles": 74,
+  "flaps": 64,
   "infr": 130
  },
  {
@@ -38481,6 +38481,42 @@
   "infr": 0
  },
  {
+  "guid": "76561198448834582",
+  "name": "Matteo Bnl",
+  "points": 66.999,
+  "kilometers": 251.2,
+  "collisions": 22,
+  "leaderboard": {
+   "imola_": {
+    "tatuusfa1": {
+     "laptime": 105779,
+     "laps": 11,
+     "ts": 1761329130417
+    }
+   },
+   "spa_": {
+    "tatuusfa1": {
+     "laptime": 143369,
+     "laps": 2,
+     "ts": 1761665015354
+    }
+   },
+   "ks_zandvoort_": {
+    "tatuusfa1": {
+     "laptime": 97115,
+     "laps": 15,
+     "ts": 1775488067570
+    }
+   }
+  },
+  "last_seen": 1775488087991,
+  "wins": 0,
+  "podiums": 2,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 2
+ },
+ {
   "guid": "76561198115762320",
   "name": "Monkey D. Mandorle",
   "points": 66.962,
@@ -43139,6 +43175,56 @@
   "infr": 0
  },
  {
+  "guid": "76561198078977889",
+  "name": "twitch.tv/xkhalio",
+  "points": 63.913,
+  "kilometers": 176.4,
+  "collisions": 6,
+  "leaderboard": {
+   "mugello_": {
+    "tatuusfa1": {
+     "laptime": 109993,
+     "laps": 1,
+     "ts": 1757339129443
+    }
+   },
+   "ks_nurburgring_layout_gp_b": {
+    "tatuusfa1": {
+     "laptime": 116733,
+     "laps": 4,
+     "ts": 1759270886573
+    }
+   },
+   "magione_": {
+    "tatuusfa1": {
+     "laptime": 71354,
+     "laps": 3,
+     "ts": 1763647666006
+    }
+   },
+   "ks_barcelona_layout_moto": {
+    "tatuusfa1": {
+     "laptime": 107291,
+     "laps": 3,
+     "ts": 1773410651490
+    }
+   },
+   "ks_zandvoort_": {
+    "tatuusfa1": {
+     "laptime": 97852,
+     "laps": 5,
+     "ts": 1775490300134
+    }
+   }
+  },
+  "last_seen": 1775490322773,
+  "wins": 0,
+  "podiums": 1,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 0
+ },
+ {
   "guid": "76561198905679004",
   "name": "Julius K.",
   "points": 63.910000000000004,
@@ -44009,42 +44095,6 @@
    }
   },
   "last_seen": 1759425371252,
-  "wins": 0,
-  "podiums": 1,
-  "poles": 0,
-  "flaps": 0,
-  "infr": 2
- },
- {
-  "guid": "76561198448834582",
-  "name": "Matteo Bnl",
-  "points": 63.408,
-  "kilometers": 225.4,
-  "collisions": 18,
-  "leaderboard": {
-   "imola_": {
-    "tatuusfa1": {
-     "laptime": 105779,
-     "laps": 11,
-     "ts": 1761329130417
-    }
-   },
-   "spa_": {
-    "tatuusfa1": {
-     "laptime": 143369,
-     "laps": 2,
-     "ts": 1761665015354
-    }
-   },
-   "ks_zandvoort_": {
-    "tatuusfa1": {
-     "laptime": 97256,
-     "laps": 11,
-     "ts": 1775487334516
-    }
-   }
-  },
-  "last_seen": 1775487426257,
   "wins": 0,
   "podiums": 1,
   "poles": 0,
@@ -51170,7 +51220,7 @@
   "guid": "76561199091975068",
   "name": "Иранский сифилис",
   "points": 60.661,
-  "kilometers": 29.8,
+  "kilometers": 33.9,
   "collisions": 3,
   "leaderboard": {
    "ks_zandvoort_": {
@@ -51181,7 +51231,7 @@
     }
    }
   },
-  "last_seen": 1775487426257,
+  "last_seen": 1775487440777,
   "wins": 0,
   "podiums": 0,
   "poles": 0,
@@ -59277,6 +59327,35 @@
   "infr": 0
  },
  {
+  "guid": "76561199701178523",
+  "name": "GRogu-VaNss",
+  "points": 58.105,
+  "kilometers": 130.6,
+  "collisions": 24,
+  "leaderboard": {
+   "ks_nurburgring_layout_gp_a": {
+    "tatuusfa1": {
+     "laptime": 120582,
+     "laps": 3,
+     "ts": 1766529140749
+    }
+   },
+   "ks_zandvoort_": {
+    "tatuusfa1": {
+     "laptime": 98952,
+     "laps": 7,
+     "ts": 1775490091877
+    }
+   }
+  },
+  "last_seen": 1775490107115,
+  "wins": 0,
+  "podiums": 0,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 1
+ },
+ {
   "guid": "76561199216583514",
   "name": "Juan Lopez",
   "points": 58.104,
@@ -60278,6 +60357,35 @@
    }
   },
   "last_seen": 1765400868580,
+  "wins": 0,
+  "podiums": 0,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 0
+ },
+ {
+  "guid": "76561199792967867",
+  "name": "mariito.07",
+  "points": 57.838,
+  "kilometers": 72.6,
+  "collisions": 9,
+  "leaderboard": {
+   "spa_": {
+    "tatuusfa1": {
+     "laptime": 148880,
+     "laps": 1,
+     "ts": 1768128181682
+    }
+   },
+   "ks_zandvoort_": {
+    "tatuusfa1": {
+     "laptime": 102218,
+     "laps": 4,
+     "ts": 1775489296636
+    }
+   }
+  },
+  "last_seen": 1775489323686,
   "wins": 0,
   "podiums": 0,
   "poles": 0,
@@ -65456,6 +65564,35 @@
   "infr": 0
  },
  {
+  "guid": "76561198086573493",
+  "name": "TheFallingDildo",
+  "points": 56.707,
+  "kilometers": 92.1,
+  "collisions": 20,
+  "leaderboard": {
+   "ks_silverstone_gp": {
+    "tatuusfa1": {
+     "laptime": 131015,
+     "laps": 6,
+     "ts": 1766266598130
+    }
+   },
+   "ks_zandvoort_": {
+    "tatuusfa1": {
+     "laptime": 112684,
+     "laps": 1,
+     "ts": 1775489908775
+    }
+   }
+  },
+  "last_seen": 1775489936232,
+  "wins": 0,
+  "podiums": 0,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 0
+ },
+ {
   "guid": "76561199499806601",
   "name": "liedl.jakub",
   "points": 56.706999999999994,
@@ -65594,28 +65731,6 @@
    }
   },
   "last_seen": 1773351443703,
-  "wins": 0,
-  "podiums": 0,
-  "poles": 0,
-  "flaps": 0,
-  "infr": 0
- },
- {
-  "guid": "76561198086573493",
-  "name": "TheFallingDildo",
-  "points": 56.687999999999995,
-  "kilometers": 72.5,
-  "collisions": 14,
-  "leaderboard": {
-   "ks_silverstone_gp": {
-    "tatuusfa1": {
-     "laptime": 131015,
-     "laps": 6,
-     "ts": 1766266598130
-    }
-   }
-  },
-  "last_seen": 1766266717705,
   "wins": 0,
   "podiums": 0,
   "poles": 0,
@@ -73301,49 +73416,6 @@
   "infr": 1
  },
  {
-  "guid": "76561198078977889",
-  "name": "twitch.tv/xkhalio",
-  "points": 55.219,
-  "kilometers": 141.9,
-  "collisions": 2,
-  "leaderboard": {
-   "mugello_": {
-    "tatuusfa1": {
-     "laptime": 109993,
-     "laps": 1,
-     "ts": 1757339129443
-    }
-   },
-   "ks_nurburgring_layout_gp_b": {
-    "tatuusfa1": {
-     "laptime": 116733,
-     "laps": 4,
-     "ts": 1759270886573
-    }
-   },
-   "magione_": {
-    "tatuusfa1": {
-     "laptime": 71354,
-     "laps": 3,
-     "ts": 1763647666006
-    }
-   },
-   "ks_barcelona_layout_moto": {
-    "tatuusfa1": {
-     "laptime": 107291,
-     "laps": 3,
-     "ts": 1773410651490
-    }
-   }
-  },
-  "last_seen": 1773410679636,
-  "wins": 0,
-  "podiums": 1,
-  "poles": 0,
-  "flaps": 0,
-  "infr": 0
- },
- {
   "guid": "76561198385901456",
   "name": "Bruno",
   "points": 55.212,
@@ -80399,28 +80471,6 @@
   "poles": 0,
   "flaps": 0,
   "infr": 3
- },
- {
-  "guid": "76561199792967867",
-  "name": "mariito.07",
-  "points": 53.775999999999996,
-  "kilometers": 35.4,
-  "collisions": 1,
-  "leaderboard": {
-   "spa_": {
-    "tatuusfa1": {
-     "laptime": 148880,
-     "laps": 1,
-     "ts": 1768128181682
-    }
-   }
-  },
-  "last_seen": 1774627992839,
-  "wins": 0,
-  "podiums": 0,
-  "poles": 0,
-  "flaps": 0,
-  "infr": 0
  },
  {
   "guid": "76561198247418098",
@@ -99120,6 +99170,28 @@
   "infr": 0
  },
  {
+  "guid": "76561198180988390",
+  "name": "braisml10",
+  "points": 51.378,
+  "kilometers": 236.2,
+  "collisions": 10,
+  "leaderboard": {
+   "ks_zandvoort_": {
+    "tatuusfa1": {
+     "laptime": 98675,
+     "laps": 28,
+     "ts": 1775489895984
+    }
+   }
+  },
+  "last_seen": 1775489988034,
+  "wins": 0,
+  "podiums": 2,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 0
+ },
+ {
   "guid": "76561198083988273",
   "name": "popcron",
   "points": 51.377,
@@ -106077,28 +106149,6 @@
   "infr": 3
  },
  {
-  "guid": "76561198180988390",
-  "name": "braisml10",
-  "points": 50.01,
-  "kilometers": 189.7,
-  "collisions": 1,
-  "leaderboard": {
-   "ks_zandvoort_": {
-    "tatuusfa1": {
-     "laptime": 98675,
-     "laps": 22,
-     "ts": 1756739615519
-    }
-   }
-  },
-  "last_seen": 1761317176165,
-  "wins": 0,
-  "podiums": 1,
-  "poles": 0,
-  "flaps": 0,
-  "infr": 0
- },
- {
   "guid": "76561198040873139",
   "name": "gorm",
   "points": 50.008,
@@ -110452,7 +110502,7 @@
   "collisions": 1,
   "leaderboard": {
   },
-  "last_seen": 1775228102867,
+  "last_seen": 1775489211439,
   "wins": 0,
   "podiums": 0,
   "poles": 0,
@@ -111499,6 +111549,21 @@
   "leaderboard": {
   },
   "last_seen": 1775171045067,
+  "wins": 0,
+  "podiums": 0,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 0
+ },
+ {
+  "guid": "76561199056018270",
+  "name": "GORDOCHITERO777",
+  "points": 49.939,
+  "kilometers": 6.2,
+  "collisions": 0,
+  "leaderboard": {
+  },
+  "last_seen": 1775490026049,
   "wins": 0,
   "podiums": 0,
   "poles": 0,
@@ -113379,6 +113444,21 @@
   "leaderboard": {
   },
   "last_seen": 1766863891453,
+  "wins": 0,
+  "podiums": 0,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 0
+ },
+ {
+  "guid": "76561199095564287",
+  "name": "ShayShay",
+  "points": 49.899,
+  "kilometers": 10.3,
+  "collisions": 1,
+  "leaderboard": {
+  },
+  "last_seen": 1775490380469,
   "wins": 0,
   "podiums": 0,
   "poles": 0,
@@ -115321,6 +115401,21 @@
   "leaderboard": {
   },
   "last_seen": 1767139041854,
+  "wins": 0,
+  "podiums": 0,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 0
+ },
+ {
+  "guid": "76561199798055278",
+  "name": "m8_lePr0670",
+  "points": 49.841,
+  "kilometers": 2,
+  "collisions": 1,
+  "leaderboard": {
+  },
+  "last_seen": 1775489476946,
   "wins": 0,
   "podiums": 0,
   "poles": 0,
@@ -124517,21 +124612,6 @@
   "infr": 0
  },
  {
-  "guid": "76561198766989900",
-  "name": "He Xuan",
-  "points": 49.451,
-  "kilometers": 5.5,
-  "collisions": 2,
-  "leaderboard": {
-  },
-  "last_seen": 1775487426257,
-  "wins": 0,
-  "podiums": 0,
-  "poles": 0,
-  "flaps": 0,
-  "infr": 0
- },
- {
   "guid": "76561198803035116",
   "name": "Cevaaat",
   "points": 49.449,
@@ -126697,21 +126777,6 @@
   "leaderboard": {
   },
   "last_seen": 1766685829433,
-  "wins": 0,
-  "podiums": 0,
-  "poles": 0,
-  "flaps": 0,
-  "infr": 0
- },
- {
-  "guid": "76561199042120505",
-  "name": "MV1",
-  "points": 49.322,
-  "kilometers": 22.3,
-  "collisions": 2,
-  "leaderboard": {
-  },
-  "last_seen": 1775251312781,
   "wins": 0,
   "podiums": 0,
   "poles": 0,
@@ -146889,28 +146954,6 @@
   "infr": 1
  },
  {
-  "guid": "76561199701178523",
-  "name": "GRogu-VaNss",
-  "points": 46.418,
-  "kilometers": 69,
-  "collisions": 9,
-  "leaderboard": {
-   "ks_nurburgring_layout_gp_a": {
-    "tatuusfa1": {
-     "laptime": 120582,
-     "laps": 3,
-     "ts": 1766529140749
-    }
-   }
-  },
-  "last_seen": 1766530013629,
-  "wins": 0,
-  "podiums": 0,
-  "poles": 0,
-  "flaps": 0,
-  "infr": 1
- },
- {
   "guid": "76561198145025592",
   "name": "Magnus_CAN",
   "points": 46.416,
@@ -162123,6 +162166,28 @@
   "infr": 1
  },
  {
+  "guid": "76561198848442390",
+  "name": "Phaethon",
+  "points": 43.965,
+  "kilometers": 17.6,
+  "collisions": 6,
+  "leaderboard": {
+   "ks_zandvoort_": {
+    "tatuusfa1": {
+     "laptime": 106856,
+     "laps": 1,
+     "ts": 1775488823130
+    }
+   }
+  },
+  "last_seen": 1775489065558,
+  "wins": 0,
+  "podiums": 0,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 1
+ },
+ {
   "guid": "76561199789016218",
   "name": "Igma",
   "points": 43.964,
@@ -164589,6 +164654,21 @@
   "poles": 0,
   "flaps": 0,
   "infr": 0
+ },
+ {
+  "guid": "76561199042120505",
+  "name": "MV1",
+  "points": 43.464,
+  "kilometers": 28,
+  "collisions": 6,
+  "leaderboard": {
+  },
+  "last_seen": 1775489767567,
+  "wins": 0,
+  "podiums": 0,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 1
  },
  {
   "guid": "76561199221877303",
@@ -167636,28 +167716,6 @@
    }
   },
   "last_seen": 1757691884139,
-  "wins": 0,
-  "podiums": 0,
-  "poles": 0,
-  "flaps": 0,
-  "infr": 0
- },
- {
-  "guid": "76561199021206624",
-  "name": "Kapsule",
-  "points": 42.775000000000006,
-  "kilometers": 112.9,
-  "collisions": 2,
-  "leaderboard": {
-   "ks_zandvoort_": {
-    "tatuusfa1": {
-     "laptime": 98892,
-     "laps": 10,
-     "ts": 1756555085274
-    }
-   }
-  },
-  "last_seen": 1775487426257,
   "wins": 0,
   "podiums": 0,
   "poles": 0,
@@ -173586,6 +173644,21 @@
   "infr": 2
  },
  {
+  "guid": "76561198766989900",
+  "name": "He Xuan",
+  "points": 41.367999999999995,
+  "kilometers": 15.8,
+  "collisions": 8,
+  "leaderboard": {
+  },
+  "last_seen": 1775487810218,
+  "wins": 0,
+  "podiums": 0,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 1
+ },
+ {
   "guid": "76561199839922129",
   "name": "Tofu_123_",
   "points": 41.352999999999994,
@@ -175166,6 +175239,28 @@
   "poles": 0,
   "flaps": 0,
   "infr": 1
+ },
+ {
+  "guid": "76561199021206624",
+  "name": "Kapsule",
+  "points": 41.012,
+  "kilometers": 126.5,
+  "collisions": 6,
+  "leaderboard": {
+   "ks_zandvoort_": {
+    "tatuusfa1": {
+     "laptime": 98892,
+     "laps": 11,
+     "ts": 1775487706120
+    }
+   }
+  },
+  "last_seen": 1775487930589,
+  "wins": 0,
+  "podiums": 0,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 0
  },
  {
   "guid": "76561199232706006",
