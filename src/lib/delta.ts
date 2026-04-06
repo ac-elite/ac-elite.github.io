@@ -21,6 +21,36 @@ export async function fetchPrevRankData(): Promise<RankDriver[]> {
   }
 }
 
+/** Aggregate change vs `rank-24h.json` baseline (community-wide). */
+export type CommunitySnapshotDelta = {
+  hasBaseline: boolean;
+  /** Rounded total km across all drivers, current minus snapshot. */
+  deltaKm: number;
+  /** Drivers present in current rank but not in the snapshot. */
+  newDrivers: number;
+};
+
+export function computeCommunitySnapshotDelta(
+  currentDrivers: RankDriver[],
+  prevDrivers: RankDriver[]
+): CommunitySnapshotDelta {
+  if (!prevDrivers.length) {
+    return { hasBaseline: false, deltaKm: 0, newDrivers: 0 };
+  }
+  const sumKm = (drivers: RankDriver[]) =>
+    drivers.reduce((sum, d) => sum + (d.kilometers || 0), 0);
+  const deltaKm = Math.round(sumKm(currentDrivers) - sumKm(prevDrivers));
+  const prevGuids = new Set(prevDrivers.map((d) => d.guid));
+  const newDrivers = currentDrivers.filter((d) => !prevGuids.has(d.guid)).length;
+  return { hasBaseline: true, deltaKm, newDrivers };
+}
+
+export function formatSignedKm(delta: number): string {
+  if (delta === 0) return '0';
+  if (delta > 0) return `+${delta.toLocaleString()}`;
+  return delta.toLocaleString();
+}
+
 export function computeDeltas(
   currentDrivers: RankDriver[],
   prevDrivers: RankDriver[]

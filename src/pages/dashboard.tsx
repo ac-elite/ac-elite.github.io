@@ -1,20 +1,29 @@
+import type { Theme } from '@mui/material/styles';
+
 import { useMemo, useState, useEffect } from 'react';
 
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
+import Skeleton from '@mui/material/Skeleton';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 
 import { CONFIG } from 'src/config-global';
 import { fetchJson } from 'src/lib/fetch-json';
-import { GLASS_CARD_SX, GLASS_CARD_INNER_SX } from 'src/lib/glass';
+import { subtleEnterUpSx, glassCardMotionSx } from 'src/lib/subtle-motion';
+import { brandAccentBorderSx, statusAccentBorderSx } from 'src/lib/status-accent';
+import { GLASS_CARD_SX, GLASS_PANEL_SX, GLASS_CARD_INNER_SX } from 'src/lib/glass';
 import { getSyncHealth, type SiteMetadata, getEffectiveLastSync } from 'src/lib/sync-utils';
+import {
+  formatSignedKm,
+  fetchPrevRankData,
+  computeCommunitySnapshotDelta,
+} from 'src/lib/delta';
 import { CAR, formatNumber, formatLaptime, type RankDriver, getTrackDisplayName } from 'src/lib/ac-elite-data';
 
 import { ErrorPanel } from 'src/components/data-state/error-panel';
-import { LoadingPanel } from 'src/components/data-state/loading-panel';
 import { PageGridOverlay } from 'src/components/page-background/page-grid-overlay';
 
 export default function Page() {
@@ -22,6 +31,7 @@ export default function Page() {
   const [error, setError] = useState<string | null>(null);
 
   const [rankData, setRankData] = useState<RankDriver[]>([]);
+  const [prevRankData, setPrevRankData] = useState<RankDriver[]>([]);
   const [leaderboardData, setLeaderboardData] = useState<Record<string, any>>({});
   const [metadata, setMetadata] = useState<SiteMetadata>({});
 
@@ -32,14 +42,16 @@ export default function Page() {
       setLoading(true);
       setError(null);
       try {
-        const [rank, leaderboard, meta] = await Promise.all([
+        const [rank, leaderboard, meta, prevRank] = await Promise.all([
           fetchJson<RankDriver[]>('/data/rank.json'),
           fetchJson<Record<string, any>>('/data/leaderboard.json'),
           fetchJson<SiteMetadata>('/data/metadata.json'),
+          fetchPrevRankData(),
         ]);
 
         if (!mounted) return;
         setRankData(rank);
+        setPrevRankData(prevRank);
         setLeaderboardData(leaderboard);
         setMetadata(meta);
       } catch (e) {
@@ -143,6 +155,11 @@ export default function Page() {
   const effectiveLastSync = getEffectiveLastSync(metadata?.lastSync, rankData);
   const syncHealth = getSyncHealth(effectiveLastSync);
 
+  const communityDelta = useMemo(
+    () => computeCommunitySnapshotDelta(rankData, prevRankData),
+    [rankData, prevRankData]
+  );
+
   return (
     <>
       <title>{`Stats - ${CONFIG.appName}`}</title>
@@ -165,38 +182,220 @@ export default function Page() {
 
       <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1 }}>
         <Stack spacing={3.5}>
-          <Stack spacing={0.75} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: { xs: 'center', md: 'flex-start' } }}>
-            <Typography variant="h4" fontWeight={800} sx={{ letterSpacing: 0.5 }}>
-              Stats
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              <Box component="span" sx={{ color: syncHealth.color, fontWeight: 700 }}>
-                {syncHealth.label}
-              </Box>{' '}
-              Data sync • Last update: {syncHealth.ageText}
-            </Typography>
-          </Stack>
+          <Box sx={{ ...GLASS_PANEL_SX, ...statusAccentBorderSx(syncHealth.color), ...glassCardMotionSx(0) }}>
+            <Stack spacing={0.75} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: { xs: 'center', md: 'flex-start' } }}>
+              <Typography variant="h4" fontWeight={800} sx={{ letterSpacing: 0.5 }}>
+                Stats
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                <Box component="span" sx={{ color: syncHealth.color, fontWeight: 700 }}>
+                  {syncHealth.label}
+                </Box>{' '}
+                Data sync • Last update: {syncHealth.ageText}
+              </Typography>
+              {communityDelta.hasBaseline && (
+                <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.78)', maxWidth: 720 }}>
+                  vs daily snapshot:{' '}
+                  <Box component="span" sx={{ fontWeight: 700, color: '#dbeafe' }}>
+                    {formatSignedKm(communityDelta.deltaKm)} km
+                  </Box>{' '}
+                  community-wide
+                  {communityDelta.newDrivers > 0 ? (
+                    <>
+                      {' '}
+                      ·{' '}
+                      <Box component="span" sx={{ fontWeight: 700, color: '#dbeafe' }}>
+                        +{communityDelta.newDrivers}
+                      </Box>{' '}
+                      new driver{communityDelta.newDrivers === 1 ? '' : 's'}
+                    </>
+                  ) : null}
+                </Typography>
+              )}
+              <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)', display: 'block' }}>
+                Numbers come from the regular KMR data sync. Small pace and SR deltas on other pages compare to the daily
+                snapshot.
+              </Typography>
+            </Stack>
+          </Box>
 
-          {loading && <LoadingPanel message="Loading data..." />}
+          {loading && (
+            <Grid container spacing={2.5}>
+              {[0, 1, 2, 3].map((k) => (
+                <Grid key={k} size={{ xs: 12, sm: 6, md: 3 }}>
+                  <Skeleton
+                    variant="rounded"
+                    height={152}
+                    sx={{ borderRadius: 2, bgcolor: 'rgba(255,255,255,0.06)' }}
+                  />
+                </Grid>
+              ))}
+              {[0, 1, 2].map((k) => (
+                <Grid key={`s-${k}`} size={{ xs: 12, sm: 6, md: 4 }}>
+                  <Skeleton
+                    variant="rounded"
+                    height={124}
+                    sx={{ borderRadius: 2, bgcolor: 'rgba(255,255,255,0.05)' }}
+                  />
+                </Grid>
+              ))}
+              <Grid size={{ xs: 12 }}>
+                <Skeleton
+                  variant="rounded"
+                  height={100}
+                  sx={{ borderRadius: 2, bgcolor: 'rgba(255,255,255,0.05)' }}
+                />
+              </Grid>
+              <Grid size={{ xs: 12, md: 6 }}>
+                <Skeleton
+                  variant="rounded"
+                  height={280}
+                  sx={{ borderRadius: 2, bgcolor: 'rgba(255,255,255,0.05)' }}
+                />
+              </Grid>
+              <Grid size={{ xs: 12, md: 6 }}>
+                <Skeleton
+                  variant="rounded"
+                  height={280}
+                  sx={{ borderRadius: 2, bgcolor: 'rgba(255,255,255,0.05)' }}
+                />
+              </Grid>
+            </Grid>
+          )}
 
           {!loading && error && <ErrorPanel error={error} onRetry={() => window.location.reload()} />}
 
           {!loading && !error && (
             <Grid container spacing={2.5}>
-              <Grid size={{ xs: 12, sm: 6 }}>
-                <Paper sx={{ ...GLASS_CARD_SX, p: 2.75, textAlign: { xs: 'center', md: 'left' } }}>
-                  <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.78)' }}>
+              {/* Hero metrics — coloured top accent + larger figures */}
+              <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                <Paper
+                  component="article"
+                  aria-label="Total drivers in synced KMR data"
+                  tabIndex={0}
+                  sx={{
+                    ...GLASS_CARD_SX,
+                    ...brandAccentBorderSx(),
+                    ...glassCardMotionSx(1),
+                    p: { xs: 2.5, md: 3 },
+                    textAlign: { xs: 'center', md: 'left' },
+                  }}
+                >
+                  <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.78)', fontWeight: 700 }}>
                     Total Drivers
                   </Typography>
-                  <Typography variant="h2" sx={{ fontSize: 40, fontWeight: 900, mt: 0.5 }}>
+                  <Typography
+                    variant="h2"
+                    sx={{
+                      fontSize: { xs: 38, md: 46 },
+                      fontWeight: 900,
+                      mt: 0.75,
+                      lineHeight: 1.05,
+                      letterSpacing: -0.02,
+                    }}
+                  >
                     {formatNumber(quickStats.totalDrivers)}
                   </Typography>
                 </Paper>
               </Grid>
 
-              <Grid size={{ xs: 12, sm: 6 }}>
-                <Paper sx={{ ...GLASS_CARD_SX, p: 2.75, textAlign: { xs: 'center', md: 'left' } }}>
-                  <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.78)' }}>
+              <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                <Paper
+                  sx={{
+                    ...GLASS_CARD_SX,
+                    ...brandAccentBorderSx(),
+                    ...glassCardMotionSx(2),
+                    p: { xs: 2.5, md: 3 },
+                    textAlign: { xs: 'center', md: 'left' },
+                  }}
+                >
+                  <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.78)', fontWeight: 700 }}>
+                    Total Laps
+                  </Typography>
+                  <Typography
+                    variant="h2"
+                    sx={{
+                      fontSize: { xs: 38, md: 46 },
+                      fontWeight: 900,
+                      mt: 0.75,
+                      lineHeight: 1.05,
+                      letterSpacing: -0.02,
+                    }}
+                  >
+                    {formatNumber(quickStats.totalLaps)}
+                  </Typography>
+                </Paper>
+              </Grid>
+
+              <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                <Paper
+                  sx={{
+                    ...GLASS_CARD_SX,
+                    ...brandAccentBorderSx(),
+                    ...glassCardMotionSx(3),
+                    p: { xs: 2.5, md: 3 },
+                    textAlign: { xs: 'center', md: 'left' },
+                  }}
+                >
+                  <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.78)', fontWeight: 700 }}>
+                    Total KM
+                  </Typography>
+                  <Typography
+                    variant="h2"
+                    sx={{
+                      fontSize: { xs: 38, md: 46 },
+                      fontWeight: 900,
+                      mt: 0.75,
+                      lineHeight: 1.05,
+                      letterSpacing: -0.02,
+                    }}
+                  >
+                    {formatNumber(quickStats.totalKm)}
+                  </Typography>
+                </Paper>
+              </Grid>
+
+              <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                <Paper
+                  sx={{
+                    ...GLASS_CARD_SX,
+                    ...brandAccentBorderSx(),
+                    ...glassCardMotionSx(4),
+                    p: { xs: 2.5, md: 3 },
+                    textAlign: { xs: 'center', md: 'left' },
+                  }}
+                >
+                  <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.78)', fontWeight: 700 }}>
+                    Incidents / 100 KM
+                  </Typography>
+                  <Typography
+                    variant="h2"
+                    sx={{
+                      fontSize: { xs: 38, md: 46 },
+                      fontWeight: 900,
+                      mt: 0.75,
+                      lineHeight: 1.05,
+                      letterSpacing: -0.02,
+                      fontVariantNumeric: 'tabular-nums',
+                    }}
+                  >
+                    {quickStats.incidentsPer100Km.toFixed(2)}
+                  </Typography>
+                </Paper>
+              </Grid>
+
+              {/* Secondary metrics */}
+              <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+                <Paper
+                  sx={{
+                    ...GLASS_CARD_SX,
+                    ...brandAccentBorderSx(),
+                    ...glassCardMotionSx(5),
+                    p: 2.75,
+                    textAlign: { xs: 'center', md: 'left' },
+                  }}
+                >
+                  <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.72)' }}>
                     Active Drivers (100+ KM)
                   </Typography>
                   <Typography variant="h2" sx={{ fontSize: 40, fontWeight: 900, mt: 0.5 }}>
@@ -205,9 +404,17 @@ export default function Page() {
                 </Paper>
               </Grid>
 
-              <Grid size={{ xs: 12, sm: 6 }}>
-                <Paper sx={{ ...GLASS_CARD_SX, p: 2.75, textAlign: { xs: 'center', md: 'left' } }}>
-                  <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.78)' }}>
+              <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+                <Paper
+                  sx={{
+                    ...GLASS_CARD_SX,
+                    ...brandAccentBorderSx(),
+                    ...glassCardMotionSx(6),
+                    p: 2.75,
+                    textAlign: { xs: 'center', md: 'left' },
+                  }}
+                >
+                  <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.72)' }}>
                     Total Tracks
                   </Typography>
                   <Typography variant="h2" sx={{ fontSize: 40, fontWeight: 900, mt: 0.5 }}>
@@ -216,9 +423,17 @@ export default function Page() {
                 </Paper>
               </Grid>
 
-              <Grid size={{ xs: 12, sm: 6 }}>
-                <Paper sx={{ ...GLASS_CARD_SX, p: 2.75, textAlign: { xs: 'center', md: 'left' } }}>
-                  <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.78)' }}>
+              <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+                <Paper
+                  sx={{
+                    ...GLASS_CARD_SX,
+                    ...brandAccentBorderSx(),
+                    ...glassCardMotionSx(7),
+                    p: 2.75,
+                    textAlign: { xs: 'center', md: 'left' },
+                  }}
+                >
+                  <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.72)' }}>
                     Avg KM per Driver
                   </Typography>
                   <Typography variant="h2" sx={{ fontSize: 40, fontWeight: 900, mt: 0.5 }}>
@@ -227,41 +442,16 @@ export default function Page() {
                 </Paper>
               </Grid>
 
-              <Grid size={{ xs: 12, sm: 6 }}>
-                <Paper sx={{ ...GLASS_CARD_SX, p: 2.75, textAlign: { xs: 'center', md: 'left' } }}>
-                  <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.78)' }}>
-                    Total Laps
-                  </Typography>
-                  <Typography variant="h2" sx={{ fontSize: 40, fontWeight: 900, mt: 0.5 }}>
-                    {formatNumber(quickStats.totalLaps)}
-                  </Typography>
-                </Paper>
-              </Grid>
-
-              <Grid size={{ xs: 12, sm: 6 }}>
-                <Paper sx={{ ...GLASS_CARD_SX, p: 2.75, textAlign: { xs: 'center', md: 'left' } }}>
-                  <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.78)' }}>
-                    Incidents / 100 KM
-                  </Typography>
-                  <Typography variant="h2" sx={{ fontSize: 40, fontWeight: 900, mt: 0.5 }}>
-                    {quickStats.incidentsPer100Km.toFixed(2)}
-                  </Typography>
-                </Paper>
-              </Grid>
-
-              <Grid size={{ xs: 12, sm: 6 }}>
-                <Paper sx={{ ...GLASS_CARD_SX, p: 2.75, textAlign: { xs: 'center', md: 'left' } }}>
-                  <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.78)' }}>
-                    Total KM
-                  </Typography>
-                  <Typography variant="h2" sx={{ fontSize: 40, fontWeight: 900, mt: 0.5 }}>
-                    {formatNumber(quickStats.totalKm)}
-                  </Typography>
-                </Paper>
-              </Grid>
-
               <Grid size={{ xs: 12 }}>
-                <Paper sx={{ ...GLASS_CARD_SX, p: 2.75, textAlign: { xs: 'center', md: 'left' } }}>
+                <Paper
+                  sx={{
+                    ...GLASS_CARD_SX,
+                    ...brandAccentBorderSx(),
+                    ...glassCardMotionSx(8),
+                    p: 2.75,
+                    textAlign: { xs: 'center', md: 'left' },
+                  }}
+                >
                   <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.78)' }}>
                     Session Totals
                   </Typography>
@@ -291,7 +481,14 @@ export default function Page() {
               </Grid>
 
               <Grid size={{ xs: 12, md: 6 }}>
-                <Paper sx={{ p: 2.75, border: '1px solid rgba(148,163,184,0.3)' }}>
+                <Paper
+                  sx={{
+                    ...GLASS_CARD_SX,
+                    ...brandAccentBorderSx(),
+                    ...glassCardMotionSx(9),
+                    p: 2.75,
+                  }}
+                >
                   <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.78)' }}>
                     Top Distance Drivers
                   </Typography>
@@ -302,7 +499,19 @@ export default function Page() {
                         direction="row"
                         justifyContent="space-between"
                         alignItems="center"
-                        sx={{ ...GLASS_CARD_INNER_SX, p: 1.1, borderRadius: 1.5 }}
+                        sx={{
+                          ...GLASS_CARD_INNER_SX,
+                          ...subtleEnterUpSx(idx, { baseDelayMs: 520 }),
+                          p: 1.1,
+                          borderRadius: 1.5,
+                          transition: (t: Theme) => t.transitions.create(['background-color', 'border-color'], { duration: 200 }),
+                          '@media (hover: hover)': {
+                            '&:hover': {
+                              bgcolor: 'rgba(255,255,255,0.06)',
+                              borderColor: 'rgba(191,219,254,0.22)',
+                            },
+                          },
+                        }}
                       >
                         <Typography variant="body2" sx={{ fontWeight: 600 }}>
                           #{idx + 1} {driver.name}
@@ -317,7 +526,7 @@ export default function Page() {
               </Grid>
 
               <Grid size={{ xs: 12, md: 6 }}>
-                <Paper sx={{ ...GLASS_CARD_SX, p: 2.75 }}>
+                <Paper sx={{ ...GLASS_CARD_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(10), p: 2.75 }}>
                   <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.78)' }}>
                     Most Active Tracks
                   </Typography>
@@ -328,7 +537,19 @@ export default function Page() {
                         direction="row"
                         justifyContent="space-between"
                         alignItems="center"
-                        sx={{ ...GLASS_CARD_INNER_SX, p: 1.1, borderRadius: 1.5 }}
+                        sx={{
+                          ...GLASS_CARD_INNER_SX,
+                          ...subtleEnterUpSx(idx, { baseDelayMs: 520 }),
+                          p: 1.1,
+                          borderRadius: 1.5,
+                          transition: (t: Theme) => t.transitions.create(['background-color', 'border-color'], { duration: 200 }),
+                          '@media (hover: hover)': {
+                            '&:hover': {
+                              bgcolor: 'rgba(255,255,255,0.06)',
+                              borderColor: 'rgba(191,219,254,0.22)',
+                            },
+                          },
+                        }}
                       >
                         <Box>
                           <Typography variant="body2" sx={{ fontWeight: 600 }}>

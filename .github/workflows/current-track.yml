@@ -7,9 +7,9 @@ permissions:
   contents: write
 
 on:
-  # Run around 09:00 Europe/Amsterdam (DST-safe by checking local hour below)
+  # Check current track every hour.
   schedule:
-    - cron: "5 7,8 * * *"
+    - cron: "5 * * * *"
 
   workflow_dispatch:
 
@@ -25,19 +25,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Guard for 09:00 Europe/Amsterdam
+      - name: Guard
         id: guard
         run: |
-          TZ_NAME="Europe/Amsterdam"
-          HOUR_LOCAL=$(TZ="$TZ_NAME" date +'%H')
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "run=true" >> "$GITHUB_OUTPUT"
-          elif [ "$HOUR_LOCAL" = "09" ]; then
-            echo "run=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "Skipping: local hour is $HOUR_LOCAL in $TZ_NAME"
-            echo "run=false" >> "$GITHUB_OUTPUT"
-          fi
+          echo "run=true" >> "$GITHUB_OUTPUT"
 
       - name: Fetch current track
         if: steps.guard.outputs.run == 'true'

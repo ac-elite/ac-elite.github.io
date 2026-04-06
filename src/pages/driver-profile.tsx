@@ -3,10 +3,10 @@ import { useParams, useNavigate } from 'react-router-dom';
 
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
-import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import Table from '@mui/material/Table';
+import Skeleton from '@mui/material/Skeleton';
 import TableRow from '@mui/material/TableRow';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -18,10 +18,13 @@ import TableContainer from '@mui/material/TableContainer';
 import { CONFIG } from 'src/config-global';
 import { fetchJson } from 'src/lib/fetch-json';
 import { getLeaderboardTrackSearch } from 'src/lib/routes';
+import { brandAccentBorderSx } from 'src/lib/status-accent';
 import { type TeamRoles, getDiscordRolesForGuid } from 'src/lib/team-roles';
 import { liveriesAssetUrl, getTeamLiveryMeta } from 'src/lib/driver-liveries';
 import { computeDeltas, type DriverDelta, fetchPrevRankData } from 'src/lib/delta';
+import { getSyncHealth, type SiteMetadata, getEffectiveLastSync } from 'src/lib/sync-utils';
 import { GLASS_PANEL_SX, GLASS_INNER_PANEL_SX, GLASS_TABLE_WRAPPER_SX } from 'src/lib/glass';
+import { subtleEnterUpSx, subtleRowEnterSx, glassCardMotionSx, glassCardEnterOnlySx } from 'src/lib/subtle-motion';
 import {
   CAR,
   getDriverSR,
@@ -46,10 +49,80 @@ import {
 
 import { DeltaChip } from 'src/components/delta-chip/delta-chip';
 import { ErrorPanel } from 'src/components/data-state/error-panel';
-import { LoadingPanel } from 'src/components/data-state/loading-panel';
 import { LiveryEnlargeDialog } from 'src/components/livery/livery-enlarge-dialog';
 import { PageGridOverlay } from 'src/components/page-background/page-grid-overlay';
 import { useLicenseSafetyGuide } from 'src/components/license-safety-guide/license-safety-guide';
+
+/** Stagger inner stat cards after the hero panel starts animating */
+const INNER_CARD_MOTION = { baseDelayMs: 380 } as const;
+
+/** Top row: License + SR span half the grid each; below: 6 + 6 compact stats (14 cells). */
+const DRIVER_STAT_GRID_SX = {
+  display: 'grid',
+  gap: 1.5,
+  gridTemplateColumns: {
+    xs: 'repeat(2, minmax(0, 1fr))',
+    sm: 'repeat(3, minmax(0, 1fr))',
+    md: 'repeat(6, minmax(0, 1fr))',
+  },
+} as const;
+
+/** Tight padding, height from content — avoids empty space under short labels. */
+const DRIVER_STAT_COMPACT_SX = {
+  ...GLASS_INNER_PANEL_SX,
+  p: 1.25,
+  textAlign: { xs: 'center', md: 'left' } as const,
+  width: '100%',
+  minWidth: 0,
+  boxSizing: 'border-box' as const,
+  display: 'flex',
+  flexDirection: 'column' as const,
+  justifyContent: 'flex-start',
+} as const;
+
+/** Hero License / SR: wide cells, larger type, stronger presence. */
+const DRIVER_STAT_HERO_SX = {
+  ...GLASS_INNER_PANEL_SX,
+  gridColumn: { xs: 'span 2', sm: 'span 3', md: 'span 3' },
+  p: { xs: 1.75, sm: 2, md: 2.25 },
+  textAlign: { xs: 'center', md: 'left' } as const,
+  width: '100%',
+  minWidth: 0,
+  boxSizing: 'border-box' as const,
+  display: 'flex',
+  flexDirection: 'column' as const,
+  justifyContent: 'center',
+  minHeight: { xs: 128, md: 140 },
+} as const;
+
+/**
+ * Chip-like “glass” hover: specular inset line + lift — only used on License / SR hero cards.
+ * (Other stat tiles use {@link glassCardEnterOnlySx} without hover.)
+ */
+const DRIVER_STAT_HERO_GLASS_HOVER_SX = {
+  cursor: 'default',
+  transition:
+    'transform 220ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 220ms cubic-bezier(0.22, 1, 0.36, 1), filter 220ms cubic-bezier(0.22, 1, 0.36, 1)',
+  '@media (hover: hover)': {
+    '&:hover': {
+      transform: 'translateY(-3px)',
+      filter: 'brightness(1.08)',
+      boxShadow: [
+        'inset 0 1px 0 rgba(255,255,255,0.38)',
+        'inset 0 -1px 0 rgba(0,0,0,0.14)',
+        '0 18px 46px rgba(0,0,0,0.48)',
+        '0 0 36px rgba(255,255,255,0.14)',
+      ].join(', '),
+    },
+  },
+  '@media (prefers-reduced-motion: reduce)': {
+    transition: 'none',
+    '&:hover': {
+      transform: 'none',
+      filter: 'none',
+    },
+  },
+} as const;
 
 type TrackStatRow = {
   trackId: string;
@@ -61,6 +134,13 @@ type TrackStatRow = {
   laps: number;
 };
 
+/** Same file as Livery Showcase — toggles whether team skins are promoted site-wide. */
+type LiveryShowcaseSectionsFile = {
+  officialPack?: boolean;
+  aceSkinPack?: boolean;
+  teamLiveries?: boolean;
+};
+
 export default function Page() {
   const navigate = useNavigate();
   const { openGuide } = useLicenseSafetyGuide();
@@ -70,7 +150,9 @@ export default function Page() {
   const [rankData, setRankData] = useState<RankDriver[]>([]);
   const [leaderboardData, setLeaderboardData] = useState<Record<string, any>>({});
   const [teamRoles, setTeamRoles] = useState<TeamRoles>({ creator: [], admin: [], moderator: [] });
+  const [metadata, setMetadata] = useState<SiteMetadata>({});
   const [delta, setDelta] = useState<DriverDelta | null>(null);
+  const [liveryShowcaseSections, setLiveryShowcaseSections] = useState<LiveryShowcaseSectionsFile | null>(null);
 
   useEffect(() => {
     let mounted = true;
@@ -78,16 +160,20 @@ export default function Page() {
       setLoading(true);
       setError(null);
       try {
-        const [rank, leaderboard, roles, prevRank] = await Promise.all([
+        const [rank, leaderboard, roles, prevRank, meta, liverySectionsRaw] = await Promise.all([
           fetchJson<RankDriver[]>('/data/rank.json'),
           fetchJson<Record<string, any>>('/data/leaderboard.json'),
           fetchJson<TeamRoles>('/data/team-roles.json'),
           fetchPrevRankData(),
+          fetchJson<SiteMetadata>('/data/metadata.json').catch(() => ({})),
+          fetchJson<LiveryShowcaseSectionsFile>('/data/livery-showcase-sections.json').catch(() => ({})),
         ]);
         if (!mounted) return;
         setRankData(rank);
         setLeaderboardData(leaderboard);
         setTeamRoles(roles);
+        setMetadata(meta);
+        setLiveryShowcaseSections(liverySectionsRaw && typeof liverySectionsRaw === 'object' ? liverySectionsRaw : {});
         const allDeltas = computeDeltas(rank, prevRank);
         setDelta(allDeltas.get(driverGuid) || null);
       } catch (e) {
@@ -111,6 +197,35 @@ export default function Page() {
   const licenseMap = useMemo(() => computeLicenseMap(rankData), [rankData]);
   const license = useMemo(() => (driver ? getDriverLicense(driver, licenseMap) : null), [driver, licenseMap]);
   const sr = useMemo(() => (driver ? getDriverSR(driver) : null), [driver]);
+
+  useEffect(() => {
+    const baseTitle = `Driver Profile - ${CONFIG.appName}`;
+    const baseDesc = 'AC Elite driver profile and per-track leaderboard performance.';
+    const resetHead = () => {
+      document.title = baseTitle;
+      document.querySelector('meta[property="og:title"]')?.setAttribute('content', 'Driver Profile - AC Elite');
+      document.querySelector('meta[name="description"]')?.setAttribute('content', baseDesc);
+      document.querySelector('meta[property="og:description"]')?.setAttribute('content', baseDesc);
+    };
+
+    if (!driver) {
+      resetHead();
+      return undefined;
+    }
+    const lic = license?.license ?? '—';
+    const srPart = sr != null ? sr.sr.toFixed(2) : '—';
+    document.title = `${driver.name} · ${lic} · SR ${srPart} | ${CONFIG.appName}`;
+    document.querySelector('meta[property="og:title"]')?.setAttribute(
+      'content',
+      `${driver.name} · ${lic} · SR ${srPart}`
+    );
+    const desc = `Leaderboards and stats for ${driver.name} on AC Elite.`;
+    document.querySelector('meta[name="description"]')?.setAttribute('content', desc);
+    document.querySelector('meta[property="og:description"]')?.setAttribute('content', desc);
+    return () => {
+      resetHead();
+    };
+  }, [driver, license, sr]);
 
   const trackRows = useMemo<TrackStatRow[]>(() => {
     if (!driver) return [];
@@ -152,15 +267,33 @@ export default function Page() {
     [trackRows]
   );
 
+  const leaderboardInsights = useMemo(() => {
+    if (!trackRows.length) return { bestPosition: null as number | null, topThreeTracks: 0 };
+    const positions = trackRows.map((r) => r.position);
+    return {
+      bestPosition: Math.min(...positions),
+      topThreeTracks: trackRows.filter((r) => r.position <= 3).length,
+    };
+  }, [trackRows]);
+
   const driverRoles = useMemo<DiscordRole[]>(
     () => (driverGuid ? getDiscordRolesForGuid(driverGuid, teamRoles) : []),
     [driverGuid, teamRoles]
+  );
+
+  const syncHealth = useMemo(
+    () => getSyncHealth(getEffectiveLastSync(metadata?.lastSync, rankData)),
+    [metadata?.lastSync, rankData]
   );
 
   const teamLiveryMeta = useMemo(
     () => (driver ? getTeamLiveryMeta(driver.guid) : undefined),
     [driver]
   );
+  const showTeamLiveryBlock = useMemo(() => {
+    if (!teamLiveryMeta || !liveryShowcaseSections) return false;
+    return liveryShowcaseSections.teamLiveries !== false;
+  }, [teamLiveryMeta, liveryShowcaseSections]);
   const [teamLiveryDialogOpen, setTeamLiveryDialogOpen] = useState(false);
 
   return (
@@ -185,7 +318,12 @@ export default function Page() {
 
         <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1 }}>
           <Stack spacing={3}>
-            {loading && <LoadingPanel message="Loading driver profile..." />}
+            {loading && (
+              <Stack spacing={2}>
+                <Skeleton variant="rounded" height={340} sx={{ borderRadius: 2, bgcolor: 'rgba(255,255,255,0.06)' }} />
+                <Skeleton variant="rounded" height={300} sx={{ borderRadius: 2, bgcolor: 'rgba(255,255,255,0.05)' }} />
+              </Stack>
+            )}
 
             {!loading && error && <ErrorPanel error={error} />}
 
@@ -203,118 +341,255 @@ export default function Page() {
 
             {!loading && !error && driver && license && sr && (
               <>
-                <Paper sx={{ ...GLASS_PANEL_SX, textAlign: { xs: 'center', md: 'left' } }}>
-                  <Stack spacing={0.5} sx={{ mb: 2, alignItems: { xs: 'center', md: 'flex-start' } }}>
-                    <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.6)', lineHeight: 1.4 }}>
-                      Driver profile
-                    </Typography>
-                    <Stack
-                      direction="row"
-                      spacing={1}
-                      alignItems="center"
-                      justifyContent={{ xs: 'center', md: 'flex-start' }}
-                      flexWrap="wrap"
-                      useFlexGap
-                    >
-                      <Typography variant="h4" sx={{ fontWeight: 800 }}>
-                        {driver.name || 'Unknown Driver'}
-                      </Typography>
-                      {driverRoles.map((role) => (
-                        <Chip
-                          key={role}
-                          size="small"
-                          label={role}
-                          sx={{ fontWeight: 700, fontSize: '0.72rem', ...ROLE_CHIP_SX[role] }}
-                        />
-                      ))}
+                <Paper sx={{ ...GLASS_PANEL_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(0), textAlign: { xs: 'center', md: 'left' } }}>
+                  <Stack spacing={1.5} sx={{ width: 1 }}>
+                    <Stack spacing={0.5} sx={{ alignItems: { xs: 'center', md: 'flex-start' } }}>
+                      <Stack direction="row" spacing={1.5} alignItems="center">
+                        <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.6)', lineHeight: 1.4 }}>
+                          Driver profile
+                        </Typography>
+                        <Typography variant="caption" sx={{ color: syncHealth.color, fontWeight: 700 }}>
+                          {syncHealth.label}
+                        </Typography>
+                      </Stack>
+                      <Stack
+                        direction="row"
+                        spacing={1}
+                        alignItems="center"
+                        justifyContent={{ xs: 'center', md: 'flex-start' }}
+                        flexWrap="wrap"
+                        useFlexGap
+                      >
+                        <Typography variant="h4" sx={{ fontWeight: 800 }}>
+                          {driver.name || 'Unknown Driver'}
+                        </Typography>
+                        {driverRoles.map((role) => (
+                          <Chip
+                            key={role}
+                            size="small"
+                            label={role}
+                            sx={{ fontWeight: 700, fontSize: '0.72rem', ...ROLE_CHIP_SX[role] }}
+                          />
+                        ))}
+                      </Stack>
                     </Stack>
-                  </Stack>
 
-                  <Grid container spacing={1.5}>
-                    <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                      <Paper sx={[GLASS_INNER_PANEL_SX, getLicensePanelSx(license.license), { textAlign: { xs: 'center', md: 'left' } }] as any}>
-                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.7)' }}>
+                    <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.45)', display: 'block', textAlign: { xs: 'center', md: 'left' } }}>
+                      Session totals, rank points, and safety — when your driver record includes them.
+                    </Typography>
+
+                    <Box sx={DRIVER_STAT_GRID_SX}>
+                      <Paper
+                        sx={
+                          [
+                            DRIVER_STAT_HERO_SX,
+                            subtleEnterUpSx(0, INNER_CARD_MOTION),
+                            getLicensePanelSx(license.license),
+                            DRIVER_STAT_HERO_GLASS_HOVER_SX,
+                          ] as any
+                        }
+                      >
+                        <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.75)', fontWeight: 800, letterSpacing: 1 }}>
                           License
                         </Typography>
-                        <Stack direction="row" spacing={1} alignItems="center" justifyContent={{ xs: 'center', md: 'flex-start' }} sx={{ mt: 0.4 }}>
+                        <Stack
+                          direction="row"
+                          spacing={1.25}
+                          alignItems="center"
+                          justifyContent={{ xs: 'center', md: 'flex-start' }}
+                          flexWrap="wrap"
+                          useFlexGap
+                          sx={{ mt: 1 }}
+                        >
                           <Chip
-                            size="small"
+                            size="medium"
                             label={license.license}
                             onClick={() => openGuide('license')}
                             sx={{
-                              minWidth: LICENSE_CHIP_WIDTH,
+                              minWidth: LICENSE_CHIP_WIDTH + 8,
                               justifyContent: 'center',
-                              fontWeight: 700,
+                              fontWeight: 800,
+                              fontSize: '0.85rem',
                               cursor: 'pointer',
+                              py: 0.25,
                               ...getLicenseBadgeSx(license.license),
                             }}
                           />
-                          <Typography variant="body2" sx={{ fontWeight: 700, color: 'rgba(255,255,255,0.85)' }}>
+                          <Typography
+                            variant="h5"
+                            sx={{
+                              fontWeight: 800,
+                              color: 'rgba(255,255,255,0.96)',
+                              fontVariantNumeric: 'tabular-nums',
+                              lineHeight: 1.15,
+                            }}
+                          >
                             {Math.round(license.paceScore).toLocaleString()}
                           </Typography>
                           {delta ? <DeltaChip value={Math.round(delta.deltaPace)} /> : null}
                         </Stack>
                       </Paper>
-                    </Grid>
-                    <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                      <Paper sx={[GLASS_INNER_PANEL_SX, getSRPanelSx(sr.tier), { textAlign: { xs: 'center', md: 'left' } }] as any}>
-                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.7)' }}>
+                      <Paper
+                        sx={
+                          [
+                            DRIVER_STAT_HERO_SX,
+                            subtleEnterUpSx(1, INNER_CARD_MOTION),
+                            getSRPanelSx(sr.tier),
+                            DRIVER_STAT_HERO_GLASS_HOVER_SX,
+                          ] as any
+                        }
+                      >
+                        <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.75)', fontWeight: 800, letterSpacing: 1 }}>
                           Safety Rating
                         </Typography>
-                        <Stack direction="row" spacing={1} alignItems="center" justifyContent={{ xs: 'center', md: 'flex-start' }} sx={{ mt: 0.4 }}>
+                        <Stack
+                          direction="row"
+                          spacing={1.25}
+                          alignItems="center"
+                          justifyContent={{ xs: 'center', md: 'flex-start' }}
+                          flexWrap="wrap"
+                          useFlexGap
+                          sx={{ mt: 1 }}
+                        >
                           <Chip
-                            size="small"
+                            size="medium"
                             label={sr.tier}
                             onClick={() => openGuide('safety')}
                             sx={{
-                              minWidth: SR_CHIP_WIDTH,
+                              minWidth: SR_CHIP_WIDTH + 8,
                               justifyContent: 'center',
-                              fontWeight: 700,
+                              fontWeight: 800,
+                              fontSize: '0.85rem',
                               cursor: 'pointer',
+                              py: 0.25,
                               ...getSRBadgeSx(sr.tier),
                             }}
                           />
-                          <Typography variant="body2" sx={{ fontWeight: 700, color: 'rgba(255,255,255,0.85)' }}>
+                          <Typography
+                            variant="h5"
+                            sx={{
+                              fontWeight: 800,
+                              color: 'rgba(255,255,255,0.96)',
+                              fontVariantNumeric: 'tabular-nums',
+                              lineHeight: 1.15,
+                            }}
+                          >
                             {sr.sr.toFixed(2)}
                           </Typography>
                           {delta ? <DeltaChip value={delta.deltaSR} decimals={2} kind="sr" /> : null}
                         </Stack>
                       </Paper>
-                    </Grid>
-                    <Grid size={{ xs: 12, sm: 6, md: 2 }}>
-                      <Paper sx={{ ...GLASS_INNER_PANEL_SX, textAlign: { xs: 'center', md: 'left' } }}>
+                      <Paper sx={{ ...DRIVER_STAT_COMPACT_SX, ...glassCardEnterOnlySx(2, INNER_CARD_MOTION) }}>
                         <Typography variant="caption" sx={{ color: 'text.secondary' }}>
                           Total KM
                         </Typography>
-                        <Typography variant="subtitle1" sx={{ fontWeight: 800, mt: 0.4 }}>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 800, mt: 0.35 }}>
                           {formatNumber(Math.round(driver.kilometers || 0))}
                         </Typography>
                       </Paper>
-                    </Grid>
-                    <Grid size={{ xs: 12, sm: 6, md: 2 }}>
-                      <Paper sx={{ ...GLASS_INNER_PANEL_SX, textAlign: { xs: 'center', md: 'left' } }}>
+                      <Paper sx={{ ...DRIVER_STAT_COMPACT_SX, ...glassCardEnterOnlySx(3, INNER_CARD_MOTION) }}>
                         <Typography variant="caption" sx={{ color: 'text.secondary' }}>
                           Tracks Driven
                         </Typography>
-                        <Typography variant="subtitle1" sx={{ fontWeight: 800, mt: 0.4 }}>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 800, mt: 0.35 }}>
                           {formatNumber(trackRows.length)}
                         </Typography>
                       </Paper>
-                    </Grid>
-                    <Grid size={{ xs: 12, sm: 6, md: 2 }}>
-                      <Paper sx={{ ...GLASS_INNER_PANEL_SX, textAlign: { xs: 'center', md: 'left' } }}>
+                      <Paper sx={{ ...DRIVER_STAT_COMPACT_SX, ...glassCardEnterOnlySx(4, INNER_CARD_MOTION) }}>
                         <Typography variant="caption" sx={{ color: 'text.secondary' }}>
                           Total Laps
                         </Typography>
-                        <Typography variant="subtitle1" sx={{ fontWeight: 800, mt: 0.4 }}>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 800, mt: 0.35 }}>
                           {formatNumber(totalLaps)}
                         </Typography>
                       </Paper>
-                    </Grid>
-                  </Grid>
+                      <Paper sx={{ ...DRIVER_STAT_COMPACT_SX, ...glassCardEnterOnlySx(5, INNER_CARD_MOTION) }}>
+                        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                          Rank points
+                        </Typography>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 800, mt: 0.35 }}>
+                          {driver.points != null && Number.isFinite(driver.points)
+                            ? driver.points.toLocaleString('en-GB', { maximumFractionDigits: 1 })
+                            : '—'}
+                        </Typography>
+                      </Paper>
+                      <Paper sx={{ ...DRIVER_STAT_COMPACT_SX, ...glassCardEnterOnlySx(6, INNER_CARD_MOTION) }}>
+                        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                          Wins
+                        </Typography>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 800, mt: 0.35 }}>
+                          {formatNumber(driver.wins ?? 0)}
+                        </Typography>
+                      </Paper>
+                      <Paper sx={{ ...DRIVER_STAT_COMPACT_SX, ...glassCardEnterOnlySx(7, INNER_CARD_MOTION) }}>
+                        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                          Podiums
+                        </Typography>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 800, mt: 0.35 }}>
+                          {formatNumber(driver.podiums ?? 0)}
+                        </Typography>
+                      </Paper>
+                      <Paper sx={{ ...DRIVER_STAT_COMPACT_SX, ...glassCardEnterOnlySx(8, INNER_CARD_MOTION) }}>
+                        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                          Poles
+                        </Typography>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 800, mt: 0.35 }}>
+                          {formatNumber(driver.poles ?? 0)}
+                        </Typography>
+                      </Paper>
+                      <Paper sx={{ ...DRIVER_STAT_COMPACT_SX, ...glassCardEnterOnlySx(9, INNER_CARD_MOTION) }}>
+                        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                          Fastest laps
+                        </Typography>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 800, mt: 0.35 }}>
+                          {formatNumber(driver.flaps ?? 0)}
+                        </Typography>
+                      </Paper>
+                      <Paper sx={{ ...DRIVER_STAT_COMPACT_SX, ...glassCardEnterOnlySx(10, INNER_CARD_MOTION) }}>
+                        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                          Best position (leaderboards)
+                        </Typography>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 800, mt: 0.35 }}>
+                          {leaderboardInsights.bestPosition != null
+                            ? `P${leaderboardInsights.bestPosition}`
+                            : '—'}
+                        </Typography>
+                      </Paper>
+                      <Paper sx={{ ...DRIVER_STAT_COMPACT_SX, ...glassCardEnterOnlySx(11, INNER_CARD_MOTION) }}>
+                        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                          Top-3 (leaderboards)
+                        </Typography>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 800, mt: 0.35 }}>
+                          {formatNumber(leaderboardInsights.topThreeTracks)}
+                        </Typography>
+                      </Paper>
+                      <Paper sx={{ ...DRIVER_STAT_COMPACT_SX, ...glassCardEnterOnlySx(12, INNER_CARD_MOTION) }}>
+                        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                          Collisions
+                        </Typography>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 800, mt: 0.35 }}>
+                          {formatNumber(driver.collisions ?? 0)}
+                        </Typography>
+                      </Paper>
+                      <Paper sx={{ ...DRIVER_STAT_COMPACT_SX, ...glassCardEnterOnlySx(13, INNER_CARD_MOTION) }}>
+                        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                          Infractions
+                        </Typography>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 800, mt: 0.35 }}>
+                          {formatNumber(driver.infr ?? 0)}
+                        </Typography>
+                      </Paper>
+                    </Box>
+                  </Stack>
                 </Paper>
 
-                <Paper sx={GLASS_TABLE_WRAPPER_SX}>
+                <Paper
+                  sx={{
+                    ...GLASS_TABLE_WRAPPER_SX,
+                    ...brandAccentBorderSx(),
+                    ...glassCardMotionSx(1),
+                  }}
+                >
                   <TableContainer>
                     <Table size="small">
                       <TableHead>
@@ -335,7 +610,7 @@ export default function Page() {
                             </TableCell>
                           </TableRow>
                         )}
-                        {trackRows.map((row) => (
+                        {trackRows.map((row, rowIndex) => (
                           <TableRow
                             key={`${row.trackId}-${row.position}`}
                             hover
@@ -345,7 +620,7 @@ export default function Page() {
                                 search: getLeaderboardTrackSearch(row.trackId),
                               })
                             }
-                            sx={{ cursor: 'pointer' }}
+                            sx={{ cursor: 'pointer', ...subtleRowEnterSx(rowIndex, { baseDelayMs: 340 }) }}
                           >
                             <TableCell sx={{ fontWeight: 700 }}>{row.trackName}</TableCell>
                             <TableCell>
@@ -372,11 +647,12 @@ export default function Page() {
                   </TableContainer>
                 </Paper>
 
-                {teamLiveryMeta ? (
+                {teamLiveryMeta && showTeamLiveryBlock ? (
                   <>
                     <Paper
                       sx={{
                         ...GLASS_PANEL_SX,
+                        ...glassCardMotionSx(2),
                         p: 2,
                         width: 1,
                       }}

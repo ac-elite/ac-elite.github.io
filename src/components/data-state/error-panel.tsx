@@ -17,6 +17,10 @@ export function ErrorPanel({ error, title = 'Failed to load data', onRetry }: Er
           {title}
         </Typography>
         <Typography color="text.secondary">{error}</Typography>
+        <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 520, lineHeight: 1.55 }}>
+          This is usually temporary. Try again in a moment, or refresh the page. Stats are synced regularly from the
+          game server.
+        </Typography>
         {onRetry && (
           <Button variant="outlined" color="primary" size="small" onClick={onRetry}>
             Retry

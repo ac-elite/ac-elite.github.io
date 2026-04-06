@@ -25,7 +25,9 @@ import { CONFIG } from 'src/config-global';
 import { fetchJson } from 'src/lib/fetch-json';
 import { getDriverProfileHref } from 'src/lib/routes';
 import { ACE_SKIN_PACK_DOWNLOAD_URL } from 'src/lib/ace-skin-pack-download';
+import { brandAccentBorderSx, statusAccentBorderSx } from 'src/lib/status-accent';
 import { computeDeltas, type DriverDelta, fetchPrevRankData } from 'src/lib/delta';
+import { subtleEnterUpSx, subtleRowEnterSx, glassCardMotionSx, subtleEnterOnceSx } from 'src/lib/subtle-motion';
 import {
   getSyncHealth,
   type SyncHealth,
@@ -180,7 +182,13 @@ function HeroSection({
       <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1 }}>
         <Grid container spacing={{ xs: 4, md: 6 }} alignItems="center">
           <Grid size={{ xs: 12, md: 7 }}>
-            <Stack spacing={3} alignItems={{ xs: 'center', md: 'flex-start' }}>
+            <Stack
+              spacing={3}
+              alignItems={{ xs: 'center', md: 'flex-start' }}
+              sx={{
+                ...subtleEnterUpSx(0),
+              }}
+            >
               <Stack spacing={1} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: { xs: 'center', md: 'flex-start' } }}>
                 <Typography
                   variant="overline"
@@ -303,7 +311,9 @@ function HeroSection({
             <Box
               sx={{
                 ...GLASS_PANEL_SX,
+                ...statusAccentBorderSx(syncStatus.color),
                 textAlign: { xs: 'center', md: 'left' },
+                ...glassCardMotionSx(1),
               }}
             >
               <Stack spacing={2}>
@@ -351,12 +361,16 @@ function HeroSection({
                     { label: 'Total drivers', value: formatNumber(totalDrivers) },
                     { label: 'Logged laps', value: formatNumber(totalLaps) },
                     { label: 'Active tracks', value: formatNumber(activeTracks) },
-                    { label: 'Driver search', value: 'By name or numeric ID' },
-                  ].map((item) => (
+                    {
+                      label: 'Live server track',
+                      value: currentTrack?.track ? getTrackDisplayName(currentTrack.track) : '—',
+                    },
+                  ].map((item, tileIndex) => (
                     <Grid key={item.label} size={{ xs: 6 }}>
                       <Box
                         sx={{
                           ...GLASS_INNER_PANEL_SX,
+                          ...glassCardMotionSx(3 + tileIndex),
                           minHeight: 78,
                           display: 'flex',
                           flexDirection: 'column',
@@ -367,7 +381,12 @@ function HeroSection({
                         <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.68)' }}>
                           {item.label}
                         </Typography>
-                        <Typography variant="subtitle2" sx={{ fontWeight: 800, lineHeight: 1.25, mt: 0.2 }}>
+                        <Typography
+                          variant="subtitle2"
+                          sx={{ fontWeight: 800, lineHeight: 1.25, mt: 0.2 }}
+                          noWrap
+                          title={typeof item.value === 'string' ? item.value : undefined}
+                        >
                           {item.value}
                         </Typography>
                       </Box>
@@ -419,6 +438,7 @@ function CurrentTrackLeaderboardSection({
   driversByGuid,
   licenseMap,
   deltas,
+  syncStatus,
   onPageChange,
   onOpenGuide,
 }: {
@@ -434,6 +454,7 @@ function CurrentTrackLeaderboardSection({
   driversByGuid: Map<string, RankDriver>;
   licenseMap: Map<string, { license: string; paceScore: number }>;
   deltas: Map<string, DriverDelta>;
+  syncStatus: SyncHealth;
   onPageChange: (page: number) => void;
   onOpenGuide: (tab: 'license' | 'safety') => void;
 }) {
@@ -458,7 +479,14 @@ function CurrentTrackLeaderboardSection({
 
       <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1 }}>
         <Stack spacing={2.5}>
-          <Stack spacing={0.7} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: { xs: 'center', md: 'flex-start' } }}>
+          <Stack
+            spacing={0.7}
+            sx={{
+              textAlign: { xs: 'center', md: 'left' },
+              alignItems: { xs: 'center', md: 'flex-start' },
+              ...subtleEnterOnceSx(340),
+            }}
+          >
             <Typography variant="overline" sx={sectionKickerSx}>
               Live track leaderboard
             </Typography>
@@ -473,7 +501,13 @@ function CurrentTrackLeaderboardSection({
             </Typography>
           </Stack>
 
-          <Paper sx={GLASS_TABLE_WRAPPER_SX}>
+          <Paper
+            sx={{
+              ...GLASS_TABLE_WRAPPER_SX,
+              ...brandAccentBorderSx(),
+              ...glassCardMotionSx(0, { baseDelayMs: 400 }),
+            }}
+          >
             <TableContainer>
               <Table
                 size="small"
@@ -534,6 +568,7 @@ function CurrentTrackLeaderboardSection({
                         key={`${entry.guid}-${entry.laptime}-${index}`}
                         sx={{
                           cursor: 'pointer',
+                          ...subtleRowEnterSx(index, { baseDelayMs: 340 }),
                           ...(absolutePos < 3 ? getPodiumRowSx((absolutePos + 1) as 1 | 2 | 3) : {}),
                         }}
                         onClick={() => {
@@ -609,7 +644,7 @@ function CurrentTrackLeaderboardSection({
           </Paper>
 
           {!loading && !error && totalPages > 1 && (
-            <Paper sx={GLASS_TABLE_PAGINATION_SX}>
+            <Paper sx={{ ...GLASS_TABLE_PAGINATION_SX, ...glassCardMotionSx(0, { baseDelayMs: 460 }) }}>
               <Stack direction="row" spacing={1} justifyContent="center" flexWrap="wrap">
                 <Button
                   disabled={safePage <= 1}
@@ -715,6 +750,7 @@ function DriverSearchSection({
           elevation={0}
           sx={{
             ...GLASS_PANEL_SX,
+            ...glassCardMotionSx(0, { baseDelayMs: 280 }),
             mb: { xs: 2, md: 4 },
             textAlign: { xs: 'center', md: 'left' },
           }}
@@ -1022,10 +1058,13 @@ export default function Page() {
       <title>{`${CONFIG.appName} | Simracing Community`}</title>
       <meta
         name="description"
-        content="AC Elite | Simracing community. Track your stats, search drivers, and compete on leaderboards."
+        content="AC Elite Assetto Corsa community: KMR-powered stats, leaderboards, safety rating and licence progression. Search drivers and compare lap times."
       />
       <meta property="og:title" content="AC Elite | Simracing Community" />
-      <meta property="og:description" content="Track your stats, search drivers, and compete on leaderboards." />
+      <meta
+        property="og:description"
+        content="AC Elite Assetto Corsa community: KMR-powered stats, leaderboards, safety rating and licence progression. Search drivers and compare lap times."
+      />
       <meta property="og:url" content="https://ac-elite.github.io/" />
 
       <HeroSection
@@ -1053,6 +1092,7 @@ export default function Page() {
         driversByGuid={driversByGuid}
         licenseMap={leaderboardLicenseMap}
         deltas={deltas}
+        syncStatus={syncStatus}
         onPageChange={setCurrentTrackPage}
         onOpenGuide={openGuide}
       />

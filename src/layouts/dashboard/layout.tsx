@@ -9,6 +9,7 @@ import { useTheme } from '@mui/material/styles';
 
 import { Logo } from 'src/components/logo';
 import { UpdateBar } from 'src/components/update-bar/update-bar';
+import { ModTeamAdminLink } from 'src/components/mod-team-admin-link/mod-team-admin-link';
 import { LicenseSafetyGuideButton } from 'src/components/license-safety-guide/license-safety-guide';
 
 import { NavMobile, NavDesktop } from './nav';
@@ -95,7 +96,12 @@ export function DashboardLayout({
             data={navData}
             layoutQuery={layoutQuery}
             slots={{
-              bottomArea: <UpdateBar compact sx={{ mx: 1, my: 1 }} />,
+              bottomArea: (
+                <>
+                  <ModTeamAdminLink />
+                  <UpdateBar compact sx={{ mx: 1, my: 1 }} />
+                </>
+              ),
             }}
           />
           <NavMobile
@@ -104,7 +110,12 @@ export function DashboardLayout({
             onClose={() => setOpenMobileNav(false)}
             sx={{ bgcolor: '#17213B' }}
             slots={{
-              bottomArea: <UpdateBar compact sx={{ mx: 1, my: 1 }} />,
+              bottomArea: (
+                <>
+                  <ModTeamAdminLink />
+                  <UpdateBar compact sx={{ mx: 1, my: 1 }} />
+                </>
+              ),
             }}
           />
         </>

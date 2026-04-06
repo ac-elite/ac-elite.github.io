@@ -9,23 +9,65 @@ import Typography from '@mui/material/Typography';
 
 import { GLASS_PANEL_SX } from 'src/lib/glass';
 
+export type PreviewLockPersist = 'none' | 'session' | 'local';
+
 type PreviewLockProps = {
+  /** Expected password (define a `const` in the page module). If empty, the lock is skipped. */
+  password: string;
+  /** Namespace for unlock flag in storage (not the password itself). */
   storageKey: string;
+  /**
+   * Where to remember “unlocked” after a correct password.
+   * - `none`: only until refresh (nothing stored).
+   * - `session`: tab/session (default; safer than local).
+   * - `local`: survives browser restarts (less safe).
+   */
+  persist?: PreviewLockPersist;
   title: string;
   description: string;
   children: React.ReactNode;
 };
 
-// Preview-only lock for internal sharing (client-side).
-const PREVIEW_PASSWORD = 'acelite-mod-team';
+const UNLOCK_VALUE = '1';
 
-export function PreviewLock({ storageKey, title, description, children }: PreviewLockProps) {
+function readUnlocked(storageKey: string, persist: PreviewLockPersist): boolean {
+  if (typeof window === 'undefined' || persist === 'none') return false;
+  const store = persist === 'session' ? window.sessionStorage : window.localStorage;
+  return store.getItem(storageKey) === UNLOCK_VALUE;
+}
+
+function writeUnlocked(storageKey: string, persist: PreviewLockPersist): void {
+  if (typeof window === 'undefined' || persist === 'none') return;
+  const store = persist === 'session' ? window.sessionStorage : window.localStorage;
+  store.setItem(storageKey, UNLOCK_VALUE);
+}
+
+/**
+ * Lightweight client-side gate for preview pages. The password is compared in the browser,
+ * so it still ships in the JS bundle — this is “keep casual visitors out”, not cryptographic
+ * security. For stronger protection without a database, use e.g. Cloudflare Access, Netlify
+ * password protection, or a private deployment; optionally combine with `persist="none"`.
+ */
+export function PreviewLock({
+  password,
+  storageKey,
+  persist = 'session',
+  title,
+  description,
+  children,
+}: PreviewLockProps) {
   const [value, setValue] = useState('');
   const [error, setError] = useState('');
-  const [unlocked, setUnlocked] = useState(() => {
-    if (typeof window === 'undefined') return false;
-    return window.localStorage.getItem(storageKey) === PREVIEW_PASSWORD;
-  });
+  const [unlocked, setUnlocked] = useState(() => readUnlocked(storageKey, persist));
+
+  if (!password?.trim()) {
+    if (import.meta.env.DEV) {
+      console.warn(
+        `[PreviewLock] No password for storageKey "${storageKey}"; content is visible. Set a non-empty password const on the page.`
+      );
+    }
+    return <>{children}</>;
+  }
 
   if (unlocked) return <>{children}</>;
 
@@ -73,13 +115,11 @@ export function PreviewLock({ storageKey, title, description, children }: Previe
             color="primary"
             size="small"
             onClick={() => {
-              if (value.trim() !== PREVIEW_PASSWORD) {
+              if (value.trim() !== password) {
                 setError('Wrong password. Please try again.');
                 return;
               }
-              if (typeof window !== 'undefined') {
-                window.localStorage.setItem(storageKey, PREVIEW_PASSWORD);
-              }
+              writeUnlocked(storageKey, persist);
               setUnlocked(true);
             }}
             sx={{ minHeight: 40 }}

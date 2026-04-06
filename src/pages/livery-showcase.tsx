@@ -14,8 +14,10 @@ import { RouterLink } from 'src/routes/components';
 import { CONFIG } from 'src/config-global';
 import { fetchJson } from 'src/lib/fetch-json';
 import { getDriverProfileHref } from 'src/lib/routes';
-import { GLASS_PANEL_TIGHT_SX, GLASS_INNER_PANEL_SX } from 'src/lib/glass';
+import { glassCardMotionSx } from 'src/lib/subtle-motion';
+import { brandAccentBorderSx } from 'src/lib/status-accent';
 import { ACE_SKIN_PACK_DOWNLOAD_URL } from 'src/lib/ace-skin-pack-download';
+import { GLASS_PANEL_SX, GLASS_PANEL_TIGHT_SX, GLASS_INNER_PANEL_SX } from 'src/lib/glass';
 import { liveriesAssetUrl, promoLiveryAssetUrl, TEAM_LIVERY_ENTRIES } from 'src/lib/driver-liveries';
 import {
   getAceSkinPackAuthorForEntryId,
@@ -207,14 +209,20 @@ export default function Page() {
 
         <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1 }}>
           <Stack spacing={3}>
-            <Stack spacing={1} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: 'stretch' }}>
-              <Typography variant="h4" fontWeight={800}>
-                Livery Showcase
-              </Typography>
-              <Typography color="text.secondary">
-                Official default-pack paints, the ACE Skin Pack, and AC Elite team liveries.
-              </Typography>
-            </Stack>
+            <Box sx={{ ...GLASS_PANEL_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(0) }}>
+              <Stack spacing={0.75} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: { xs: 'center', md: 'flex-start' } }}>
+                <Typography variant="h4" fontWeight={800}>
+                  Livery Showcase
+                </Typography>
+                <Typography color="text.secondary">
+                  Official default-pack paints, the ACE Skin Pack, and AC Elite team liveries.
+                </Typography>
+                <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.52)', maxWidth: 720, lineHeight: 1.55 }}>
+                  Click any image for a full-size view. Which sections appear (official pack, skin pack, team cars) is set in the
+                  site configuration by the team.
+                </Typography>
+              </Stack>
+            </Box>
 
             <Stack spacing={3}>
               {sectionsConfig?.officialPack && (
@@ -226,11 +234,13 @@ export default function Page() {
                   Included with the standard AC Elite livery pack.
                 </Typography>
                 <Grid container spacing={2} sx={{ width: 1 }}>
-                  {generalLiveries.map((livery) => (
+                  {generalLiveries.map((livery, i) => (
                     <Grid key={livery.name} size={{ xs: 12, sm: 6, md: 4 }}>
                       <Paper
                         sx={{
                           ...GLASS_PANEL_TIGHT_SX,
+                          ...brandAccentBorderSx(),
+                          ...glassCardMotionSx(1 + i),
                           width: 1,
                         }}
                       >
@@ -308,7 +318,7 @@ export default function Page() {
                     </Button>
                   </Stack>
                   <Grid container spacing={2} sx={{ width: 1 }}>
-                    {aceSkinPackOrdered.map((entry) => {
+                    {aceSkinPackOrdered.map((entry, i) => {
                       const src = publicAsset(entry.previewUrl);
                       const alt = `AC Elite skin pack preview · ${entry.title}`;
                       const author = getAceSkinPackAuthorForEntryId(entry.id);
@@ -317,6 +327,8 @@ export default function Page() {
                           <Paper
                             sx={{
                               ...GLASS_PANEL_TIGHT_SX,
+                              ...brandAccentBorderSx(),
+                              ...glassCardMotionSx(4 + i),
                               width: 1,
                             }}
                           >
@@ -399,13 +411,15 @@ export default function Page() {
                   Team and collaborator liveries.
                 </Typography>
                 <Grid container spacing={2} sx={{ width: 1 }}>
-                  {TEAM_LIVERY_ENTRIES.map((livery) => {
+                  {TEAM_LIVERY_ENTRIES.map((livery, i) => {
                     const image = liveriesAssetUrl(livery.steamGuid);
                     return (
                       <Grid key={livery.steamGuid} size={{ xs: 12, sm: 6, md: 4 }}>
                         <Paper
                           sx={{
                             ...GLASS_PANEL_TIGHT_SX,
+                            ...brandAccentBorderSx(),
+                            ...glassCardMotionSx(6 + aceSkinPackOrdered.length + i),
                             width: 1,
                           }}
                         >

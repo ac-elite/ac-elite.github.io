@@ -8,6 +8,7 @@ import Stack from '@mui/material/Stack';
 import Table from '@mui/material/Table';
 import Select from '@mui/material/Select';
 import Button from '@mui/material/Button';
+import Skeleton from '@mui/material/Skeleton';
 import MenuItem from '@mui/material/MenuItem';
 import TableRow from '@mui/material/TableRow';
 import TableBody from '@mui/material/TableBody';
@@ -21,7 +22,10 @@ import TableContainer from '@mui/material/TableContainer';
 import { CONFIG } from 'src/config-global';
 import { fetchJson } from 'src/lib/fetch-json';
 import { getDriverProfileHref } from 'src/lib/routes';
+import { subtleRowEnterSx, glassCardMotionSx } from 'src/lib/subtle-motion';
+import { brandAccentBorderSx, statusAccentBorderSx } from 'src/lib/status-accent';
 import { computeDeltas, type DriverDelta, fetchPrevRankData } from 'src/lib/delta';
+import { getSyncHealth, type SiteMetadata, getEffectiveLastSync } from 'src/lib/sync-utils';
 import {
   GLASS_PANEL_SX,
   getPodiumRowSx,
@@ -47,7 +51,6 @@ import {
 
 import { DeltaChip } from 'src/components/delta-chip/delta-chip';
 import { ErrorPanel } from 'src/components/data-state/error-panel';
-import { LoadingPanel } from 'src/components/data-state/loading-panel';
 import { PageGridOverlay } from 'src/components/page-background/page-grid-overlay';
 import { useLicenseSafetyGuide } from 'src/components/license-safety-guide/license-safety-guide';
 
@@ -69,6 +72,7 @@ export default function Page() {
   const [error, setError] = useState<string | null>(null);
   const [rankData, setRankData] = useState<RankDriver[]>([]);
   const [leaderboardData, setLeaderboardData] = useState<Record<string, any>>({});
+  const [metadata, setMetadata] = useState<SiteMetadata>({});
   const [deltas, setDeltas] = useState<Map<string, DriverDelta>>(new Map());
   const [preferredTrack, setPreferredTrack] = useState('');
   const [currentTrack, setCurrentTrack] = useState('');
@@ -80,15 +84,17 @@ export default function Page() {
       setLoading(true);
       setError(null);
       try {
-        const [rank, leaderboard, prevRank, trackData] = await Promise.all([
+        const [rank, leaderboard, prevRank, trackData, meta] = await Promise.all([
           fetchJson<RankDriver[]>('/data/rank.json'),
           fetchJson<Record<string, any>>('/data/leaderboard.json'),
           fetchPrevRankData(),
           fetchJson<CurrentTrackData>('/data/current-track.json').catch(() => null),
+          fetchJson<SiteMetadata>('/data/metadata.json').catch(() => ({})),
         ]);
         if (!mounted) return;
         setRankData(rank);
         setLeaderboardData(leaderboard);
+        setMetadata(meta);
         setDeltas(computeDeltas(rank, prevRank));
         setPreferredTrack(normalizeTrackId(trackData?.track));
       } catch (e) {
@@ -150,6 +156,11 @@ export default function Page() {
     return [...data].sort((a, b) => (a.laptime || 0) - (b.laptime || 0));
   }, [currentTrack, leaderboardData]);
 
+  const syncHealth = useMemo(
+    () => getSyncHealth(getEffectiveLastSync(metadata?.lastSync, rankData)),
+    [metadata?.lastSync, rankData]
+  );
+
   const fastestLap = rows[0]?.laptime || 0;
   const totalPages = Math.max(1, Math.ceil(rows.length / LEADERBOARD_PER_PAGE));
   const safePage = Math.min(Math.max(1, page), totalPages);
@@ -178,16 +189,29 @@ export default function Page() {
 
         <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1 }}>
           <Stack spacing={3}>
-            <Stack spacing={1} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: { xs: 'center', md: 'flex-start' } }}>
-              <Typography variant="h4" fontWeight={800}>
-                Leaderboard
-              </Typography>
-              <Typography color="text.secondary">
-                Track-based leaderboard for {CAR}. Click a driver to open the full profile.
-              </Typography>
-            </Stack>
+            <Box sx={{ ...GLASS_PANEL_SX, ...statusAccentBorderSx(syncHealth.color), ...glassCardMotionSx(0) }}>
+              <Stack spacing={0.75} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: { xs: 'center', md: 'flex-start' } }}>
+                <Typography variant="h4" fontWeight={800}>
+                  Leaderboard
+                </Typography>
+                <Typography color="text.secondary">
+                  Track-based leaderboard for {CAR}. Click a driver to open the full profile.
+                </Typography>
+                <Typography variant="body2" sx={{ color: syncHealth.color, fontWeight: 700 }}>
+                  {syncHealth.label} · {syncHealth.ageText}
+                </Typography>
+                <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.52)', maxWidth: 640 }}>
+                  Small deltas next to pace and SR compare to the daily snapshot.
+                </Typography>
+              </Stack>
+            </Box>
 
-            {loading && <LoadingPanel message="Loading leaderboard data..." />}
+            {loading && (
+              <Stack spacing={2}>
+                <Skeleton variant="rounded" height={56} sx={{ borderRadius: 2, bgcolor: 'rgba(255,255,255,0.06)' }} />
+                <Skeleton variant="rounded" height={400} sx={{ borderRadius: 2, bgcolor: 'rgba(255,255,255,0.05)' }} />
+              </Stack>
+            )}
 
             {!loading && error && <ErrorPanel error={error} />}
 
@@ -196,6 +220,7 @@ export default function Page() {
                 <Paper
                   sx={{
                     ...GLASS_PANEL_SX,
+                    ...glassCardMotionSx(1),
                     textAlign: { xs: 'center', md: 'left' },
                   }}
                 >
@@ -271,6 +296,8 @@ export default function Page() {
                 <Paper
                   sx={{
                     ...GLASS_TABLE_WRAPPER_SX,
+                    ...brandAccentBorderSx(),
+                    ...glassCardMotionSx(2),
                   }}
                 >
                   <TableContainer>
@@ -317,6 +344,7 @@ export default function Page() {
                               key={`${entry.guid}-${entry.laptime}-${index}`}
                               sx={{
                                 cursor: 'pointer',
+                                ...subtleRowEnterSx(index, { baseDelayMs: 340 }),
                                 ...(absolutePos < 3
                                   ? getPodiumRowSx((absolutePos + 1) as 1 | 2 | 3)
                                   : {}),
@@ -396,7 +424,7 @@ export default function Page() {
                 </Paper>
 
                 {totalPages > 1 && (
-                  <Paper sx={GLASS_TABLE_PAGINATION_SX}>
+                  <Paper sx={{ ...GLASS_TABLE_PAGINATION_SX, ...glassCardMotionSx(3) }}>
                     <Stack direction="row" spacing={1} justifyContent="center" flexWrap="wrap">
                       <Button
                         disabled={safePage <= 1}

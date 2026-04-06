@@ -9,10 +9,15 @@ import Typography from '@mui/material/Typography';
 
 import { CONFIG } from 'src/config-global';
 import { CAR } from 'src/lib/ac-elite-data';
-import { GLASS_PANEL_COMPACT_SX } from 'src/lib/glass';
+import { glassCardMotionSx } from 'src/lib/subtle-motion';
+import { brandAccentBorderSx } from 'src/lib/status-accent';
+import { GLASS_PANEL_SX, GLASS_PANEL_COMPACT_SX } from 'src/lib/glass';
 
 import { PreviewLock } from 'src/components/preview-lock/preview-lock';
 import { PageGridOverlay } from 'src/components/page-background/page-grid-overlay';
+
+/** Preview gate (client-side only; edit here to rotate). */
+const SETUP_STORE_PREVIEW_PASSWORD = 'acelite-setup-store';
 
 const mockSetups = [
   {
@@ -61,7 +66,16 @@ export default function Page() {
   return (
     <>
       <title>{`Setup Store - ${CONFIG.appName}`}</title>
-      <meta name="description" content="AC Elite setup store preview." />
+      <meta
+        name="description"
+        content="AC Elite setup store: community Assetto Corsa car setups (preview). Browse qualy, race and wet baselines."
+      />
+      <meta property="og:title" content={`Setup Store - ${CONFIG.appName}`} />
+      <meta
+        property="og:description"
+        content="AC Elite setup store: community Assetto Corsa car setups (preview). Browse qualy, race and wet baselines."
+      />
+      <meta property="og:url" content="https://ac-elite.github.io/setup-store" />
 
       <Box
         sx={{
@@ -77,26 +91,34 @@ export default function Page() {
 
         <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1 }}>
           <Stack spacing={3}>
-            <Stack spacing={1} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: { xs: 'center', md: 'flex-start' } }}>
-              <Typography variant="h4" fontWeight={800}>
-                Setup Store
-              </Typography>
-              <Typography color="text.secondary">
-                Private preview for mod team feedback.
-              </Typography>
-            </Stack>
+            <Box sx={{ ...GLASS_PANEL_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(0) }}>
+              <Stack spacing={0.75} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: { xs: 'center', md: 'flex-start' } }}>
+                <Typography variant="h4" fontWeight={800}>
+                  Setup Store
+                </Typography>
+                <Typography color="text.secondary">
+                  Private preview for mod team feedback — mock listings until the store goes live.
+                </Typography>
+                <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.52)', maxWidth: 640, lineHeight: 1.55 }}>
+                  Nothing here is tied to live race data; unlock below to browse placeholder setups and test layout.
+                </Typography>
+              </Stack>
+            </Box>
 
             <PreviewLock
               storageKey="acelite-preview-setup-store"
+              password={SETUP_STORE_PREVIEW_PASSWORD}
               title="Setup Store Preview Locked"
               description="This section is in preview state with mock data."
             >
               <Grid container spacing={2}>
-                {mockSetups.map((setup) => (
+                {mockSetups.map((setup, i) => (
                   <Grid key={`${setup.name}-${setup.track}`} size={{ xs: 12, md: 4 }} sx={{ display: 'flex' }}>
                     <Paper
                       sx={{
                         ...GLASS_PANEL_COMPACT_SX,
+                        ...brandAccentBorderSx(),
+                        ...glassCardMotionSx(1 + i),
                         height: '100%',
                         width: '100%',
                         display: 'flex',

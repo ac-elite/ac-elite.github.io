@@ -6,6 +6,8 @@ import { usePathname } from 'src/routes/hooks';
 
 import { ThemeProvider } from 'src/theme/theme-provider';
 
+import { SyncCanonicalMeta } from 'src/components/seo/sync-canonical';
+
 // ----------------------------------------------------------------------
 
 type AppProps = {
@@ -17,6 +19,7 @@ export default function App({ children }: AppProps) {
 
   return (
     <ThemeProvider>
+      <SyncCanonicalMeta />
       {children}
     </ThemeProvider>
   );

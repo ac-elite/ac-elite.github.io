@@ -5,6 +5,7 @@ import Chip from '@mui/material/Chip';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
+import Skeleton from '@mui/material/Skeleton';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 
@@ -13,6 +14,9 @@ import { fetchJson } from 'src/lib/fetch-json';
 import { getDriverProfileHref } from 'src/lib/routes';
 import { GLASS_PANEL_SX, GLASS_INNER_ROW_SX } from 'src/lib/glass';
 import { type TeamRoles, EMPTY_TEAM_ROLES } from 'src/lib/team-roles';
+import { getSyncHealth, type SiteMetadata, getEffectiveLastSync } from 'src/lib/sync-utils';
+import { subtleEnterUpSx, glassCardMotionSx, subtleEnterOnceSx } from 'src/lib/subtle-motion';
+import { BRAND_ACCENT, brandAccentBorderSx, statusAccentBorderSx } from 'src/lib/status-accent';
 import {
   CAR,
   type CarLap,
@@ -28,7 +32,6 @@ import {
 } from 'src/lib/ac-elite-data';
 
 import { ErrorPanel } from 'src/components/data-state/error-panel';
-import { LoadingPanel } from 'src/components/data-state/loading-panel';
 import { PageGridOverlay } from 'src/components/page-background/page-grid-overlay';
 import { useLicenseSafetyGuide } from 'src/components/license-safety-guide/license-safety-guide';
 
@@ -41,14 +44,23 @@ type FameEntry = {
   srTier: string;
 };
 
+/** Matches Discord role chip gradients in `ROLE_CHIP_SX` (Creator / Admin / Moderator). */
+const TEAM_SPOTLIGHT_ACCENTS: Record<string, string> = {
+  Creators: '#ED4245',
+  Admins: '#A855F7',
+  Moderators: '#22C55E',
+};
+
 function CategoryCard({
   title,
   description,
   entries,
+  enterIndex = 1,
 }: {
   title: string;
   description: string;
   entries: FameEntry[];
+  enterIndex?: number;
 }) {
   const { openGuide } = useLicenseSafetyGuide();
 
@@ -56,6 +68,8 @@ function CategoryCard({
     <Paper
       sx={{
         ...GLASS_PANEL_SX,
+        ...brandAccentBorderSx(),
+        ...glassCardMotionSx(enterIndex),
         height: '100%',
         textAlign: { xs: 'center', md: 'left' },
       }}
@@ -79,6 +93,7 @@ function CategoryCard({
               }}
               sx={{
                 ...GLASS_INNER_ROW_SX,
+                ...subtleEnterUpSx(index, { baseDelayMs: 320 + enterIndex * 36 }),
               }}
             >
               <Stack spacing={0.8}>
@@ -174,10 +189,12 @@ function TeamRoleColumn({
   title,
   guids,
   allDrivers,
+  enterIndex = 7,
 }: {
   title: string;
   guids: string[];
   allDrivers: RankDriver[];
+  enterIndex?: number;
 }) {
   const { openGuide } = useLicenseSafetyGuide();
   const byGuid = useMemo(() => new Map(allDrivers.map((d) => [d.guid, d])), [allDrivers]);
@@ -201,10 +218,14 @@ function TeamRoleColumn({
     [byGuid, guids, licenseMap]
   );
 
+  const accent = TEAM_SPOTLIGHT_ACCENTS[title] ?? BRAND_ACCENT;
+
   return (
     <Paper
       sx={{
         ...GLASS_PANEL_SX,
+        ...statusAccentBorderSx(accent),
+        ...glassCardMotionSx(enterIndex),
         height: '100%',
         textAlign: { xs: 'center', md: 'left' },
       }}
@@ -218,7 +239,7 @@ function TeamRoleColumn({
             No members found in current data.
           </Typography>
         )}
-        {members.map((member) => (
+        {members.map((member, mi) => (
           <Box
             key={`${title}-${member.guid}`}
             onClick={() => {
@@ -226,6 +247,7 @@ function TeamRoleColumn({
             }}
             sx={{
               ...GLASS_INNER_ROW_SX,
+              ...subtleEnterUpSx(mi, { baseDelayMs: 380 }),
             }}
           >
             <Typography variant="subtitle2" sx={{ fontWeight: 700, textAlign: { xs: 'center', md: 'left' } }}>
@@ -268,6 +290,7 @@ export default function Page() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [drivers, setDrivers] = useState<RankDriver[]>([]);
+  const [metadata, setMetadata] = useState<SiteMetadata>({});
   const [teamRoles, setTeamRoles] = useState<TeamRoles>(EMPTY_TEAM_ROLES);
 
   useEffect(() => {
@@ -276,13 +299,15 @@ export default function Page() {
       setLoading(true);
       setError(null);
       try {
-        const [rank, roles] = await Promise.all([
+        const [rank, roles, meta] = await Promise.all([
           fetchJson<RankDriver[]>('/data/rank.json'),
           fetchJson<TeamRoles>('/data/team-roles.json'),
+          fetchJson<SiteMetadata>('/data/metadata.json').catch(() => ({})),
         ]);
         if (!mounted) return;
         setDrivers(rank);
         setTeamRoles(roles);
+        setMetadata(meta);
       } catch (e) {
         if (!mounted) return;
         setError(e instanceof Error ? e.message : 'Unknown error');
@@ -430,6 +455,11 @@ export default function Page() {
     [driverView]
   );
 
+  const syncHealth = useMemo(
+    () => getSyncHealth(getEffectiveLastSync(metadata?.lastSync, drivers)),
+    [metadata?.lastSync, drivers]
+  );
+
   const teamAdmins = useMemo(
     () => teamRoles.admin.filter((guid) => !teamRoles.creator.includes(guid)),
     [teamRoles.admin, teamRoles.creator]
@@ -461,46 +491,60 @@ export default function Page() {
 
         <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1 }}>
           <Stack spacing={3}>
-            <Stack spacing={1} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: { xs: 'center', md: 'flex-start' } }}>
-              <Typography variant="h4" fontWeight={800}>
-                Hall of Fame
-              </Typography>
-              <Typography color="text.secondary">
-                Standout drivers, iconic stats, and the AC Elite team behind the community.
-              </Typography>
-            </Stack>
+            <Box sx={{ ...GLASS_PANEL_SX, ...statusAccentBorderSx(syncHealth.color), ...glassCardMotionSx(0) }}>
+              <Stack spacing={0.75} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: { xs: 'center', md: 'flex-start' } }}>
+                <Typography variant="h4" fontWeight={800}>
+                  Hall of Fame
+                </Typography>
+                <Typography color="text.secondary">
+                  Standout drivers, iconic stats, and the AC Elite team behind the community.
+                </Typography>
+                <Typography variant="body2" sx={{ color: syncHealth.color, fontWeight: 700 }}>
+                  {syncHealth.label} · {syncHealth.ageText}
+                </Typography>
+              </Stack>
+            </Box>
 
-            {loading && <LoadingPanel message="Loading Hall of Fame data..." />}
+            {loading && (
+              <Grid container spacing={2.5}>
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <Grid key={i} size={{ xs: 12, md: 6 }}>
+                    <Skeleton variant="rounded" height={220} sx={{ borderRadius: 2, bgcolor: 'rgba(255,255,255,0.06)' }} />
+                  </Grid>
+                ))}
+              </Grid>
+            )}
 
             {!loading && error && <ErrorPanel error={error} />}
 
             {!loading && !error && (
               <>
                 <Grid container spacing={2.5}>
-                  {categories.map((category) => (
+                  {categories.map((category, categoryIndex) => (
                     <Grid key={category.title} size={{ xs: 12, md: 6 }}>
                       <CategoryCard
                         title={category.title}
                         description={category.description}
                         entries={category.entries}
+                        enterIndex={1 + categoryIndex}
                       />
                     </Grid>
                   ))}
                 </Grid>
 
                 <Box sx={{ pt: 1, textAlign: { xs: 'center', md: 'left' } }}>
-                  <Typography variant="h5" sx={{ fontWeight: 800, mb: 1.5 }}>
+                  <Typography variant="h5" sx={{ fontWeight: 800, mb: 1.5, ...subtleEnterOnceSx(320) }}>
                     Team Spotlight
                   </Typography>
                   <Grid container spacing={2.5}>
                     <Grid size={{ xs: 12, md: 4 }}>
-                      <TeamRoleColumn title="Creators" guids={teamRoles.creator} allDrivers={drivers} />
+                      <TeamRoleColumn title="Creators" guids={teamRoles.creator} allDrivers={drivers} enterIndex={7} />
                     </Grid>
                     <Grid size={{ xs: 12, md: 4 }}>
-                      <TeamRoleColumn title="Admins" guids={teamAdmins} allDrivers={drivers} />
+                      <TeamRoleColumn title="Admins" guids={teamAdmins} allDrivers={drivers} enterIndex={8} />
                     </Grid>
                     <Grid size={{ xs: 12, md: 4 }}>
-                      <TeamRoleColumn title="Moderators" guids={teamModerators} allDrivers={drivers} />
+                      <TeamRoleColumn title="Moderators" guids={teamModerators} allDrivers={drivers} enterIndex={9} />
                     </Grid>
                   </Grid>
                 </Box>

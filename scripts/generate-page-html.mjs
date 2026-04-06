@@ -43,6 +43,12 @@ const PAGES = [
     title: 'Livery Showcase - AC Elite',
     description: 'Official and team livery designs for the AC Elite simracing community.',
   },
+  {
+    route: 'setup-store',
+    title: 'Setup Store - AC Elite',
+    description:
+      'AC Elite setup store: community Assetto Corsa car setups (preview). Browse qualy, race and wet baselines.',
+  },
 ];
 
 function replaceTag(html, attr, value) {
@@ -50,6 +56,13 @@ function replaceTag(html, attr, value) {
     `(<meta\\s[^>]*${attr.replace(/([.*+?^${}()|[\]\\])/g, '\\$1')}\\s[^>]*content=")[^"]*(")`
   );
   return html.replace(re, `$1${value}$2`);
+}
+
+function replaceCanonical(html, href) {
+  return html.replace(
+    /<link\s+rel="canonical"\s+href="[^"]*"\s*\/?>/i,
+    `<link rel="canonical" href="${href}" />`
+  );
 }
 
 const template = readFileSync(join(DIST, 'index.html'), 'utf-8');
@@ -65,7 +78,9 @@ for (const page of PAGES) {
   html = replaceTag(html, 'property="og:url"', url);
   html = replaceTag(html, 'name="twitter:title"', page.title);
   html = replaceTag(html, 'name="twitter:description"', page.description);
+  html = replaceTag(html, 'name="twitter:url"', url);
   html = replaceTag(html, 'name="description"', page.description);
+  html = replaceCanonical(html, url);
 
   const dir = join(DIST, page.route);
   mkdirSync(dir, { recursive: true });

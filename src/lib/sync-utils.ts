@@ -16,7 +16,11 @@ export type SyncHealth = {
   ageText: string;
 };
 
-/** Data freshness for UI badges (same thresholds as former home/dashboard helpers). */
+/**
+ * Data freshness for UI badges (same thresholds as former home/dashboard helpers).
+ * Use `color` with `statusAccentBorderSx` from `src/lib/status-accent` **only** for accents that
+ * represent this freshness. For other panels use `brandAccentBorderSx()`.
+ */
 export function getSyncHealth(lastSync?: string): SyncHealth {
   if (!lastSync) {
     return { label: 'Unknown', color: '#f59e0b', ageText: 'Unknown' };
