@@ -46,7 +46,9 @@ import {
   getLicenseBadgeSx,
   LICENSE_CHIP_WIDTH,
   getTrackDisplayName,
+  normalizeServerTrackId,
   type LeaderboardCarRow,
+  leaderboardTrackIdLookupCandidates,
 } from 'src/lib/ac-elite-data';
 
 import { DeltaChip } from 'src/components/delta-chip/delta-chip';
@@ -59,11 +61,6 @@ const LEADERBOARD_PER_PAGE = 20;
 type CurrentTrackData = {
   track?: string;
 };
-
-function normalizeTrackId(track?: string): string {
-  if (!track) return '';
-  return track.replace('-layout', '_layout').replace(/-/g, '_');
-}
 
 export default function Page() {
   const { openGuide } = useLicenseSafetyGuide();
@@ -96,7 +93,12 @@ export default function Page() {
         setLeaderboardData(leaderboard);
         setMetadata(meta);
         setDeltas(computeDeltas(rank, prevRank));
-        setPreferredTrack(normalizeTrackId(trackData?.track));
+        const trackKeys = Object.keys(leaderboard);
+        const raw = trackData?.track?.trim() ?? '';
+        const preferred =
+          leaderboardTrackIdLookupCandidates(raw).find((id) => trackKeys.includes(id)) ??
+          normalizeServerTrackId(raw);
+        setPreferredTrack(preferred);
       } catch (e) {
         if (!mounted) return;
         setError(e instanceof Error ? e.message : 'Unknown error');

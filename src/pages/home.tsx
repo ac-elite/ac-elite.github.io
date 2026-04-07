@@ -68,6 +68,7 @@ import {
   LICENSE_CHIP_WIDTH,
   getTrackDisplayName,
   type LeaderboardCarRow,
+  leaderboardTrackIdLookupCandidates,
 } from 'src/lib/ac-elite-data';
 
 import { DeltaChip } from 'src/components/delta-chip/delta-chip';
@@ -966,14 +967,9 @@ export default function Page() {
 
   const currentTrackRows = useMemo<LeaderboardCarRow[]>(() => {
     const currentTrackId = currentTrack?.track;
-    if (!currentTrackId) return [];
-    const candidateTrackIds = [
-      currentTrackId,
-      currentTrackId.replace('-layout', '_layout'),
-      currentTrackId.replace(/-/g, '_'),
-    ];
-    const matchedTrackId = candidateTrackIds.find((id, index) => candidateTrackIds.indexOf(id) === index && leaderboardData?.[id]);
-    const data = leaderboardData?.[matchedTrackId || currentTrackId]?.[CAR];
+    if (!currentTrackId?.trim()) return [];
+    const matchedTrackId = leaderboardTrackIdLookupCandidates(currentTrackId).find((id) => leaderboardData?.[id]);
+    const data = matchedTrackId ? leaderboardData[matchedTrackId]?.[CAR] : undefined;
     if (!Array.isArray(data)) return [];
     return [...data].sort((a, b) => (a.laptime || 0) - (b.laptime || 0));
   }, [currentTrack?.track, leaderboardData]);

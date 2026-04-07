@@ -43,10 +43,26 @@ jobs:
           else
             echo "$HTTP_RESPONSE" | python3 -c "
           import json, sys
+          # Keep in sync with trackNames keys in src/lib/ac-elite-data.ts that end with a lone trailing _.
+          _CANONICAL_TRAILING_UNDERSCORE = (
+              'imola_',
+              'ks_laguna_seca_',
+              'magione_',
+              'monza_',
+              'mugello_',
+              'spa_',
+              'ks_zandvoort_',
+              'canada_2021_',
+          )
+
           def normalize_track_id(track):
               if not isinstance(track, str):
                   return ''
-              return track.replace('-layout', '_layout')
+              t = track.replace('-layout', '_layout').replace('-', '_')
+              for canon in _CANONICAL_TRAILING_UNDERSCORE:
+                  if t == canon or t == canon[:-1]:
+                      return canon
+              return t
           try:
               data = json.load(sys.stdin)
               track = normalize_track_id(data.get('track', ''))

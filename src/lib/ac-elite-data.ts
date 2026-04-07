@@ -390,8 +390,71 @@ const trackNames: Record<string, string> = {
   acu_unitedstates_a: 'COTA (USA)',
 };
 
+/**
+ * Server /INFO often omits a trailing `_` that leaderboard.json uses (e.g. `spa` vs `spa_`).
+ * Map the short form to the canonical key when it is unambiguous (no separate `trackNames` entry for the short form).
+ */
+function buildTrailingUnderscoreAliases(names: Record<string, string>): Record<string, string> {
+  const aliases: Record<string, string> = {};
+  for (const key of Object.keys(names)) {
+    if (!key.endsWith('_')) continue;
+    const without = key.slice(0, -1);
+    if (without && !(without in names)) aliases[without] = key;
+  }
+  return aliases;
+}
+
+/** Server id → canonical leaderboard key (trailing `_` variants derived from `trackNames`). */
+const SERVER_TRACK_ID_ALIASES: Record<string, string> = {
+  ...buildTrailingUnderscoreAliases(trackNames),
+};
+
+/** Normalize track id from live server or URL params to keys used in leaderboard.json and trackNames. */
+export function normalizeServerTrackId(trackId: string): string {
+  let t = trackId.trim();
+  t = t.replace('-layout', '_layout').replace(/-/g, '_');
+  return SERVER_TRACK_ID_ALIASES[t] ?? t;
+}
+
+/**
+ * Ordered ids to try when matching a server /INFO string to `leaderboard.json` top-level keys.
+ * Includes a generic `id` / `id_` pair so **unknown** tracks still match if the file uses a trailing `_`
+ * (common in AC) while the server omits it — without listing every circuit in `trackNames`.
+ */
+export function leaderboardTrackIdLookupCandidates(rawTrackId: string): string[] {
+  const t = rawTrackId.trim();
+  if (!t) return [];
+
+  const seen = new Set<string>();
+  const out: string[] = [];
+
+  const push = (id: string) => {
+    if (!id || seen.has(id)) return;
+    seen.add(id);
+    out.push(id);
+    if (!id.endsWith('_')) {
+      const suffixed = `${id}_`;
+      if (!seen.has(suffixed)) {
+        seen.add(suffixed);
+        out.push(suffixed);
+      }
+    }
+  };
+
+  push(normalizeServerTrackId(t));
+  push(t);
+  push(t.replace('-layout', '_layout'));
+  push(t.replace(/-/g, '_'));
+  push(t.replace('-layout', '_layout').replace(/-/g, '_'));
+
+  return out;
+}
+
 export function getTrackDisplayName(trackId: string) {
-  return trackNames[trackId] || trackId.replace(/_/g, ' ').trim();
+  const id = normalizeServerTrackId(trackId);
+  const pretty =
+    trackNames[id] ?? (!id.endsWith('_') ? trackNames[`${id}_`] : undefined);
+  return pretty ?? id.replace(/_/g, ' ').trim();
 }
 
 export function formatLaptime(ms?: number | null) {

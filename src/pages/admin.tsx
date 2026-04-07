@@ -18,8 +18,8 @@ import TableContainer from '@mui/material/TableContainer';
 import { CONFIG } from 'src/config-global';
 import { fetchJson } from 'src/lib/fetch-json';
 import { getSyncHealth } from 'src/lib/sync-utils';
-import { formatNumber } from 'src/lib/ac-elite-data';
 import { glassCardMotionSx } from 'src/lib/subtle-motion';
+import { formatNumber, getTrackDisplayName } from 'src/lib/ac-elite-data';
 import { STATUS_ACCENT, brandAccentBorderSx, statusAccentBorderSx } from 'src/lib/status-accent';
 import {
   GLASS_CARD_SX,
@@ -173,7 +173,10 @@ const DATA_FILES: readonly DataFileEntry[] = [
     file: 'current-track.json',
     updatedBy: 'Daily Current Track',
     getTimestamp: (s) => s.currentTrack?.fetchedAt,
-    getNote: (s) => (s.currentTrack?.online ? `online · ${s.currentTrack.track || '—'}` : 'offline'),
+    getNote: (s) =>
+      s.currentTrack?.online
+        ? `online · ${s.currentTrack.track ? getTrackDisplayName(s.currentTrack.track) : '—'}`
+        : 'offline',
   },
   {
     file: 'rank.json',
@@ -466,7 +469,9 @@ export default function Page() {
                           letterSpacing: '-0.02em',
                         }}
                       >
-                        {data.currentTrack?.track?.trim() ? data.currentTrack.track : '—'}
+                        {data.currentTrack?.track?.trim()
+                          ? getTrackDisplayName(data.currentTrack.track)
+                          : '—'}
                       </Typography>
                       <Typography variant="body2" sx={{ color: 'text.secondary', mt: 1.25 }}>
                         {data.currentTrack?.fetchedAt
