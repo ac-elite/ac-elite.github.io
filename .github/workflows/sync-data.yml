@@ -47,6 +47,34 @@ jobs:
           const fs = require('fs');
           const path = require('path');
 
+          function parseJsonFile(filePath, label) {
+              const raw = fs.readFileSync(filePath, 'utf8');
+              if (!raw || !raw.trim()) {
+                  throw new Error(`${label} is empty`);
+              }
+              try {
+                  return JSON.parse(raw);
+              } catch (err) {
+                  throw new Error(`${label} is not valid JSON: ${err.message}`);
+              }
+          }
+
+          async function downloadJsonAtomically(client, dataDir, remotePath, fileName) {
+              const finalPath = path.join(dataDir, fileName);
+              const tempPath = `${finalPath}.tmp`;
+
+              try {
+                  if (fs.existsSync(tempPath)) fs.unlinkSync(tempPath);
+                  await client.downloadTo(tempPath, remotePath);
+                  parseJsonFile(tempPath, fileName);
+                  fs.renameSync(tempPath, finalPath);
+                  console.log(`✓ Downloaded and validated ${fileName}`);
+              } catch (err) {
+                  if (fs.existsSync(tempPath)) fs.unlinkSync(tempPath);
+                  throw err;
+              }
+          }
+
           async function syncData() {
               const client = new ftp.Client();
               client.ftp.verbose = false;
@@ -67,29 +95,21 @@ jobs:
                   });
                   
                   console.log('Connected! Downloading files...');
-                  
-                  // Download rank.json
-                  try {
-                      await client.downloadTo(
-                          path.join(dataDir, 'rank.json'),
-                          'kissmyrank/rank.json'
-                      );
-                      console.log('✓ Downloaded rank.json');
-                  } catch (err) {
-                      console.error('✗ Failed to download rank.json:', err.message);
+
+                  // Download + validate required data files.
+                  await downloadJsonAtomically(client, dataDir, 'kissmyrank/rank.json', 'rank.json');
+                  await downloadJsonAtomically(client, dataDir, 'kissmyrank/leaderboard.json', 'leaderboard.json');
+
+                  // Sanity-check shape to avoid committing garbage.
+                  const rank = parseJsonFile(path.join(dataDir, 'rank.json'), 'rank.json');
+                  const leaderboard = parseJsonFile(path.join(dataDir, 'leaderboard.json'), 'leaderboard.json');
+                  if (!Array.isArray(rank)) {
+                      throw new Error('rank.json must contain a JSON array');
                   }
-                  
-                  // Download leaderboard.json
-                  try {
-                      await client.downloadTo(
-                          path.join(dataDir, 'leaderboard.json'),
-                          'kissmyrank/leaderboard.json'
-                      );
-                      console.log('✓ Downloaded leaderboard.json');
-                  } catch (err) {
-                      console.error('✗ Failed to download leaderboard.json:', err.message);
+                  if (!leaderboard || Array.isArray(leaderboard) || typeof leaderboard !== 'object') {
+                      throw new Error('leaderboard.json must contain a JSON object');
                   }
-                  
+
                   // Create metadata file with sync timestamp
                   const metadata = {
                       lastSync: new Date().toISOString(),
@@ -102,7 +122,7 @@ jobs:
                   console.log('✓ Created metadata.json');
                   
               } catch (err) {
-                  console.error('FTP connection failed:', err.message);
+                  console.error('Sync failed:', err.message);
                   
                   // Create error metadata
                   const metadata = {
@@ -128,7 +148,18 @@ jobs:
 
       - name: Commit and push changes
         run: |
+          # Never allow accidental deletion of required live data files.
+          if [ ! -f public/data/rank.json ] || [ ! -f public/data/leaderboard.json ]; then
+            echo "Required files missing; aborting commit."
+            exit 1
+          fi
+
           git add public/data/
+
+          if git diff --staged --name-status | grep -E '^D[[:space:]]+public/data/(rank|leaderboard)\.json$' >/dev/null; then
+            echo "Refusing to commit deletion of rank.json or leaderboard.json."
+            exit 1
+          fi
 
           # Only commit if there are changes
           if git diff --staged --quiet; then
