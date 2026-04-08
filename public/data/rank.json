@@ -6595,6 +6595,77 @@
   "infr": 15
  },
  {
+  "guid": "76561198066917659",
+  "name": "maVVam",
+  "points": 459.229,
+  "kilometers": 5133.7,
+  "collisions": 145,
+  "leaderboard": {
+   "monza_": {
+    "tatuusfa1": {
+     "laptime": 110537,
+     "laps": 121,
+     "ts": 1757200234824
+    }
+   },
+   "mugello_": {
+    "tatuusfa1": {
+     "laptime": 105404,
+     "laps": 6,
+     "ts": 1757704215614
+    }
+   },
+   "ks_red_bull_ring_layout_gp": {
+    "tatuusfa1": {
+     "laptime": 89073,
+     "laps": 70,
+     "ts": 1771092714940
+    }
+   },
+   "ks_zandvoort_": {
+    "tatuusfa1": {
+     "laptime": 93846,
+     "laps": 183,
+     "ts": 1775688505262
+    }
+   },
+   "rt_suzuka_suzukagp": {
+    "tatuusfa1": {
+     "laptime": 119953,
+     "laps": 6,
+     "ts": 1769124179421
+    }
+   },
+   "canada_2021_": {
+    "tatuusfa1": {
+     "laptime": 94526,
+     "laps": 22,
+     "ts": 1769711902782
+    }
+   },
+   "acu_unitedstates_a": {
+    "tatuusfa1": {
+     "laptime": 123610,
+     "laps": 24,
+     "ts": 1770331982359
+    }
+   },
+   "ks_nurburgring_layout_gp_b": {
+    "tatuusfa1": {
+     "laptime": 113690,
+     "laps": 5,
+     "ts": 1775406409763
+    }
+   }
+  },
+  "last_seen": 1775688536545,
+  "wins": 22,
+  "podiums": 33,
+  "poles": 25,
+  "flaps": 27,
+  "infr": 5
+ },
+ {
   "guid": "76561199442944100",
   "name": "Jamal alabyte",
   "points": 448.05,
@@ -6713,77 +6784,6 @@
   "poles": 7,
   "flaps": 6,
   "infr": 47
- },
- {
-  "guid": "76561198066917659",
-  "name": "maVVam",
-  "points": 443.39099999999996,
-  "kilometers": 4977.6,
-  "collisions": 143,
-  "leaderboard": {
-   "monza_": {
-    "tatuusfa1": {
-     "laptime": 110537,
-     "laps": 121,
-     "ts": 1757200234824
-    }
-   },
-   "mugello_": {
-    "tatuusfa1": {
-     "laptime": 105404,
-     "laps": 6,
-     "ts": 1757704215614
-    }
-   },
-   "ks_red_bull_ring_layout_gp": {
-    "tatuusfa1": {
-     "laptime": 89073,
-     "laps": 70,
-     "ts": 1771092714940
-    }
-   },
-   "ks_zandvoort_": {
-    "tatuusfa1": {
-     "laptime": 94047,
-     "laps": 172,
-     "ts": 1775684465680
-    }
-   },
-   "rt_suzuka_suzukagp": {
-    "tatuusfa1": {
-     "laptime": 119953,
-     "laps": 6,
-     "ts": 1769124179421
-    }
-   },
-   "canada_2021_": {
-    "tatuusfa1": {
-     "laptime": 94526,
-     "laps": 22,
-     "ts": 1769711902782
-    }
-   },
-   "acu_unitedstates_a": {
-    "tatuusfa1": {
-     "laptime": 123610,
-     "laps": 24,
-     "ts": 1770331982359
-    }
-   },
-   "ks_nurburgring_layout_gp_b": {
-    "tatuusfa1": {
-     "laptime": 113690,
-     "laps": 5,
-     "ts": 1775406409763
-    }
-   }
-  },
-  "last_seen": 1775684557416,
-  "wins": 19,
-  "podiums": 30,
-  "poles": 25,
-  "flaps": 24,
-  "infr": 5
  },
  {
   "guid": "76561199049146223",
@@ -41372,35 +41372,6 @@
   "infr": 5
  },
  {
-  "guid": "76561198949239918",
-  "name": "DarkWeasel920",
-  "points": 65.141,
-  "kilometers": 223.1,
-  "collisions": 22,
-  "leaderboard": {
-   "ks_silverstone_gp": {
-    "tatuusfa1": {
-     "laptime": 122662,
-     "laps": 2,
-     "ts": 1765929054220
-    }
-   },
-   "ks_zandvoort_": {
-    "tatuusfa1": {
-     "laptime": 96552,
-     "laps": 17,
-     "ts": 1775682493226
-    }
-   }
-  },
-  "last_seen": 1775684557416,
-  "wins": 1,
-  "podiums": 1,
-  "poles": 2,
-  "flaps": 1,
-  "infr": 2
- },
- {
   "guid": "76561199231096841",
   "name": "Simply Bugsy",
   "points": 65.132,
@@ -41813,6 +41784,35 @@
   "podiums": 1,
   "poles": 0,
   "flaps": 0,
+  "infr": 2
+ },
+ {
+  "guid": "76561198949239918",
+  "name": "DarkWeasel920",
+  "points": 64.84100000000001,
+  "kilometers": 223.1,
+  "collisions": 22,
+  "leaderboard": {
+   "ks_silverstone_gp": {
+    "tatuusfa1": {
+     "laptime": 122662,
+     "laps": 2,
+     "ts": 1765929054220
+    }
+   },
+   "ks_zandvoort_": {
+    "tatuusfa1": {
+     "laptime": 96552,
+     "laps": 17,
+     "ts": 1775682493226
+    }
+   }
+  },
+  "last_seen": 1775686261849,
+  "wins": 1,
+  "podiums": 1,
+  "poles": 2,
+  "flaps": 1,
   "infr": 2
  },
  {
@@ -138989,6 +138989,21 @@
   "infr": 2
  },
  {
+  "guid": "76561199094309112",
+  "name": "Illyrianblood",
+  "points": 48.283,
+  "kilometers": 28.1,
+  "collisions": 2,
+  "leaderboard": {
+  },
+  "last_seen": 1775685287253,
+  "wins": 0,
+  "podiums": 0,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 0
+ },
+ {
   "guid": "76561199522347608",
   "name": "ak_m2005",
   "points": 48.282,
@@ -166487,6 +166502,21 @@
    }
   },
   "last_seen": 1768003684121,
+  "wins": 0,
+  "podiums": 0,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 1
+ },
+ {
+  "guid": "76561198942480347",
+  "name": "it_ski",
+  "points": 43.63,
+  "kilometers": 9.1,
+  "collisions": 8,
+  "leaderboard": {
+  },
+  "last_seen": 1775688078534,
   "wins": 0,
   "podiums": 0,
   "poles": 0,
