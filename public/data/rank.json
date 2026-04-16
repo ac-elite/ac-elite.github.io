@@ -1282,8 +1282,8 @@
  {
   "guid": "76561198999518018",
   "name": "David O.",
-  "points": 2243.781,
-  "kilometers": 15014.8,
+  "points": 2244.24,
+  "kilometers": 15037.8,
   "collisions": 349,
   "leaderboard": {
    "ks_zandvoort_": {
@@ -1338,8 +1338,8 @@
    "mugello_": {
     "tatuusfa1": {
      "laptime": 104820,
-     "laps": 263,
-     "ts": 1776277038090
+     "laps": 265,
+     "ts": 1776351222751
     }
    },
    "acu_unitedstates_a": {
@@ -1364,7 +1364,7 @@
     }
    }
   },
-  "last_seen": 1776277117644,
+  "last_seen": 1776351390652,
   "wins": 82,
   "podiums": 189,
   "poles": 43,
@@ -2658,9 +2658,9 @@
  {
   "guid": "76561198823475881",
   "name": "Dani3314",
-  "points": 1219.0249999999999,
-  "kilometers": 8538.3,
-  "collisions": 595,
+  "points": 1228.509,
+  "kilometers": 8569.9,
+  "collisions": 596,
   "leaderboard": {
    "ks_zandvoort_": {
     "tatuusfa1": {
@@ -2678,9 +2678,9 @@
    },
    "mugello_": {
     "tatuusfa1": {
-     "laptime": 105021,
-     "laps": 119,
-     "ts": 1776269371436
+     "laptime": 104819,
+     "laps": 126,
+     "ts": 1776351180387
     }
    },
    "ks_silverstone_gp": {
@@ -2747,11 +2747,11 @@
     }
    }
   },
-  "last_seen": 1776269387963,
-  "wins": 72,
-  "podiums": 103,
+  "last_seen": 1776351390652,
+  "wins": 73,
+  "podiums": 104,
   "poles": 35,
-  "flaps": 75,
+  "flaps": 76,
   "infr": 24
  },
  {
@@ -18101,8 +18101,8 @@
  {
   "guid": "76561198985940634",
   "name": "PPB",
-  "points": 108.33200000000001,
-  "kilometers": 774.8,
+  "points": 108.272,
+  "kilometers": 782.5,
   "collisions": 81,
   "leaderboard": {
    "ks_silverstone_gp": {
@@ -18162,7 +18162,7 @@
     }
    }
   },
-  "last_seen": 1775947585910,
+  "last_seen": 1776346484598,
   "wins": 2,
   "podiums": 4,
   "poles": 1,
@@ -26431,7 +26431,7 @@
   "guid": "76561198845742764",
   "name": "Volanda",
   "points": 80.754,
-  "kilometers": 442.9,
+  "kilometers": 443.1,
   "collisions": 4,
   "leaderboard": {
    "ks_zandvoort_": {
@@ -26456,7 +26456,7 @@
     }
    }
   },
-  "last_seen": 1776339131776,
+  "last_seen": 1776346445222,
   "wins": 3,
   "podiums": 5,
   "poles": 0,
@@ -40567,6 +40567,28 @@
   "infr": 6
  },
  {
+  "guid": "76561199789396728",
+  "name": "YeetyBoey",
+  "points": 66.507,
+  "kilometers": 68.2,
+  "collisions": 6,
+  "leaderboard": {
+   "mugello_": {
+    "tatuusfa1": {
+     "laptime": 110394,
+     "laps": 10,
+     "ts": 1776339055563
+    }
+   }
+  },
+  "last_seen": 1776339111202,
+  "wins": 1,
+  "podiums": 2,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 0
+ },
+ {
   "guid": "76561198250672976",
   "name": "Freddepadd",
   "points": 66.484,
@@ -43654,28 +43676,6 @@
   "last_seen": 1776101880409,
   "wins": 0,
   "podiums": 0,
-  "poles": 0,
-  "flaps": 0,
-  "infr": 0
- },
- {
-  "guid": "76561199789396728",
-  "name": "YeetyBoey",
-  "points": 64.778,
-  "kilometers": 68.2,
-  "collisions": 6,
-  "leaderboard": {
-   "mugello_": {
-    "tatuusfa1": {
-     "laptime": 110394,
-     "laps": 10,
-     "ts": 1776339055563
-    }
-   }
-  },
-  "last_seen": 1776339111202,
-  "wins": 1,
-  "podiums": 1,
   "poles": 0,
   "flaps": 0,
   "infr": 0
@@ -49545,28 +49545,6 @@
   "infr": 0
  },
  {
-  "guid": "76561198202156252",
-  "name": "Lowquattro",
-  "points": 61.854,
-  "kilometers": 15.1,
-  "collisions": 0,
-  "leaderboard": {
-   "mugello_": {
-    "tatuusfa1": {
-     "laptime": 110357,
-     "laps": 5,
-     "ts": 1776276936509
-    }
-   }
-  },
-  "last_seen": 1776292810548,
-  "wins": 0,
-  "podiums": 0,
-  "poles": 0,
-  "flaps": 0,
-  "infr": 0
- },
- {
   "guid": "76561199169260783",
   "name": "BinBoBoi",
   "points": 61.853,
@@ -50723,6 +50701,28 @@
    }
   },
   "last_seen": 1774567238677,
+  "wins": 0,
+  "podiums": 0,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 0
+ },
+ {
+  "guid": "76561198202156252",
+  "name": "Lowquattro",
+  "points": 61.505,
+  "kilometers": 6.6,
+  "collisions": 0,
+  "leaderboard": {
+   "mugello_": {
+    "tatuusfa1": {
+     "laptime": 110357,
+     "laps": 5,
+     "ts": 1776276936509
+    }
+   }
+  },
+  "last_seen": 1776350741282,
   "wins": 0,
   "podiums": 0,
   "poles": 0,
