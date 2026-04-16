@@ -983,8 +983,8 @@
  {
   "guid": "76561198010877229",
   "name": "JoP",
-  "points": 2686.5209999999997,
-  "kilometers": 16872.2,
+  "points": 2690.454,
+  "kilometers": 16903.7,
   "collisions": 813,
   "leaderboard": {
    "ks_zandvoort_": {
@@ -1004,8 +1004,8 @@
    "mugello_": {
     "tatuusfa1": {
      "laptime": 105900,
-     "laps": 255,
-     "ts": 1776360117334
+     "laps": 260,
+     "ts": 1776360910696
     }
    },
    "ks_barcelona_layout_gp": {
@@ -1126,9 +1126,9 @@
     }
    }
   },
-  "last_seen": 1776360208650,
+  "last_seen": 1776361007743,
   "wins": 24,
-  "podiums": 149,
+  "podiums": 150,
   "poles": 5,
   "flaps": 10,
   "infr": 3
@@ -1847,8 +1847,8 @@
  {
   "guid": "76561198845443064",
   "name": "Peter Paris",
-  "points": 1655.3129999999999,
-  "kilometers": 9142.7,
+  "points": 1661.782,
+  "kilometers": 9174.2,
   "collisions": 483,
   "leaderboard": {
    "ks_zandvoort_": {
@@ -1861,8 +1861,8 @@
    "mugello_": {
     "tatuusfa1": {
      "laptime": 105737,
-     "laps": 228,
-     "ts": 1776198547304
+     "laps": 233,
+     "ts": 1776367327002
     }
    },
    "ks_nurburgring_layout_gp_b": {
@@ -1971,11 +1971,11 @@
     }
    }
   },
-  "last_seen": 1776198608664,
-  "wins": 35,
-  "podiums": 118,
+  "last_seen": 1776367381841,
+  "wins": 36,
+  "podiums": 119,
   "poles": 9,
-  "flaps": 10,
+  "flaps": 11,
   "infr": 9,
   "notif": 0
  },
@@ -2757,8 +2757,8 @@
  {
   "guid": "76561198253261997",
   "name": "Zheng Ting Lim",
-  "points": 1094.342,
-  "kilometers": 16035.1,
+  "points": 1100.94,
+  "kilometers": 16066.5,
   "collisions": 750,
   "leaderboard": {
    "ks_nurburgring_layout_gp_b": {
@@ -2876,16 +2876,16 @@
    "mugello_": {
     "tatuusfa1": {
      "laptime": 104355,
-     "laps": 69,
-     "ts": 1776360039169
+     "laps": 74,
+     "ts": 1776360903186
     }
    }
   },
-  "last_seen": 1776360208650,
-  "wins": 51,
-  "podiums": 93,
+  "last_seen": 1776361004879,
+  "wins": 52,
+  "podiums": 94,
   "poles": 46,
-  "flaps": 79,
+  "flaps": 80,
   "infr": 31
  },
  {
@@ -47748,6 +47748,28 @@
   "infr": 0
  },
  {
+  "guid": "76561197993075565",
+  "name": "Candyman",
+  "points": 62.638,
+  "kilometers": 39.2,
+  "collisions": 1,
+  "leaderboard": {
+   "mugello_": {
+    "tatuusfa1": {
+     "laptime": 110242,
+     "laps": 5,
+     "ts": 1776360931302
+    }
+   }
+  },
+  "last_seen": 1776361019975,
+  "wins": 0,
+  "podiums": 1,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 0
+ },
+ {
   "guid": "76561198449398235",
   "name": "YC",
   "points": 62.636,
@@ -55184,6 +55206,28 @@
   "last_seen": 1765229083512,
   "wins": 0,
   "podiums": 2,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 0
+ },
+ {
+  "guid": "76561199360878319",
+  "name": "Lorenzo Hendriksz",
+  "points": 60.202,
+  "kilometers": 32.5,
+  "collisions": 6,
+  "leaderboard": {
+   "mugello_": {
+    "tatuusfa1": {
+     "laptime": 106531,
+     "laps": 4,
+     "ts": 1776367154273
+    }
+   }
+  },
+  "last_seen": 1776367346414,
+  "wins": 0,
+  "podiums": 0,
   "poles": 0,
   "flaps": 0,
   "infr": 0
@@ -96058,6 +96102,28 @@
   "infr": 0
  },
  {
+  "guid": "76561199048139308",
+  "name": "Efe Günaltılı",
+  "points": 52.394999999999996,
+  "kilometers": 27.4,
+  "collisions": 9,
+  "leaderboard": {
+   "mugello_": {
+    "tatuusfa1": {
+     "laptime": 111620,
+     "laps": 4,
+     "ts": 1776367287861
+    }
+   }
+  },
+  "last_seen": 1776367349921,
+  "wins": 0,
+  "podiums": 0,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 0
+ },
+ {
   "guid": "76561198868969801",
   "name": "resetyourskills",
   "points": 52.393,
@@ -119150,21 +119216,6 @@
   "leaderboard": {
   },
   "last_seen": 1764019319747,
-  "wins": 0,
-  "podiums": 0,
-  "poles": 0,
-  "flaps": 0,
-  "infr": 0
- },
- {
-  "guid": "76561197993075565",
-  "name": "Ted Floyd",
-  "points": 49.911,
-  "kilometers": 7.7,
-  "collisions": 1,
-  "leaderboard": {
-  },
-  "last_seen": 1771094369687,
   "wins": 0,
   "podiums": 0,
   "poles": 0,
@@ -151103,6 +151154,21 @@
    }
   },
   "last_seen": 1766344964914,
+  "wins": 0,
+  "podiums": 0,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 0
+ },
+ {
+  "guid": "76561199172677295",
+  "name": "reyanshaqil99",
+  "points": 47.453,
+  "kilometers": 11.5,
+  "collisions": 10,
+  "leaderboard": {
+  },
+  "last_seen": 1776364794019,
   "wins": 0,
   "podiums": 0,
   "poles": 0,
@@ -340990,21 +341056,6 @@
   "infr": 1
  },
  {
-  "guid": "76561198986611908",
-  "name": "Lewis Hamilton",
-  "points": 9.538999999999998,
-  "kilometers": 32.8,
-  "collisions": 24,
-  "leaderboard": {
-  },
-  "last_seen": 1762195020425,
-  "wins": 0,
-  "podiums": 0,
-  "poles": 0,
-  "flaps": 0,
-  "infr": 4
- },
- {
   "guid": "76561198395297562",
   "name": "Kapitan III Rzesza",
   "points": 9.535,
@@ -341473,6 +341524,21 @@
   "poles": 0,
   "flaps": 0,
   "infr": 3
+ },
+ {
+  "guid": "76561198986611908",
+  "name": "Lewis Hamilton",
+  "points": 8.458,
+  "kilometers": 39.4,
+  "collisions": 25,
+  "leaderboard": {
+  },
+  "last_seen": 1776362526224,
+  "wins": 0,
+  "podiums": 0,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 5
  },
  {
   "guid": "76561198214900403",
