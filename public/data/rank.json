@@ -983,9 +983,9 @@
  {
   "guid": "76561198010877229",
   "name": "JoP",
-  "points": 2703.057,
-  "kilometers": 17215.4,
-  "collisions": 834,
+  "points": 2707.034,
+  "kilometers": 17251,
+  "collisions": 838,
   "leaderboard": {
    "ks_zandvoort_": {
     "tatuusfa1": {
@@ -997,8 +997,8 @@
    "monza_": {
     "tatuusfa1": {
      "laptime": 112549,
-     "laps": 199,
-     "ts": 1776887800149
+     "laps": 203,
+     "ts": 1776889237705
     }
    },
    "mugello_": {
@@ -1126,11 +1126,11 @@
     }
    }
   },
-  "last_seen": 1776888617154,
-  "wins": 24,
-  "podiums": 154,
+  "last_seen": 1776889392277,
+  "wins": 25,
+  "podiums": 155,
   "poles": 5,
-  "flaps": 10,
+  "flaps": 11,
   "infr": 3
  },
  {
@@ -9017,7 +9017,7 @@
   "guid": "76561199738550526",
   "name": "MRV2",
   "points": 242.386,
-  "kilometers": 4535.6,
+  "kilometers": 4539.9,
   "collisions": 364,
   "leaderboard": {
    "ks_silverstone_gp": {
@@ -9091,7 +9091,7 @@
     }
    }
   },
-  "last_seen": 1776888617154,
+  "last_seen": 1776888743756,
   "wins": 3,
   "podiums": 18,
   "poles": 1,
@@ -207554,84 +207554,6 @@
   "infr": 0
  },
  {
-  "guid": "76561198217814752",
-  "name": "Y-Softy",
-  "points": 37.49,
-  "kilometers": 562.4,
-  "collisions": 54,
-  "leaderboard": {
-   "monza_": {
-    "tatuusfa1": {
-     "laptime": 116114,
-     "laps": 10,
-     "ts": 1776888341933
-    }
-   },
-   "ks_nurburgring_layout_gp_b": {
-    "tatuusfa1": {
-     "laptime": 125036,
-     "laps": 2,
-     "ts": 1759438763306
-    }
-   },
-   "imola_": {
-    "tatuusfa1": {
-     "laptime": 117532,
-     "laps": 1,
-     "ts": 1761424697803
-    }
-   },
-   "spa_": {
-    "tatuusfa1": {
-     "laptime": 146100,
-     "laps": 2,
-     "ts": 1761667306234
-    }
-   },
-   "ks_zandvoort_": {
-    "tatuusfa1": {
-     "laptime": 101567,
-     "laps": 1,
-     "ts": 1763096962536
-    }
-   },
-   "ks_barcelona_layout_moto": {
-    "tatuusfa1": {
-     "laptime": 104957,
-     "laps": 2,
-     "ts": 1764357505819
-    }
-   },
-   "mugello_": {
-    "tatuusfa1": {
-     "laptime": 109649,
-     "laps": 6,
-     "ts": 1764880434162
-    }
-   },
-   "ks_nurburgring_layout_gp_a": {
-    "tatuusfa1": {
-     "laptime": 124592,
-     "laps": 1,
-     "ts": 1766861025802
-    }
-   },
-   "ks_laguna_seca_": {
-    "tatuusfa1": {
-     "laptime": 86960,
-     "laps": 4,
-     "ts": 1772652095097
-    }
-   }
-  },
-  "last_seen": 1776888617154,
-  "wins": 1,
-  "podiums": 1,
-  "poles": 0,
-  "flaps": 0,
-  "infr": 10
- },
- {
   "guid": "76561199299647782",
   "name": "FRAN GOMEZ",
   "points": 37.485,
@@ -223883,6 +223805,84 @@
   "poles": 0,
   "flaps": 0,
   "infr": 0
+ },
+ {
+  "guid": "76561198217814752",
+  "name": "Y-Softy",
+  "points": 34.561,
+  "kilometers": 570.5,
+  "collisions": 56,
+  "leaderboard": {
+   "monza_": {
+    "tatuusfa1": {
+     "laptime": 116114,
+     "laps": 10,
+     "ts": 1776888341933
+    }
+   },
+   "ks_nurburgring_layout_gp_b": {
+    "tatuusfa1": {
+     "laptime": 125036,
+     "laps": 2,
+     "ts": 1759438763306
+    }
+   },
+   "imola_": {
+    "tatuusfa1": {
+     "laptime": 117532,
+     "laps": 1,
+     "ts": 1761424697803
+    }
+   },
+   "spa_": {
+    "tatuusfa1": {
+     "laptime": 146100,
+     "laps": 2,
+     "ts": 1761667306234
+    }
+   },
+   "ks_zandvoort_": {
+    "tatuusfa1": {
+     "laptime": 101567,
+     "laps": 1,
+     "ts": 1763096962536
+    }
+   },
+   "ks_barcelona_layout_moto": {
+    "tatuusfa1": {
+     "laptime": 104957,
+     "laps": 2,
+     "ts": 1764357505819
+    }
+   },
+   "mugello_": {
+    "tatuusfa1": {
+     "laptime": 109649,
+     "laps": 6,
+     "ts": 1764880434162
+    }
+   },
+   "ks_nurburgring_layout_gp_a": {
+    "tatuusfa1": {
+     "laptime": 124592,
+     "laps": 1,
+     "ts": 1766861025802
+    }
+   },
+   "ks_laguna_seca_": {
+    "tatuusfa1": {
+     "laptime": 86960,
+     "laps": 4,
+     "ts": 1772652095097
+    }
+   }
+  },
+  "last_seen": 1776888757948,
+  "wins": 1,
+  "podiums": 1,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 10
  },
  {
   "guid": "76561198866491994",
