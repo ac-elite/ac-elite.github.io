@@ -8651,6 +8651,63 @@
   "infr": 15
  },
  {
+  "guid": "76561198050070050",
+  "name": "Gianc",
+  "points": 254.193,
+  "kilometers": 1926.4,
+  "collisions": 100,
+  "leaderboard": {
+   "ks_silverstone_gp": {
+    "tatuusfa1": {
+     "laptime": 125444,
+     "laps": 1,
+     "ts": 1760288434146
+    }
+   },
+   "ks_vallelunga_classic_circuit": {
+    "tatuusfa1": {
+     "laptime": 70185,
+     "laps": 30,
+     "ts": 1767614009009
+    }
+   },
+   "ks_nurburgring_layout_gp_b": {
+    "tatuusfa1": {
+     "laptime": 114744,
+     "laps": 40,
+     "ts": 1775142693530
+    }
+   },
+   "ks_zandvoort_": {
+    "tatuusfa1": {
+     "laptime": 96756,
+     "laps": 6,
+     "ts": 1775496735506
+    }
+   },
+   "mugello_": {
+    "tatuusfa1": {
+     "laptime": 106244,
+     "laps": 40,
+     "ts": 1776444501902
+    }
+   },
+   "monza_": {
+    "tatuusfa1": {
+     "laptime": 111674,
+     "laps": 95,
+     "ts": 1776942296559
+    }
+   }
+  },
+  "last_seen": 1776942338275,
+  "wins": 10,
+  "podiums": 19,
+  "poles": 1,
+  "flaps": 9,
+  "infr": 2
+ },
+ {
   "guid": "76561198029742156",
   "name": "Mohammad Alsharawneh",
   "points": 253.234,
@@ -9012,63 +9069,6 @@
   "poles": 2,
   "flaps": 2,
   "infr": 10
- },
- {
-  "guid": "76561198050070050",
-  "name": "Gianc",
-  "points": 243.70399999999998,
-  "kilometers": 1855.3,
-  "collisions": 97,
-  "leaderboard": {
-   "ks_silverstone_gp": {
-    "tatuusfa1": {
-     "laptime": 125444,
-     "laps": 1,
-     "ts": 1760288434146
-    }
-   },
-   "ks_vallelunga_classic_circuit": {
-    "tatuusfa1": {
-     "laptime": 70185,
-     "laps": 30,
-     "ts": 1767614009009
-    }
-   },
-   "ks_nurburgring_layout_gp_b": {
-    "tatuusfa1": {
-     "laptime": 114744,
-     "laps": 40,
-     "ts": 1775142693530
-    }
-   },
-   "ks_zandvoort_": {
-    "tatuusfa1": {
-     "laptime": 96756,
-     "laps": 6,
-     "ts": 1775496735506
-    }
-   },
-   "mugello_": {
-    "tatuusfa1": {
-     "laptime": 106244,
-     "laps": 40,
-     "ts": 1776444501902
-    }
-   },
-   "monza_": {
-    "tatuusfa1": {
-     "laptime": 111674,
-     "laps": 88,
-     "ts": 1776940637046
-    }
-   }
-  },
-  "last_seen": 1776940695232,
-  "wins": 8,
-  "podiums": 17,
-  "poles": 1,
-  "flaps": 7,
-  "infr": 2
  },
  {
   "guid": "76561199738550526",
@@ -45511,6 +45511,28 @@
   "last_seen": 1771956107540,
   "wins": 0,
   "podiums": 0,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 0
+ },
+ {
+  "guid": "76561199174149583",
+  "name": "Danil Tishin",
+  "points": 64.15,
+  "kilometers": 40.8,
+  "collisions": 2,
+  "leaderboard": {
+   "monza_": {
+    "tatuusfa1": {
+     "laptime": 114799,
+     "laps": 4,
+     "ts": 1776942306817
+    }
+   }
+  },
+  "last_seen": 1776942338275,
+  "wins": 0,
+  "podiums": 1,
   "poles": 0,
   "flaps": 0,
   "infr": 0
@@ -165889,7 +165911,7 @@
   "guid": "76561199401700420",
   "name": "OrangeSum203665",
   "points": 45.161,
-  "kilometers": 218.5,
+  "kilometers": 221.2,
   "collisions": 22,
   "leaderboard": {
    "spa_": {
@@ -165914,7 +165936,7 @@
     }
    }
   },
-  "last_seen": 1776940695232,
+  "last_seen": 1776940815401,
   "wins": 1,
   "podiums": 1,
   "poles": 0,
