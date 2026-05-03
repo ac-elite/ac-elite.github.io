@@ -41,8 +41,9 @@ import {
 import {
   pickNewerCurrentTrack,
   toCurrentTrackPayload,
+  type CurrentTrackPayload,
+  canAttemptLiveServerStatusFetch,
   fetchLiveServerStatusFromSupabase,
-  isSupabaseLiveServerStatusEnabled,
 } from 'src/lib/server-status';
 import {
   CAR,
@@ -70,9 +71,7 @@ import { useLicenseSafetyGuide } from 'src/components/license-safety-guide/licen
 
 const LEADERBOARD_PER_PAGE = 20;
 
-type CurrentTrackData = {
-  track?: string;
-};
+type CurrentTrackData = CurrentTrackPayload;
 
 export default function Page() {
   const { openGuide } = useLicenseSafetyGuide();
@@ -99,7 +98,7 @@ export default function Page() {
           fetchPrevRankData(),
           fetchJson<CurrentTrackData>('/data/current-track.json').catch(() => null),
           fetchJson<SiteMetadata>('/data/metadata.json').catch(() => ({})),
-          isSupabaseLiveServerStatusEnabled()
+          canAttemptLiveServerStatusFetch()
             ? fetchLiveServerStatusFromSupabase()
             : Promise.resolve(null),
         ]);

@@ -18,23 +18,28 @@
 --     Alternatief header: x-cron-secret = <CRON_SECRET>
 --
 -- === Stap 4: frontend build (GitHub Pages / lokaal) ===
---   Zet naast VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY ook:
---   VITE_SUPABASE_LIVE_SERVER_STATUS=1
---   (Zonder deze flag blijft de site alleen current-track.json gebruiken.)
+--   Zet VITE_SUPABASE_URL + VITE_SUPABASE_ANON_KEY: de site probeert dan automatisch server_status te lezen.
+--   Uitzetten live-read: VITE_SUPABASE_LIVE_SERVER_STATUS=0 (of false / off).
+--   Expliciet forceren: VITE_SUPABASE_LIVE_SERVER_STATUS=1 (zelfde gedrag als keys aanwezig + niet uit).
 --
--- Optioneel: GitHub workflow "Daily Current Track" uitzetten of zeldzamer maken als deze route de waarheid is.
+-- Optioneel: GitHub workflow "Current Track Snapshot (GitHub)" (current-track.json) zeldzamer maken als Supabase
+--   de bron van waarheid is; de JSON blijft nuttig als fallback en voor git-history.
 
 create table if not exists public.server_status (
   id int primary key check (id = 1),
   online boolean not null default false,
   track text not null default '',
-  fetched_at timestamptz not null default (now() at time zone 'utc')
+  fetched_at timestamptz not null default (now() at time zone 'utc'),
+  info jsonb not null default '{}'::jsonb
 );
 
 alter table public.server_status enable row level security;
 
-insert into public.server_status (id, online, track, fetched_at)
-values (1, false, '', (now() at time zone 'utc'))
+-- Volledige /INFO JSON voor de join card (idempotent; oude installs upgraden hiermee):
+alter table public.server_status add column if not exists info jsonb not null default '{}'::jsonb;
+
+insert into public.server_status (id, online, track, fetched_at, info)
+values (1, false, '', (now() at time zone 'utc'), '{}'::jsonb)
 on conflict (id) do nothing;
 
 do $policy$
@@ -58,6 +63,7 @@ end
 $policy$;
 
 -- Schrijven alleen via service role (Edge Function), niet via anon.
+--
 --
 -- === Supabase CLI (Windows) — veelvoorkomende fixes ===
 --

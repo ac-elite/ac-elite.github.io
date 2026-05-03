@@ -1,4 +1,4 @@
-name: Daily Current Track
+name: Current Track Snapshot (GitHub)
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
@@ -39,7 +39,7 @@ jobs:
           HTTP_RESPONSE=$(curl -s --max-time 8 "http://157.90.3.32:18283/INFO" 2>/dev/null) || HTTP_RESPONSE=""
 
           if [ -z "$HTTP_RESPONSE" ]; then
-            echo '{"online":false,"track":"","fetchedAt":"'"$(date -u +'%Y-%m-%dT%H:%M:%SZ')"'"}' > "$DEST"
+            echo '{"online":false,"track":"","fetchedAt":"'"$(date -u +'%Y-%m-%dT%H:%M:%SZ')"'","info":{}}' > "$DEST"
           else
             echo "$HTTP_RESPONSE" | python3 -c "
           import json, sys
@@ -66,14 +66,17 @@ jobs:
           try:
               data = json.load(sys.stdin)
               track = normalize_track_id(data.get('track', ''))
+              info = dict(data)
+              info['track'] = track
               out = {
                   'online': True,
                   'track': track,
                   'fetchedAt': '$(date -u +%Y-%m-%dT%H:%M:%SZ)',
+                  'info': info,
               }
               json.dump(out, sys.stdout, separators=(',', ':'))
           except Exception:
-              json.dump({'online': False, 'track': '', 'fetchedAt': '$(date -u +%Y-%m-%dT%H:%M:%SZ)'}, sys.stdout, separators=(',', ':'))
+              json.dump({'online': False, 'track': '', 'fetchedAt': '$(date -u +%Y-%m-%dT%H:%M:%SZ)', 'info': {}}, sys.stdout, separators=(',', ':'))
           " > "$DEST"
           fi
 

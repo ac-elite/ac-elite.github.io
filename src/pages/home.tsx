@@ -27,13 +27,8 @@ import { getDriverProfileHref } from 'src/lib/routes';
 import { ACE_SKIN_PACK_DOWNLOAD_URL } from 'src/lib/ace-skin-pack-download';
 import { computeDeltas, type DriverDelta, fetchPrevRankData } from 'src/lib/delta';
 import { brandAccentBorderSx, statusAccentBorderSx, statusAccentSplitRimSx } from 'src/lib/status-accent';
+import { getSyncHealth, type SyncHealth, type SiteMetadata, getEffectiveLastSync } from 'src/lib/sync-utils';
 import { subtleEnterUpSx, subtleRowEnterSx, glassCardMotionSx, subtleEnterOnceSx } from 'src/lib/subtle-motion';
-import {
-  getSyncHealth,
-  type SyncHealth,
-  type SiteMetadata,
-  getEffectiveLastSync,
-} from 'src/lib/sync-utils';
 import {
   getTeamRole,
   type TeamRole,
@@ -42,16 +37,9 @@ import {
   teamRoleToDiscordRole,
 } from 'src/lib/team-roles';
 import {
-  pickNewerCurrentTrack,
-  LIVE_SERVER_STATUS_POLL_MS,
-  fetchLiveServerStatusFromSupabase,
-  isSupabaseLiveServerStatusEnabled,
-} from 'src/lib/server-status';
-import {
   DATA_PAGE_SHELL_SX,
   PAGINATION_NAV_BUTTON_SX,
   PAGINATION_PAGE_BUTTON_SX,
-  DATA_PAGE_CALLOUT_PRIMARY_SX,
   MARKETING_CTA_LARGE_LAYOUT_SX,
 } from 'src/lib/page-shell';
 import {
@@ -63,6 +51,14 @@ import {
   GLASS_NOTE_AMBER_RIM_SX,
   GLASS_TABLE_PAGINATION_SX,
 } from 'src/lib/glass';
+import {
+  type CurrentTrackPayload,
+  LIVE_SERVER_STATUS_POLL_MS,
+  shouldPollLiveServerStatus,
+  isServerStatusDebugEnabled,
+  canAttemptLiveServerStatusFetch,
+  fetchLiveServerStatusFromSupabase,
+} from 'src/lib/server-status';
 import {
   CAR,
   getSRTier,
@@ -87,6 +83,7 @@ import {
 
 import { EmptyState } from 'src/components/data-state';
 import { DeltaChip } from 'src/components/delta-chip/delta-chip';
+import { ServerJoinCard } from 'src/components/server-join-card';
 import { PageGridOverlay } from 'src/components/page-background/page-grid-overlay';
 import { useLicenseSafetyGuide } from 'src/components/license-safety-guide/license-safety-guide';
 
@@ -106,13 +103,8 @@ type DriverView = {
   teamRole: TeamRole;
 };
 
-type CurrentTrackData = {
-  online: boolean;
-  track: string;
-  fetchedAt: string;
-};
+type CurrentTrackData = CurrentTrackPayload;
 
-const APP_BASE_URL = import.meta.env.BASE_URL;
 const HOME_CURRENT_TRACK_PER_PAGE = 20;
 
 /** Hero CTA: subtle “breathing” glass glow (matches grid energy, stays on-brand). */
@@ -259,7 +251,7 @@ function HeroSection({
                 direction={{ xs: 'column', sm: 'row' }}
                 spacing={1.25}
                 flexWrap="wrap"
-                alignItems={{ xs: 'center', sm: 'center' }}
+                alignItems={{ xs: 'center', sm: 'flex-start' }}
                 justifyContent={{ xs: 'center', sm: 'flex-start' }}
                 sx={{ width: '100%' }}
               >
@@ -282,17 +274,6 @@ function HeroSection({
                   variant="contained"
                   color="secondary"
                   size="large"
-                  sx={{ ...MARKETING_CTA_LARGE_LAYOUT_SX }}
-                  href="https://acstuff.ru/s/q:race/online/join?httpPort=18283&ip=157.90.3.32"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Join the server
-                </Button>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  size="large"
                   sx={{
                     ...MARKETING_CTA_LARGE_LAYOUT_SX,
                     animation: `${heroPrimaryPulse} 4.5s ease-in-out infinite`,
@@ -310,77 +291,80 @@ function HeroSection({
           </Grid>
 
           <Grid size={{ xs: 12, md: 5 }}>
-            <Box
-              sx={{
-                ...GLASS_PANEL_SX,
-                ...statusAccentBorderSx(syncStatus.color),
-                ...statusAccentSplitRimSx(syncStatus.color),
-                textAlign: { xs: 'center', md: 'left' },
-                ...glassCardMotionSx(1),
-              }}
-            >
-              <Stack spacing={2}>
-                <Box>
+            <Stack spacing={2}>
+              <Box
+                sx={{
+                  ...GLASS_PANEL_SX,
+                  ...statusAccentBorderSx(syncStatus.color),
+                  ...statusAccentSplitRimSx(syncStatus.color),
+                  textAlign: { xs: 'center', md: 'left' },
+                  ...glassCardMotionSx(1),
+                }}
+              >
+                <Stack spacing={2}>
+                  <Box>
+                    <Typography
+                      variant="overline"
+                      sx={sectionKickerSx}
+                    >
+                      Race Intelligence
+                    </Typography>
+                    <Typography variant="h6" sx={{ fontWeight: 800, mt: 0.4 }}>
+                      One view. All key data.
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5 }}>
+                      Live KMR-powered insights for driver search, safety rating, and license progression.
+                    </Typography>
+                  </Box>
+
                   <Typography
-                    variant="overline"
-                    sx={sectionKickerSx}
+                    variant="body2"
+                    sx={{ color: syncStatus.color, fontWeight: 700, textAlign: { xs: 'center', md: 'left' } }}
                   >
-                    Race Intelligence
+                    {syncStatus.label} · {syncStatus.ageText}
                   </Typography>
-                  <Typography variant="h6" sx={{ fontWeight: 800, mt: 0.4 }}>
-                    One view. All key data.
-                  </Typography>
-                  <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5 }}>
-                    Live KMR-powered insights for driver search, safety rating, and license progression.
-                  </Typography>
-                </Box>
 
-                <Typography
-                  variant="body2"
-                  sx={{ color: syncStatus.color, fontWeight: 700, textAlign: { xs: 'center', md: 'left' } }}
-                >
-                  {syncStatus.label} · {syncStatus.ageText}
-                </Typography>
-
-                <Grid container spacing={1}>
-                  {[
-                    { label: 'Total drivers', value: formatNumber(totalDrivers) },
-                    { label: 'Logged laps', value: formatNumber(totalLaps) },
-                    { label: 'Active tracks', value: formatNumber(activeTracks) },
-                    {
-                      label: 'Live server track',
-                      value: currentTrack?.track ? getTrackDisplayName(currentTrack.track) : '—',
-                    },
-                  ].map((item, tileIndex) => (
-                    <Grid key={item.label} size={{ xs: 6 }}>
-                      <Box
-                        sx={{
-                          ...GLASS_INNER_PANEL_SX,
-                          ...glassCardMotionSx(3 + tileIndex),
-                          minHeight: 78,
-                          display: 'flex',
-                          flexDirection: 'column',
-                          justifyContent: 'center',
-                          alignItems: { xs: 'center', md: 'flex-start' },
-                        }}
-                      >
-                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.68)' }}>
-                          {item.label}
-                        </Typography>
-                        <Typography
-                          variant="subtitle2"
-                          sx={{ fontWeight: 800, lineHeight: 1.25, mt: 0.2 }}
-                          noWrap
-                          title={typeof item.value === 'string' ? item.value : undefined}
+                  <Grid container spacing={1}>
+                    {[
+                      { label: 'Total drivers', value: formatNumber(totalDrivers) },
+                      { label: 'Logged laps', value: formatNumber(totalLaps) },
+                      { label: 'Active tracks', value: formatNumber(activeTracks) },
+                      {
+                        label: 'Live server track',
+                        value: currentTrack?.track ? getTrackDisplayName(currentTrack.track) : '—',
+                      },
+                    ].map((item, tileIndex) => (
+                      <Grid key={item.label} size={{ xs: 6 }}>
+                        <Box
+                          sx={{
+                            ...GLASS_INNER_PANEL_SX,
+                            ...glassCardMotionSx(3 + tileIndex),
+                            minHeight: 78,
+                            display: 'flex',
+                            flexDirection: 'column',
+                            justifyContent: 'center',
+                            alignItems: { xs: 'center', md: 'flex-start' },
+                          }}
                         >
-                          {item.value}
-                        </Typography>
-                      </Box>
-                    </Grid>
-                  ))}
-                </Grid>
-              </Stack>
-            </Box>
+                          <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.68)' }}>
+                            {item.label}
+                          </Typography>
+                          <Typography
+                            variant="subtitle2"
+                            sx={{ fontWeight: 800, lineHeight: 1.25, mt: 0.2 }}
+                            noWrap
+                            title={typeof item.value === 'string' ? item.value : undefined}
+                          >
+                            {item.value}
+                          </Typography>
+                        </Box>
+                      </Grid>
+                    ))}
+                  </Grid>
+                </Stack>
+              </Box>
+
+            </Stack>
           </Grid>
         </Grid>
 
@@ -454,9 +438,6 @@ function CurrentTrackLeaderboardSection({
   onOpenGuide: (tab: 'license' | 'safety') => void;
 }) {
   if (!currentTrack?.track) return null;
-  const syncedAt = Number.isNaN(new Date(currentTrack.fetchedAt).getTime())
-    ? currentTrack.fetchedAt
-    : new Date(currentTrack.fetchedAt).toLocaleString();
 
   return (
     <Box component="section" sx={{ ...DATA_PAGE_SHELL_SX }}>
@@ -480,9 +461,6 @@ function CurrentTrackLeaderboardSection({
             </Typography>
             <Typography color="text.secondary">
               Full leaderboard for {CAR} on the currently active server track.
-            </Typography>
-            <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.68)' }}>
-              Synced at {syncedAt}
             </Typography>
           </Stack>
 
@@ -685,10 +663,12 @@ function DriverSearchSection({
   drivers,
   loading,
   error,
+  currentTrack,
 }: {
   drivers: DriverView[];
   loading: boolean;
   error: string | null;
+  currentTrack: CurrentTrackData | null;
 }) {
   const [query, setQuery] = useState('');
 
@@ -721,34 +701,31 @@ function DriverSearchSection({
       }}
     >
       <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1 }}>
-        <Stack spacing={3} sx={{ mb: 3, textAlign: { xs: 'center', md: 'left' }, alignItems: { xs: 'center', md: 'flex-start' } }}>
-          <Stack spacing={1} sx={{ alignItems: { xs: 'center', md: 'flex-start' } }}>
-            <Typography variant="overline" sx={sectionKickerSx}>
-              Driver statistics
-            </Typography>
-            <Typography variant="h4" sx={{ fontWeight: 700 }}>
-              Search drivers and view their profile
-            </Typography>
-            <Typography variant="body1" sx={{ maxWidth: 680, color: 'text.secondary' }}>
-              This search uses live AC Elite data with real-time Safety Rating and License calculations.
-            </Typography>
-          </Stack>
-        </Stack>
-
-        <Paper
-          elevation={0}
-          sx={{
-            ...GLASS_PANEL_SX,
-            ...brandAccentBorderSx(),
-            ...glassCardMotionSx(0, { baseDelayMs: 280 }),
-            mb: { xs: 2, md: 4 },
-            textAlign: { xs: 'center', md: 'left' },
-          }}
-        >
-          <Grid container spacing={2} alignItems="stretch">
-            <Grid size={{ xs: 12, md: 9 }}>
-              <Stack spacing={1.5} sx={{ alignItems: { xs: 'center', md: 'flex-start' } }}>
-                <Typography variant="subtitle2" sx={{ color: 'text.secondary' }}>
+        <Grid container spacing={{ xs: 2, md: 4.5 }} alignItems="stretch">
+          <Grid size={{ xs: 12, md: 8 }}>
+            <Stack spacing={1} sx={{ mb: 2, textAlign: { xs: 'center', md: 'left' }, alignItems: { xs: 'center', md: 'flex-start' } }}>
+              <Typography variant="overline" sx={sectionKickerSx}>
+                Driver statistics
+              </Typography>
+              <Typography variant="h4" sx={{ fontWeight: 700 }}>
+                Driver search
+              </Typography>
+              <Typography variant="body1" sx={{ maxWidth: 680, color: 'text.secondary' }}>
+                Search drivers and open their profile with live Safety Rating and License data.
+              </Typography>
+            </Stack>
+            <Paper
+              elevation={0}
+              sx={{
+                ...GLASS_PANEL_SX,
+                ...brandAccentBorderSx(),
+                ...glassCardMotionSx(0, { baseDelayMs: 280 }),
+                mb: { xs: 2, md: 0 },
+                textAlign: { xs: 'center', md: 'left' },
+              }}
+            >
+              <Stack spacing={1.5} sx={{ alignItems: 'stretch', width: '100%' }}>
+                <Typography variant="subtitle2" sx={{ color: 'text.secondary', textAlign: { xs: 'center', md: 'left' } }}>
                   Search driver
                 </Typography>
 
@@ -793,6 +770,7 @@ function DriverSearchSection({
                   <Paper
                     sx={{
                       ...GLASS_CARD_SX,
+                      width: '100%',
                       mt: 1,
                       borderRadius: 2,
                       maxHeight: 280,
@@ -800,7 +778,7 @@ function DriverSearchSection({
                       boxShadow: '0 8px 26px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.08)',
                     }}
                   >
-                    <List dense disablePadding>
+                    <List dense disablePadding sx={{ width: '100%' }}>
                       {matches.map((driver) => (
                         <ListItemButton
                           key={driver.guid}
@@ -808,14 +786,16 @@ function DriverSearchSection({
                             window.location.href = getDriverProfileHref(driver.guid);
                           }}
                           sx={{
+                            width: '100%',
                             px: 1.75,
                             py: 1,
                             '&:hover': { bgcolor: 'rgba(255,255,255,0.12)' },
                           }}
                         >
                           <ListItemText
+                            sx={{ width: '100%', m: 0 }}
                             primary={
-                              <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
+                              <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" sx={{ width: '100%' }}>
                                 <Typography variant="body2">{driver.name}</Typography>
                                 {driver.teamRole && teamRoleToDiscordRole(driver.teamRole) && (
                                   <Chip
@@ -847,41 +827,18 @@ function DriverSearchSection({
                   </Paper>
                 )}
               </Stack>
-            </Grid>
+            </Paper>
 
-            <Grid size={{ xs: 12, md: 3 }}>
-              <Stack spacing={1.25} sx={{ height: 1, alignItems: { xs: 'center', md: 'stretch' } }}>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  fullWidth
-                  sx={{ ...DATA_PAGE_CALLOUT_PRIMARY_SX }}
-                  href={`${APP_BASE_URL}dashboard`}
-                >
-                  Open full stats page
-                </Button>
-
-                <Box
-                  sx={{
-                    ...GLASS_INNER_PANEL_SX,
-                  }}
-                >
-                  <Stack spacing={0.35}>
-                    <Typography variant="subtitle2" sx={{ color: 'text.secondary' }}>
-                      Drivers loaded
-                    </Typography>
-                    <Typography variant="h5" sx={{ fontWeight: 700 }}>
-                      {loading ? '...' : formatNumber(drivers.length)}
-                    </Typography>
-                  </Stack>
-                </Box>
-
-                {loading && <Typography color="text.secondary">Loading drivers...</Typography>}
-                {error && <Typography color="error">Failed to load driver data: {error}</Typography>}
-              </Stack>
-            </Grid>
+            {loading && <Typography color="text.secondary" sx={{ mt: 1 }}>Loading drivers...</Typography>}
+            {error && <Typography color="error" sx={{ mt: 1 }}>Failed to load driver data: {error}</Typography>}
           </Grid>
-        </Paper>
+
+          <Grid size={{ xs: 12, md: 4 }}>
+            <Stack spacing={1.25} sx={{ height: 1, alignItems: { xs: 'center', md: 'stretch' } }}>
+              <ServerJoinCard currentTrack={currentTrack} sx={{ ...glassCardMotionSx(1) }} />
+            </Stack>
+          </Grid>
+        </Grid>
       </Container>
     </Box>
   );
@@ -898,6 +855,22 @@ export default function Page() {
   const [metadata, setMetadata] = useState<SiteMetadata>({});
   const [currentTrack, setCurrentTrack] = useState<CurrentTrackData | null>(null);
   const [currentTrackPage, setCurrentTrackPage] = useState(1);
+
+  useEffect(() => {
+    if (!isServerStatusDebugEnabled()) return;
+    console.info('[server-status] home currentTrack for card', {
+      fetchedAt: currentTrack?.fetchedAt,
+      track: currentTrack?.track,
+      online: currentTrack?.online,
+      clients: currentTrack?.info?.clients,
+      maxclients: currentTrack?.info?.maxclients,
+      cars: currentTrack?.info?.cars,
+      session: currentTrack?.info?.session,
+      sessiontypes: currentTrack?.info?.sessiontypes,
+      durations: currentTrack?.info?.durations,
+      timeleft: currentTrack?.info?.timeleft,
+    });
+  }, [currentTrack]);
 
   useEffect(() => {
     let mounted = true;
@@ -929,28 +902,14 @@ export default function Page() {
     }
 
     load();
-    fetchJson<CurrentTrackData>('/data/current-track.json')
-      .then(async (data) => {
+    if (!canAttemptLiveServerStatusFetch()) {
+      setCurrentTrack(null);
+    } else {
+      void fetchLiveServerStatusFromSupabase().then((live) => {
         if (!mounted) return;
-        if (!isSupabaseLiveServerStatusEnabled()) {
-          setCurrentTrack(data);
-          return;
-        }
-        const live = await fetchLiveServerStatusFromSupabase();
-        if (!mounted) return;
-        const merged = pickNewerCurrentTrack(data, live);
-        setCurrentTrack(merged ?? data);
-      })
-      .catch(() => {
-        if (!mounted) return;
-        if (isSupabaseLiveServerStatusEnabled()) {
-          void fetchLiveServerStatusFromSupabase().then((live) => {
-            if (mounted) setCurrentTrack(live);
-          });
-        } else {
-          setCurrentTrack(null);
-        }
+        setCurrentTrack(live ?? null);
       });
+    }
 
     return () => {
       mounted = false;
@@ -958,11 +917,12 @@ export default function Page() {
   }, []);
 
   useEffect(() => {
-    if (!isSupabaseLiveServerStatusEnabled()) return undefined;
+    if (!shouldPollLiveServerStatus()) return undefined;
     let mounted = true;
     const tick = () => {
       void fetchLiveServerStatusFromSupabase().then((live) => {
-        if (mounted && live) setCurrentTrack(live);
+        if (!mounted) return;
+        setCurrentTrack(live ?? null);
       });
     };
     const id = window.setInterval(tick, LIVE_SERVER_STATUS_POLL_MS);
@@ -970,7 +930,7 @@ export default function Page() {
       mounted = false;
       window.clearInterval(id);
     };
-  }, []);
+  }, [currentTrack?.fetchedAt]);
 
   useEffect(() => {
     setCurrentTrackPage(1);
@@ -1093,6 +1053,7 @@ export default function Page() {
         drivers={drivers}
         loading={loading}
         error={error}
+        currentTrack={currentTrack}
       />
       <CurrentTrackLeaderboardSection
         loading={loading}

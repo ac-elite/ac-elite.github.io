@@ -79,6 +79,7 @@ Deno.serve(async (req) => {
   const fetchedAt = new Date().toISOString();
   let online = false;
   let track = '';
+  let info: Record<string, unknown> = {};
 
   try {
     const ctrl = new AbortController();
@@ -86,13 +87,15 @@ Deno.serve(async (req) => {
     const res = await fetch(infoUrl, { signal: ctrl.signal });
     clearTimeout(t);
     if (res.ok) {
-      const data = (await res.json()) as { track?: unknown };
+      const data = (await res.json()) as Record<string, unknown>;
       track = normalizeTrackId(data?.track);
       online = true;
+      info = { ...data, track };
     }
   } catch {
     online = false;
     track = '';
+    info = {};
   }
 
   const supabase = createClient(supabaseUrl, serviceKey, {
@@ -105,6 +108,7 @@ Deno.serve(async (req) => {
       online,
       track,
       fetched_at: fetchedAt,
+      info,
     },
     { onConflict: 'id' }
   );
@@ -116,7 +120,7 @@ Deno.serve(async (req) => {
     });
   }
 
-  return new Response(JSON.stringify({ ok: true, online, track, fetchedAt }), {
+  return new Response(JSON.stringify({ ok: true, online, track, fetchedAt, info }), {
     status: 200,
     headers: { ...CORS, 'Content-Type': 'application/json' },
   });

@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from 'react';
+import { useRef, useMemo, useState, useEffect } from 'react';
 
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
@@ -21,13 +21,20 @@ import { getSyncHealth } from 'src/lib/sync-utils';
 import { glassCardMotionSx } from 'src/lib/subtle-motion';
 import { formatNumber, getTrackDisplayName } from 'src/lib/ac-elite-data';
 import { fetchSiteVisitCount, isSiteVisitsConfigured } from 'src/lib/site-visits';
-import { STATUS_ACCENT, brandAccentBorderSx, statusAccentBorderSx, statusAccentSplitRimSx } from 'src/lib/status-accent';
 import {
   GLASS_CARD_SX,
   GLASS_PANEL_SX,
   GLASS_INNER_PANEL_SX,
   GLASS_PANEL_COMPACT_SX,
 } from 'src/lib/glass';
+import { STATUS_ACCENT, brandAccentBorderSx, statusAccentBorderSx, statusAccentSplitRimSx } from 'src/lib/status-accent';
+import {
+  acSessionTypeLabel,
+  acCurrentSessionLabel,
+  formatTimeLeftSeconds,
+  formatSessionDurationsLine,
+  sanitizeServerLobbyDisplayName,
+} from 'src/lib/server-info';
 import {
   DATA_PAGE_SHELL_SX,
   TABLE_HEAD_MUTED_COLOR,
@@ -38,9 +45,11 @@ import {
 import {
   pickNewerCurrentTrack,
   toCurrentTrackPayload,
+  type CurrentTrackPayload,
   LIVE_SERVER_STATUS_POLL_MS,
+  shouldPollLiveServerStatus,
+  canAttemptLiveServerStatusFetch,
   fetchLiveServerStatusFromSupabase,
-  isSupabaseLiveServerStatusEnabled,
 } from 'src/lib/server-status';
 
 import { PreviewLock } from 'src/components/preview-lock/preview-lock';
@@ -62,7 +71,7 @@ const TEAM_GAME_SERVER_JOIN =
 // ---------------------------------------------------------------------------
 
 type MetadataData = { lastSync?: string; status?: string };
-type CurrentTrackData = { online?: boolean; track?: string; fetchedAt?: string };
+type CurrentTrackData = CurrentTrackPayload;
 type AceSkinPackData = { generatedAt?: string; entries?: unknown[] };
 type LiverySectionsData = { officialPack?: boolean; aceSkinPack?: boolean; teamLiveries?: boolean };
 
@@ -106,9 +115,10 @@ const SCHEDULE: readonly ScheduleEntry[] = [
     agendaWhen: ':05',
     agendaSub: 'Every hour · UTC',
     kind: 'recurring',
-    workflow: 'Daily Current Track',
+    workflow: 'GitHub · current-track snapshot',
     cron: '5 * * * *',
-    what: 'Fetches server /INFO and writes current-track.json (only commits on change). Optional fallback if Supabase live path is off.',
+    what:
+      'GitHub Action hits /INFO and commits public/data/current-track.json only when it changes. Static fallback for builds; live server UI reads Supabase server_status when URL + anon key are in the build (opt-out with VITE_SUPABASE_LIVE_SERVER_STATUS=0).',
   },
   {
     agendaWhen: '1–5 min',
@@ -116,7 +126,8 @@ const SCHEDULE: readonly ScheduleEntry[] = [
     kind: 'recurring',
     workflow: 'sync-server-status',
     cron: 'Your cron-job.org schedule',
-    what: 'POST to Edge Function with CRON_SECRET; polls /INFO and upserts public.server_status. Site reads when VITE_SUPABASE_LIVE_SERVER_STATUS=1.',
+    what:
+      'POST to Edge Function with CRON_SECRET; polls /INFO and upserts public.server_status. Same /INFO source as the snapshot workflow, but stored in Supabase for frequent updates without a git commit.',
   },
   {
     agendaWhen: 'After sync',
@@ -195,12 +206,15 @@ const DATA_FILES: readonly DataFileEntry[] = [
   },
   {
     file: 'current-track.json',
-    updatedBy: 'Daily Current Track',
+    updatedBy: 'GitHub · current-track.json',
     getTimestamp: (s) => s.currentTrack?.fetchedAt,
-    getNote: (s) =>
-      s.currentTrack?.online
-        ? `online · ${s.currentTrack.track ? getTrackDisplayName(s.currentTrack.track) : '—'}`
-        : 'offline',
+    getNote: (s) => {
+      const state =
+        s.currentTrack?.online
+          ? `online · ${s.currentTrack.track ? getTrackDisplayName(s.currentTrack.track) : '—'}`
+          : 'offline';
+      return `${state} · GitHub Action when file changes; live feed = Supabase server_status`;
+    },
   },
   {
     file: 'rank.json',
@@ -275,6 +289,140 @@ function formatRelative(iso?: string): string {
   return `${Math.floor(h / 24)}d ago`;
 }
 
+const AC_SERVER_INFO_URL = 'http://157.90.3.32:18283/INFO';
+
+/** Keys we render explicitly; anything else on `info` becomes an extra row. */
+const ADMIN_SERVER_INFO_HANDLED = new Set([
+  'name',
+  'clients',
+  'maxclients',
+  'track',
+  'cars',
+  'cport',
+  'port',
+  'tport',
+  'session',
+  'sessiontypes',
+  'durations',
+  'timeleft',
+  'timeofday',
+  'pickup',
+  'timed',
+  'pass',
+  'inverted',
+  'ip',
+  'country',
+  'json',
+  'timestamp',
+  'l',
+  'extra',
+  'pit',
+]);
+
+function fmtAdminScalar(v: unknown): string {
+  if (v == null) return '—';
+  if (typeof v === 'boolean') return v ? 'Yes' : 'No';
+  if (typeof v === 'number' && Number.isFinite(v)) return String(v);
+  if (typeof v === 'string') return v.trim() === '' ? '(empty)' : v;
+  if (Array.isArray(v)) return v.length ? JSON.stringify(v) : '[]';
+  if (typeof v === 'object') {
+    try {
+      return JSON.stringify(v);
+    } catch {
+      return String(v);
+    }
+  }
+  return String(v);
+}
+
+function formatAdminTimeleft(sec: number | undefined): string {
+  if (sec == null || !Number.isFinite(sec)) return '—';
+  if (sec < 0) return `${sec}s`;
+  return formatTimeLeftSeconds(sec);
+}
+
+function buildAdminServerInfoRows(ct: CurrentTrackPayload | null): { label: string; value: string }[] {
+  const rows: { label: string; value: string }[] = [];
+  if (!ct) {
+    rows.push({ label: 'Payload', value: 'No current track loaded yet.' });
+    return rows;
+  }
+
+  rows.push({ label: 'Snapshot (fetched_at)', value: ct.fetchedAt ? `${formatAbsolute(ct.fetchedAt)} · ${formatRelative(ct.fetchedAt)}` : '—' });
+  rows.push({ label: 'Online (row)', value: ct.online ? 'Yes' : 'No' });
+  rows.push({ label: 'Track ID (row)', value: ct.track?.trim() ? ct.track : '—' });
+
+  const info = ct.info;
+  if (!info || typeof info !== 'object') {
+    rows.push({ label: '/INFO', value: 'No info object on payload — check Supabase server_status.info or static merge.' });
+    return rows;
+  }
+
+  if (typeof info.name === 'string' && info.name.trim()) {
+    rows.push({ label: 'Lobby name (display)', value: sanitizeServerLobbyDisplayName(info.name) });
+    rows.push({ label: 'Lobby name (raw)', value: info.name });
+  }
+
+  const clients = typeof info.clients === 'number' && Number.isFinite(info.clients) ? info.clients : null;
+  const maxc = typeof info.maxclients === 'number' && Number.isFinite(info.maxclients) ? info.maxclients : null;
+  rows.push({
+    label: 'Clients / max',
+    value: clients != null && maxc != null ? `${clients} / ${maxc}` : `${fmtAdminScalar(info.clients)} / ${fmtAdminScalar(info.maxclients)}`,
+  });
+
+  if (typeof info.track === 'string' && info.track.trim() && info.track.trim() !== ct.track?.trim()) {
+    rows.push({ label: 'Track ID (/INFO)', value: info.track });
+  }
+
+  rows.push({ label: 'Cars', value: Array.isArray(info.cars) && info.cars.length ? info.cars.join(', ') : '—' });
+
+  rows.push({
+    label: 'Ports',
+    value: `cport ${fmtAdminScalar(info.cport)} · game ${fmtAdminScalar(info.port)} · query ${fmtAdminScalar(info.tport)}`,
+  });
+
+  rows.push({ label: 'IP (server)', value: typeof info.ip === 'string' && info.ip.trim() ? info.ip : '(empty)' });
+
+  if (Array.isArray(info.sessiontypes) && info.sessiontypes.length > 0) {
+    const seq = info.sessiontypes.map((id) => `${id} → ${acSessionTypeLabel(id)}`).join('; ');
+    rows.push({ label: 'Session types', value: seq });
+  }
+
+  rows.push({ label: 'Session index', value: fmtAdminScalar(info.session) });
+  rows.push({ label: 'Current phase', value: acCurrentSessionLabel(info) });
+  rows.push({ label: 'Time left', value: formatAdminTimeleft(info.timeleft) });
+  rows.push({ label: 'Schedule (short)', value: formatSessionDurationsLine(info.sessiontypes, info.durations) ?? '—' });
+
+  if (Array.isArray(info.sessiontypes) && Array.isArray(info.durations)) {
+    const n = Math.min(info.sessiontypes.length, info.durations.length);
+    const parts: string[] = [];
+    for (let i = 0; i < n; i += 1) {
+      parts.push(`${acSessionTypeLabel(info.sessiontypes[i])}: ${fmtAdminScalar(info.durations[i])} min`);
+    }
+    if (parts.length) rows.push({ label: 'Durations (per type)', value: parts.join(' · ') });
+  }
+
+  rows.push({ label: 'Time of day (slot)', value: fmtAdminScalar(info.timeofday) });
+  rows.push({ label: 'Inverted grid', value: fmtAdminScalar(info.inverted) });
+  rows.push({ label: 'Country (geo)', value: Array.isArray(info.country) && info.country.length ? info.country.join(', ') : '—' });
+
+  rows.push({ label: 'Pickup', value: fmtAdminScalar(info.pickup) });
+  rows.push({ label: 'Timed', value: fmtAdminScalar(info.timed) });
+  rows.push({ label: 'Passworded', value: fmtAdminScalar(info.pass) });
+  rows.push({ label: 'l', value: fmtAdminScalar(info.l) });
+  rows.push({ label: 'extra', value: fmtAdminScalar(info.extra) });
+  rows.push({ label: 'pit', value: fmtAdminScalar(info.pit) });
+  rows.push({ label: 'timestamp', value: fmtAdminScalar(info.timestamp) });
+  rows.push({ label: 'json', value: info.json == null ? '—' : fmtAdminScalar(info.json) });
+
+  for (const key of Object.keys(info)) {
+    if (ADMIN_SERVER_INFO_HANDLED.has(key)) continue;
+    rows.push({ label: `Other: ${key}`, value: fmtAdminScalar((info as Record<string, unknown>)[key]) });
+  }
+
+  return rows;
+}
+
 type SiteVisitPanelState =
   | { kind: 'off' }
   | { kind: 'loading'; lastCount?: number }
@@ -288,6 +436,25 @@ const freshnessBodyCellSx = {
   borderBottom: FRESHNESS_ROW_BORDER,
   py: 1.35,
   verticalAlign: 'top' as const,
+};
+
+const TEAM_HUB_INLINE_CODE_SX = {
+  display: 'inline' as const,
+  fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+  fontSize: '0.8125rem',
+  bgcolor: 'rgba(15,23,42,0.55)',
+  px: 0.45,
+  py: 0.15,
+  borderRadius: 0.5,
+  border: '1px solid rgba(148,163,184,0.2)',
+};
+
+const TEAM_HUB_NOTE_PANEL_SX = {
+  borderRadius: 2,
+  bgcolor: 'rgba(15,23,42,0.4)',
+  border: '1px solid rgba(148,163,184,0.14)',
+  px: 1.5,
+  py: 1.25,
 };
 
 // ---------------------------------------------------------------------------
@@ -306,6 +473,8 @@ export default function Page() {
   const [siteVisitPanel, setSiteVisitPanel] = useState<SiteVisitPanelState>(() =>
     isSiteVisitsConfigured() ? { kind: 'loading' } : { kind: 'off' }
   );
+
+  const staticCurrentTrackRef = useRef<CurrentTrackData | null>(null);
 
   useEffect(() => {
     if (!isSiteVisitsConfigured()) return undefined;
@@ -333,6 +502,7 @@ export default function Page() {
       const rankLen =
         rankResult.status === 'fulfilled' && Array.isArray(rankResult.value) ? rankResult.value.length : null;
       const staticTrack = results[1].status === 'fulfilled' ? results[1].value : null;
+      staticCurrentTrackRef.current = staticTrack;
       setData({
         metadata: results[0].status === 'fulfilled' ? results[0].value : null,
         currentTrack: staticTrack,
@@ -340,12 +510,13 @@ export default function Page() {
         liverySections: results[3].status === 'fulfilled' ? results[3].value : null,
         rankDriverCount: rankLen,
       });
-      if (isSupabaseLiveServerStatusEnabled()) {
+      if (canAttemptLiveServerStatusFetch()) {
         void fetchLiveServerStatusFromSupabase().then((live) => {
           if (!mounted || !live) return;
+          const base = toCurrentTrackPayload(staticCurrentTrackRef.current);
           setData((prev) => ({
             ...prev,
-            currentTrack: pickNewerCurrentTrack(toCurrentTrackPayload(prev.currentTrack), live),
+            currentTrack: pickNewerCurrentTrack(base ?? toCurrentTrackPayload(prev.currentTrack), live),
           }));
         });
       }
@@ -356,14 +527,15 @@ export default function Page() {
   }, []);
 
   useEffect(() => {
-    if (!isSupabaseLiveServerStatusEnabled()) return undefined;
+    if (!shouldPollLiveServerStatus()) return undefined;
     let mounted = true;
     const id = window.setInterval(() => {
       void fetchLiveServerStatusFromSupabase().then((live) => {
         if (!mounted || !live) return;
+        const base = toCurrentTrackPayload(staticCurrentTrackRef.current);
         setData((prev) => ({
           ...prev,
-          currentTrack: pickNewerCurrentTrack(toCurrentTrackPayload(prev.currentTrack), live),
+          currentTrack: pickNewerCurrentTrack(base ?? toCurrentTrackPayload(prev.currentTrack), live),
         }));
       });
     }, LIVE_SERVER_STATUS_POLL_MS);
@@ -371,7 +543,7 @@ export default function Page() {
       mounted = false;
       window.clearInterval(id);
     };
-  }, []);
+  }, [data.currentTrack?.fetchedAt]);
 
   const syncStatus = useMemo(() => getSyncHealth(data.metadata?.lastSync), [data.metadata?.lastSync]);
 
@@ -393,6 +565,8 @@ export default function Page() {
     ).length;
   }, [data.liverySections]);
 
+  const adminServerDetailRows = useMemo(() => buildAdminServerInfoRows(data.currentTrack), [data.currentTrack]);
+
   return (
     <>
       <title>{`Admin Panel - ${CONFIG.appName}`}</title>
@@ -413,8 +587,8 @@ export default function Page() {
                   Internal overview for moderators and admins — schedules, data freshness, and site status at a glance.
                 </Typography>
                 <Typography variant="caption" sx={{ ...HERO_FOOTNOTE_CAPTION_SX, maxWidth: 720 }}>
-                  Live KMR sync and server track are in the cards directly below. Further down: workflow schedule, file-level
-                  freshness, and team shortcuts.
+                  Live KMR sync and server snapshot cards are directly below, then workflow schedule, file freshness (incl.
+                  current-track.json vs Supabase), and team shortcuts.
                 </Typography>
               </Stack>
             </Box>
@@ -548,6 +722,79 @@ export default function Page() {
                     </Paper>
                   </Grid>
                 </Grid>
+
+                <Paper
+                  sx={{
+                    ...GLASS_PANEL_COMPACT_SX,
+                    p: 2.25,
+                    ...brandAccentBorderSx(),
+                    ...glassCardMotionSx(6),
+                  }}
+                >
+                  <Stack
+                    direction={{ xs: 'column', sm: 'row' }}
+                    justifyContent="space-between"
+                    alignItems={{ xs: 'flex-start', sm: 'flex-start' }}
+                    spacing={1.5}
+                    sx={{ mb: 2 }}
+                  >
+                    <Box>
+                      <Typography variant="h6" sx={{ fontWeight: 800 }}>
+                        Server /INFO
+                      </Typography>
+                      <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5, maxWidth: 720 }}>
+                        Merged <Box component="code" sx={{ px: 0.35 }}>currentTrack</Box> payload (GitHub static + Supabase live). Use this to verify Edge/cron vs the game server.
+                      </Typography>
+                    </Box>
+                    <Button
+                      component="a"
+                      href={AC_SERVER_INFO_URL}
+                      target="_blank"
+                      rel="noreferrer"
+                      size="small"
+                      variant="outlined"
+                      sx={{ ...ADMIN_EXTERNAL_LINK_OUTLINED_SX, flexShrink: 0, alignSelf: { xs: 'stretch', sm: 'flex-start' } }}
+                    >
+                      Open live /INFO
+                    </Button>
+                  </Stack>
+                  <TableContainer
+                    sx={{
+                      maxHeight: 440,
+                      borderRadius: 1,
+                      border: '1px solid rgba(148,163,184,0.14)',
+                      bgcolor: 'rgba(15,23,42,0.35)',
+                    }}
+                  >
+                    <Table size="small" stickyHeader>
+                      <TableHead>
+                        <TableRow>
+                          <TableCell sx={{ fontWeight: 800, width: '32%', bgcolor: 'rgba(15,23,42,0.88)' }}>Field</TableCell>
+                          <TableCell sx={{ fontWeight: 800, bgcolor: 'rgba(15,23,42,0.88)' }}>Value</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {adminServerDetailRows.map((row, idx) => (
+                          <TableRow key={`${row.label}-${idx}`}>
+                            <TableCell sx={{ ...freshnessBodyCellSx, color: 'text.secondary', fontWeight: 700 }}>
+                              {row.label}
+                            </TableCell>
+                            <TableCell
+                              sx={{
+                                ...freshnessBodyCellSx,
+                                fontFamily: row.value.length > 120 ? 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace' : 'inherit',
+                                fontSize: '0.8125rem',
+                                wordBreak: 'break-word',
+                              }}
+                            >
+                              {row.value}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </Paper>
 
                 <SiteVisitsShowcase
                   configured={isSiteVisitsConfigured()}
@@ -986,6 +1233,9 @@ export default function Page() {
                                   color: 'text.secondary',
                                   fontSize: '0.8125rem',
                                   lineHeight: 1.45,
+                                  maxWidth: { xs: 200, sm: 280, md: 360 },
+                                  whiteSpace: 'normal',
+                                  overflowWrap: 'anywhere',
                                 }}
                               >
                                 {note || '—'}
@@ -1007,122 +1257,213 @@ export default function Page() {
                     Shortcuts and bite-sized context — nothing here replaces the tables above.
                   </Typography>
 
-                  <Grid container spacing={2}>
-                    <Grid size={{ xs: 12, md: 5 }}>
-                      <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700, letterSpacing: 0.06 }}>
-                        Snapshot
-                      </Typography>
-                      <Stack direction="row" flexWrap="wrap" useFlexGap spacing={1} sx={{ mt: 1 }}>
-                        <Chip
-                          size="small"
-                          label={
-                            data.rankDriverCount != null
-                              ? `${formatNumber(data.rankDriverCount)} drivers in rank.json`
-                              : 'rank.json …'
-                          }
-                          sx={{ fontWeight: 700, bgcolor: 'rgba(56,189,248,0.12)', border: '1px solid rgba(56,189,248,0.35)' }}
-                        />
-                        <Chip
-                          size="small"
-                          label={
-                            skinPackCount != null
-                              ? `${formatNumber(skinPackCount)} skin pack entries`
-                              : 'Skin pack …'
-                          }
-                          sx={{ fontWeight: 700, bgcolor: 'rgba(246,211,101,0.1)', border: '1px solid rgba(246,211,101,0.35)' }}
-                        />
-                        {liverySectionsOn != null && (
-                          <Chip
-                            size="small"
-                            label={`${liverySectionsOn}/3 livery sections on`}
-                            sx={{ fontWeight: 700, bgcolor: 'rgba(167,139,250,0.12)', border: '1px solid rgba(167,139,250,0.35)' }}
-                          />
-                        )}
+                  <Grid container spacing={3}>
+                    <Grid size={{ xs: 12, md: 6 }}>
+                      <Stack spacing={2.25}>
+                        <Box>
+                          <Typography
+                            variant="caption"
+                            sx={{ color: 'text.secondary', fontWeight: 700, letterSpacing: 0.06 }}
+                          >
+                            Snapshot
+                          </Typography>
+                          <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mt: 0.35, mb: 1 }}>
+                            Live counts from the same JSON the site loads.
+                          </Typography>
+                          <Stack direction="row" flexWrap="wrap" useFlexGap spacing={1}>
+                            <Chip
+                              size="small"
+                              label={
+                                data.rankDriverCount != null
+                                  ? `${formatNumber(data.rankDriverCount)} drivers in rank.json`
+                                  : 'rank.json …'
+                              }
+                              sx={{
+                                fontWeight: 700,
+                                bgcolor: 'rgba(56,189,248,0.12)',
+                                border: '1px solid rgba(56,189,248,0.35)',
+                              }}
+                            />
+                            <Chip
+                              size="small"
+                              label={
+                                skinPackCount != null
+                                  ? `${formatNumber(skinPackCount)} skin pack entries`
+                                  : 'Skin pack …'
+                              }
+                              sx={{
+                                fontWeight: 700,
+                                bgcolor: 'rgba(246,211,101,0.1)',
+                                border: '1px solid rgba(246,211,101,0.35)',
+                              }}
+                            />
+                            {liverySectionsOn != null && (
+                              <Chip
+                                size="small"
+                                label={`${liverySectionsOn}/3 livery sections on`}
+                                sx={{
+                                  fontWeight: 700,
+                                  bgcolor: 'rgba(167,139,250,0.12)',
+                                  border: '1px solid rgba(167,139,250,0.35)',
+                                }}
+                              />
+                            )}
+                          </Stack>
+                        </Box>
+
+                        <Box sx={TEAM_HUB_NOTE_PANEL_SX}>
+                          <Typography
+                            variant="caption"
+                            sx={{
+                              color: 'text.secondary',
+                              fontWeight: 800,
+                              letterSpacing: 0.06,
+                              textTransform: 'uppercase',
+                              display: 'block',
+                              mb: 0.75,
+                            }}
+                          >
+                            Rank deltas
+                          </Typography>
+                          <Typography
+                            variant="body2"
+                            sx={{ color: 'text.secondary', lineHeight: 1.65, maxWidth: 520 }}
+                          >
+                            Day-to-day rank <strong>deltas</strong> compare{' '}
+                            <Box component="code" sx={TEAM_HUB_INLINE_CODE_SX}>
+                              rank-24h.json
+                            </Box>{' '}
+                            to{' '}
+                            <Box component="code" sx={TEAM_HUB_INLINE_CODE_SX}>
+                              rank.json
+                            </Box>
+                            . The daily snapshot workflow runs after 06:00 Amsterdam.
+                          </Typography>
+                        </Box>
+
+                        <Box sx={TEAM_HUB_NOTE_PANEL_SX}>
+                          <Typography
+                            variant="caption"
+                            sx={{
+                              color: 'text.secondary',
+                              fontWeight: 800,
+                              letterSpacing: 0.06,
+                              textTransform: 'uppercase',
+                              display: 'block',
+                              mb: 0.75,
+                            }}
+                          >
+                            Manual file
+                          </Typography>
+                          <Typography
+                            variant="body2"
+                            sx={{ color: 'text.secondary', lineHeight: 1.65, maxWidth: 520 }}
+                          >
+                            <Box component="code" sx={TEAM_HUB_INLINE_CODE_SX}>
+                              team-roles.json
+                            </Box>{' '}
+                            is not part of the FTP sync. Update it in the repo when Discord roles change.
+                          </Typography>
+                        </Box>
                       </Stack>
-                      <Typography variant="body2" sx={{ color: 'text.secondary', mt: 1.75, lineHeight: 1.55 }}>
-                        Day-to-day rank <strong>deltas</strong> use <code style={{ fontSize: '0.85em' }}>rank-24h.json</code>{' '}
-                        vs <code style={{ fontSize: '0.85em' }}>rank.json</code> (snapshot workflow after 06:00 Amsterdam).
-                        <br />
-                        <code style={{ fontSize: '0.85em' }}>team-roles.json</code> is not part of the FTP sync — update it in
-                        the repo when Discord roles change.
-                      </Typography>
                     </Grid>
 
-                    <Grid size={{ xs: 12, md: 7 }}>
-                      <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700, letterSpacing: 0.06 }}>
-                        Links
-                      </Typography>
-                      <Stack direction="row" flexWrap="wrap" useFlexGap spacing={1} sx={{ mt: 1 }}>
-                        <Button
-                          component="a"
-                          href={liveSiteHref}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          variant="outlined"
-                          size="small"
-                          sx={{ ...ADMIN_EXTERNAL_LINK_OUTLINED_SX }}
+                    <Grid size={{ xs: 12, md: 6 }}>
+                      <Stack spacing={2}>
+                        <Box>
+                          <Typography
+                            variant="caption"
+                            sx={{ color: 'text.secondary', fontWeight: 700, letterSpacing: 0.06 }}
+                          >
+                            Links
+                          </Typography>
+                          <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mt: 0.35, mb: 1 }}>
+                            External shortcuts; opens in a new tab.
+                          </Typography>
+                          <Stack direction="row" flexWrap="wrap" useFlexGap spacing={1}>
+                            <Button
+                              component="a"
+                              href={liveSiteHref}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              variant="outlined"
+                              size="small"
+                              sx={{ ...ADMIN_EXTERNAL_LINK_OUTLINED_SX }}
+                            >
+                              This site
+                            </Button>
+                            <Button
+                              component="a"
+                              href={TEAM_PUBLIC_SITE}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              variant="outlined"
+                              size="small"
+                              sx={{ ...ADMIN_EXTERNAL_LINK_OUTLINED_SX }}
+                            >
+                              Production
+                            </Button>
+                            <Button
+                              component="a"
+                              href={TEAM_GITHUB_REPO}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              variant="outlined"
+                              size="small"
+                              sx={{ ...ADMIN_EXTERNAL_LINK_OUTLINED_SX }}
+                            >
+                              GitHub
+                            </Button>
+                            <Button
+                              component="a"
+                              href={`${TEAM_GITHUB_REPO}/actions`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              variant="outlined"
+                              size="small"
+                              sx={{ ...ADMIN_EXTERNAL_LINK_OUTLINED_SX }}
+                            >
+                              Actions
+                            </Button>
+                            <Button
+                              component="a"
+                              href={TEAM_DISCORD}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              variant="outlined"
+                              size="small"
+                              sx={{ ...ADMIN_EXTERNAL_LINK_OUTLINED_SX }}
+                            >
+                              Discord
+                            </Button>
+                            <Button
+                              component="a"
+                              href={TEAM_GAME_SERVER_JOIN}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              variant="outlined"
+                              size="small"
+                              sx={{ ...ADMIN_JOIN_SERVER_OUTLINED_SX }}
+                            >
+                              Join game server
+                            </Button>
+                          </Stack>
+                        </Box>
+
+                        <Box
+                          sx={{
+                            borderRadius: 2,
+                            px: 1.5,
+                            py: 1.15,
+                            border: '1px solid rgba(148,163,184,0.14)',
+                            bgcolor: 'rgba(15,23,42,0.35)',
+                          }}
                         >
-                          This site
-                        </Button>
-                        <Button
-                          component="a"
-                          href={TEAM_PUBLIC_SITE}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          variant="outlined"
-                          size="small"
-                          sx={{ ...ADMIN_EXTERNAL_LINK_OUTLINED_SX }}
-                        >
-                          Production
-                        </Button>
-                        <Button
-                          component="a"
-                          href={TEAM_GITHUB_REPO}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          variant="outlined"
-                          size="small"
-                          sx={{ ...ADMIN_EXTERNAL_LINK_OUTLINED_SX }}
-                        >
-                          GitHub
-                        </Button>
-                        <Button
-                          component="a"
-                          href={`${TEAM_GITHUB_REPO}/actions`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          variant="outlined"
-                          size="small"
-                          sx={{ ...ADMIN_EXTERNAL_LINK_OUTLINED_SX }}
-                        >
-                          Actions
-                        </Button>
-                        <Button
-                          component="a"
-                          href={TEAM_DISCORD}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          variant="outlined"
-                          size="small"
-                          sx={{ ...ADMIN_EXTERNAL_LINK_OUTLINED_SX }}
-                        >
-                          Discord
-                        </Button>
-                        <Button
-                          component="a"
-                          href={TEAM_GAME_SERVER_JOIN}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          variant="outlined"
-                          size="small"
-                          sx={{ ...ADMIN_JOIN_SERVER_OUTLINED_SX }}
-                        >
-                          Join game server
-                        </Button>
+                          <Typography variant="caption" sx={{ color: 'text.secondary', lineHeight: 1.55, display: 'block' }}>
+                            App {CONFIG.appVersion} · same data as the rest of this page
+                          </Typography>
+                        </Box>
                       </Stack>
-                      <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mt: 1.25 }}>
-                        App {CONFIG.appVersion} · same data as the rest of this page
-                      </Typography>
                     </Grid>
                   </Grid>
                 </Paper>

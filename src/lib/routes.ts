@@ -28,3 +28,8 @@ export function getLeaderboardTrackSearch(trackId: string) {
 export function getLeaderboardHref(trackId: string) {
   return `${APP_BASE_URL}leaderboard${getLeaderboardTrackSearch(trackId)}`;
 }
+
+/** Leaderboard page without `?track=` (same basename as {@link getLeaderboardHref}). */
+export function getLeaderboardIndexHref() {
+  return `${APP_BASE_URL}leaderboard`;
+}
