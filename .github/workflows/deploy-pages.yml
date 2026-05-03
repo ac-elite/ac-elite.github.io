@@ -42,6 +42,10 @@ jobs:
         run: npm ci
 
       - name: Build site for GitHub Pages
+        env:
+          # Optional: site visit counter (see scripts/supabase-site-stats.sql)
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
         run: |
           BASE_PATH="/${{ github.event.repository.name }}/"
           if [[ "${{ github.event.repository.name }}" == *.github.io ]]; then

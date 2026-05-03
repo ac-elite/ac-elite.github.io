@@ -5,6 +5,7 @@ import { useEffect } from 'react';
 import { usePathname } from 'src/routes/hooks';
 
 import { ThemeProvider } from 'src/theme/theme-provider';
+import { recordVisitOncePerSession } from 'src/lib/site-visits';
 
 import { SyncCanonicalMeta } from 'src/components/seo/sync-canonical';
 
@@ -16,6 +17,7 @@ type AppProps = {
 
 export default function App({ children }: AppProps) {
   useScrollToTop();
+  useRecordSiteVisit();
 
   return (
     <ThemeProvider>
@@ -33,6 +35,14 @@ function useScrollToTop() {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [pathname]);
+
+  return null;
+}
+
+function useRecordSiteVisit() {
+  useEffect(() => {
+    recordVisitOncePerSession();
+  }, []);
 
   return null;
 }

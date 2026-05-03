@@ -20,6 +20,7 @@ import { fetchJson } from 'src/lib/fetch-json';
 import { getSyncHealth } from 'src/lib/sync-utils';
 import { glassCardMotionSx } from 'src/lib/subtle-motion';
 import { formatNumber, getTrackDisplayName } from 'src/lib/ac-elite-data';
+import { fetchSiteVisitCount, isSiteVisitsConfigured } from 'src/lib/site-visits';
 import { STATUS_ACCENT, brandAccentBorderSx, statusAccentBorderSx } from 'src/lib/status-accent';
 import {
   GLASS_CARD_SX,
@@ -251,6 +252,12 @@ function formatRelative(iso?: string): string {
   return `${Math.floor(h / 24)}d ago`;
 }
 
+type SiteVisitPanelState =
+  | { kind: 'off' }
+  | { kind: 'loading' }
+  | { kind: 'ready'; count: number }
+  | { kind: 'error' };
+
 const FRESHNESS_ROW_BORDER = '1px solid rgba(148,163,184,0.1)';
 
 /** Body cell: soft row divider; vertical align top for multi-line age/note. */
@@ -272,6 +279,22 @@ export default function Page() {
     liverySections: null,
     rankDriverCount: null,
   });
+
+  const [siteVisitPanel, setSiteVisitPanel] = useState<SiteVisitPanelState>(() =>
+    isSiteVisitsConfigured() ? { kind: 'loading' } : { kind: 'off' }
+  );
+
+  useEffect(() => {
+    if (!isSiteVisitsConfigured()) return undefined;
+    let mounted = true;
+    fetchSiteVisitCount().then((n) => {
+      if (!mounted) return;
+      setSiteVisitPanel(n == null ? { kind: 'error' } : { kind: 'ready', count: n });
+    });
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   useEffect(() => {
     let mounted = true;
@@ -481,6 +504,85 @@ export default function Page() {
                     </Paper>
                   </Grid>
                 </Grid>
+
+                <Paper
+                  sx={{
+                    ...GLASS_PANEL_COMPACT_SX,
+                    p: 2.25,
+                    ...brandAccentBorderSx(),
+                    ...glassCardMotionSx(2.5),
+                  }}
+                >
+                  <Stack
+                    direction={{ xs: 'column', sm: 'row' }}
+                    alignItems={{ xs: 'flex-start', sm: 'center' }}
+                    justifyContent="space-between"
+                    spacing={1.5}
+                  >
+                    <Box>
+                      <Typography
+                        variant="overline"
+                        sx={{
+                          letterSpacing: 0.14,
+                          color: 'text.secondary',
+                          fontWeight: 700,
+                          lineHeight: 1.3,
+                          display: 'block',
+                          mb: 0.75,
+                        }}
+                      >
+                        Site visits
+                      </Typography>
+                      {siteVisitPanel.kind === 'off' && (
+                        <Typography variant="body2" sx={{ color: 'text.secondary', maxWidth: 640, lineHeight: 1.55 }}>
+                          Counter not active. Add{' '}
+                          <Box component="span" sx={{ fontFamily: 'monospace', color: 'text.primary' }}>
+                            VITE_SUPABASE_URL
+                          </Box>{' '}
+                          and{' '}
+                          <Box component="span" sx={{ fontFamily: 'monospace', color: 'text.primary' }}>
+                            VITE_SUPABASE_ANON_KEY
+                          </Box>{' '}
+                          (Supabase publishable key or legacy anon JWT) to your build, then run{' '}
+                          <Box component="span" sx={{ fontFamily: 'monospace', color: 'text.primary' }}>
+                            scripts/supabase-site-stats.sql
+                          </Box>{' '}
+                          in the Supabase SQL editor (one session ≈ one count).
+                        </Typography>
+                      )}
+                      {siteVisitPanel.kind === 'loading' && (
+                        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                          Loading…
+                        </Typography>
+                      )}
+                      {siteVisitPanel.kind === 'error' && (
+                        <Typography variant="body2" sx={{ color: 'error.light' }}>
+                          Could not load the counter. Check Supabase RLS and that the SQL script was applied.
+                        </Typography>
+                      )}
+                      {siteVisitPanel.kind === 'ready' && (
+                        <Typography variant="h4" sx={{ fontWeight: 800, letterSpacing: '-0.02em' }}>
+                          {formatNumber(siteVisitPanel.count)}
+                        </Typography>
+                      )}
+                    </Box>
+                    {isSiteVisitsConfigured() && (
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        disabled={siteVisitPanel.kind === 'loading'}
+                        onClick={() => {
+                          setSiteVisitPanel({ kind: 'loading' });
+                          void fetchSiteVisitCount().then((n) =>
+                            setSiteVisitPanel(n == null ? { kind: 'error' } : { kind: 'ready', count: n })
+                          );
+                        }}
+                      >
+                        Refresh
+                      </Button>
+                    )}
+                  </Stack>
+                </Paper>
 
                 {/* ── Action schedule (agenda / timeline) ── */}
                 <Paper sx={{ ...GLASS_PANEL_COMPACT_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(3) }}>
