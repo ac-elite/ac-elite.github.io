@@ -12,8 +12,8 @@ import Typography from '@mui/material/Typography';
 
 import { CONFIG } from 'src/config-global';
 import { fetchJson } from 'src/lib/fetch-json';
+import { DATA_PAGE_SHELL_SX } from 'src/lib/page-shell';
 import { subtleEnterUpSx, glassCardMotionSx } from 'src/lib/subtle-motion';
-import { DATA_PAGE_SHELL_SX, HERO_FOOTNOTE_CAPTION_SX } from 'src/lib/page-shell';
 import { GLASS_CARD_SX, GLASS_PANEL_SX, GLASS_CARD_INNER_SX } from 'src/lib/glass';
 import { getSyncHealth, type SiteMetadata, getEffectiveLastSync } from 'src/lib/sync-utils';
 import {
@@ -180,8 +180,7 @@ export default function Page() {
                 Stats
               </Typography>
               <Typography color="text.secondary">
-                Community-wide totals for drivers, tracks, laps, and distance — same sync cadence as Leaderboard and
-                Rankings.
+                Community-wide totals for drivers, tracks, laps, and distance.
               </Typography>
               <Typography variant="body2" sx={{ color: syncHealth.color, fontWeight: 700 }}>
                 {syncHealth.label} · {syncHealth.ageText}
@@ -205,10 +204,6 @@ export default function Page() {
                   ) : null}
                 </Typography>
               ) : null}
-              <Typography variant="caption" sx={{ ...HERO_FOOTNOTE_CAPTION_SX }}>
-                Numbers come from the regular KMR data sync. Small pace and SR deltas on other pages compare to the daily
-                snapshot.
-              </Typography>
             </Stack>
           </Box>
 

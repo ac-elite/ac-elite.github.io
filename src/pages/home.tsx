@@ -283,7 +283,7 @@ function HeroSection({
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  Download skin pack
+                  Download ACE skin pack
                 </Button>
               </Stack>
 

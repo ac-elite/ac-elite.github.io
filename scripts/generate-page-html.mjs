@@ -41,7 +41,8 @@ const PAGES = [
   {
     route: 'livery-showcase',
     title: 'Livery Showcase - AC Elite',
-    description: 'Official and team livery designs for the AC Elite simracing community.',
+    description:
+      'Browse the AC Elite ACE skin pack: previews and download. Click any image for a full-size view.',
   },
   {
     route: 'setup-store',

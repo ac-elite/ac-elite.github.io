@@ -94,6 +94,84 @@ const DEFAULT_SECTIONS_CONFIG: LiveryShowcaseSectionsConfig = {
   teamLiveries: true,
 };
 
+function capitalizeFirst(s: string) {
+  return s ? `${s.charAt(0).toUpperCase()}${s.slice(1)}` : s;
+}
+
+/** Hero + SEO lines derived from which galleries are enabled (see `public/data/livery-showcase-sections.json`). */
+function buildShowcasePageCopy(sections: LiveryShowcaseSectionsConfig | null): {
+  heroSubtitle: string;
+  metaDescription: string;
+  ogDescription: string;
+} {
+  if (!sections) {
+    return {
+      heroSubtitle:
+        'Browse highlighted liveries from AC Elite; which galleries appear is configured for this deployment.',
+      metaDescription:
+        'AC Elite livery showcase — previews and download links. Click any image for a full-size view.',
+      ogDescription: 'Livery previews for the AC Elite simracing community.',
+    };
+  }
+
+  const { officialPack, aceSkinPack, teamLiveries } = sections;
+  const count = Number(officialPack) + Number(aceSkinPack) + Number(teamLiveries);
+
+  if (count === 0) {
+    return {
+      heroSubtitle: 'No livery galleries are enabled on this page right now.',
+      metaDescription: 'AC Elite livery showcase.',
+      ogDescription: 'AC Elite livery showcase.',
+    };
+  }
+
+  if (count === 1) {
+    if (aceSkinPack) {
+      return {
+        heroSubtitle:
+          'This page lists the ACE skin pack — optional paints you can install for Assetto Corsa.',
+        metaDescription:
+          'Browse the AC Elite ACE skin pack: previews and download. Click any image for a full-size view.',
+        ogDescription: 'ACE skin pack liveries for the AC Elite simracing community.',
+      };
+    }
+    if (officialPack) {
+      return {
+        heroSubtitle:
+          'This page lists the official default-pack paints included with the AC Elite livery pack.',
+        metaDescription:
+          'Browse the AC Elite official default-pack liveries. Click any image for a full-size view.',
+        ogDescription: 'Official AC Elite default-pack liveries.',
+      };
+    }
+    return {
+      heroSubtitle: 'This page lists AC Elite team liveries.',
+      metaDescription: 'Browse AC Elite team liveries. Click any image for a full-size view.',
+      ogDescription: 'AC Elite team liveries.',
+    };
+  }
+
+  const phrases: string[] = [];
+  if (officialPack) phrases.push('official default-pack paints');
+  if (aceSkinPack) phrases.push('the ACE skin pack');
+  if (teamLiveries) phrases.push('AC Elite team liveries');
+
+  const heroFirst = capitalizeFirst(phrases[0] ?? '');
+  const heroSubtitle =
+    phrases.length === 2
+      ? `${heroFirst} and ${phrases[1]}.`
+      : `${heroFirst}, ${phrases[1]}, and ${phrases[2]}.`;
+
+  const metaList =
+    phrases.length === 2
+      ? `${capitalizeFirst(phrases[0]!)} and ${phrases[1]}`
+      : `${capitalizeFirst(phrases[0]!)}, ${phrases[1]}, and ${phrases[2]}`;
+  const metaDescription = `Browse AC Elite liveries: ${metaList}. Click any image for a full-size view.`;
+  const ogDescription = `Livery previews on AC Elite — ${metaList}.`;
+
+  return { heroSubtitle, metaDescription, ogDescription };
+}
+
 function LiveryThumbButton({
   preview,
   onOpen,
@@ -203,15 +281,14 @@ export default function Page() {
     return flattenAceSkinPackOrderedEntries(aceSkinPack);
   }, [aceSkinPack]);
 
+  const showcaseCopy = useMemo(() => buildShowcasePageCopy(sectionsConfig), [sectionsConfig]);
+
   return (
     <>
       <title>{`Livery Showcase - ${CONFIG.appName}`}</title>
-      <meta
-        name="description"
-        content="Browse AC Elite liveries: official default pack paints and AC Elite team designs. Click any image for a full-size view."
-      />
+      <meta name="description" content={showcaseCopy.metaDescription} />
       <meta property="og:title" content="Livery Showcase - AC Elite" />
-      <meta property="og:description" content="Official and team livery designs for the AC Elite simracing community." />
+      <meta property="og:description" content={showcaseCopy.ogDescription} />
       <meta property="og:url" content="https://ac-elite.github.io/livery-showcase" />
 
       <Box sx={{ ...DATA_PAGE_SHELL_SX }}>
@@ -231,15 +308,12 @@ export default function Page() {
                 <Typography variant="h4" fontWeight={800}>
                   Livery Showcase
                 </Typography>
-                <Typography color="text.secondary">
-                  Official default-pack paints, the ACE Skin Pack, and AC Elite team liveries.
-                </Typography>
+                <Typography color="text.secondary">{showcaseCopy.heroSubtitle}</Typography>
                 <Typography variant="body2" sx={{ color: syncHealth.color, fontWeight: 700 }}>
                   {syncHealth.label} · {syncHealth.ageText}
                 </Typography>
                 <Typography variant="caption" sx={{ ...HERO_FOOTNOTE_CAPTION_SX }}>
-                  Click any image for a full-size view. Which sections appear (official pack, skin pack, team cars) is set in the
-                  site configuration by the team.
+                  Click any image for a full-size view.
                 </Typography>
               </Stack>
             </Box>
@@ -309,10 +383,10 @@ export default function Page() {
                   <Typography variant="h6" sx={{ fontWeight: 800 }}>
                     ACE Skin Pack
                   </Typography>
-                  <Stack spacing={0.75}>
+                  <Stack spacing={0.75} useFlexGap>
                     <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                       The full ACE Skin Pack for Assetto Corsa: install it in your game to drive these liveries.
-                      Each card shows the author (linked to their driver profile). Order follows team pairs, not car number.
+                      Each card shows the author (linked to their driver profile).
                     </Typography>
                     <Button
                       component="a"
@@ -322,12 +396,11 @@ export default function Page() {
                       variant="outlined"
                       size="small"
                       sx={{
-                        alignSelf: { xs: 'center', md: 'flex-start' },
-                        mt: 0.25,
+                        my: 2,
                         ...OUTLINED_GLASS_WHITE_SX,
                       }}
                     >
-                      Download ACE Skin Pack
+                      Download ACE skin pack
                     </Button>
                   </Stack>
                   <Grid container spacing={2} sx={{ width: 1 }}>

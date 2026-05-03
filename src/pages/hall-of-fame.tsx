@@ -12,9 +12,9 @@ import Typography from '@mui/material/Typography';
 import { CONFIG } from 'src/config-global';
 import { fetchJson } from 'src/lib/fetch-json';
 import { getDriverProfileHref } from 'src/lib/routes';
+import { DATA_PAGE_SHELL_SX } from 'src/lib/page-shell';
 import { GLASS_PANEL_SX, GLASS_INNER_ROW_SX } from 'src/lib/glass';
 import { type TeamRoles, EMPTY_TEAM_ROLES } from 'src/lib/team-roles';
-import { DATA_PAGE_SHELL_SX, HERO_FOOTNOTE_CAPTION_SX } from 'src/lib/page-shell';
 import { getSyncHealth, type SiteMetadata, getEffectiveLastSync } from 'src/lib/sync-utils';
 import { subtleEnterUpSx, glassCardMotionSx, subtleEnterOnceSx } from 'src/lib/subtle-motion';
 import { BRAND_ACCENT, brandAccentBorderSx, statusAccentBorderSx, statusAccentSplitRimSx } from 'src/lib/status-accent';
@@ -495,10 +495,6 @@ export default function Page() {
                 </Typography>
                 <Typography variant="body2" sx={{ color: syncHealth.color, fontWeight: 700 }}>
                   {syncHealth.label} · {syncHealth.ageText}
-                </Typography>
-                <Typography variant="caption" sx={{ ...HERO_FOOTNOTE_CAPTION_SX }}>
-                  Spotlight cards and team rows refresh with the same KMR sync as Leaderboard and Rankings — deltas on
-                  those pages still compare to the daily snapshot.
                 </Typography>
               </Stack>
             </Box>

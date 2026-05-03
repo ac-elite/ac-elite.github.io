@@ -142,7 +142,7 @@ export function ServerJoinCard({ currentTrack, joinHref = AC_ELITE_SERVER_JOIN_H
       <Stack spacing={1}>
         <Stack direction="row" justifyContent="space-between" alignItems="center">
           <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.72)', fontWeight: 700, letterSpacing: 0.5 }}>
-            OFFICIAL SERVER
+            AC ELITE SERVER
           </Typography>
           <Chip
             size="small"

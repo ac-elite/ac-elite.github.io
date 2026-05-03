@@ -33,7 +33,6 @@ import {
 } from 'src/lib/glass';
 import {
   DATA_PAGE_SHELL_SX,
-  HERO_FOOTNOTE_CAPTION_SX,
   PAGINATION_NAV_BUTTON_SX,
   PAGINATION_PAGE_BUTTON_SX,
   ACTION_OUTLINED_SMALL_DENSE_SX,
@@ -312,9 +311,6 @@ export default function Page() {
                 </Typography>
                 <Typography variant="body2" sx={{ color: syncHealth.color, fontWeight: 700 }}>
                   {syncHealth.label} · {syncHealth.ageText}
-                </Typography>
-                <Typography variant="caption" sx={{ ...HERO_FOOTNOTE_CAPTION_SX }}>
-                  Small deltas next to pace and SR compare to the daily snapshot.
                 </Typography>
               </Stack>
             </Box>
