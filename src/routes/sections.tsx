@@ -7,6 +7,7 @@ import { varAlpha } from 'minimal-shared/utils';
 import Box from '@mui/material/Box';
 import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgress';
 
+import AdminPage from 'src/pages/admin';
 import { DashboardLayout } from 'src/layouts/dashboard';
 
 import { LicenseSafetyGuideProvider } from 'src/components/license-safety-guide/license-safety-guide';
@@ -21,7 +22,6 @@ export const HallOfFamePage = lazy(() => import('src/pages/hall-of-fame'));
 export const DriverProfilePage = lazy(() => import('src/pages/driver-profile'));
 export const SetupStorePage = lazy(() => import('src/pages/setup-store'));
 export const LiveryShowcasePage = lazy(() => import('src/pages/livery-showcase'));
-export const AdminPage = lazy(() => import('src/pages/admin'));
 export const Page404 = lazy(() => import('src/pages/page-not-found'));
 
 const renderFallback = () => (

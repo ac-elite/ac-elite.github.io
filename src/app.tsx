@@ -5,7 +5,7 @@ import { useEffect } from 'react';
 import { usePathname } from 'src/routes/hooks';
 
 import { ThemeProvider } from 'src/theme/theme-provider';
-import { recordVisitOncePerSession } from 'src/lib/site-visits';
+import { recordVisitOncePerSession, isPathExcludedFromSiteVisitCount } from 'src/lib/site-visits';
 
 import { SyncCanonicalMeta } from 'src/components/seo/sync-canonical';
 
@@ -40,9 +40,12 @@ function useScrollToTop() {
 }
 
 function useRecordSiteVisit() {
+  const pathname = usePathname();
+
   useEffect(() => {
+    if (isPathExcludedFromSiteVisitCount(pathname)) return;
     recordVisitOncePerSession();
-  }, []);
+  }, [pathname]);
 
   return null;
 }

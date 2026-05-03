@@ -23,15 +23,21 @@ import { CONFIG } from 'src/config-global';
 import { fetchJson } from 'src/lib/fetch-json';
 import { getDriverProfileHref } from 'src/lib/routes';
 import { subtleRowEnterSx, glassCardMotionSx } from 'src/lib/subtle-motion';
-import { brandAccentBorderSx, statusAccentBorderSx } from 'src/lib/status-accent';
 import { computeDeltas, type DriverDelta, fetchPrevRankData } from 'src/lib/delta';
 import { getSyncHealth, type SiteMetadata, getEffectiveLastSync } from 'src/lib/sync-utils';
+import { brandAccentBorderSx, statusAccentBorderSx, statusAccentSplitRimSx } from 'src/lib/status-accent';
 import {
   GLASS_PANEL_SX,
   getPodiumRowSx,
   GLASS_TABLE_WRAPPER_SX,
   GLASS_TABLE_PAGINATION_SX,
 } from 'src/lib/glass';
+import {
+  DATA_PAGE_SHELL_SX,
+  HERO_FOOTNOTE_CAPTION_SX,
+  PAGINATION_NAV_BUTTON_SX,
+  PAGINATION_PAGE_BUTTON_SX,
+} from 'src/lib/page-shell';
 import {
   CAR,
   getDriverSR,
@@ -52,7 +58,7 @@ import {
 } from 'src/lib/ac-elite-data';
 
 import { DeltaChip } from 'src/components/delta-chip/delta-chip';
-import { ErrorPanel } from 'src/components/data-state/error-panel';
+import { EmptyState, ErrorPanel, LoadingPanel } from 'src/components/data-state';
 import { PageGridOverlay } from 'src/components/page-background/page-grid-overlay';
 import { useLicenseSafetyGuide } from 'src/components/license-safety-guide/license-safety-guide';
 
@@ -177,21 +183,12 @@ export default function Page() {
       <meta property="og:description" content="AC Elite leaderboard by track. Compare lap times and find the fastest drivers." />
       <meta property="og:url" content="https://ac-elite.github.io/leaderboard" />
 
-      <Box
-        sx={{
-          position: 'relative',
-          py: 4,
-          background:
-            'radial-gradient(circle at 20% 0%, rgba(23,33,59,0.24) 0, transparent 50%),' +
-            'linear-gradient(180deg, #17213B 0%, #1f2c49 100%)',
-          overflow: 'hidden',
-        }}
-      >
+      <Box sx={{ ...DATA_PAGE_SHELL_SX }}>
         <PageGridOverlay />
 
         <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1 }}>
           <Stack spacing={3}>
-            <Box sx={{ ...GLASS_PANEL_SX, ...statusAccentBorderSx(syncHealth.color), ...glassCardMotionSx(0) }}>
+            <Box sx={{ ...GLASS_PANEL_SX, ...statusAccentBorderSx(syncHealth.color), ...statusAccentSplitRimSx(syncHealth.color), ...glassCardMotionSx(0) }}>
               <Stack spacing={0.75} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: { xs: 'center', md: 'flex-start' } }}>
                 <Typography variant="h4" fontWeight={800}>
                   Leaderboard
@@ -202,17 +199,19 @@ export default function Page() {
                 <Typography variant="body2" sx={{ color: syncHealth.color, fontWeight: 700 }}>
                   {syncHealth.label} · {syncHealth.ageText}
                 </Typography>
-                <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.52)', maxWidth: 640 }}>
+                <Typography variant="caption" sx={{ ...HERO_FOOTNOTE_CAPTION_SX }}>
                   Small deltas next to pace and SR compare to the daily snapshot.
                 </Typography>
               </Stack>
             </Box>
 
             {loading && (
-              <Stack spacing={2}>
-                <Skeleton variant="rounded" height={56} sx={{ borderRadius: 2, bgcolor: 'rgba(255,255,255,0.06)' }} />
-                <Skeleton variant="rounded" height={400} sx={{ borderRadius: 2, bgcolor: 'rgba(255,255,255,0.05)' }} />
-              </Stack>
+              <LoadingPanel title="Loading leaderboard…" message="Pulling rank data and per-track lap times.">
+                <Stack spacing={2}>
+                  <Skeleton variant="rounded" height={56} sx={{ borderRadius: 2, bgcolor: 'rgba(255,255,255,0.06)' }} />
+                  <Skeleton variant="rounded" height={400} sx={{ borderRadius: 2, bgcolor: 'rgba(255,255,255,0.05)' }} />
+                </Stack>
+              </LoadingPanel>
             )}
 
             {!loading && error && <ErrorPanel error={error} />}
@@ -326,8 +325,11 @@ export default function Page() {
                       <TableBody>
                         {rows.length === 0 && (
                           <TableRow>
-                            <TableCell colSpan={8} align="center" sx={{ py: 6 }}>
-                              No leaderboard data for this track yet.
+                            <TableCell colSpan={8} sx={{ py: 4, px: 2 }}>
+                              <EmptyState
+                                title="No leaderboard data for this track yet."
+                                description="When laps are recorded on this layout, rows will appear here automatically after the next sync."
+                              />
                             </TableCell>
                           </TableRow>
                         )}
@@ -434,7 +436,7 @@ export default function Page() {
                         variant="contained"
                         color="secondary"
                         size="small"
-                        sx={{ minWidth: 78, fontWeight: 800 }}
+                        sx={{ ...PAGINATION_NAV_BUTTON_SX }}
                       >
                         Prev
                       </Button>
@@ -450,6 +452,7 @@ export default function Page() {
                               size="small"
                               variant={p === safePage ? 'contained' : 'outlined'}
                               color={p === safePage ? 'primary' : 'secondary'}
+                              sx={{ ...PAGINATION_PAGE_BUTTON_SX }}
                             >
                               {p}
                             </Button>
@@ -461,7 +464,7 @@ export default function Page() {
                         variant="contained"
                         color="secondary"
                         size="small"
-                        sx={{ minWidth: 78, fontWeight: 800 }}
+                        sx={{ ...PAGINATION_NAV_BUTTON_SX }}
                       >
                         Next
                       </Button>

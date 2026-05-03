@@ -1,5 +1,7 @@
 import type { Theme, SxProps } from '@mui/material/styles';
 
+import { GLASS_CHIP_SHEEN_SX } from 'src/lib/glass';
+
 export type CarLap = { laptime?: number; laps?: number; ts?: number };
 /** One driver row under a car id in `leaderboard.json` (e.g. per track). */
 export type LeaderboardCarRow = {
@@ -469,9 +471,10 @@ export function calculateGap(fastestLap: number, currentLap: number) {
   return `+${((currentLap - fastestLap) / 1000).toFixed(3)}`;
 }
 
-/** Specular “glass” hover for license / SR chips (matches driver profile hero feel). */
+/** Animated glass sheen + hover lift for license / SR chips (same timing as theme buttons). */
 function withBadgeGlassHover(base: SxProps<Theme>): SxProps<Theme> {
   return {
+    ...GLASS_CHIP_SHEEN_SX,
     ...base,
     transition: (theme: Theme) =>
       theme.transitions.create(['transform', 'box-shadow', 'filter'], { duration: 180 }),
@@ -481,6 +484,9 @@ function withBadgeGlassHover(base: SxProps<Theme>): SxProps<Theme> {
         filter: 'brightness(1.08)',
         boxShadow:
           'inset 0 1px 0 rgba(255,255,255,0.48), 0 0 0 1px rgba(255,255,255,0.2), 0 10px 28px rgba(0,0,0,0.38), 0 0 20px rgba(255,255,255,0.14)',
+        '&::before': {
+          mixBlendMode: 'screen',
+        },
       },
     },
     '@media (prefers-reduced-motion: reduce)': {
@@ -490,7 +496,7 @@ function withBadgeGlassHover(base: SxProps<Theme>): SxProps<Theme> {
         filter: 'none',
       },
     },
-  };
+  } as SxProps<Theme>;
 }
 
 export function getLicenseBadgeSx(license: string): SxProps<Theme> {
@@ -593,4 +599,32 @@ export function getOverallCombinedScore(paceScore: number, sr: number, maxPaceSc
   const paceNorm = maxPaceScore > 0 ? paceScore / maxPaceScore : 0;
   const srNorm = Math.max(0, Math.min(1, (sr - 1.0) / (9.99 - 1.0)));
   return PACE_WEIGHT * paceNorm + SR_WEIGHT * srNorm;
+}
+
+/**
+ * 1-based overall standing for Rankings → "Overall" (combined score, then pace tie-break).
+ * Matches {@link getOverallCombinedScore} ordering used on the rankings page — not `rank.json` array order.
+ */
+export function getDriverOverallRank(rankData: RankDriver[], guid: string): number | null {
+  if (!rankData.length) return null;
+  const licenseMap = computeLicenseMap(rankData);
+  const maxPaceScore = Math.max(1, ...rankData.map((d) => getDriverLicense(d, licenseMap).paceScore));
+
+  const scored = rankData.map((driver) => {
+    const license = getDriverLicense(driver, licenseMap);
+    const sr = getDriverSR(driver);
+    return {
+      guid: driver.guid,
+      combined: getOverallCombinedScore(license.paceScore, sr.sr, maxPaceScore),
+      paceScore: license.paceScore,
+    };
+  });
+
+  scored.sort((a, b) => {
+    if (b.combined !== a.combined) return b.combined - a.combined;
+    return b.paceScore - a.paceScore;
+  });
+
+  const idx = scored.findIndex((row) => row.guid === guid);
+  return idx >= 0 ? idx + 1 : null;
 }

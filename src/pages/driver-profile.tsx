@@ -6,6 +6,7 @@ import Chip from '@mui/material/Chip';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import Table from '@mui/material/Table';
+import Button from '@mui/material/Button';
 import Skeleton from '@mui/material/Skeleton';
 import TableRow from '@mui/material/TableRow';
 import TableBody from '@mui/material/TableBody';
@@ -15,16 +16,25 @@ import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import TableContainer from '@mui/material/TableContainer';
 
+import { RouterLink } from 'src/routes/components';
+
 import { CONFIG } from 'src/config-global';
 import { fetchJson } from 'src/lib/fetch-json';
-import { getLeaderboardTrackSearch } from 'src/lib/routes';
-import { brandAccentBorderSx } from 'src/lib/status-accent';
+import { getHomeHref, getLeaderboardTrackSearch } from 'src/lib/routes';
+import { BRAND_ACCENT, brandAccentBorderSx } from 'src/lib/status-accent';
 import { type TeamRoles, getDiscordRolesForGuid } from 'src/lib/team-roles';
 import { liveriesAssetUrl, getTeamLiveryMeta } from 'src/lib/driver-liveries';
 import { computeDeltas, type DriverDelta, fetchPrevRankData } from 'src/lib/delta';
 import { getSyncHealth, type SiteMetadata, getEffectiveLastSync } from 'src/lib/sync-utils';
 import { GLASS_PANEL_SX, GLASS_INNER_PANEL_SX, GLASS_TABLE_WRAPPER_SX } from 'src/lib/glass';
 import { subtleEnterUpSx, subtleRowEnterSx, glassCardMotionSx, glassCardEnterOnlySx } from 'src/lib/subtle-motion';
+import {
+  DATA_PAGE_SHELL_SX,
+  ACTION_PRIMARY_SMALL_SX,
+  PANEL_OVERLINE_MUTED_SX,
+  HERO_TERTIARY_CAPTION_SX,
+  ACTION_OUTLINED_SMALL_DENSE_SX,
+} from 'src/lib/page-shell';
 import {
   CAR,
   getDriverSR,
@@ -44,11 +54,12 @@ import {
   getLicensePanelSx,
   LICENSE_CHIP_WIDTH,
   getTrackDisplayName,
+  getDriverOverallRank,
   type LeaderboardCarRow,
 } from 'src/lib/ac-elite-data';
 
 import { DeltaChip } from 'src/components/delta-chip/delta-chip';
-import { ErrorPanel } from 'src/components/data-state/error-panel';
+import { EmptyState, ErrorPanel, LoadingPanel } from 'src/components/data-state';
 import { LiveryEnlargeDialog } from 'src/components/livery/livery-enlarge-dialog';
 import { PageGridOverlay } from 'src/components/page-background/page-grid-overlay';
 import { useLicenseSafetyGuide } from 'src/components/license-safety-guide/license-safety-guide';
@@ -194,6 +205,49 @@ export default function Page() {
     [driverGuid, rankData]
   );
 
+  /** Same ordering as Rankings → Overall (combined score, pace tie-break), not raw `rank.json` order. */
+  const overallRank = useMemo(
+    () => (driver ? getDriverOverallRank(rankData, driver.guid) : null),
+    [driver, rankData]
+  );
+
+  const driverSeasonHeaderBandSx = useMemo(() => {
+    const base = {
+      borderRadius: 2,
+      px: { xs: 2, md: 2.25 },
+      py: { xs: 1.5, md: 1.75 },
+      mb: 0,
+      border: '1px solid rgba(255,255,255,0.12)',
+      background: 'linear-gradient(120deg, rgba(31,44,73,0.5) 0%, rgba(23,33,59,0.28) 100%)',
+      borderLeft: '3px solid rgba(147,197,253,0.48)',
+    };
+    if (overallRank === 1) {
+      return {
+        ...base,
+        borderLeft: '3px solid rgba(245,158,11,0.78)',
+        background:
+          'linear-gradient(120deg, rgba(245,158,11,0.14) 0%, rgba(23,33,59,0.42) 48%, rgba(23,33,59,0.24) 100%)',
+      };
+    }
+    if (overallRank === 2) {
+      return {
+        ...base,
+        borderLeft: '3px solid rgba(148,163,184,0.78)',
+        background:
+          'linear-gradient(120deg, rgba(148,163,184,0.12) 0%, rgba(23,33,59,0.42) 48%, rgba(23,33,59,0.24) 100%)',
+      };
+    }
+    if (overallRank === 3) {
+      return {
+        ...base,
+        borderLeft: '3px solid rgba(194,101,31,0.78)',
+        background:
+          'linear-gradient(120deg, rgba(194,101,31,0.13) 0%, rgba(23,33,59,0.42) 48%, rgba(23,33,59,0.24) 100%)',
+      };
+    }
+    return base;
+  }, [overallRank]);
+
   const licenseMap = useMemo(() => computeLicenseMap(rankData), [rankData]);
   const license = useMemo(() => (driver ? getDriverLicense(driver, licenseMap) : null), [driver, licenseMap]);
   const sr = useMemo(() => (driver ? getDriverSR(driver) : null), [driver]);
@@ -303,39 +357,63 @@ export default function Page() {
       <meta property="og:title" content="Driver Profile - AC Elite" />
       <meta property="og:description" content="AC Elite driver profile and per-track leaderboard performance." />
 
-      <Box
-        sx={{
-          position: 'relative',
-          pt: { xs: 5, md: 6 },
-          pb: 4,
-          background:
-            'radial-gradient(circle at 20% 0%, rgba(23,33,59,0.24) 0, transparent 50%),' +
-            'linear-gradient(180deg, #17213B 0%, #1f2c49 100%)',
-          overflow: 'hidden',
-        }}
-      >
+      {/* Same vertical rhythm as other data pages (py:4 via DATA_PAGE_SHELL_SX). */}
+      <Box sx={{ ...DATA_PAGE_SHELL_SX }}>
         <PageGridOverlay />
 
         <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1 }}>
           <Stack spacing={3}>
             {loading && (
-              <Stack spacing={2}>
-                <Skeleton variant="rounded" height={340} sx={{ borderRadius: 2, bgcolor: 'rgba(255,255,255,0.06)' }} />
-                <Skeleton variant="rounded" height={300} sx={{ borderRadius: 2, bgcolor: 'rgba(255,255,255,0.05)' }} />
-              </Stack>
+              <LoadingPanel title="Loading profile…" message="Resolving driver, license, SR, and per-track leaderboard rows.">
+                <Stack spacing={2}>
+                  <Skeleton variant="rounded" height={340} sx={{ borderRadius: 2, bgcolor: 'rgba(255,255,255,0.06)' }} />
+                  <Skeleton variant="rounded" height={300} sx={{ borderRadius: 2, bgcolor: 'rgba(255,255,255,0.05)' }} />
+                </Stack>
+              </LoadingPanel>
             )}
 
             {!loading && error && <ErrorPanel error={error} />}
 
             {!loading && !error && !driver && (
-              <Paper sx={{ p: 3 }}>
-                <Typography variant="h6" fontWeight={800}>
-                  Driver not found
-                </Typography>
-                <Typography color="text.secondary" sx={{ mt: 0.75 }}>
-                  This driver is not in the current AC Elite data. Check the link or use the driver search on the home
-                  page.
-                </Typography>
+              <Paper
+                sx={{
+                  ...GLASS_PANEL_SX,
+                  borderTop: `3px solid ${BRAND_ACCENT}`,
+                  boxShadow:
+                    '0 12px 30px rgba(0,0,0,0.32), inset 0 1px 0 rgba(255,255,255,0.08), 0 -1px 0 rgba(147,197,253,0.2)',
+                }}
+              >
+                <Stack spacing={1.5} sx={{ alignItems: { xs: 'center', md: 'flex-start' }, textAlign: { xs: 'center', md: 'left' } }}>
+                  <Typography variant="h6" fontWeight={800}>
+                    Driver not found
+                  </Typography>
+                  <Typography color="text.secondary" sx={{ maxWidth: 560 }}>
+                    This driver is not in the current AC Elite data. Check the link or use the driver search on the home
+                    page.
+                  </Typography>
+                  <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} sx={{ pt: 0.5 }}>
+                    <Button
+                      component={RouterLink}
+                      href={getHomeHref()}
+                      variant="contained"
+                      color="primary"
+                      size="small"
+                      sx={{ ...ACTION_PRIMARY_SMALL_SX }}
+                    >
+                      Home
+                    </Button>
+                    <Button
+                      component={RouterLink}
+                      href="/rankings"
+                      variant="outlined"
+                      color="primary"
+                      size="small"
+                      sx={{ ...ACTION_OUTLINED_SMALL_DENSE_SX }}
+                    >
+                      Rankings
+                    </Button>
+                  </Stack>
+                </Stack>
               </Paper>
             )}
 
@@ -343,40 +421,77 @@ export default function Page() {
               <>
                 <Paper sx={{ ...GLASS_PANEL_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(0), textAlign: { xs: 'center', md: 'left' } }}>
                   <Stack spacing={1.5} sx={{ width: 1 }}>
-                    <Stack spacing={0.5} sx={{ alignItems: { xs: 'center', md: 'flex-start' } }}>
-                      <Stack direction="row" spacing={1.5} alignItems="center">
-                        <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.6)', lineHeight: 1.4 }}>
-                          Driver profile
-                        </Typography>
-                        <Typography variant="caption" sx={{ color: syncHealth.color, fontWeight: 700 }}>
-                          {syncHealth.label}
-                        </Typography>
-                      </Stack>
-                      <Stack
-                        direction="row"
-                        spacing={1}
-                        alignItems="center"
-                        justifyContent={{ xs: 'center', md: 'flex-start' }}
-                        flexWrap="wrap"
-                        useFlexGap
-                      >
-                        <Typography variant="h4" sx={{ fontWeight: 800 }}>
-                          {driver.name || 'Unknown Driver'}
-                        </Typography>
-                        {driverRoles.map((role) => (
-                          <Chip
-                            key={role}
-                            size="small"
-                            label={role}
-                            sx={{ fontWeight: 700, fontSize: '0.72rem', ...ROLE_CHIP_SX[role] }}
-                          />
-                        ))}
-                      </Stack>
-                    </Stack>
+                    <Box sx={driverSeasonHeaderBandSx}>
+                      <Stack spacing={1} sx={{ alignItems: { xs: 'center', md: 'stretch' } }}>
+                        <Stack
+                          direction="row"
+                          alignItems="center"
+                          justifyContent={{ xs: 'center', md: 'space-between' }}
+                          flexWrap="wrap"
+                          useFlexGap
+                          columnGap={1.5}
+                          rowGap={1}
+                          sx={{ width: 1 }}
+                        >
+                          <Stack
+                            direction="row"
+                            spacing={1.5}
+                            alignItems="center"
+                            flexWrap="wrap"
+                            useFlexGap
+                            justifyContent={{ xs: 'center', md: 'flex-start' }}
+                          >
+                            <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.6)', lineHeight: 1.4 }}>
+                              Driver profile
+                            </Typography>
+                            <Typography variant="caption" sx={{ color: syncHealth.color, fontWeight: 700 }}>
+                              {syncHealth.label} · {syncHealth.ageText}
+                            </Typography>
+                          </Stack>
+                          {overallRank != null ? (
+                            <Chip
+                              size="small"
+                              label={`Overall #${overallRank}`}
+                              sx={{ fontWeight: 800, flexShrink: 0, ...getPodiumChipSx(overallRank) }}
+                            />
+                          ) : null}
+                        </Stack>
 
-                    <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.45)', display: 'block', textAlign: { xs: 'center', md: 'left' } }}>
-                      Session totals, rank points, and safety — when your driver record includes them.
-                    </Typography>
+                        <Stack
+                          direction="row"
+                          spacing={1}
+                          alignItems="center"
+                          justifyContent={{ xs: 'center', md: 'flex-start' }}
+                          flexWrap="wrap"
+                          useFlexGap
+                          sx={{ width: 1 }}
+                        >
+                          <Typography variant="h4" sx={{ fontWeight: 800, letterSpacing: '-0.02em' }}>
+                            {driver.name || 'Unknown Driver'}
+                          </Typography>
+                          {driverRoles.map((role) => (
+                            <Chip
+                              key={role}
+                              size="small"
+                              label={role}
+                              sx={{ fontWeight: 700, fontSize: '0.72rem', ...ROLE_CHIP_SX[role] }}
+                            />
+                          ))}
+                        </Stack>
+
+                        <Typography
+                          variant="caption"
+                          sx={{
+                            ...HERO_TERTIARY_CAPTION_SX,
+                            display: 'block',
+                            textAlign: { xs: 'center', md: 'left' },
+                            pt: 0.25,
+                          }}
+                        >
+                          Figures below are from the latest synced AC Elite laps and results for this driver.
+                        </Typography>
+                      </Stack>
+                    </Box>
 
                     <Box sx={DRIVER_STAT_GRID_SX}>
                       <Paper
@@ -605,8 +720,11 @@ export default function Page() {
                       <TableBody>
                         {trackRows.length === 0 && (
                           <TableRow>
-                            <TableCell colSpan={6} align="center" sx={{ py: 6 }}>
-                              No leaderboard entries found for this driver yet.
+                            <TableCell colSpan={6} sx={{ py: 4, px: 2 }}>
+                              <EmptyState
+                                title="No leaderboard entries found for this driver yet."
+                                description="When this driver sets a ranked lap on a track, it will show up here after sync."
+                              />
                             </TableCell>
                           </TableRow>
                         )}
@@ -661,8 +779,7 @@ export default function Page() {
                         <Typography
                           variant="overline"
                           sx={{
-                            color: 'rgba(255,255,255,0.55)',
-                            lineHeight: 1.4,
+                            ...PANEL_OVERLINE_MUTED_SX,
                             textAlign: { xs: 'center', md: 'left' },
                           }}
                         >

@@ -11,6 +11,7 @@ import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import DialogContent from '@mui/material/DialogContent';
 
+import { GUIDE_LAUNCH_BUTTON_SX } from 'src/lib/page-shell';
 import {
   SR_TIERS,
   SR_CONFIG,
@@ -99,11 +100,11 @@ export function LicenseSafetyGuideButton({ compact = false }: LicenseSafetyGuide
       size={compact ? 'small' : 'medium'}
       onClick={() => openGuide('license')}
       sx={{
+        ...GUIDE_LAUNCH_BUTTON_SX,
         minWidth: compact ? 0 : undefined,
         width: compact ? 'auto' : '100%',
         px: compact ? 1.3 : 1.8,
         py: compact ? 0.75 : 1,
-        borderRadius: 2,
       }}
     >
       {compact ? 'License / SR' : 'License / SR (BETA)'}

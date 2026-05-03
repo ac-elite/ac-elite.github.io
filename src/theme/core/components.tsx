@@ -4,7 +4,39 @@ import { varAlpha } from 'minimal-shared/utils';
 
 import SvgIcon from '@mui/material/SvgIcon';
 
+import { GLASS_SYNC_CYCLE_SEC, buttonGlassReflectPulse } from 'src/lib/glass';
+
 // ----------------------------------------------------------------------
+
+/** Glass specular layer — same cadence as {@link GLASS_SYNC_CYCLE_SEC} rim glow on cards. */
+const buttonGlassSheenSx = {
+  position: 'relative',
+  overflow: 'hidden',
+  isolation: 'isolate',
+  '&::before': {
+    content: '""',
+    position: 'absolute',
+    inset: 0,
+    borderRadius: 'inherit',
+    zIndex: 0,
+    pointerEvents: 'none',
+    backgroundImage:
+      'linear-gradient(115deg, transparent 16%, rgba(255,255,255,0.07) 36%, rgba(255,255,255,0.24) 49.2%, rgba(191,225,255,0.32) 50%, rgba(255,255,255,0.18) 50.8%, rgba(255,255,255,0.06) 64%, transparent 84%)',
+    backgroundSize: '260% 260%',
+    backgroundRepeat: 'no-repeat',
+    mixBlendMode: 'soft-light',
+    animation: `${buttonGlassReflectPulse} ${GLASS_SYNC_CYCLE_SEC}s ease-in-out infinite`,
+    '@media (prefers-reduced-motion: reduce)': {
+      animation: 'none',
+      opacity: 0.5,
+      backgroundPosition: '48% 50%',
+    },
+  },
+  '& > *': {
+    position: 'relative',
+    zIndex: 1,
+  },
+} as const;
 
 const MuiBackdrop: Components<Theme>['MuiBackdrop'] = {
   styleOverrides: {
@@ -25,70 +57,109 @@ const MuiButton: Components<Theme>['MuiButton'] = {
     root: {
       textTransform: 'none' as const,
       fontWeight: 700,
-      transition: 'box-shadow 220ms ease, border-color 220ms ease, background 220ms ease',
+      transition:
+        'box-shadow 220ms ease, border-color 220ms ease, background 220ms ease, transform 200ms ease, filter 200ms ease',
+      '&.Mui-disabled::before': {
+        animation: 'none',
+        opacity: 0.28,
+      },
     },
     /** Main CTA — glassy but opaque enough for clear contrast. */
     containedPrimary: ({ theme }) => ({
+      ...buttonGlassSheenSx,
       color: theme.palette.primary.contrastText,
       background: `linear-gradient(135deg, #2a3c63 0%, #21355b 52%, ${theme.palette.primary.dark} 100%)`,
       border: '1px solid rgba(255,255,255,0.24)',
       boxShadow: '0 2px 10px rgba(0,0,0,0.24), inset 0 1px 0 rgba(255,255,255,0.16)',
       '&:hover': {
         background: `linear-gradient(135deg, #304775 0%, #26406f 52%, #1a2c4f 100%)`,
-        borderColor: 'rgba(255,255,255,0.3)',
-        boxShadow: '0 2px 12px rgba(0,0,0,0.26), inset 0 1px 0 rgba(255,255,255,0.2)',
+        borderColor: 'rgba(255,255,255,0.36)',
+        boxShadow:
+          '0 4px 16px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.24), 0 0 22px rgba(147,197,253,0.32)',
+        filter: 'brightness(1.05)',
+        transform: 'translateY(-1px)',
+        '&::before': {
+          mixBlendMode: 'screen',
+        },
       },
       '&:disabled': {
         color: varAlpha(theme.vars.palette.common.whiteChannel, 0.45),
         background: varAlpha(theme.vars.palette.grey['800Channel'], 0.55),
         borderColor: varAlpha(theme.vars.palette.common.whiteChannel, 0.1),
+        transform: 'none',
+        filter: 'none',
       },
     }),
     /** Secondary filled — graphite, distinct from primary gradient. */
     containedSecondary: ({ theme }) => ({
+      ...buttonGlassSheenSx,
       color: theme.palette.secondary.contrastText,
       background: `linear-gradient(135deg, #3a3437 0%, ${theme.palette.secondary.light} 55%, ${theme.palette.secondary.main} 100%)`,
       border: '1px solid rgba(255,255,255,0.2)',
       boxShadow: '0 2px 10px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.1)',
       '&:hover': {
         background: `linear-gradient(135deg, #453d41 0%, #3a3437 55%, ${theme.palette.secondary.dark} 100%)`,
-        borderColor: 'rgba(255,255,255,0.28)',
-        boxShadow: '0 2px 12px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.14)',
+        borderColor: 'rgba(255,255,255,0.34)',
+        boxShadow:
+          '0 4px 16px rgba(0,0,0,0.26), inset 0 1px 0 rgba(255,255,255,0.16), 0 0 18px rgba(255,255,255,0.08)',
+        filter: 'brightness(1.04)',
+        transform: 'translateY(-1px)',
+        '&::before': {
+          mixBlendMode: 'overlay',
+        },
       },
       '&:disabled': {
         color: varAlpha(theme.vars.palette.common.whiteChannel, 0.45),
         background: varAlpha(theme.vars.palette.grey['800Channel'], 0.5),
         borderColor: varAlpha(theme.vars.palette.common.whiteChannel, 0.1),
+        transform: 'none',
+        filter: 'none',
       },
     }),
     outlinedPrimary: ({ theme }) => ({
+      ...buttonGlassSheenSx,
       color: 'rgba(255,255,255,0.94)',
       borderColor: 'rgba(255,255,255,0.34)',
       backgroundColor: '#283756',
       boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.08)',
       '&:hover': {
-        borderColor: 'rgba(255,255,255,0.5)',
+        borderColor: 'rgba(191,225,255,0.55)',
         backgroundColor: '#304166',
-        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.12)',
+        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.14), 0 0 20px rgba(147,197,253,0.22)',
+        filter: 'brightness(1.06)',
+        transform: 'translateY(-1px)',
+        '&::before': {
+          mixBlendMode: 'screen',
+        },
       },
       '&:disabled': {
         color: varAlpha(theme.vars.palette.common.whiteChannel, 0.35),
         borderColor: varAlpha(theme.vars.palette.common.whiteChannel, 0.12),
+        transform: 'none',
+        filter: 'none',
       },
     }),
     outlinedSecondary: ({ theme }) => ({
+      ...buttonGlassSheenSx,
       color: 'rgba(255,255,255,0.88)',
       borderColor: 'rgba(255,255,255,0.26)',
       backgroundColor: '#2a303f',
       boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)',
       '&:hover': {
-        borderColor: 'rgba(255,255,255,0.4)',
+        borderColor: 'rgba(255,255,255,0.46)',
         backgroundColor: '#323a4b',
-        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.1)',
+        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.12), 0 0 16px rgba(255,255,255,0.06)',
+        filter: 'brightness(1.05)',
+        transform: 'translateY(-1px)',
+        '&::before': {
+          mixBlendMode: 'overlay',
+        },
       },
       '&:disabled': {
         color: varAlpha(theme.vars.palette.common.whiteChannel, 0.35),
         borderColor: varAlpha(theme.vars.palette.common.whiteChannel, 0.12),
+        transform: 'none',
+        filter: 'none',
       },
     }),
     containedInherit: ({ theme }) => ({

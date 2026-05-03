@@ -8,6 +8,8 @@ import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 
 import { GLASS_PANEL_SX } from 'src/lib/glass';
+import { brandAccentBorderSx } from 'src/lib/status-accent';
+import { HERO_FOOTNOTE_CAPTION_SX, ACTION_CONTAINED_PRIMARY_SMALL_SX } from 'src/lib/page-shell';
 
 export type PreviewLockPersist = 'none' | 'session' | 'local';
 
@@ -19,8 +21,8 @@ type PreviewLockProps = {
   /**
    * Where to remember “unlocked” after a correct password.
    * - `none`: only until refresh (nothing stored).
-   * - `session`: tab/session (default; safer than local).
-   * - `local`: survives browser restarts (less safe).
+   * - `session`: this browser tab until it is closed.
+   * - `local`: this browser profile until cleared (default).
    */
   persist?: PreviewLockPersist;
   title: string;
@@ -32,14 +34,19 @@ const UNLOCK_VALUE = '1';
 
 function readUnlocked(storageKey: string, persist: PreviewLockPersist): boolean {
   if (typeof window === 'undefined' || persist === 'none') return false;
-  const store = persist === 'session' ? window.sessionStorage : window.localStorage;
-  return store.getItem(storageKey) === UNLOCK_VALUE;
+  if (persist === 'local') return window.localStorage.getItem(storageKey) === UNLOCK_VALUE;
+  return window.sessionStorage.getItem(storageKey) === UNLOCK_VALUE;
 }
 
 function writeUnlocked(storageKey: string, persist: PreviewLockPersist): void {
   if (typeof window === 'undefined' || persist === 'none') return;
-  const store = persist === 'session' ? window.sessionStorage : window.localStorage;
-  store.setItem(storageKey, UNLOCK_VALUE);
+  if (persist === 'local') {
+    window.localStorage.setItem(storageKey, UNLOCK_VALUE);
+    window.sessionStorage.removeItem(storageKey);
+  } else {
+    window.sessionStorage.setItem(storageKey, UNLOCK_VALUE);
+    window.localStorage.removeItem(storageKey);
+  }
 }
 
 /**
@@ -47,11 +54,13 @@ function writeUnlocked(storageKey: string, persist: PreviewLockPersist): void {
  * so it still ships in the JS bundle — this is “keep casual visitors out”, not cryptographic
  * security. For stronger protection without a database, use e.g. Cloudflare Access, Netlify
  * password protection, or a private deployment; optionally combine with `persist="none"`.
+ *
+ * Storage holds only a flag (`'1'`), never the password.
  */
 export function PreviewLock({
   password,
   storageKey,
-  persist = 'session',
+  persist = 'local',
   title,
   description,
   children,
@@ -75,11 +84,17 @@ export function PreviewLock({
     <Paper
       sx={{
         ...GLASS_PANEL_SX,
+        ...brandAccentBorderSx(),
         p: 3,
         textAlign: { xs: 'center', md: 'left' },
       }}
     >
       <Stack spacing={2} sx={{ alignItems: { xs: 'center', md: 'flex-start' } }}>
+        <Typography variant="caption" sx={{ ...HERO_FOOTNOTE_CAPTION_SX, maxWidth: 720, display: 'block' }}>
+          Client-side preview gate only. Your password is checked in the browser; storage keeps a simple unlock flag, never
+          the password itself.
+        </Typography>
+
         <Box sx={{ width: '100%' }}>
           <Typography variant="h5" sx={{ fontWeight: 800 }}>
             {title}
@@ -91,7 +106,7 @@ export function PreviewLock({
 
         <Stack
           direction={{ xs: 'column', sm: 'row' }}
-          spacing={1.2}
+          spacing={1.25}
           alignItems={{ xs: 'center', sm: 'flex-start' }}
           justifyContent={{ xs: 'center', sm: 'flex-start' }}
           sx={{ width: '100%' }}
@@ -122,7 +137,7 @@ export function PreviewLock({
               writeUnlocked(storageKey, persist);
               setUnlocked(true);
             }}
-            sx={{ minHeight: 40 }}
+            sx={{ ...ACTION_CONTAINED_PRIMARY_SMALL_SX }}
           >
             Unlock preview
           </Button>

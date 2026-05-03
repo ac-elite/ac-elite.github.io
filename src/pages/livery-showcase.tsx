@@ -15,10 +15,12 @@ import { CONFIG } from 'src/config-global';
 import { fetchJson } from 'src/lib/fetch-json';
 import { getDriverProfileHref } from 'src/lib/routes';
 import { glassCardMotionSx } from 'src/lib/subtle-motion';
-import { brandAccentBorderSx } from 'src/lib/status-accent';
+import { getSyncHealth, type SiteMetadata } from 'src/lib/sync-utils';
 import { ACE_SKIN_PACK_DOWNLOAD_URL } from 'src/lib/ace-skin-pack-download';
 import { GLASS_PANEL_SX, GLASS_PANEL_TIGHT_SX, GLASS_INNER_PANEL_SX } from 'src/lib/glass';
 import { liveriesAssetUrl, promoLiveryAssetUrl, TEAM_LIVERY_ENTRIES } from 'src/lib/driver-liveries';
+import { brandAccentBorderSx, statusAccentBorderSx, statusAccentSplitRimSx } from 'src/lib/status-accent';
+import { DATA_PAGE_SHELL_SX, OUTLINED_GLASS_WHITE_SX, HERO_FOOTNOTE_CAPTION_SX } from 'src/lib/page-shell';
 import {
   getAceSkinPackAuthorForEntryId,
   flattenAceSkinPackOrderedEntries,
@@ -145,6 +147,9 @@ export default function Page() {
   const [aceSkinPack, setAceSkinPack] = useState<AceSkinPackEntry[] | null>(null);
   /** `null` until `/data/livery-showcase-sections.json` loads — avoids flashing defaults (all `true`) before fetch. */
   const [sectionsConfig, setSectionsConfig] = useState<LiveryShowcaseSectionsConfig | null>(null);
+  const [metadata, setMetadata] = useState<SiteMetadata>({});
+
+  const syncHealth = useMemo(() => getSyncHealth(metadata?.lastSync), [metadata?.lastSync]);
 
   useEffect(() => {
     let mounted = true;
@@ -154,6 +159,20 @@ export default function Page() {
       })
       .catch(() => {
         if (mounted) setAceSkinPack([]);
+      });
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    let mounted = true;
+    fetchJson<SiteMetadata>('/data/metadata.json')
+      .then((data) => {
+        if (mounted) setMetadata(data && typeof data === 'object' ? data : {});
+      })
+      .catch(() => {
+        if (mounted) setMetadata({});
       });
     return () => {
       mounted = false;
@@ -195,21 +214,19 @@ export default function Page() {
       <meta property="og:description" content="Official and team livery designs for the AC Elite simracing community." />
       <meta property="og:url" content="https://ac-elite.github.io/livery-showcase" />
 
-      <Box
-        sx={{
-          position: 'relative',
-          py: 4,
-          background:
-            'radial-gradient(circle at 20% 0%, rgba(23,33,59,0.24) 0, transparent 50%),' +
-            'linear-gradient(180deg, #17213B 0%, #1f2c49 100%)',
-          overflow: 'hidden',
-        }}
-      >
+      <Box sx={{ ...DATA_PAGE_SHELL_SX }}>
         <PageGridOverlay />
 
         <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1 }}>
           <Stack spacing={3}>
-            <Box sx={{ ...GLASS_PANEL_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(0) }}>
+            <Box
+              sx={{
+                ...GLASS_PANEL_SX,
+                ...statusAccentBorderSx(syncHealth.color),
+                ...statusAccentSplitRimSx(syncHealth.color),
+                ...glassCardMotionSx(0),
+              }}
+            >
               <Stack spacing={0.75} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: { xs: 'center', md: 'flex-start' } }}>
                 <Typography variant="h4" fontWeight={800}>
                   Livery Showcase
@@ -217,7 +234,10 @@ export default function Page() {
                 <Typography color="text.secondary">
                   Official default-pack paints, the ACE Skin Pack, and AC Elite team liveries.
                 </Typography>
-                <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.52)', maxWidth: 720, lineHeight: 1.55 }}>
+                <Typography variant="body2" sx={{ color: syncHealth.color, fontWeight: 700 }}>
+                  {syncHealth.label} · {syncHealth.ageText}
+                </Typography>
+                <Typography variant="caption" sx={{ ...HERO_FOOTNOTE_CAPTION_SX }}>
                   Click any image for a full-size view. Which sections appear (official pack, skin pack, team cars) is set in the
                   site configuration by the team.
                 </Typography>
@@ -226,7 +246,7 @@ export default function Page() {
 
             <Stack spacing={3}>
               {sectionsConfig?.officialPack && (
-                <Stack spacing={1.2} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: 'stretch' }}>
+                <Stack spacing={1.25} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: 'stretch' }}>
                 <Typography variant="h6" sx={{ fontWeight: 800 }}>
                   Official pack
                 </Typography>
@@ -285,7 +305,7 @@ export default function Page() {
               )}
 
               {sectionsConfig?.aceSkinPack && aceSkinPack && aceSkinPack.length > 0 && (
-                <Stack spacing={1.2} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: 'stretch' }}>
+                <Stack spacing={1.25} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: 'stretch' }}>
                   <Typography variant="h6" sx={{ fontWeight: 800 }}>
                     ACE Skin Pack
                   </Typography>
@@ -304,14 +324,7 @@ export default function Page() {
                       sx={{
                         alignSelf: { xs: 'center', md: 'flex-start' },
                         mt: 0.25,
-                        textTransform: 'none',
-                        fontWeight: 700,
-                        borderColor: 'rgba(255, 255, 255, 0.45)',
-                        color: 'common.white',
-                        '&:hover': {
-                          borderColor: 'common.white',
-                          bgcolor: 'rgba(255, 255, 255, 0.08)',
-                        },
+                        ...OUTLINED_GLASS_WHITE_SX,
                       }}
                     >
                       Download ACE Skin Pack
@@ -403,7 +416,7 @@ export default function Page() {
               )}
 
               {sectionsConfig?.teamLiveries && (
-                <Stack spacing={1.2} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: 'stretch' }}>
+                <Stack spacing={1.25} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: 'stretch' }}>
                 <Typography variant="h6" sx={{ fontWeight: 800 }}>
                   AC Elite Team
                 </Typography>

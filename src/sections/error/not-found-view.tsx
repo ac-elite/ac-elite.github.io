@@ -1,52 +1,92 @@
 import Box from '@mui/material/Box';
+import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 
 import { RouterLink } from 'src/routes/components';
 
+import { GLASS_PANEL_SX } from 'src/lib/glass';
+import { brandAccentBorderSx } from 'src/lib/status-accent';
+import { getHomeHref, getPublicAssetHref } from 'src/lib/routes';
+import { PAGE_SURFACE_SX, NOT_FOUND_SUPPORTING_TEXT_SX, LINK_PRIMARY_CONTAINED_LARGE_SX } from 'src/lib/page-shell';
+
 import { Logo } from 'src/components/logo';
+import { PageGridOverlay } from 'src/components/page-background/page-grid-overlay';
 
 // ----------------------------------------------------------------------
 
 export function NotFoundView() {
   return (
-    <>
-      <Logo sx={{ position: 'fixed', top: 20, left: 20 }} />
+    <Box
+      sx={{
+        ...PAGE_SURFACE_SX,
+        minHeight: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        py: { xs: 8, md: 10 },
+      }}
+    >
+      <PageGridOverlay />
+
+      <Logo sx={{ position: 'fixed', top: 20, left: 20, zIndex: 2 }} />
 
       <Container
+        maxWidth="md"
         sx={{
-          py: 10,
+          position: 'relative',
+          zIndex: 1,
           flexGrow: 1,
           display: 'flex',
           alignItems: 'center',
-          flexDirection: 'column',
           justifyContent: 'center',
         }}
       >
-        <Typography variant="h3" sx={{ mb: 2 }}>
-          Sorry, page not found!
-        </Typography>
+        <Stack spacing={3} alignItems="center" sx={{ width: 1, textAlign: 'center' }}>
+          <Box
+            sx={{
+              ...GLASS_PANEL_SX,
+              ...brandAccentBorderSx(),
+              width: 1,
+              maxWidth: 560,
+            }}
+          >
+            <Stack spacing={1.25} alignItems="center">
+              <Typography variant="h4" sx={{ fontWeight: 900, letterSpacing: 0.02 }}>
+                Wrong chicane
+              </Typography>
+              <Typography variant="body1" sx={{ color: 'rgba(255,255,255,0.78)', fontWeight: 600 }}>
+                Off track — this URL is not on our circuit.
+              </Typography>
+              <Typography variant="body2" sx={{ ...NOT_FOUND_SUPPORTING_TEXT_SX }}>
+                Check the address for typos, or head back to the pits and pick a page from the nav.
+              </Typography>
+            </Stack>
+          </Box>
 
-        <Typography sx={{ color: 'text.secondary', maxWidth: 480, textAlign: 'center' }}>
-          Sorry, we couldn’t find the page you’re looking for. Perhaps you’ve mistyped the URL? Be
-          sure to check your spelling.
-        </Typography>
+          <Box
+            component="img"
+            src={getPublicAssetHref('/assets/illustrations/illustration-404.svg')}
+            alt=""
+            sx={{
+              width: { xs: 260, sm: 320 },
+              height: 'auto',
+              my: { xs: 2, sm: 3 },
+            }}
+          />
 
-        <Box
-          component="img"
-          src="/assets/illustrations/illustration-404.svg"
-          sx={{
-            width: 320,
-            height: 'auto',
-            my: { xs: 5, sm: 10 },
-          }}
-        />
-
-        <Button component={RouterLink} href="/" size="large" variant="contained" color="primary">
-          Go to home
-        </Button>
+          <Button
+            component={RouterLink}
+            href={getHomeHref()}
+            size="large"
+            variant="contained"
+            color="primary"
+            sx={{ ...LINK_PRIMARY_CONTAINED_LARGE_SX }}
+          >
+            Back to home
+          </Button>
+        </Stack>
       </Container>
-    </>
+    </Box>
   );
 }

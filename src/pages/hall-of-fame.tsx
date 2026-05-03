@@ -14,9 +14,10 @@ import { fetchJson } from 'src/lib/fetch-json';
 import { getDriverProfileHref } from 'src/lib/routes';
 import { GLASS_PANEL_SX, GLASS_INNER_ROW_SX } from 'src/lib/glass';
 import { type TeamRoles, EMPTY_TEAM_ROLES } from 'src/lib/team-roles';
+import { DATA_PAGE_SHELL_SX, HERO_FOOTNOTE_CAPTION_SX } from 'src/lib/page-shell';
 import { getSyncHealth, type SiteMetadata, getEffectiveLastSync } from 'src/lib/sync-utils';
 import { subtleEnterUpSx, glassCardMotionSx, subtleEnterOnceSx } from 'src/lib/subtle-motion';
-import { BRAND_ACCENT, brandAccentBorderSx, statusAccentBorderSx } from 'src/lib/status-accent';
+import { BRAND_ACCENT, brandAccentBorderSx, statusAccentBorderSx, statusAccentSplitRimSx } from 'src/lib/status-accent';
 import {
   CAR,
   type CarLap,
@@ -31,7 +32,7 @@ import {
   LICENSE_CHIP_WIDTH,
 } from 'src/lib/ac-elite-data';
 
-import { ErrorPanel } from 'src/components/data-state/error-panel';
+import { EmptyState, ErrorPanel, LoadingPanel } from 'src/components/data-state';
 import { PageGridOverlay } from 'src/components/page-background/page-grid-overlay';
 import { useLicenseSafetyGuide } from 'src/components/license-safety-guide/license-safety-guide';
 
@@ -225,6 +226,7 @@ function TeamRoleColumn({
       sx={{
         ...GLASS_PANEL_SX,
         ...statusAccentBorderSx(accent),
+        ...statusAccentSplitRimSx(accent),
         ...glassCardMotionSx(enterIndex),
         height: '100%',
         textAlign: { xs: 'center', md: 'left' },
@@ -235,9 +237,10 @@ function TeamRoleColumn({
       </Typography>
       <Stack spacing={1}>
         {members.length === 0 && (
-          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-            No members found in current data.
-          </Typography>
+          <EmptyState
+            title="No members found in current data."
+            description="Team roster GUIDs are matched to synced drivers; if someone is missing from rank.json, they will not appear here."
+          />
         )}
         {members.map((member, mi) => (
           <Box
@@ -477,21 +480,12 @@ export default function Page() {
       <meta property="og:description" content="AC Elite Hall of Fame with standout drivers and team members." />
       <meta property="og:url" content="https://ac-elite.github.io/hall-of-fame" />
 
-      <Box
-        sx={{
-          position: 'relative',
-          py: 4,
-          background:
-            'radial-gradient(circle at 20% 0%, rgba(23,33,59,0.24) 0, transparent 50%),' +
-            'linear-gradient(180deg, #17213B 0%, #1f2c49 100%)',
-          overflow: 'hidden',
-        }}
-      >
+      <Box sx={{ ...DATA_PAGE_SHELL_SX }}>
         <PageGridOverlay />
 
         <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1 }}>
           <Stack spacing={3}>
-            <Box sx={{ ...GLASS_PANEL_SX, ...statusAccentBorderSx(syncHealth.color), ...glassCardMotionSx(0) }}>
+            <Box sx={{ ...GLASS_PANEL_SX, ...statusAccentBorderSx(syncHealth.color), ...statusAccentSplitRimSx(syncHealth.color), ...glassCardMotionSx(0) }}>
               <Stack spacing={0.75} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: { xs: 'center', md: 'flex-start' } }}>
                 <Typography variant="h4" fontWeight={800}>
                   Hall of Fame
@@ -502,17 +496,23 @@ export default function Page() {
                 <Typography variant="body2" sx={{ color: syncHealth.color, fontWeight: 700 }}>
                   {syncHealth.label} · {syncHealth.ageText}
                 </Typography>
+                <Typography variant="caption" sx={{ ...HERO_FOOTNOTE_CAPTION_SX }}>
+                  Spotlight cards and team rows refresh with the same KMR sync as Leaderboard and Rankings — deltas on
+                  those pages still compare to the daily snapshot.
+                </Typography>
               </Stack>
             </Box>
 
             {loading && (
-              <Grid container spacing={2.5}>
-                {Array.from({ length: 6 }).map((_, i) => (
-                  <Grid key={i} size={{ xs: 12, md: 6 }}>
-                    <Skeleton variant="rounded" height={220} sx={{ borderRadius: 2, bgcolor: 'rgba(255,255,255,0.06)' }} />
-                  </Grid>
-                ))}
-              </Grid>
+              <LoadingPanel title="Loading Hall of Fame…" message="Loading drivers, spotlight stats, and team roster matches.">
+                <Grid container spacing={2.5}>
+                  {Array.from({ length: 6 }).map((_, i) => (
+                    <Grid key={i} size={{ xs: 12, md: 6 }}>
+                      <Skeleton variant="rounded" height={220} sx={{ borderRadius: 2, bgcolor: 'rgba(255,255,255,0.06)' }} />
+                    </Grid>
+                  ))}
+                </Grid>
+              </LoadingPanel>
             )}
 
             {!loading && error && <ErrorPanel error={error} />}

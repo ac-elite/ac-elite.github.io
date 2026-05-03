@@ -13,7 +13,7 @@ import Typography from '@mui/material/Typography';
 import { CONFIG } from 'src/config-global';
 import { fetchJson } from 'src/lib/fetch-json';
 import { subtleEnterUpSx, glassCardMotionSx } from 'src/lib/subtle-motion';
-import { brandAccentBorderSx, statusAccentBorderSx } from 'src/lib/status-accent';
+import { DATA_PAGE_SHELL_SX, HERO_FOOTNOTE_CAPTION_SX } from 'src/lib/page-shell';
 import { GLASS_CARD_SX, GLASS_PANEL_SX, GLASS_CARD_INNER_SX } from 'src/lib/glass';
 import { getSyncHealth, type SiteMetadata, getEffectiveLastSync } from 'src/lib/sync-utils';
 import {
@@ -21,9 +21,10 @@ import {
   fetchPrevRankData,
   computeCommunitySnapshotDelta,
 } from 'src/lib/delta';
+import { brandAccentBorderSx, statusAccentBorderSx, statusAccentSplitRimSx } from 'src/lib/status-accent';
 import { CAR, formatNumber, formatLaptime, type RankDriver, getTrackDisplayName } from 'src/lib/ac-elite-data';
 
-import { ErrorPanel } from 'src/components/data-state/error-panel';
+import { ErrorPanel, LoadingPanel } from 'src/components/data-state';
 import { PageGridOverlay } from 'src/components/page-background/page-grid-overlay';
 
 export default function Page() {
@@ -168,35 +169,27 @@ export default function Page() {
       <meta property="og:description" content="AC Elite community stats: driver counts, lap totals, and track activity." />
       <meta property="og:url" content="https://ac-elite.github.io/dashboard" />
 
-      <Box
-        sx={{
-          position: 'relative',
-          py: 4,
-          background:
-            'radial-gradient(circle at 20% 0%, rgba(23,33,59,0.24) 0, transparent 50%),' +
-            'linear-gradient(180deg, #17213B 0%, #1f2c49 100%)',
-          overflow: 'hidden',
-        }}
-      >
+      <Box sx={{ ...DATA_PAGE_SHELL_SX }}>
         <PageGridOverlay />
 
       <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1 }}>
-        <Stack spacing={3.5}>
-          <Box sx={{ ...GLASS_PANEL_SX, ...statusAccentBorderSx(syncHealth.color), ...glassCardMotionSx(0) }}>
+        <Stack spacing={3}>
+          <Box sx={{ ...GLASS_PANEL_SX, ...statusAccentBorderSx(syncHealth.color), ...statusAccentSplitRimSx(syncHealth.color), ...glassCardMotionSx(0) }}>
             <Stack spacing={0.75} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: { xs: 'center', md: 'flex-start' } }}>
-              <Typography variant="h4" fontWeight={800} sx={{ letterSpacing: 0.5 }}>
+              <Typography variant="h4" fontWeight={800}>
                 Stats
               </Typography>
-              <Typography variant="body2" color="text.secondary">
-                <Box component="span" sx={{ color: syncHealth.color, fontWeight: 700 }}>
-                  {syncHealth.label}
-                </Box>{' '}
-                Data sync • Last update: {syncHealth.ageText}
+              <Typography color="text.secondary">
+                Community-wide totals for drivers, tracks, laps, and distance — same sync cadence as Leaderboard and
+                Rankings.
               </Typography>
-              {communityDelta.hasBaseline && (
-                <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.78)', maxWidth: 720 }}>
+              <Typography variant="body2" sx={{ color: syncHealth.color, fontWeight: 700 }}>
+                {syncHealth.label} · {syncHealth.ageText}
+              </Typography>
+              {communityDelta.hasBaseline ? (
+                <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 720 }}>
                   vs daily snapshot:{' '}
-                  <Box component="span" sx={{ fontWeight: 700, color: '#dbeafe' }}>
+                  <Box component="span" sx={{ fontWeight: 700, color: 'rgba(255,255,255,0.92)' }}>
                     {formatSignedKm(communityDelta.deltaKm)} km
                   </Box>{' '}
                   community-wide
@@ -204,15 +197,15 @@ export default function Page() {
                     <>
                       {' '}
                       ·{' '}
-                      <Box component="span" sx={{ fontWeight: 700, color: '#dbeafe' }}>
+                      <Box component="span" sx={{ fontWeight: 700, color: 'rgba(255,255,255,0.92)' }}>
                         +{communityDelta.newDrivers}
                       </Box>{' '}
                       new driver{communityDelta.newDrivers === 1 ? '' : 's'}
                     </>
                   ) : null}
                 </Typography>
-              )}
-              <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)', display: 'block' }}>
+              ) : null}
+              <Typography variant="caption" sx={{ ...HERO_FOOTNOTE_CAPTION_SX }}>
                 Numbers come from the regular KMR data sync. Small pace and SR deltas on other pages compare to the daily
                 snapshot.
               </Typography>
@@ -220,47 +213,49 @@ export default function Page() {
           </Box>
 
           {loading && (
-            <Grid container spacing={2.5}>
-              {[0, 1, 2, 3].map((k) => (
-                <Grid key={k} size={{ xs: 12, sm: 6, md: 3 }}>
+            <LoadingPanel title="Loading dashboard…" message="Aggregating community totals and track coverage from the latest sync.">
+              <Grid container spacing={2.5}>
+                {[0, 1, 2, 3].map((k) => (
+                  <Grid key={k} size={{ xs: 12, sm: 6, md: 3 }}>
+                    <Skeleton
+                      variant="rounded"
+                      height={152}
+                      sx={{ borderRadius: 2, bgcolor: 'rgba(255,255,255,0.06)' }}
+                    />
+                  </Grid>
+                ))}
+                {[0, 1, 2].map((k) => (
+                  <Grid key={`s-${k}`} size={{ xs: 12, sm: 6, md: 4 }}>
+                    <Skeleton
+                      variant="rounded"
+                      height={124}
+                      sx={{ borderRadius: 2, bgcolor: 'rgba(255,255,255,0.05)' }}
+                    />
+                  </Grid>
+                ))}
+                <Grid size={{ xs: 12 }}>
                   <Skeleton
                     variant="rounded"
-                    height={152}
-                    sx={{ borderRadius: 2, bgcolor: 'rgba(255,255,255,0.06)' }}
-                  />
-                </Grid>
-              ))}
-              {[0, 1, 2].map((k) => (
-                <Grid key={`s-${k}`} size={{ xs: 12, sm: 6, md: 4 }}>
-                  <Skeleton
-                    variant="rounded"
-                    height={124}
+                    height={100}
                     sx={{ borderRadius: 2, bgcolor: 'rgba(255,255,255,0.05)' }}
                   />
                 </Grid>
-              ))}
-              <Grid size={{ xs: 12 }}>
-                <Skeleton
-                  variant="rounded"
-                  height={100}
-                  sx={{ borderRadius: 2, bgcolor: 'rgba(255,255,255,0.05)' }}
-                />
+                <Grid size={{ xs: 12, md: 6 }}>
+                  <Skeleton
+                    variant="rounded"
+                    height={280}
+                    sx={{ borderRadius: 2, bgcolor: 'rgba(255,255,255,0.05)' }}
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, md: 6 }}>
+                  <Skeleton
+                    variant="rounded"
+                    height={280}
+                    sx={{ borderRadius: 2, bgcolor: 'rgba(255,255,255,0.05)' }}
+                  />
+                </Grid>
               </Grid>
-              <Grid size={{ xs: 12, md: 6 }}>
-                <Skeleton
-                  variant="rounded"
-                  height={280}
-                  sx={{ borderRadius: 2, bgcolor: 'rgba(255,255,255,0.05)' }}
-                />
-              </Grid>
-              <Grid size={{ xs: 12, md: 6 }}>
-                <Skeleton
-                  variant="rounded"
-                  height={280}
-                  sx={{ borderRadius: 2, bgcolor: 'rgba(255,255,255,0.05)' }}
-                />
-              </Grid>
-            </Grid>
+            </LoadingPanel>
           )}
 
           {!loading && error && <ErrorPanel error={error} onRetry={() => window.location.reload()} />}
@@ -492,7 +487,7 @@ export default function Page() {
                   <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.78)' }}>
                     Top Distance Drivers
                   </Typography>
-                  <Stack spacing={1.1} sx={{ mt: 1.25 }}>
+                  <Stack spacing={1.25} sx={{ mt: 1.25 }}>
                     {topDistanceDrivers.map((driver, idx) => (
                       <Stack
                         key={driver.guid}
@@ -530,7 +525,7 @@ export default function Page() {
                   <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.78)' }}>
                     Most Active Tracks
                   </Typography>
-                  <Stack spacing={1.1} sx={{ mt: 1.25 }}>
+                  <Stack spacing={1.25} sx={{ mt: 1.25 }}>
                     {topTracksByEntries.map((track, idx) => (
                       <Stack
                         key={track.trackId}

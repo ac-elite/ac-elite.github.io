@@ -22,15 +22,23 @@ import { CONFIG } from 'src/config-global';
 import { fetchJson } from 'src/lib/fetch-json';
 import { getDriverProfileHref } from 'src/lib/routes';
 import { subtleRowEnterSx, glassCardMotionSx } from 'src/lib/subtle-motion';
-import { brandAccentBorderSx, statusAccentBorderSx } from 'src/lib/status-accent';
 import { computeDeltas, type DriverDelta, fetchPrevRankData } from 'src/lib/delta';
 import { getSyncHealth, type SiteMetadata, getEffectiveLastSync } from 'src/lib/sync-utils';
+import { brandAccentBorderSx, statusAccentBorderSx, statusAccentSplitRimSx } from 'src/lib/status-accent';
 import {
   GLASS_PANEL_SX,
   getPodiumRowSx,
   GLASS_TABLE_WRAPPER_SX,
   GLASS_TABLE_PAGINATION_SX,
 } from 'src/lib/glass';
+import {
+  DATA_PAGE_SHELL_SX,
+  HERO_FOOTNOTE_CAPTION_SX,
+  PAGINATION_NAV_BUTTON_SX,
+  PAGINATION_PAGE_BUTTON_SX,
+  ACTION_OUTLINED_SMALL_DENSE_SX,
+  FORM_SECTION_KICKER_CAPTION_SX,
+} from 'src/lib/page-shell';
 import {
   SR_TIERS,
   getDriverSR,
@@ -47,7 +55,7 @@ import {
 } from 'src/lib/ac-elite-data';
 
 import { DeltaChip } from 'src/components/delta-chip/delta-chip';
-import { ErrorPanel } from 'src/components/data-state/error-panel';
+import { EmptyState, ErrorPanel, LoadingPanel } from 'src/components/data-state';
 import { PageGridOverlay } from 'src/components/page-background/page-grid-overlay';
 import { useLicenseSafetyGuide } from 'src/components/license-safety-guide/license-safety-guide';
 
@@ -97,7 +105,7 @@ function Paginate({
           variant="contained"
           color="secondary"
           size="small"
-          sx={{ minWidth: 78, fontWeight: 800 }}
+          sx={{ ...PAGINATION_NAV_BUTTON_SX }}
         >
           Prev
         </Button>
@@ -113,6 +121,7 @@ function Paginate({
               size="small"
               variant={p === page ? 'contained' : 'outlined'}
               color={p === page ? 'primary' : 'secondary'}
+              sx={{ ...PAGINATION_PAGE_BUTTON_SX }}
             >
               {p}
             </Button>
@@ -124,7 +133,7 @@ function Paginate({
           variant="contained"
           color="secondary"
           size="small"
-          sx={{ minWidth: 78, fontWeight: 800 }}
+          sx={{ ...PAGINATION_NAV_BUTTON_SX }}
         >
           Next
         </Button>
@@ -288,21 +297,12 @@ export default function Page() {
       <meta property="og:description" content="AC Elite rankings by overall, license tier, and safety tier." />
       <meta property="og:url" content="https://ac-elite.github.io/rankings" />
 
-      <Box
-        sx={{
-          position: 'relative',
-          py: 4,
-          background:
-            'radial-gradient(circle at 20% 0%, rgba(23,33,59,0.24) 0, transparent 50%),' +
-            'linear-gradient(180deg, #17213B 0%, #1f2c49 100%)',
-          overflow: 'hidden',
-        }}
-      >
+      <Box sx={{ ...DATA_PAGE_SHELL_SX }}>
         <PageGridOverlay />
 
         <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1 }}>
           <Stack spacing={3}>
-            <Box sx={{ ...GLASS_PANEL_SX, ...statusAccentBorderSx(syncHealth.color), ...glassCardMotionSx(0) }}>
+            <Box sx={{ ...GLASS_PANEL_SX, ...statusAccentBorderSx(syncHealth.color), ...statusAccentSplitRimSx(syncHealth.color), ...glassCardMotionSx(0) }}>
               <Stack spacing={0.75} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: { xs: 'center', md: 'flex-start' } }}>
                 <Typography variant="h4" fontWeight={800}>
                   Rankings
@@ -313,17 +313,19 @@ export default function Page() {
                 <Typography variant="body2" sx={{ color: syncHealth.color, fontWeight: 700 }}>
                   {syncHealth.label} · {syncHealth.ageText}
                 </Typography>
-                <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.52)', maxWidth: 640 }}>
+                <Typography variant="caption" sx={{ ...HERO_FOOTNOTE_CAPTION_SX }}>
                   Small deltas next to pace and SR compare to the daily snapshot.
                 </Typography>
               </Stack>
             </Box>
 
             {loading && (
-              <Stack spacing={2}>
-                <Skeleton variant="rounded" height={56} sx={{ borderRadius: 2, bgcolor: 'rgba(255,255,255,0.06)' }} />
-                <Skeleton variant="rounded" height={400} sx={{ borderRadius: 2, bgcolor: 'rgba(255,255,255,0.05)' }} />
-              </Stack>
+              <LoadingPanel title="Loading rankings…" message="Fetching drivers, licenses, and safety tiers.">
+                <Stack spacing={2}>
+                  <Skeleton variant="rounded" height={56} sx={{ borderRadius: 2, bgcolor: 'rgba(255,255,255,0.06)' }} />
+                  <Skeleton variant="rounded" height={400} sx={{ borderRadius: 2, bgcolor: 'rgba(255,255,255,0.05)' }} />
+                </Stack>
+              </LoadingPanel>
             )}
 
             {!loading && error && <ErrorPanel error={error} />}
@@ -349,6 +351,7 @@ export default function Page() {
                         variant={tab === item.key ? 'contained' : 'outlined'}
                         color={tab === item.key ? 'primary' : 'secondary'}
                         onClick={() => setTab(item.key as RankingsTab)}
+                        sx={{ ...ACTION_OUTLINED_SMALL_DENSE_SX }}
                       >
                         {item.label}
                       </Button>
@@ -356,8 +359,8 @@ export default function Page() {
                   </Stack>
 
                   {tab === 'license' && (
-                    <Stack spacing={1.2} sx={{ mt: 1.5 }}>
-                      <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.78)', letterSpacing: 0.3 }}>
+                    <Stack spacing={1.25} sx={{ mt: 1.5 }}>
+                      <Typography variant="caption" sx={{ ...FORM_SECTION_KICKER_CAPTION_SX }}>
                         License tier
                       </Typography>
                       <FormControl size="small" sx={{ maxWidth: 360, width: '100%' }}>
@@ -428,8 +431,8 @@ export default function Page() {
                   )}
 
                   {tab === 'safety' && (
-                    <Stack spacing={1.2} sx={{ mt: 1.5 }}>
-                      <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.78)', letterSpacing: 0.3 }}>
+                    <Stack spacing={1.25} sx={{ mt: 1.5 }}>
+                      <Typography variant="caption" sx={{ ...FORM_SECTION_KICKER_CAPTION_SX }}>
                         Safety Rating tier
                       </Typography>
                       <FormControl size="small" sx={{ maxWidth: 360, width: '100%' }}>
@@ -528,8 +531,11 @@ export default function Page() {
                       <TableBody>
                         {activeData.rows.length === 0 && (
                           <TableRow>
-                            <TableCell colSpan={5} align="center" sx={{ py: 6 }}>
-                              No drivers in this ranking yet.
+                            <TableCell colSpan={5} sx={{ py: 4, px: 2 }}>
+                              <EmptyState
+                                title="No drivers in this ranking yet."
+                                description="Try another tab or tier filter, or check back after more drivers sync into this view."
+                              />
                             </TableCell>
                           </TableRow>
                         )}

@@ -21,18 +21,26 @@ import { getSyncHealth } from 'src/lib/sync-utils';
 import { glassCardMotionSx } from 'src/lib/subtle-motion';
 import { formatNumber, getTrackDisplayName } from 'src/lib/ac-elite-data';
 import { fetchSiteVisitCount, isSiteVisitsConfigured } from 'src/lib/site-visits';
-import { STATUS_ACCENT, brandAccentBorderSx, statusAccentBorderSx } from 'src/lib/status-accent';
 import {
   GLASS_CARD_SX,
   GLASS_PANEL_SX,
   GLASS_INNER_PANEL_SX,
   GLASS_PANEL_COMPACT_SX,
 } from 'src/lib/glass';
+import { STATUS_ACCENT, brandAccentBorderSx, statusAccentBorderSx, statusAccentSplitRimSx } from 'src/lib/status-accent';
+import {
+  DATA_PAGE_SHELL_SX,
+  TABLE_HEAD_MUTED_COLOR,
+  HERO_FOOTNOTE_CAPTION_SX,
+  ADMIN_JOIN_SERVER_OUTLINED_SX,
+  ADMIN_EXTERNAL_LINK_OUTLINED_SX,
+} from 'src/lib/page-shell';
 
 import { PreviewLock } from 'src/components/preview-lock/preview-lock';
 import { PageGridOverlay } from 'src/components/page-background/page-grid-overlay';
+import { SiteVisitsShowcase } from 'src/components/site-visits-showcase/site-visits-showcase';
 
-/** Preview gate (client-side only; edit here to rotate). */
+/** Preview gate (client-side only; edit here to rotate the admin preview password). */
 const ADMIN_PREVIEW_PASSWORD = 'acelite-mod-team';
 
 /** Public site + repo (same URLs as elsewhere in the project). */
@@ -254,7 +262,7 @@ function formatRelative(iso?: string): string {
 
 type SiteVisitPanelState =
   | { kind: 'off' }
-  | { kind: 'loading' }
+  | { kind: 'loading'; lastCount?: number }
   | { kind: 'ready'; count: number }
   | { kind: 'error' };
 
@@ -348,16 +356,7 @@ export default function Page() {
       <meta name="description" content="AC Elite internal admin panel." />
       <meta name="robots" content="noindex, nofollow" />
 
-      <Box
-        sx={{
-          position: 'relative',
-          py: 4,
-          background:
-            'radial-gradient(circle at 20% 0%, rgba(23,33,59,0.24) 0, transparent 50%),' +
-            'linear-gradient(180deg, #17213B 0%, #1f2c49 100%)',
-          overflow: 'hidden',
-        }}
-      >
+      <Box sx={{ ...DATA_PAGE_SHELL_SX }}>
         <PageGridOverlay />
 
         <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1 }}>
@@ -370,7 +369,7 @@ export default function Page() {
                 <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                   Internal overview for moderators and admins — schedules, data freshness, and site status at a glance.
                 </Typography>
-                <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.52)', maxWidth: 720, lineHeight: 1.55 }}>
+                <Typography variant="caption" sx={{ ...HERO_FOOTNOTE_CAPTION_SX, maxWidth: 720 }}>
                   Live KMR sync and server track are in the cards directly below. Further down: workflow schedule, file-level
                   freshness, and team shortcuts.
                 </Typography>
@@ -393,6 +392,7 @@ export default function Page() {
                         height: '100%',
                         p: 2.25,
                         ...statusAccentBorderSx(syncStatus.color),
+                        ...statusAccentSplitRimSx(syncStatus.color),
                         ...glassCardMotionSx(1),
                       }}
                     >
@@ -447,6 +447,7 @@ export default function Page() {
                         height: '100%',
                         p: 2.25,
                         ...statusAccentBorderSx(trackStatusAccent),
+                        ...statusAccentSplitRimSx(trackStatusAccent),
                         ...glassCardMotionSx(2),
                       }}
                     >
@@ -505,84 +506,25 @@ export default function Page() {
                   </Grid>
                 </Grid>
 
-                <Paper
-                  sx={{
-                    ...GLASS_PANEL_COMPACT_SX,
-                    p: 2.25,
-                    ...brandAccentBorderSx(),
-                    ...glassCardMotionSx(2.5),
+                <SiteVisitsShowcase
+                  configured={isSiteVisitsConfigured()}
+                  phase={siteVisitPanel.kind}
+                  count={
+                    siteVisitPanel.kind === 'ready'
+                      ? siteVisitPanel.count
+                      : siteVisitPanel.kind === 'loading' && siteVisitPanel.lastCount != null
+                        ? siteVisitPanel.lastCount
+                        : undefined
+                  }
+                  onRefresh={() => {
+                    setSiteVisitPanel((prev) =>
+                      prev.kind === 'ready' ? { kind: 'loading', lastCount: prev.count } : { kind: 'loading' }
+                    );
+                    void fetchSiteVisitCount().then((n) =>
+                      setSiteVisitPanel(n == null ? { kind: 'error' } : { kind: 'ready', count: n })
+                    );
                   }}
-                >
-                  <Stack
-                    direction={{ xs: 'column', sm: 'row' }}
-                    alignItems={{ xs: 'flex-start', sm: 'center' }}
-                    justifyContent="space-between"
-                    spacing={1.5}
-                  >
-                    <Box>
-                      <Typography
-                        variant="overline"
-                        sx={{
-                          letterSpacing: 0.14,
-                          color: 'text.secondary',
-                          fontWeight: 700,
-                          lineHeight: 1.3,
-                          display: 'block',
-                          mb: 0.75,
-                        }}
-                      >
-                        Site visits
-                      </Typography>
-                      {siteVisitPanel.kind === 'off' && (
-                        <Typography variant="body2" sx={{ color: 'text.secondary', maxWidth: 640, lineHeight: 1.55 }}>
-                          Counter not active. Add{' '}
-                          <Box component="span" sx={{ fontFamily: 'monospace', color: 'text.primary' }}>
-                            VITE_SUPABASE_URL
-                          </Box>{' '}
-                          and{' '}
-                          <Box component="span" sx={{ fontFamily: 'monospace', color: 'text.primary' }}>
-                            VITE_SUPABASE_ANON_KEY
-                          </Box>{' '}
-                          (Supabase publishable key or legacy anon JWT) to your build, then run{' '}
-                          <Box component="span" sx={{ fontFamily: 'monospace', color: 'text.primary' }}>
-                            scripts/supabase-site-stats.sql
-                          </Box>{' '}
-                          in the Supabase SQL editor (one session ≈ one count).
-                        </Typography>
-                      )}
-                      {siteVisitPanel.kind === 'loading' && (
-                        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                          Loading…
-                        </Typography>
-                      )}
-                      {siteVisitPanel.kind === 'error' && (
-                        <Typography variant="body2" sx={{ color: 'error.light' }}>
-                          Could not load the counter. Check Supabase RLS and that the SQL script was applied.
-                        </Typography>
-                      )}
-                      {siteVisitPanel.kind === 'ready' && (
-                        <Typography variant="h4" sx={{ fontWeight: 800, letterSpacing: '-0.02em' }}>
-                          {formatNumber(siteVisitPanel.count)}
-                        </Typography>
-                      )}
-                    </Box>
-                    {isSiteVisitsConfigured() && (
-                      <Button
-                        size="small"
-                        variant="outlined"
-                        disabled={siteVisitPanel.kind === 'loading'}
-                        onClick={() => {
-                          setSiteVisitPanel({ kind: 'loading' });
-                          void fetchSiteVisitCount().then((n) =>
-                            setSiteVisitPanel(n == null ? { kind: 'error' } : { kind: 'ready', count: n })
-                          );
-                        }}
-                      >
-                        Refresh
-                      </Button>
-                    )}
-                  </Stack>
-                </Paper>
+                />
 
                 {/* ── Action schedule (agenda / timeline) ── */}
                 <Paper sx={{ ...GLASS_PANEL_COMPACT_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(3) }}>
@@ -907,7 +849,7 @@ export default function Page() {
                               textTransform: 'uppercase',
                               letterSpacing: '0.1em',
                               fontWeight: 800,
-                              color: 'rgba(255,255,255,0.55)',
+                              color: TABLE_HEAD_MUTED_COLOR,
                               borderBottom: '1px solid rgba(148,163,184,0.28)',
                               py: 1.35,
                               px: 1.5,
@@ -1075,7 +1017,7 @@ export default function Page() {
                           rel="noopener noreferrer"
                           variant="outlined"
                           size="small"
-                          sx={{ borderColor: 'rgba(148,163,184,0.4)', fontWeight: 700 }}
+                          sx={{ ...ADMIN_EXTERNAL_LINK_OUTLINED_SX }}
                         >
                           This site
                         </Button>
@@ -1086,7 +1028,7 @@ export default function Page() {
                           rel="noopener noreferrer"
                           variant="outlined"
                           size="small"
-                          sx={{ borderColor: 'rgba(148,163,184,0.4)', fontWeight: 700 }}
+                          sx={{ ...ADMIN_EXTERNAL_LINK_OUTLINED_SX }}
                         >
                           Production
                         </Button>
@@ -1097,7 +1039,7 @@ export default function Page() {
                           rel="noopener noreferrer"
                           variant="outlined"
                           size="small"
-                          sx={{ borderColor: 'rgba(148,163,184,0.4)', fontWeight: 700 }}
+                          sx={{ ...ADMIN_EXTERNAL_LINK_OUTLINED_SX }}
                         >
                           GitHub
                         </Button>
@@ -1108,7 +1050,7 @@ export default function Page() {
                           rel="noopener noreferrer"
                           variant="outlined"
                           size="small"
-                          sx={{ borderColor: 'rgba(148,163,184,0.4)', fontWeight: 700 }}
+                          sx={{ ...ADMIN_EXTERNAL_LINK_OUTLINED_SX }}
                         >
                           Actions
                         </Button>
@@ -1119,7 +1061,7 @@ export default function Page() {
                           rel="noopener noreferrer"
                           variant="outlined"
                           size="small"
-                          sx={{ borderColor: 'rgba(148,163,184,0.4)', fontWeight: 700 }}
+                          sx={{ ...ADMIN_EXTERNAL_LINK_OUTLINED_SX }}
                         >
                           Discord
                         </Button>
@@ -1130,7 +1072,7 @@ export default function Page() {
                           rel="noopener noreferrer"
                           variant="outlined"
                           size="small"
-                          sx={{ borderColor: 'rgba(34,197,94,0.45)', color: '#86efac', fontWeight: 700 }}
+                          sx={{ ...ADMIN_JOIN_SERVER_OUTLINED_SX }}
                         >
                           Join game server
                         </Button>

@@ -7,6 +7,8 @@ import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import { useTheme } from '@mui/material/styles';
 
+import { OUTLINED_MENU_TRIGGER_SMALL_SX } from 'src/lib/page-shell';
+
 import { Logo } from 'src/components/logo';
 import { UpdateBar } from 'src/components/update-bar/update-bar';
 import { ModTeamAdminLink } from 'src/components/mod-team-admin-link/mod-team-admin-link';
@@ -72,7 +74,7 @@ export function DashboardLayout({
             color="secondary"
             onClick={() => setOpenMobileNav(true)}
             size="small"
-            sx={{ minWidth: 0, px: 1.5, py: 0.75, borderRadius: 1.25 }}
+            sx={{ ...OUTLINED_MENU_TRIGGER_SMALL_SX }}
           >
             Menu
           </Button>

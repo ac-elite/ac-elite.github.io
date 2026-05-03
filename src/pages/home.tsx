@@ -25,8 +25,8 @@ import { CONFIG } from 'src/config-global';
 import { fetchJson } from 'src/lib/fetch-json';
 import { getDriverProfileHref } from 'src/lib/routes';
 import { ACE_SKIN_PACK_DOWNLOAD_URL } from 'src/lib/ace-skin-pack-download';
-import { brandAccentBorderSx, statusAccentBorderSx } from 'src/lib/status-accent';
 import { computeDeltas, type DriverDelta, fetchPrevRankData } from 'src/lib/delta';
+import { brandAccentBorderSx, statusAccentBorderSx, statusAccentSplitRimSx } from 'src/lib/status-accent';
 import { subtleEnterUpSx, subtleRowEnterSx, glassCardMotionSx, subtleEnterOnceSx } from 'src/lib/subtle-motion';
 import {
   getSyncHealth,
@@ -42,11 +42,19 @@ import {
   teamRoleToDiscordRole,
 } from 'src/lib/team-roles';
 import {
+  DATA_PAGE_SHELL_SX,
+  PAGINATION_NAV_BUTTON_SX,
+  PAGINATION_PAGE_BUTTON_SX,
+  DATA_PAGE_CALLOUT_PRIMARY_SX,
+  MARKETING_CTA_LARGE_LAYOUT_SX,
+} from 'src/lib/page-shell';
+import {
   GLASS_CARD_SX,
   GLASS_PANEL_SX,
   getPodiumRowSx,
   GLASS_INNER_PANEL_SX,
   GLASS_TABLE_WRAPPER_SX,
+  GLASS_NOTE_AMBER_RIM_SX,
   GLASS_TABLE_PAGINATION_SX,
 } from 'src/lib/glass';
 import {
@@ -71,6 +79,7 @@ import {
   leaderboardTrackIdLookupCandidates,
 } from 'src/lib/ac-elite-data';
 
+import { EmptyState } from 'src/components/data-state';
 import { DeltaChip } from 'src/components/delta-chip/delta-chip';
 import { PageGridOverlay } from 'src/components/page-background/page-grid-overlay';
 import { useLicenseSafetyGuide } from 'src/components/license-safety-guide/license-safety-guide';
@@ -253,11 +262,7 @@ function HeroSection({
                   color="primary"
                   size="large"
                   sx={{
-                    px: 3.5,
-                    borderRadius: 3,
-                    minHeight: { xs: 46, sm: 48 },
-                    width: { xs: '100%', sm: 'auto' },
-                    maxWidth: { xs: 320, sm: 'none' },
+                    ...MARKETING_CTA_LARGE_LAYOUT_SX,
                     animation: `${heroPrimaryPulse} 4.5s ease-in-out infinite`,
                     ...reducedMotionNone,
                   }}
@@ -271,13 +276,7 @@ function HeroSection({
                   variant="contained"
                   color="secondary"
                   size="large"
-                  sx={{
-                    px: 3.5,
-                    borderRadius: 3,
-                    minHeight: { xs: 46, sm: 48 },
-                    width: { xs: '100%', sm: 'auto' },
-                    maxWidth: { xs: 320, sm: 'none' },
-                  }}
+                  sx={{ ...MARKETING_CTA_LARGE_LAYOUT_SX }}
                   href="https://acstuff.ru/s/q:race/online/join?httpPort=18283&ip=157.90.3.32"
                   target="_blank"
                   rel="noreferrer"
@@ -289,11 +288,7 @@ function HeroSection({
                   color="primary"
                   size="large"
                   sx={{
-                    px: 3.5,
-                    borderRadius: 3,
-                    minHeight: { xs: 46, sm: 48 },
-                    width: { xs: '100%', sm: 'auto' },
-                    maxWidth: { xs: 320, sm: 'none' },
+                    ...MARKETING_CTA_LARGE_LAYOUT_SX,
                     animation: `${heroPrimaryPulse} 4.5s ease-in-out infinite`,
                     ...reducedMotionNone,
                   }}
@@ -313,6 +308,7 @@ function HeroSection({
               sx={{
                 ...GLASS_PANEL_SX,
                 ...statusAccentBorderSx(syncStatus.color),
+                ...statusAccentSplitRimSx(syncStatus.color),
                 textAlign: { xs: 'center', md: 'left' },
                 ...glassCardMotionSx(1),
               }}
@@ -333,29 +329,12 @@ function HeroSection({
                   </Typography>
                 </Box>
 
-                <Box
-                  sx={{
-                    ...GLASS_INNER_PANEL_SX,
-                  }}
+                <Typography
+                  variant="body2"
+                  sx={{ color: syncStatus.color, fontWeight: 700, textAlign: { xs: 'center', md: 'left' } }}
                 >
-                  <Stack direction="row" alignItems="center" spacing={1} justifyContent={{ xs: 'center', md: 'flex-start' }}>
-                    <Box
-                      sx={{
-                        width: 9,
-                        height: 9,
-                        borderRadius: '50%',
-                        bgcolor: syncStatus.color,
-                        boxShadow: `0 0 0 3px ${syncStatus.color}22`,
-                      }}
-                    />
-                    <Typography sx={{ fontWeight: 800, color: syncStatus.color }}>
-                      {syncStatus.label}
-                    </Typography>
-                    <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                      • Data sync {syncStatus.ageText}
-                    </Typography>
-                  </Stack>
-                </Box>
+                  {syncStatus.label} · {syncStatus.ageText}
+                </Typography>
 
                 <Grid container spacing={1}>
                   {[
@@ -411,9 +390,18 @@ function HeroSection({
               'linear-gradient(135deg, rgba(245,196,53,0.2) 0%, rgba(245,196,53,0.08) 42%, rgba(31,44,73,0.34) 100%), rgba(15,23,42,0.48)',
             backdropFilter: 'blur(12px)',
             boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.14)',
+            ...GLASS_NOTE_AMBER_RIM_SX,
           }}
         >
-          <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.95)', textAlign: { xs: 'center', md: 'left' } }}>
+          <Typography
+            variant="body2"
+            sx={{
+              position: 'relative',
+              zIndex: 3,
+              color: 'rgba(255,255,255,0.95)',
+              textAlign: { xs: 'center', md: 'left' },
+            }}
+          >
             <Box component="span" sx={{ fontWeight: 800, color: '#f6d365' }}>
               Note:
             </Box>{' '}
@@ -465,21 +453,11 @@ function CurrentTrackLeaderboardSection({
     : new Date(currentTrack.fetchedAt).toLocaleString();
 
   return (
-    <Box
-      component="section"
-      sx={{
-        position: 'relative',
-        py: 4,
-        background:
-          'radial-gradient(circle at 20% 0%, rgba(23,33,59,0.24) 0, transparent 50%),' +
-          'linear-gradient(180deg, #17213B 0%, #1f2c49 100%)',
-        overflow: 'hidden',
-      }}
-    >
+    <Box component="section" sx={{ ...DATA_PAGE_SHELL_SX }}>
       <PageGridOverlay opacity={0.28} />
 
       <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1 }}>
-        <Stack spacing={2.5}>
+        <Stack spacing={3}>
           <Stack
             spacing={0.7}
             sx={{
@@ -549,8 +527,11 @@ function CurrentTrackLeaderboardSection({
 
                   {!loading && !error && rows.length === 0 && (
                     <TableRow>
-                      <TableCell colSpan={8} align="center" sx={{ py: 6 }}>
-                        No leaderboard data for this track yet.
+                      <TableCell colSpan={8} sx={{ py: 4, px: 2 }}>
+                        <EmptyState
+                          title="No leaderboard data for this track yet."
+                          description="When laps post for this layout, the table fills in on the next data sync."
+                        />
                       </TableCell>
                     </TableRow>
                   )}
@@ -653,7 +634,7 @@ function CurrentTrackLeaderboardSection({
                   variant="contained"
                   color="secondary"
                   size="small"
-                  sx={{ minWidth: 78, fontWeight: 800 }}
+                  sx={{ ...PAGINATION_NAV_BUTTON_SX }}
                 >
                   Prev
                 </Button>
@@ -669,6 +650,7 @@ function CurrentTrackLeaderboardSection({
                         size="small"
                         variant={p === safePage ? 'contained' : 'outlined'}
                         color={p === safePage ? 'primary' : 'secondary'}
+                        sx={{ ...PAGINATION_PAGE_BUTTON_SX }}
                       >
                         {p}
                       </Button>
@@ -680,7 +662,7 @@ function CurrentTrackLeaderboardSection({
                   variant="contained"
                   color="secondary"
                   size="small"
-                  sx={{ minWidth: 78, fontWeight: 800 }}
+                  sx={{ ...PAGINATION_NAV_BUTTON_SX }}
                 >
                   Next
                 </Button>
@@ -751,6 +733,7 @@ function DriverSearchSection({
           elevation={0}
           sx={{
             ...GLASS_PANEL_SX,
+            ...brandAccentBorderSx(),
             ...glassCardMotionSx(0, { baseDelayMs: 280 }),
             mb: { xs: 2, md: 4 },
             textAlign: { xs: 'center', md: 'left' },
@@ -866,7 +849,7 @@ function DriverSearchSection({
                   variant="contained"
                   color="primary"
                   fullWidth
-                  sx={{ minHeight: 50, borderRadius: 2 }}
+                  sx={{ ...DATA_PAGE_CALLOUT_PRIMARY_SX }}
                   href={`${APP_BASE_URL}dashboard`}
                 >
                   Open full stats page

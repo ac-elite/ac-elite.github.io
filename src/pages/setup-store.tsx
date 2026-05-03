@@ -12,6 +12,7 @@ import { CAR } from 'src/lib/ac-elite-data';
 import { glassCardMotionSx } from 'src/lib/subtle-motion';
 import { brandAccentBorderSx } from 'src/lib/status-accent';
 import { GLASS_PANEL_SX, GLASS_PANEL_COMPACT_SX } from 'src/lib/glass';
+import { DATA_PAGE_SHELL_SX, ACTION_PRIMARY_SMALL_SX, HERO_FOOTNOTE_CAPTION_SX } from 'src/lib/page-shell';
 
 import { PreviewLock } from 'src/components/preview-lock/preview-lock';
 import { PageGridOverlay } from 'src/components/page-background/page-grid-overlay';
@@ -77,16 +78,7 @@ export default function Page() {
       />
       <meta property="og:url" content="https://ac-elite.github.io/setup-store" />
 
-      <Box
-        sx={{
-          position: 'relative',
-          py: 4,
-          background:
-            'radial-gradient(circle at 20% 0%, rgba(23,33,59,0.24) 0, transparent 50%),' +
-            'linear-gradient(180deg, #17213B 0%, #1f2c49 100%)',
-          overflow: 'hidden',
-        }}
-      >
+      <Box sx={{ ...DATA_PAGE_SHELL_SX }}>
         <PageGridOverlay />
 
         <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1 }}>
@@ -99,7 +91,10 @@ export default function Page() {
                 <Typography color="text.secondary">
                   Private preview for mod team feedback — mock listings until the store goes live.
                 </Typography>
-                <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.52)', maxWidth: 640, lineHeight: 1.55 }}>
+                <Typography variant="body2" sx={{ color: 'rgba(147,197,253,0.92)', fontWeight: 700 }}>
+                  Preview · mock data
+                </Typography>
+                <Typography variant="caption" sx={{ ...HERO_FOOTNOTE_CAPTION_SX }}>
                   Nothing here is tied to live race data; unlock below to browse placeholder setups and test layout.
                 </Typography>
               </Stack>
@@ -148,7 +143,7 @@ export default function Page() {
                           color="primary"
                           size="small"
                           fullWidth
-                          sx={{ px: 2.25, borderRadius: 2.4 }}
+                          sx={{ ...ACTION_PRIMARY_SMALL_SX, px: 2.25, borderRadius: 2.4 }}
                         >
                           Buy
                         </Button>
