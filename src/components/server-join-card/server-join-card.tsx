@@ -121,7 +121,7 @@ export function ServerJoinCard({ currentTrack, joinHref = AC_ELITE_SERVER_JOIN_H
 
   const phase = acCurrentSessionLabel(info);
   const timeLeft = formatTimeLeftSeconds(info?.timeleft);
-  const schedule = formatSessionDurationsLine(info?.sessiontypes, info?.durations);
+  const schedule = formatSessionDurationsLine(info?.sessiontypes, info?.durations, info?.timed);
 
   const rawLobbyName = typeof info?.name === 'string' ? info.name.trim() : '';
   const lobbyName = rawLobbyName ? sanitizeServerLobbyDisplayName(rawLobbyName) : '';

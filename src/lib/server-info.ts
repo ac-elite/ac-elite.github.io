@@ -35,6 +35,9 @@ export function sanitizeServerLobbyDisplayName(raw: string): string {
     .trim();
 }
 
+/** Session type id 3 = race; when `timed` is false, `/INFO` `durations` entry is laps, not minutes. */
+export const AC_SESSION_TYPE_RACE = 3;
+
 /** AC `session` / `sessiontypes` enum (common values). */
 const SESSION_LABEL: Record<number, string> = {
   0: 'Booking',
@@ -70,25 +73,36 @@ export function formatTimeLeftSeconds(sec: number | undefined | null): string {
   return `${m}:${String(r).padStart(2, '0')}`;
 }
 
-/** e.g. "Q 10m · R 6m" when lengths match. */
+/**
+ * Schedule line from `/INFO` `sessiontypes` + `durations`.
+ * Time sessions: `Q 10 min`. Race with `timed === false`: lap count, e.g. `R 6 laps`.
+ */
 export function formatSessionDurationsLine(
   sessiontypes: number[] | undefined,
-  durations: number[] | undefined
+  durations: number[] | undefined,
+  timed?: boolean
 ): string | null {
   if (!sessiontypes?.length || !durations?.length) return null;
   const n = Math.min(sessiontypes.length, durations.length);
   const parts: string[] = [];
   for (let i = 0; i < n; i += 1) {
-    const label = acSessionTypeLabel(sessiontypes[i]).charAt(0);
+    const typeId = sessiontypes[i];
+    const label = acSessionTypeLabel(typeId).charAt(0);
     const raw: unknown = durations[i];
-    const minutes =
+    const value =
       typeof raw === 'number' && Number.isFinite(raw)
         ? raw
         : typeof raw === 'string' && raw.trim() !== ''
           ? Number(raw)
           : NaN;
-    if (Number.isFinite(minutes)) {
-      parts.push(`${label} ${minutes}m`);
+    if (Number.isFinite(value)) {
+      const raceIsLaps = typeId === AC_SESSION_TYPE_RACE && timed === false;
+      if (raceIsLaps) {
+        const lapWord = value === 1 ? 'lap' : 'laps';
+        parts.push(`${label} ${value} ${lapWord}`);
+      } else {
+        parts.push(`${label} ${value} min`);
+      }
     }
   }
   return parts.length ? parts.join(' · ') : null;

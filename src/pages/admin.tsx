@@ -29,19 +29,20 @@ import {
 } from 'src/lib/glass';
 import { STATUS_ACCENT, brandAccentBorderSx, statusAccentBorderSx, statusAccentSplitRimSx } from 'src/lib/status-accent';
 import {
-  acSessionTypeLabel,
-  acCurrentSessionLabel,
-  formatTimeLeftSeconds,
-  formatSessionDurationsLine,
-  sanitizeServerLobbyDisplayName,
-} from 'src/lib/server-info';
-import {
   DATA_PAGE_SHELL_SX,
   TABLE_HEAD_MUTED_COLOR,
   HERO_FOOTNOTE_CAPTION_SX,
   ADMIN_JOIN_SERVER_OUTLINED_SX,
   ADMIN_EXTERNAL_LINK_OUTLINED_SX,
 } from 'src/lib/page-shell';
+import {
+  AC_SESSION_TYPE_RACE,
+  acSessionTypeLabel,
+  acCurrentSessionLabel,
+  formatTimeLeftSeconds,
+  formatSessionDurationsLine,
+  sanitizeServerLobbyDisplayName,
+} from 'src/lib/server-info';
 import {
   pickNewerCurrentTrack,
   toCurrentTrackPayload,
@@ -391,13 +392,18 @@ function buildAdminServerInfoRows(ct: CurrentTrackPayload | null): { label: stri
   rows.push({ label: 'Session index', value: fmtAdminScalar(info.session) });
   rows.push({ label: 'Current phase', value: acCurrentSessionLabel(info) });
   rows.push({ label: 'Time left', value: formatAdminTimeleft(info.timeleft) });
-  rows.push({ label: 'Schedule (short)', value: formatSessionDurationsLine(info.sessiontypes, info.durations) ?? '—' });
+  rows.push({
+    label: 'Schedule (short)',
+    value: formatSessionDurationsLine(info.sessiontypes, info.durations, info.timed) ?? '—',
+  });
 
   if (Array.isArray(info.sessiontypes) && Array.isArray(info.durations)) {
     const n = Math.min(info.sessiontypes.length, info.durations.length);
     const parts: string[] = [];
     for (let i = 0; i < n; i += 1) {
-      parts.push(`${acSessionTypeLabel(info.sessiontypes[i])}: ${fmtAdminScalar(info.durations[i])} min`);
+      const typeId = info.sessiontypes[i];
+      const unit = typeId === AC_SESSION_TYPE_RACE && info.timed === false ? 'laps' : 'min';
+      parts.push(`${acSessionTypeLabel(typeId)}: ${fmtAdminScalar(info.durations[i])} ${unit}`);
     }
     if (parts.length) rows.push({ label: 'Durations (per type)', value: parts.join(' · ') });
   }
