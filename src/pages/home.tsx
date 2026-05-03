@@ -42,6 +42,12 @@ import {
   teamRoleToDiscordRole,
 } from 'src/lib/team-roles';
 import {
+  pickNewerCurrentTrack,
+  LIVE_SERVER_STATUS_POLL_MS,
+  fetchLiveServerStatusFromSupabase,
+  isSupabaseLiveServerStatusEnabled,
+} from 'src/lib/server-status';
+import {
   DATA_PAGE_SHELL_SX,
   PAGINATION_NAV_BUTTON_SX,
   PAGINATION_PAGE_BUTTON_SX,
@@ -924,15 +930,45 @@ export default function Page() {
 
     load();
     fetchJson<CurrentTrackData>('/data/current-track.json')
-      .then((data) => {
-        if (mounted) setCurrentTrack(data);
+      .then(async (data) => {
+        if (!mounted) return;
+        if (!isSupabaseLiveServerStatusEnabled()) {
+          setCurrentTrack(data);
+          return;
+        }
+        const live = await fetchLiveServerStatusFromSupabase();
+        if (!mounted) return;
+        const merged = pickNewerCurrentTrack(data, live);
+        setCurrentTrack(merged ?? data);
       })
       .catch(() => {
-        if (mounted) setCurrentTrack(null);
+        if (!mounted) return;
+        if (isSupabaseLiveServerStatusEnabled()) {
+          void fetchLiveServerStatusFromSupabase().then((live) => {
+            if (mounted) setCurrentTrack(live);
+          });
+        } else {
+          setCurrentTrack(null);
+        }
       });
 
     return () => {
       mounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!isSupabaseLiveServerStatusEnabled()) return undefined;
+    let mounted = true;
+    const tick = () => {
+      void fetchLiveServerStatusFromSupabase().then((live) => {
+        if (mounted && live) setCurrentTrack(live);
+      });
+    };
+    const id = window.setInterval(tick, LIVE_SERVER_STATUS_POLL_MS);
+    return () => {
+      mounted = false;
+      window.clearInterval(id);
     };
   }, []);
 

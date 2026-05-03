@@ -1,0 +1,5 @@
+# https://supabase.com/docs/guides/cli/config
+# Link dit project met: supabase link --project-ref <ref>
+
+[functions.sync-server-status]
+verify_jwt = false

@@ -35,6 +35,13 @@ import {
   ADMIN_JOIN_SERVER_OUTLINED_SX,
   ADMIN_EXTERNAL_LINK_OUTLINED_SX,
 } from 'src/lib/page-shell';
+import {
+  pickNewerCurrentTrack,
+  toCurrentTrackPayload,
+  LIVE_SERVER_STATUS_POLL_MS,
+  fetchLiveServerStatusFromSupabase,
+  isSupabaseLiveServerStatusEnabled,
+} from 'src/lib/server-status';
 
 import { PreviewLock } from 'src/components/preview-lock/preview-lock';
 import { PageGridOverlay } from 'src/components/page-background/page-grid-overlay';
@@ -101,7 +108,15 @@ const SCHEDULE: readonly ScheduleEntry[] = [
     kind: 'recurring',
     workflow: 'Daily Current Track',
     cron: '5 * * * *',
-    what: 'Fetches server /INFO and writes current-track.json (only commits on change).',
+    what: 'Fetches server /INFO and writes current-track.json (only commits on change). Optional fallback if Supabase live path is off.',
+  },
+  {
+    agendaWhen: '1–5 min',
+    agendaSub: 'cron-job.org → Supabase Edge',
+    kind: 'recurring',
+    workflow: 'sync-server-status',
+    cron: 'Your cron-job.org schedule',
+    what: 'POST to Edge Function with CRON_SECRET; polls /INFO and upserts public.server_status. Site reads when VITE_SUPABASE_LIVE_SERVER_STATUS=1.',
   },
   {
     agendaWhen: 'After sync',
@@ -317,16 +332,44 @@ export default function Page() {
       const rankResult = results[4];
       const rankLen =
         rankResult.status === 'fulfilled' && Array.isArray(rankResult.value) ? rankResult.value.length : null;
+      const staticTrack = results[1].status === 'fulfilled' ? results[1].value : null;
       setData({
         metadata: results[0].status === 'fulfilled' ? results[0].value : null,
-        currentTrack: results[1].status === 'fulfilled' ? results[1].value : null,
+        currentTrack: staticTrack,
         aceSkinPack: results[2].status === 'fulfilled' ? results[2].value : null,
         liverySections: results[3].status === 'fulfilled' ? results[3].value : null,
         rankDriverCount: rankLen,
       });
+      if (isSupabaseLiveServerStatusEnabled()) {
+        void fetchLiveServerStatusFromSupabase().then((live) => {
+          if (!mounted || !live) return;
+          setData((prev) => ({
+            ...prev,
+            currentTrack: pickNewerCurrentTrack(toCurrentTrackPayload(prev.currentTrack), live),
+          }));
+        });
+      }
     });
     return () => {
       mounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!isSupabaseLiveServerStatusEnabled()) return undefined;
+    let mounted = true;
+    const id = window.setInterval(() => {
+      void fetchLiveServerStatusFromSupabase().then((live) => {
+        if (!mounted || !live) return;
+        setData((prev) => ({
+          ...prev,
+          currentTrack: pickNewerCurrentTrack(toCurrentTrackPayload(prev.currentTrack), live),
+        }));
+      });
+    }, LIVE_SERVER_STATUS_POLL_MS);
+    return () => {
+      mounted = false;
+      window.clearInterval(id);
     };
   }, []);
 

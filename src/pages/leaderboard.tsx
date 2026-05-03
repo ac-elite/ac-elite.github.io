@@ -39,6 +39,12 @@ import {
   PAGINATION_PAGE_BUTTON_SX,
 } from 'src/lib/page-shell';
 import {
+  pickNewerCurrentTrack,
+  toCurrentTrackPayload,
+  fetchLiveServerStatusFromSupabase,
+  isSupabaseLiveServerStatusEnabled,
+} from 'src/lib/server-status';
+import {
   CAR,
   getDriverSR,
   calculateGap,
@@ -87,12 +93,15 @@ export default function Page() {
       setLoading(true);
       setError(null);
       try {
-        const [rank, leaderboard, prevRank, trackData, meta] = await Promise.all([
+        const [rank, leaderboard, prevRank, trackJson, meta, liveStatus] = await Promise.all([
           fetchJson<RankDriver[]>('/data/rank.json'),
           fetchJson<Record<string, any>>('/data/leaderboard.json'),
           fetchPrevRankData(),
           fetchJson<CurrentTrackData>('/data/current-track.json').catch(() => null),
           fetchJson<SiteMetadata>('/data/metadata.json').catch(() => ({})),
+          isSupabaseLiveServerStatusEnabled()
+            ? fetchLiveServerStatusFromSupabase()
+            : Promise.resolve(null),
         ]);
         if (!mounted) return;
         setRankData(rank);
@@ -100,7 +109,8 @@ export default function Page() {
         setMetadata(meta);
         setDeltas(computeDeltas(rank, prevRank));
         const trackKeys = Object.keys(leaderboard);
-        const raw = trackData?.track?.trim() ?? '';
+        const merged = pickNewerCurrentTrack(toCurrentTrackPayload(trackJson), liveStatus);
+        const raw = merged?.track?.trim() ?? '';
         const preferred =
           leaderboardTrackIdLookupCandidates(raw).find((id) => trackKeys.includes(id)) ??
           normalizeServerTrackId(raw);

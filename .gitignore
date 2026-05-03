@@ -36,3 +36,6 @@ build
 tsconfig.tsbuildinfo
 .ncurc.js
 knip.jsonc
+
+# Supabase CLI (local cache; ref wordt in config.toml gezet na `supabase link`)
+supabase/.temp/
