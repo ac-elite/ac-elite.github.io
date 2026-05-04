@@ -1,11 +1,11 @@
-import globals from 'globals';
 import eslintJs from '@eslint/js';
-import eslintTs from 'typescript-eslint';
-import reactPlugin from 'eslint-plugin-react';
 import importPlugin from 'eslint-plugin-import';
-import reactHooksPlugin from 'eslint-plugin-react-hooks';
 import perfectionistPlugin from 'eslint-plugin-perfectionist';
+import reactPlugin from 'eslint-plugin-react';
+import reactHooksPlugin from 'eslint-plugin-react-hooks';
 import unusedImportsPlugin from 'eslint-plugin-unused-imports';
+import globals from 'globals';
+import eslintTs from 'typescript-eslint';
 
 // ----------------------------------------------------------------------
 
@@ -76,77 +76,20 @@ const unusedImportsRules = () => ({
 });
 
 /**
- * @rules sort or imports/exports
- * from 'eslint-plugin-perfectionist'.
+ * @rules sort (perfectionist) — import *statements* order disabled; named import order + exports kept light.
  */
-const sortImportsRules = () => {
-  const customGroups = {
-    mui: ['custom-mui'],
-    auth: ['custom-auth'],
-    hooks: ['custom-hooks'],
-    utils: ['custom-utils'],
-    types: ['custom-types'],
-    routes: ['custom-routes'],
-    sections: ['custom-sections'],
-    components: ['custom-components'],
-  };
-
-  return {
-    'perfectionist/sort-named-imports': [1, { type: 'line-length', order: 'asc' }],
-    'perfectionist/sort-named-exports': [1, { type: 'line-length', order: 'asc' }],
-    'perfectionist/sort-exports': [
-      1,
-      {
-        order: 'asc',
-        type: 'line-length',
-        groupKind: 'values-first',
-      },
-    ],
-    'perfectionist/sort-imports': [
-      2,
-      {
-        order: 'asc',
-        ignoreCase: true,
-        type: 'line-length',
-        environment: 'node',
-        maxLineLength: undefined,
-        newlinesBetween: 'always',
-        internalPattern: ['^src/.+'],
-        groups: [
-          'style',
-          'side-effect',
-          'type',
-          ['builtin', 'external'],
-          customGroups.mui,
-          customGroups.routes,
-          customGroups.hooks,
-          customGroups.utils,
-          'internal',
-          customGroups.components,
-          customGroups.sections,
-          customGroups.auth,
-          customGroups.types,
-          ['parent', 'sibling', 'index'],
-          ['parent-type', 'sibling-type', 'index-type'],
-          'object',
-          'unknown',
-        ],
-        customGroups: {
-          value: {
-            [customGroups.mui]: ['^@mui/.+'],
-            [customGroups.auth]: ['^src/auth/.+'],
-            [customGroups.hooks]: ['^src/hooks/.+'],
-            [customGroups.utils]: ['^src/utils/.+'],
-            [customGroups.types]: ['^src/types/.+'],
-            [customGroups.routes]: ['^src/routes/.+'],
-            [customGroups.sections]: ['^src/sections/.+'],
-            [customGroups.components]: ['^src/components/.+'],
-          },
-        },
-      },
-    ],
-  };
-};
+const sortImportsRules = () => ({
+  'perfectionist/sort-named-imports': [1, { type: 'line-length', order: 'asc' }],
+  'perfectionist/sort-named-exports': [1, { type: 'line-length', order: 'asc' }],
+  'perfectionist/sort-exports': [
+    1,
+    {
+      order: 'asc',
+      type: 'line-length',
+      groupKind: 'values-first',
+    },
+  ],
+});
 
 /**
  * Custom ESLint configuration.
