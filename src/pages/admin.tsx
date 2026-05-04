@@ -70,7 +70,7 @@ const TEAM_GAME_SERVER_JOIN =
 // Types for fetched data
 // ---------------------------------------------------------------------------
 
-type MetadataData = { lastSync?: string; status?: string; rank24hSnapshotAt?: string };
+type MetadataData = { lastSync?: string; status?: string; error?: string; rank24hSnapshotAt?: string };
 type CurrentTrackData = CurrentTrackPayload;
 type AceSkinPackData = { generatedAt?: string; entries?: unknown[] };
 type LiverySectionsData = { officialPack?: boolean; aceSkinPack?: boolean; teamLiveries?: boolean };
@@ -451,6 +451,17 @@ type SiteVisitPanelState =
   | { kind: 'ready'; count: number }
   | { kind: 'error' };
 
+type ActionStatusTone = 'ok' | 'warn' | 'error';
+
+type ActionPanelEntry = {
+  name: string;
+  tone: ActionStatusTone;
+  status: string;
+  when?: string;
+  note: string;
+  href: string;
+};
+
 const FRESHNESS_ROW_BORDER = '1px solid rgba(148,163,184,0.1)';
 
 /** Body cell: soft row divider; vertical align top for multi-line age/note. */
@@ -588,6 +599,51 @@ export default function Page() {
   }, [data.liverySections]);
 
   const adminServerDetailRows = useMemo(() => buildAdminServerInfoRows(data.currentTrack), [data.currentTrack]);
+
+  const actionOverview = useMemo<ActionPanelEntry[]>(() => {
+    const syncHealth = getSyncHealth(data.metadata?.lastSync);
+    const syncFailed = data.metadata?.status?.toLowerCase() === 'error';
+    const syncStatus = syncFailed ? 'Failed' : data.metadata?.status === 'success' ? 'Healthy' : syncHealth.label;
+
+    const snapshotHealth = getSyncHealth(data.metadata?.rank24hSnapshotAt);
+    const snapshotStatus = data.metadata?.rank24hSnapshotAt ? snapshotHealth.label : 'Pending';
+
+    const trackHealth = getSyncHealth(data.currentTrack?.fetchedAt);
+
+    const syncNote =
+      syncFailed && data.metadata?.error
+        ? data.metadata.error
+        : 'Downloads rank.json + leaderboard.json and updates metadata.';
+
+    return [
+      {
+        name: 'Sync KMR Data',
+        tone: syncFailed ? 'error' : syncStatus === 'Live' || syncStatus === 'Healthy' ? 'ok' : 'warn',
+        status: syncStatus,
+        when: data.metadata?.lastSync,
+        note: syncNote,
+        href: `${TEAM_GITHUB_REPO}/actions/workflows/sync-data.yml`,
+      },
+      {
+        name: 'Daily Rank Snapshot (24h)',
+        tone: snapshotStatus === 'Live' || snapshotStatus === 'Delayed' ? 'ok' : 'warn',
+        status: snapshotStatus,
+        when: data.metadata?.rank24hSnapshotAt,
+        note: data.metadata?.rank24hSnapshotAt
+          ? 'Copies rank.json to rank-24h.json once per day after 06:00 Amsterdam.'
+          : 'No snapshot timestamp yet; this can be normal before the first daily run.',
+        href: `${TEAM_GITHUB_REPO}/actions/workflows/snapshot-24h.yml`,
+      },
+      {
+        name: 'Current-track snapshot',
+        tone: trackHealth.label === 'Live' ? 'ok' : trackHealth.label === 'Stale' ? 'error' : 'warn',
+        status: trackHealth.label,
+        when: data.currentTrack?.fetchedAt,
+        note: 'GitHub Action updates current-track.json when /INFO snapshot changes.',
+        href: `${TEAM_GITHUB_REPO}/actions`,
+      },
+    ];
+  }, [data.currentTrack?.fetchedAt, data.metadata?.error, data.metadata?.lastSync, data.metadata?.rank24hSnapshotAt, data.metadata?.status]);
 
   return (
     <>
@@ -746,6 +802,107 @@ export default function Page() {
                     </Paper>
                   </Grid>
                 </Grid>
+
+                <Paper sx={{ ...GLASS_PANEL_COMPACT_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(2.5) }}>
+                  <Stack
+                    direction={{ xs: 'column', sm: 'row' }}
+                    justifyContent="space-between"
+                    alignItems={{ xs: 'flex-start', sm: 'center' }}
+                    spacing={1.5}
+                    sx={{ mb: 1.75 }}
+                  >
+                    <Box>
+                      <Typography variant="h6" sx={{ fontWeight: 800 }}>
+                        Action status
+                      </Typography>
+                      <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.4 }}>
+                        Compact health view of the key workflows, with direct links to the run logs.
+                      </Typography>
+                    </Box>
+                    <Button
+                      component="a"
+                      href={`${TEAM_GITHUB_REPO}/actions`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      variant="outlined"
+                      size="small"
+                      sx={{ ...ADMIN_EXTERNAL_LINK_OUTLINED_SX }}
+                    >
+                      Open Actions
+                    </Button>
+                  </Stack>
+
+                  <Stack spacing={1.1}>
+                    {actionOverview.map((entry) => {
+                      const toneColor =
+                        entry.tone === 'ok' ? '#22c55e' : entry.tone === 'error' ? '#ef4444' : '#f59e0b';
+                      return (
+                        <Stack
+                          key={entry.name}
+                          direction={{ xs: 'column', md: 'row' }}
+                          spacing={1.25}
+                          sx={{
+                            p: 1.35,
+                            borderRadius: 1.75,
+                            border: '1px solid rgba(148,163,184,0.2)',
+                            bgcolor: 'rgba(15,23,42,0.35)',
+                            borderLeft: `3px solid ${toneColor}`,
+                          }}
+                        >
+                          <Box sx={{ minWidth: { md: 270 } }}>
+                            <Typography variant="subtitle2" sx={{ fontWeight: 800 }}>
+                              {entry.name}
+                            </Typography>
+                            <Stack direction="row" alignItems="center" spacing={0.9} sx={{ mt: 0.65 }}>
+                              <Chip
+                                size="small"
+                                label={entry.status}
+                                sx={{
+                                  height: 22,
+                                  fontWeight: 800,
+                                  fontSize: '0.68rem',
+                                  color: toneColor,
+                                  bgcolor: `${toneColor}22`,
+                                  border: `1px solid ${toneColor}55`,
+                                }}
+                              />
+                              <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                                {entry.when ? `${formatAbsolute(entry.when)} (${formatRelative(entry.when)})` : 'No timestamp yet'}
+                              </Typography>
+                            </Stack>
+                          </Box>
+
+                          <Box sx={{ flex: 1, minWidth: 0 }}>
+                            <Typography
+                              variant="body2"
+                              sx={{
+                                color: 'text.secondary',
+                                lineHeight: 1.5,
+                                overflowWrap: 'anywhere',
+                              }}
+                            >
+                              {entry.note}
+                            </Typography>
+                          </Box>
+
+                          <Box sx={{ alignSelf: { xs: 'flex-start', md: 'center' } }}>
+                            <Button
+                              component="a"
+                              href={entry.href}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              variant="outlined"
+                              size="small"
+                              sx={{ ...ADMIN_EXTERNAL_LINK_OUTLINED_SX }}
+                            >
+                              View logs
+                            </Button>
+                          </Box>
+                        </Stack>
+                      );
+                    })}
+                  </Stack>
+                </Paper>
 
                 <Paper
                   sx={{
