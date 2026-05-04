@@ -211,6 +211,31 @@ function writePageStatCooldownState(state: PageStatCooldownState): void {
   }
 }
 
+/**
+ * Serialize same-path page-stat checks across tabs/windows when supported (LockManager API).
+ * This closes a race where many tabs opened at once can all pass the cooldown check.
+ */
+function runWithPageStatLock(statsPath: string, task: () => void): void {
+  if (typeof window === 'undefined') {
+    task();
+    return;
+  }
+
+  type LockRequester = {
+    request: (name: string, callback: () => void) => Promise<unknown>;
+  };
+  const maybeLocks = (window.navigator as Navigator & { locks?: LockRequester }).locks;
+  if (!maybeLocks?.request) {
+    task();
+    return;
+  }
+
+  const lockName = `ace:page-stat:${statsPath}`;
+  void maybeLocks.request(lockName, () => {
+    task();
+  });
+}
+
 function canRecordPageStatNow(statsPath: string, nowMs: number): boolean {
   const memoryLast = pageStatCooldownMemory.get(statsPath);
   if (typeof memoryLast === 'number' && nowMs - memoryLast < PAGE_STAT_COOLDOWN_MS) {
@@ -252,11 +277,12 @@ export function recordSitePageStat(pathname: string): void {
   if (isPathExcludedFromSiteVisitCount(pathname)) return;
 
   const statsPath = normalizePathForVisitStats(pathname);
-  const now = Date.now();
-  if (!canRecordPageStatNow(statsPath, now)) return;
-  markPageStatRecorded(statsPath, now);
-
-  void incrementSitePageOnly(statsPath);
+  runWithPageStatLock(statsPath, () => {
+    const now = Date.now();
+    if (!canRecordPageStatNow(statsPath, now)) return;
+    markPageStatRecorded(statsPath, now);
+    void incrementSitePageOnly(statsPath);
+  });
 }
 
 /**
