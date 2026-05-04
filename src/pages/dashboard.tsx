@@ -18,12 +18,12 @@ import { getLeaderboardHref, getDriverProfileHref } from 'src/lib/routes';
 import { GLASS_CARD_SX, GLASS_PANEL_SX, GLASS_CARD_INNER_SX } from 'src/lib/glass';
 import { getSyncHealth, type SiteMetadata, getEffectiveLastSync } from 'src/lib/sync-utils';
 import { subtleEnterUpSx, glassCardMotionSx, softFloatWrapperSx } from 'src/lib/subtle-motion';
+import { brandAccentBorderSx, statusAccentBorderSx, statusAccentSplitRimSx } from 'src/lib/status-accent';
 import {
   formatSignedKm,
   fetchPrevRankData,
   computeCommunitySnapshotDelta,
 } from 'src/lib/delta';
-import { brandAccentBorderSx, statusAccentBorderSx, statusAccentSplitRimSx } from 'src/lib/status-accent';
 import { CAR, formatNumber, formatLaptime, type RankDriver, getTrackDisplayName } from 'src/lib/ac-elite-data';
 
 import { ErrorPanel, LoadingPanel } from 'src/components/data-state';
