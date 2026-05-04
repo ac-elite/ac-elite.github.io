@@ -59,6 +59,35 @@ jobs:
               }
           }
 
+          function getCandidateRemotePaths(fileName) {
+              return [
+                  `kissmyrank/${fileName}`,
+                  `/kissmyrank/${fileName}`,
+                  fileName,
+                  `/${fileName}`
+              ];
+          }
+
+          async function downloadJsonWithFallback(client, dataDir, fileName) {
+              const candidates = getCandidateRemotePaths(fileName);
+              let lastError = null;
+
+              for (const remotePath of candidates) {
+                  try {
+                      await downloadJsonAtomically(client, dataDir, remotePath, fileName);
+                      console.log(`✓ Remote path resolved for ${fileName}: ${remotePath}`);
+                      return;
+                  } catch (err) {
+                      lastError = err;
+                      console.log(`- Failed path for ${fileName}: ${remotePath} (${err.message})`);
+                  }
+              }
+
+              throw new Error(
+                  `Could not download ${fileName} from any known path (${candidates.join(', ')}). Last error: ${lastError?.message || 'unknown'}`
+              );
+          }
+
           async function downloadJsonAtomically(client, dataDir, remotePath, fileName) {
               const finalPath = path.join(dataDir, fileName);
               const tempPath = `${finalPath}.tmp`;
@@ -108,10 +137,18 @@ jobs:
                   });
                   
                   console.log('Connected! Downloading files...');
+                  console.log(`FTP current directory: ${await client.pwd()}`);
+                  try {
+                      const listing = await client.list();
+                      const names = listing.map((entry) => entry.name).slice(0, 30);
+                      console.log(`FTP root entries (first ${names.length}): ${names.join(', ')}`);
+                  } catch (listErr) {
+                      console.log(`Could not list FTP directory: ${listErr.message}`);
+                  }
 
                   // Download + validate required data files.
-                  await downloadJsonAtomically(client, dataDir, 'kissmyrank/rank.json', 'rank.json');
-                  await downloadJsonAtomically(client, dataDir, 'kissmyrank/leaderboard.json', 'leaderboard.json');
+                  await downloadJsonWithFallback(client, dataDir, 'rank.json');
+                  await downloadJsonWithFallback(client, dataDir, 'leaderboard.json');
 
                   // Sanity-check shape to avoid committing garbage.
                   const rank = parseJsonFile(path.join(dataDir, 'rank.json'), 'rank.json');
