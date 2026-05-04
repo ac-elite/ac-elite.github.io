@@ -159,11 +159,6 @@ export function SiteVisitsShowcase({ phase, count, configured, pageRows, onRefre
             <Typography variant="h6" sx={{ fontWeight: 800 }}>
               Public site visits
             </Typography>
-            <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.4, lineHeight: 1.55, maxWidth: 900 }}>
-              <strong>Total:</strong> +1 after ~{SITE_VISIT_COUNT_GAP_MINUTES} min away on this device; same visit,
-              more clicks = still one. <strong>Table below:</strong> +1 each time someone opens that part of the site
-              (e.g. Home then Dashboard adds both).
-            </Typography>
           </Box>
           {configured && (
             <Button
@@ -278,12 +273,6 @@ export function SiteVisitsShowcase({ phase, count, configured, pageRows, onRefre
                     <Stack spacing={1}>
                       <Typography variant="subtitle2" sx={{ fontWeight: 800 }}>
                         Where people opened the site
-                      </Typography>
-                      <Typography variant="body2" sx={{ color: 'text.secondary', lineHeight: 1.55 }}>
-                        Each row counts how often that page was opened (every navigation). Driver profiles are grouped as{' '}
-                        <Box component="span" sx={{ fontFamily: 'ui-monospace, monospace' }}>/driver/:id</Box>. Up to 40
-                        rows, busiest first. The big total uses the longer ‘visit’ rule — the two numbers will not
-                        match.
                       </Typography>
                       {pageRows.length === 0 ? (
                         <Typography variant="body2" sx={{ color: 'text.secondary', lineHeight: 1.55 }}>

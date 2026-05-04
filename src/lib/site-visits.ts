@@ -12,14 +12,18 @@ const VISIT_COUNT_GAP_MS = SITE_VISIT_COUNT_GAP_MINUTES * 60 * 1000;
 let visitIncrementInFlight = false;
 
 /**
- * Cooldown for per-page stats within the same browser tab/session.
+ * Cooldown for per-page stats (same origin, all tabs/windows).
  * Prevents F5-spam from creating artificial spikes and avoids unnecessary RPC load.
+ *
+ * Note: `sessionStorage` is per-tab only, so several tabs opened to the same path within the
+ * cooldown window each counted once — we persist cooldown timestamps in `localStorage` instead
+ * so parallel tabs share the same throttle.
  */
 const PAGE_STAT_COOLDOWN_MS = 7_000;
-const PAGE_STAT_COOLDOWN_KEY = 'ace:site-page-stat-cooldown-v1';
+const PAGE_STAT_COOLDOWN_KEY = 'ace:site-page-stat-cooldown-v2';
 
 /**
- * In-memory fallback if sessionStorage is unavailable (private mode, blocked storage, etc.).
+ * In-memory fallback if localStorage is unavailable (private mode, blocked storage, etc.).
  * Also helps dedupe immediate same-tick calls in React StrictMode.
  */
 const pageStatCooldownMemory = new Map<string, number>();
@@ -153,10 +157,11 @@ export async function fetchSiteVisitCount(): Promise<number | null> {
 
 /** Increments global visit total only (per-route uses {@link incrementSitePageOnly}). */
 async function incrementSiteVisit(): Promise<number | null> {
+  // Named arg must match SQL (`p_path`); explicit value avoids PostgREST/default-arg edge cases vs `{}`.
   const res = await fetch(`${supabaseBaseUrl()}/rest/v1/rpc/increment_site_visits`, {
     method: 'POST',
     headers: supabaseHeaders(),
-    body: '{}',
+    body: JSON.stringify({ p_path: '/' }),
   });
   if (!res.ok) return null;
   const text = await res.text();
@@ -182,7 +187,7 @@ type PageStatCooldownState = Record<string, number>;
 function readPageStatCooldownState(): PageStatCooldownState {
   if (typeof window === 'undefined') return {};
   try {
-    const raw = sessionStorage.getItem(PAGE_STAT_COOLDOWN_KEY);
+    const raw = localStorage.getItem(PAGE_STAT_COOLDOWN_KEY);
     if (!raw) return {};
     const parsed: unknown = JSON.parse(raw);
     if (!parsed || typeof parsed !== 'object') return {};
@@ -200,7 +205,7 @@ function readPageStatCooldownState(): PageStatCooldownState {
 function writePageStatCooldownState(state: PageStatCooldownState): void {
   if (typeof window === 'undefined') return;
   try {
-    sessionStorage.setItem(PAGE_STAT_COOLDOWN_KEY, JSON.stringify(state));
+    localStorage.setItem(PAGE_STAT_COOLDOWN_KEY, JSON.stringify(state));
   } catch {
     /* storage unavailable — in-memory fallback is still used */
   }
