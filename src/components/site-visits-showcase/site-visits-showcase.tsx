@@ -158,7 +158,10 @@ export function SiteVisitsShowcase({ phase, count, configured, pageRows, onRefre
         >
           <Box sx={{ flex: 1, minWidth: 0, pr: { sm: 1 } }}>
             <Typography variant="h6" sx={{ fontWeight: 800 }}>
-              Public site visits
+              Public site visits (sessions)
+            </Typography>
+            <Typography variant="caption" sx={{ color: 'text.secondary', lineHeight: 1.45, display: 'block', mt: 0.25 }}>
+              Top number uses the {SITE_VISIT_COUNT_GAP_MINUTES}-minute session rule. The breakdown below shows page opens.
             </Typography>
           </Box>
           {configured && (
@@ -217,6 +220,9 @@ export function SiteVisitsShowcase({ phase, count, configured, pageRows, onRefre
           {showCount && (
             <Stack spacing={2} sx={{ pt: 0.25 }}>
               <Stack spacing={0.75}>
+                <Typography variant="caption" sx={{ ...PANEL_OVERLINE_MUTED_SX, fontWeight: 700 }}>
+                  Session visits
+                </Typography>
                 <Typography
                   variant="h3"
                   sx={{
@@ -274,7 +280,7 @@ export function SiteVisitsShowcase({ phase, count, configured, pageRows, onRefre
                     <Stack spacing={1}>
                       <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={1}>
                         <Typography variant="subtitle2" sx={{ fontWeight: 800 }}>
-                          Where people opened the site
+                          Page opens by route
                         </Typography>
                         <Button
                           size="small"
@@ -315,7 +321,7 @@ export function SiteVisitsShowcase({ phase, count, configured, pageRows, onRefre
                                 <TableRow>
                                   <TableCell sx={{ fontWeight: 800, bgcolor: 'rgba(15,23,42,0.92)' }}>Site area</TableCell>
                                   <TableCell align="right" sx={{ fontWeight: 800, width: 120, bgcolor: 'rgba(15,23,42,0.92)' }}>
-                                    Count
+                                    Opens
                                   </TableCell>
                                 </TableRow>
                               </TableHead>
