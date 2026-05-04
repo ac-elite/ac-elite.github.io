@@ -9,7 +9,7 @@ import Typography from '@mui/material/Typography';
 
 import { GLASS_PANEL_SX } from 'src/lib/glass';
 import { brandAccentBorderSx } from 'src/lib/status-accent';
-import { HERO_FOOTNOTE_CAPTION_SX, ACTION_CONTAINED_PRIMARY_SMALL_SX } from 'src/lib/page-shell';
+import { ACTION_CONTAINED_PRIMARY_SMALL_SX } from 'src/lib/page-shell';
 
 export type PreviewLockPersist = 'none' | 'session' | 'local';
 
@@ -90,10 +90,6 @@ export function PreviewLock({
       }}
     >
       <Stack spacing={2} sx={{ alignItems: { xs: 'center', md: 'flex-start' } }}>
-        <Typography variant="caption" sx={{ ...HERO_FOOTNOTE_CAPTION_SX, maxWidth: 720, display: 'block' }}>
-          Client-side preview gate only. Your password is checked in the browser; storage keeps a simple unlock flag, never
-          the password itself.
-        </Typography>
 
         <Box sx={{ width: '100%' }}>
           <Typography variant="h5" sx={{ fontWeight: 800 }}>
@@ -119,7 +115,7 @@ export function PreviewLock({
               if (error) setError('');
             }}
             size="small"
-            label="Preview password"
+            label="Password"
             autoComplete="off"
             error={Boolean(error)}
             helperText={error || undefined}
@@ -139,7 +135,7 @@ export function PreviewLock({
             }}
             sx={{ ...ACTION_CONTAINED_PRIMARY_SMALL_SX }}
           >
-            Unlock preview
+            Unlock
           </Button>
         </Stack>
       </Stack>

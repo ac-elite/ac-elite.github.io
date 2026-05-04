@@ -18,12 +18,18 @@ export type SyncHealth = {
   ageText: string;
 };
 
+/** How strictly to interpret age for badges (hourly-ish feeds vs at-most-daily snapshot). */
+export type SyncHealthProfile = 'default' | 'dailySnapshot';
+
 /**
  * Data freshness for UI badges (same thresholds as former home/dashboard helpers).
  * Use `color` with `statusAccentBorderSx` from `src/lib/status-accent` **only** for accents that
  * represent this freshness. For other panels use `brandAccentBorderSx()`.
+ *
+ * @param profile `dailySnapshot` — job runs at most once per day; age under ~30h stays **Live**
+ *   so a snapshot from “yesterday morning” is not flagged **Delayed** like an hourly feed.
  */
-export function getSyncHealth(lastSync?: string): SyncHealth {
+export function getSyncHealth(lastSync?: string, profile: SyncHealthProfile = 'default'): SyncHealth {
   if (!lastSync) {
     return { label: 'Unknown', color: '#f59e0b', ageText: 'Unknown' };
   }
@@ -37,6 +43,18 @@ export function getSyncHealth(lastSync?: string): SyncHealth {
   const hour = 60 * 60 * 1000;
   const day = 24 * hour;
   const ago = formatTimeAgo(lastSync);
+
+  if (profile === 'dailySnapshot') {
+    const liveWindow = 30 * hour;
+    const delayedWindow = 54 * hour;
+    if (diffMs <= liveWindow) {
+      return { label: 'Live', color: '#22c55e', ageText: ago };
+    }
+    if (diffMs <= delayedWindow) {
+      return { label: 'Delayed', color: '#f59e0b', ageText: ago };
+    }
+    return { label: 'Stale', color: '#ef4444', ageText: ago };
+  }
 
   if (diffMs <= 2 * hour) {
     return { label: 'Live', color: '#22c55e', ageText: ago };

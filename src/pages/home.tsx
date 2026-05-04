@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from 'react';
+import { useRef, useMemo, useState, useEffect } from 'react';
 
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
@@ -54,6 +54,9 @@ import {
   GLASS_TABLE_PAGINATION_SX,
 } from 'src/lib/glass';
 import {
+  pickNewerCurrentTrack,
+  toCurrentTrackPayload,
+  applyServerOfflineDebug,
   type CurrentTrackPayload,
   LIVE_SERVER_STATUS_POLL_MS,
   shouldPollLiveServerStatus,
@@ -897,6 +900,7 @@ export default function Page() {
   const [metadata, setMetadata] = useState<SiteMetadata>({});
   const [currentTrack, setCurrentTrack] = useState<CurrentTrackData | null>(null);
   const [currentTrackPage, setCurrentTrackPage] = useState(1);
+  const staticCurrentTrackRef = useRef<CurrentTrackData | null>(null);
 
   useEffect(() => {
     if (!isServerStatusDebugEnabled()) return;
@@ -921,18 +925,30 @@ export default function Page() {
       setLoading(true);
       setError(null);
       try {
-        const [rank, leaderboard, meta, prevRank] = await Promise.all([
+        const [rank, leaderboard, meta, prevRank, trackJson] = await Promise.all([
           fetchJson<RankDriver[]>('/data/rank.json'),
           fetchJson<Record<string, any>>('/data/leaderboard.json'),
           fetchJson<SiteMetadata>('/data/metadata.json'),
           fetchPrevRankData(),
+          fetchJson<CurrentTrackData>('/data/current-track.json').catch(() => null),
         ]);
 
         if (!mounted) return;
+        staticCurrentTrackRef.current = trackJson;
         setRankData(rank);
         setLeaderboardData(leaderboard);
         setDeltas(computeDeltas(rank, prevRank));
         setMetadata(meta);
+
+        const staticPayload = toCurrentTrackPayload(trackJson);
+        if (!canAttemptLiveServerStatusFetch()) {
+          setCurrentTrack(applyServerOfflineDebug(staticPayload));
+        } else {
+          void fetchLiveServerStatusFromSupabase().then((live) => {
+            if (!mounted) return;
+            setCurrentTrack(pickNewerCurrentTrack(staticPayload, live));
+          });
+        }
       } catch (e) {
         if (!mounted) return;
         setError(e instanceof Error ? e.message : 'Unknown error');
@@ -942,14 +958,6 @@ export default function Page() {
     }
 
     load();
-    if (!canAttemptLiveServerStatusFetch()) {
-      setCurrentTrack(null);
-    } else {
-      void fetchLiveServerStatusFromSupabase().then((live) => {
-        if (!mounted) return;
-        setCurrentTrack(live ?? null);
-      });
-    }
 
     return () => {
       mounted = false;
@@ -960,10 +968,16 @@ export default function Page() {
     if (!shouldPollLiveServerStatus()) return undefined;
     let mounted = true;
     const tick = () => {
-      void fetchLiveServerStatusFromSupabase().then((live) => {
-        if (!mounted) return;
-        setCurrentTrack(live ?? null);
-      });
+      void fetchJson<CurrentTrackData>('/data/current-track.json')
+        .catch(() => null)
+        .then((trackJson) => {
+          if (!mounted) return;
+          staticCurrentTrackRef.current = trackJson;
+          void fetchLiveServerStatusFromSupabase().then((live) => {
+            if (!mounted) return;
+            setCurrentTrack(pickNewerCurrentTrack(toCurrentTrackPayload(staticCurrentTrackRef.current), live));
+          });
+        });
     };
     const id = window.setInterval(tick, LIVE_SERVER_STATUS_POLL_MS);
     return () => {

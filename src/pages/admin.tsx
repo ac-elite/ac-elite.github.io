@@ -7,7 +7,7 @@ import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import Table from '@mui/material/Table';
 import Button from '@mui/material/Button';
-import Switch from '@mui/material/Switch';
+import Collapse from '@mui/material/Collapse';
 import TableRow from '@mui/material/TableRow';
 import Container from '@mui/material/Container';
 import TableBody from '@mui/material/TableBody';
@@ -15,11 +15,10 @@ import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import Typography from '@mui/material/Typography';
 import TableContainer from '@mui/material/TableContainer';
-import FormControlLabel from '@mui/material/FormControlLabel';
 
 import { CONFIG } from 'src/config-global';
 import { fetchJson } from 'src/lib/fetch-json';
-import { getSyncHealth } from 'src/lib/sync-utils';
+import { getSyncHealth, type SyncHealthProfile } from 'src/lib/sync-utils';
 import { SITE_PREVIEW } from 'src/site-manual-config';
 import { getTrackDisplayName } from 'src/lib/ac-elite-data';
 import { glassCardMotionSx, softFloatWrapperSx } from 'src/lib/subtle-motion';
@@ -33,7 +32,6 @@ import {
 import {
   DATA_PAGE_SHELL_SX,
   TABLE_HEAD_MUTED_COLOR,
-  HERO_FOOTNOTE_CAPTION_SX,
   ADMIN_JOIN_SERVER_OUTLINED_SX,
   ADMIN_EXTERNAL_LINK_OUTLINED_SX,
 } from 'src/lib/page-shell';
@@ -98,48 +96,102 @@ const SCHEDULE: readonly ScheduleEntry[] = [
     agendaWhen: ':00',
     agendaSub: 'Every hour · UTC',
     kind: 'recurring',
-    workflow: 'Sync KMR Data',
+    workflow: 'Ranking sync (KMR)',
     cron: '0 * * * *',
-    what: 'Downloads rank.json and leaderboard.json from KMR FTP; writes metadata.json with sync time.',
-    chain: 'Then: Daily Rank Snapshot → Deploy Pages',
+    what: 'Downloads the latest driver list and leaderboard from KMR so the website matches the league.',
+    chain: 'Then: daily 24h snapshot → publish website',
   },
   {
     agendaWhen: ':05',
     agendaSub: 'Every hour · UTC',
     kind: 'recurring',
-    workflow: 'GitHub · current-track snapshot',
+    workflow: 'Hourly server backup file',
     cron: '5 * * * *',
     what:
-      'GitHub Action hits /INFO and commits public/data/current-track.json only when it changes. Static fallback for builds; live server UI reads Supabase server_status when URL + anon key are in the build (opt-out with VITE_SUPABASE_LIVE_SERVER_STATUS=0).',
+      'Once an hour, checks if the game lobby or track changed. If so, saves a backup copy the website can fall back on. Slower than the live check below.',
   },
   {
-    agendaWhen: '1–5 min',
-    agendaSub: 'cron-job.org → Supabase Edge',
+    agendaWhen: '≈1 min',
+    agendaSub: 'External scheduler · hosted service',
     kind: 'recurring',
-    workflow: 'sync-server-status',
-    cron: 'Your cron-job.org schedule',
+    workflow: 'Live server check',
+    cron: 'Your external cron schedule (e.g. every minute)',
     what:
-      'POST to Edge Function with CRON_SECRET; polls /INFO and upserts public.server_status. Same /INFO source as the snapshot workflow, but stored in Supabase for frequent updates without a git commit.',
+      'Checks the game server often so the site can show who is online, which track is running, and session info without waiting for the hourly backup.',
   },
   {
     agendaWhen: 'After sync',
-    agendaSub: 'Not before 06:00 local (Amsterdam) · once per day',
+    agendaSub: 'Not before 06:00 Amsterdam · once per day',
     kind: 'chained',
-    workflow: 'Daily Rank Snapshot (24h)',
+    workflow: 'Daily 24h ranking snapshot',
     cron: 'workflow_run (after Sync KMR)',
     what:
-      'Copies rank.json → rank-24h.json for delta calculations. Skipped before 06:00 local (Amsterdam); at most once per day.',
-    chain: 'Then: Deploy Pages',
+      'Saves a “yesterday style” copy of the rankings used for 24-hour stats. Waits until after 06:00 Amsterdam time and runs at most once per day.',
+    chain: 'Then: publish website',
   },
   {
     agendaWhen: 'On change',
-    agendaSub: 'Push main · workflow_run',
+    agendaSub: 'When the website code updates',
     kind: 'deploy',
-    workflow: 'Deploy Pages',
+    workflow: 'Publish website',
     cron: 'workflow_run + push main',
-    what: 'Builds Vite app and deploys dist/ to GitHub Pages.',
+    what: 'Rebuilds the public site so visitors see the latest pages and data files.',
   },
 ];
+
+/** Simple “try this in the address bar” helpers (optional). */
+const DEBUG_QUICK_TRIES = [
+  {
+    key: 'offline',
+    title: 'Preview: site thinks the game server is offline',
+    intro:
+      'Good for checking the homepage “server offline” layout. The real server is not touched — this only changes what your browser shows.',
+    paste: '?serverOfflineDebug=on',
+    stepsBeforeSnippet: [
+      'Click the address bar at the top of the browser.',
+      'Click at the very end of the URL so the cursor sits after the last character.',
+    ],
+    stepsAfterSnippet: [
+      'Copy the entire line in the grey box above, paste it at the end of the URL, then press Enter.',
+      'Reload the homepage (or open it) to see the offline layout.',
+    ],
+    turnOff: 'Delete the pasted part from the address bar, or open the site in a fresh tab without it.',
+  },
+  {
+    key: 'console',
+    title: 'Extra detail in the browser console (optional)',
+    intro:
+      'For someone who already uses “Developer tools → Console”. Adds more lines about server loading. Safe to skip if that sounds unfamiliar.',
+    paste: '?serverStatusDebug=1',
+    stepsBeforeSnippet: [
+      'Click the address bar and put the cursor at the very end of the URL.',
+    ],
+    stepsAfterSnippet: [
+      'Copy the entire line in the grey box above, paste it at the end of the URL, then press Enter.',
+      'Open Developer tools (F12 on many browsers) → Console tab.',
+      'Look for lines starting with [server-status].',
+    ],
+    turnOff: 'Remove the extra text from the address bar when you are done.',
+  },
+] as const;
+
+/** Developer-only reference (env / storage keys). */
+const DEBUG_TECH_REFERENCE = [
+  {
+    title: 'Pretend server offline',
+    env: 'VITE_SERVER_OFFLINE_DEBUG',
+    query: 'serverOfflineDebug',
+    storageKey: 'acelite:server-offline-debug',
+    values: '1, true, yes, on',
+  },
+  {
+    title: 'Verbose server-status logging',
+    env: 'VITE_SERVER_STATUS_DEBUG',
+    query: 'serverStatusDebug',
+    storageKey: 'acelite:server-status-debug',
+    values: '1, true, yes',
+  },
+] as const;
 
 // ---------------------------------------------------------------------------
 // Data files we track
@@ -150,44 +202,47 @@ type DataFileEntry = {
   updatedBy: string;
   getTimestamp: (s: AdminState) => string | undefined;
   getNote?: (s: AdminState) => string;
+  /** Freshness thresholds: daily snapshot is not “delayed” within ~30h. */
+  syncHealthProfile?: SyncHealthProfile;
 };
 
 const DATA_FILES: readonly DataFileEntry[] = [
   {
     file: 'metadata.json',
-    updatedBy: 'Sync KMR Data',
+    updatedBy: 'Ranking sync (KMR)',
     getTimestamp: (s) => s.metadata?.lastSync,
-    getNote: (s) => (s.metadata?.status === 'success' ? 'success' : s.metadata?.status ?? ''),
+    getNote: (s) => (s.metadata?.status === 'success' ? 'Last run reported success' : s.metadata?.status ?? ''),
   },
   {
     file: 'current-track.json',
-    updatedBy: 'GitHub · current-track.json',
+    updatedBy: 'Game server (live check + hourly backup)',
     getTimestamp: (s) => s.currentTrack?.fetchedAt,
     getNote: (s) => {
       const state =
         s.currentTrack?.online
-          ? `online · ${s.currentTrack.track ? getTrackDisplayName(s.currentTrack.track) : '—'}`
-          : 'offline';
-      return `${state} · GitHub Action when file changes; live feed = Supabase server_status`;
+          ? `Online · ${s.currentTrack.track ? getTrackDisplayName(s.currentTrack.track) : '—'}`
+          : 'Offline';
+      return `${state} · Time shown is the newest of: frequent live checks, or the hourly backup when the lobby/track changed`;
     },
   },
   {
     file: 'rank.json',
-    updatedBy: 'Sync KMR Data',
+    updatedBy: 'Ranking sync (KMR)',
     getTimestamp: (s) => s.metadata?.lastSync,
   },
   {
     file: 'rank-24h.json',
-    updatedBy: 'Daily Rank Snapshot',
+    updatedBy: 'Daily 24h snapshot (once per day)',
     getTimestamp: (s) => s.metadata?.rank24hSnapshotAt,
+    syncHealthProfile: 'dailySnapshot',
     getNote: (s) =>
       s.metadata?.rank24hSnapshotAt
-        ? 'metadata.rank24hSnapshotAt (Daily Rank Snapshot; preserved when KMR sync rewrites metadata)'
-        : 'set automatically on next snapshot run after workflow update',
+        ? 'Runs at most once per day; timestamp is kept when the main rank file refreshes'
+        : 'Will fill in automatically after the next daily snapshot job',
   },
   {
     file: 'leaderboard.json',
-    updatedBy: 'Sync KMR Data',
+    updatedBy: 'Ranking sync (KMR)',
     getTimestamp: (s) => s.metadata?.lastSync,
   },
 ];
@@ -285,7 +340,10 @@ function buildAdminServerInfoRows(ct: CurrentTrackPayload | null): { label: stri
 
   const info = ct.info;
   if (!info || typeof info !== 'object') {
-    rows.push({ label: '/INFO', value: 'No info object on payload — check Supabase server_status.info or static merge.' });
+    rows.push({
+      label: '/INFO',
+      value: 'No lobby detail on this snapshot yet — try again shortly or open the live server link.',
+    });
     return rows;
   }
 
@@ -372,17 +430,6 @@ function buildAdminServerInfoRows(ct: CurrentTrackPayload | null): { label: stri
   return rows;
 }
 
-type ActionStatusTone = 'ok' | 'warn' | 'error';
-
-type ActionPanelEntry = {
-  name: string;
-  tone: ActionStatusTone;
-  status: string;
-  when?: string;
-  note: string;
-  href: string;
-};
-
 const FRESHNESS_ROW_BORDER = '1px solid rgba(148,163,184,0.1)';
 
 /** Body cell: soft row divider; vertical align top for multi-line age/note. */
@@ -401,9 +448,7 @@ export default function Page() {
     metadata: null,
     currentTrack: null,
   });
-  const [showAllFiles, setShowAllFiles] = useState(false);
-  const [showRawServerInfo, setShowRawServerInfo] = useState(false);
-  const [showSchedule, setShowSchedule] = useState(false);
+  const [debugTechOpen, setDebugTechOpen] = useState(false);
 
   const staticCurrentTrackRef = useRef<CurrentTrackData | null>(null);
 
@@ -457,83 +502,21 @@ export default function Page() {
 
   const adminServerDetailRows = useMemo(() => buildAdminServerInfoRows(data.currentTrack), [data.currentTrack]);
 
-  const actionOverview = useMemo<ActionPanelEntry[]>(() => {
-    const syncHealth = getSyncHealth(data.metadata?.lastSync);
-    const syncFailed = data.metadata?.status?.toLowerCase() === 'error';
-    const syncActionStatus = syncFailed ? 'Failed' : data.metadata?.status === 'success' ? 'Healthy' : syncHealth.label;
-
-    const snapshotHealth = getSyncHealth(data.metadata?.rank24hSnapshotAt);
-    const snapshotStatus = data.metadata?.rank24hSnapshotAt ? snapshotHealth.label : 'Pending';
-
-    const trackHealth = getSyncHealth(data.currentTrack?.fetchedAt);
-
-    const syncNote =
-      syncFailed && data.metadata?.error
-        ? data.metadata.error
-        : 'Downloads rank.json + leaderboard.json and updates metadata.';
-
-    return [
-      {
-        name: 'Sync KMR Data',
-        tone: syncFailed ? 'error' : syncActionStatus === 'Live' || syncActionStatus === 'Healthy' ? 'ok' : 'warn',
-        status: syncActionStatus,
-        when: data.metadata?.lastSync,
-        note: syncNote,
-        href: `${TEAM_GITHUB_REPO}/actions/workflows/sync-data.yml`,
-      },
-      {
-        name: 'Daily Rank Snapshot (24h)',
-        tone: snapshotStatus === 'Live' || snapshotStatus === 'Delayed' ? 'ok' : 'warn',
-        status: snapshotStatus,
-        when: data.metadata?.rank24hSnapshotAt,
-        note: data.metadata?.rank24hSnapshotAt
-          ? 'Copies rank.json to rank-24h.json once per day after 06:00 Amsterdam.'
-          : 'No snapshot timestamp yet; this can be normal before the first daily run.',
-        href: `${TEAM_GITHUB_REPO}/actions/workflows/snapshot-24h.yml`,
-      },
-      {
-        name: 'Current-track snapshot',
-        tone: trackHealth.label === 'Live' ? 'ok' : trackHealth.label === 'Stale' ? 'error' : 'warn',
-        status: trackHealth.label,
-        when: data.currentTrack?.fetchedAt,
-        note: 'GitHub Action updates current-track.json when /INFO snapshot changes.',
-        href: `${TEAM_GITHUB_REPO}/actions`,
-      },
-    ];
-  }, [data.currentTrack?.fetchedAt, data.metadata?.error, data.metadata?.lastSync, data.metadata?.rank24hSnapshotAt, data.metadata?.status]);
-
-  const overallIncident = useMemo(() => {
-    const hasHardError = actionOverview.some((entry) => entry.tone === 'error');
-    const hasWarning = actionOverview.some((entry) => entry.tone === 'warn');
-    if (hasHardError) return { label: 'Down', color: '#ef4444', tone: 'error' as const };
-    if (hasWarning) return { label: 'Degraded', color: '#f59e0b', tone: 'warn' as const };
-    return { label: 'Healthy', color: '#22c55e', tone: 'ok' as const };
-  }, [actionOverview]);
-
-  const actionLastUpdate = useMemo(() => {
-    const stamps = actionOverview
-      .map((entry) => entry.when)
-      .filter((x): x is string => Boolean(x))
-      .map((ts) => new Date(ts).getTime())
-      .filter((ms) => Number.isFinite(ms));
-    if (!stamps.length) return undefined;
-    return new Date(Math.max(...stamps)).toISOString();
-  }, [actionOverview]);
-
-  const staleFileRows = useMemo(() => {
-    const rows = DATA_FILES.map((df) => {
-      const ts = df.getTimestamp(data);
-      const note = df.getNote?.(data) ?? '';
-      const health = getSyncHealth(ts);
-      return { df, ts, note, health };
-    });
-    return showAllFiles ? rows : rows.filter((row) => row.health.label !== 'Live');
-  }, [data, showAllFiles]);
+  const dataStatusRows = useMemo(
+    () =>
+      DATA_FILES.map((df) => {
+        const ts = df.getTimestamp(data);
+        const note = df.getNote?.(data) ?? '';
+        const health = getSyncHealth(ts, df.syncHealthProfile ?? 'default');
+        return { df, ts, note, health };
+      }),
+    [data]
+  );
 
   return (
     <>
       <title>{`Admin Panel - ${CONFIG.appName}`}</title>
-      <meta name="description" content="AC Elite internal admin panel." />
+      <meta name="description" content="AC Elite team page — data freshness, game server readout, and helpful links." />
       <meta name="robots" content="noindex, nofollow" />
 
       <Box sx={{ ...DATA_PAGE_SHELL_SX }}>
@@ -548,11 +531,7 @@ export default function Page() {
                     Admin Panel
                   </Typography>
                   <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                    Internal overview for moderators and admins — schedules, data freshness, and site status at a glance.
-                  </Typography>
-                  <Typography variant="caption" sx={{ ...HERO_FOOTNOTE_CAPTION_SX, maxWidth: 720 }}>
-                    Live KMR sync and server snapshot cards are directly below, then workflow schedule, file freshness (incl.
-                    current-track.json vs Supabase), and team shortcuts.
+                    Quick checks for the team: is public data up to date, is the game lobby up, and where to dig deeper if something looks wrong.
                   </Typography>
                 </Stack>
               </Box>
@@ -561,149 +540,161 @@ export default function Page() {
             <PreviewLock
               storageKey={SITE_PREVIEW.adminPanel.storageKey}
               password={SITE_PREVIEW.adminPanel.password}
-              title="Admin Panel Locked"
-              description="Use the internal preview password to access operational dashboards."
+              title="This area is locked"
+              description="Ask your team lead for the shared password, then type it below."
             >
               <Stack spacing={3}>
-                <Paper
-                  sx={{
-                    ...GLASS_PANEL_COMPACT_SX,
-                    ...glassCardMotionSx(1),
-                    border: `1px solid ${overallIncident.color}55`,
-                    borderLeft: `4px solid ${overallIncident.color}`,
-                  }}
-                >
-                  <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.25} alignItems={{ sm: 'center' }} justifyContent="space-between">
-                    <Box>
-                      <Typography variant="overline" sx={{ color: 'text.secondary', letterSpacing: 0.14, fontWeight: 700 }}>
-                        Incident overview
-                      </Typography>
-                      <Stack direction="row" spacing={1} alignItems="center" sx={{ mt: 0.25 }}>
-                        <Chip
-                          size="small"
-                          label={overallIncident.label}
-                          sx={{
-                            fontWeight: 800,
-                            color: overallIncident.color,
-                            bgcolor: `${overallIncident.color}22`,
-                            border: `1px solid ${overallIncident.color}55`,
-                          }}
-                        />
-                        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                          Last update: {actionLastUpdate ? `${formatAbsolute(actionLastUpdate)} (${formatRelative(actionLastUpdate)})` : 'Unknown'}
-                        </Typography>
-                      </Stack>
-                    </Box>
-                    <Button
-                      component="a"
-                      href={`${TEAM_GITHUB_REPO}/actions`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      variant="outlined"
-                      size="small"
-                      sx={{ ...ADMIN_EXTERNAL_LINK_OUTLINED_SX }}
-                    >
-                      Open Actions
-                    </Button>
-                  </Stack>
+                <Paper sx={{ ...GLASS_PANEL_COMPACT_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(1) }}>
+                  <Typography variant="h6" sx={{ fontWeight: 800 }}>
+                    Data freshness
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.4, mb: 1 }}>
+                    Each row is one file the website reads. If something looks old, note the time and tell a tech lead which row it was.
+                  </Typography>
+                  <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mb: data.metadata?.error ? 1 : 2, lineHeight: 1.55, maxWidth: 900 }}>
+                    <strong>Live</strong> — updated recently. <strong>Delayed</strong> — older than we like for that type of file; worth a look if players ask.{' '}
+                    <strong>Stale</strong> — please flag to a tech lead. <strong>Unknown</strong> — no date yet (first load or missing file).
+                  </Typography>
                   {data.metadata?.error && (
-                    <Typography variant="body2" sx={{ mt: 1.25, color: '#fca5a5', overflowWrap: 'anywhere' }}>
-                      Last failure: {data.metadata.error}
+                    <Typography variant="body2" sx={{ mb: 2, color: '#fca5a5', overflowWrap: 'anywhere' }}>
+                      Last sync error: {data.metadata.error}
                     </Typography>
                   )}
-                </Paper>
 
-                <Paper sx={{ ...GLASS_PANEL_COMPACT_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(2) }}>
-                  <Stack
-                    direction={{ xs: 'column', sm: 'row' }}
-                    justifyContent="space-between"
-                    alignItems={{ xs: 'flex-start', sm: 'center' }}
-                    spacing={1.5}
-                    sx={{ mb: 1.75 }}
+                  <TableContainer
+                    sx={{
+                      ...GLASS_CARD_SX,
+                      maxWidth: '100%',
+                      overflowX: 'auto',
+                      overflowY: 'hidden',
+                      WebkitOverflowScrolling: 'touch',
+                      borderRadius: 2,
+                      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)',
+                    }}
                   >
-                    <Box>
-                      <Typography variant="h6" sx={{ fontWeight: 800 }}>
-                        Pipeline health
-                      </Typography>
-                      <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.4 }}>
-                        One row per critical workflow. Use this block as the primary triage signal.
-                      </Typography>
-                    </Box>
-                  </Stack>
-
-                  <Stack spacing={1.1}>
-                    {actionOverview.map((entry) => {
-                      const toneColor =
-                        entry.tone === 'ok' ? '#22c55e' : entry.tone === 'error' ? '#ef4444' : '#f59e0b';
-                      return (
-                        <Stack
-                          key={entry.name}
-                          direction={{ xs: 'column', md: 'row' }}
-                          spacing={1.25}
+                    <Table
+                      size="small"
+                      sx={{
+                        borderCollapse: 'separate',
+                        borderSpacing: 0,
+                        minWidth: 720,
+                      }}
+                    >
+                      <TableHead>
+                        <TableRow
                           sx={{
-                            p: 1.35,
-                            borderRadius: 1.75,
-                            border: '1px solid rgba(148,163,184,0.2)',
-                            bgcolor: 'rgba(15,23,42,0.35)',
-                            borderLeft: `3px solid ${toneColor}`,
+                            background:
+                              'linear-gradient(180deg, rgba(36,52,88,0.92) 0%, rgba(24,35,58,0.88) 100%)',
+                            '& th': {
+                              fontSize: '0.68rem',
+                              textTransform: 'uppercase',
+                              letterSpacing: '0.1em',
+                              fontWeight: 800,
+                              color: TABLE_HEAD_MUTED_COLOR,
+                              borderBottom: '1px solid rgba(148,163,184,0.28)',
+                              py: 1.35,
+                              px: 1.5,
+                            },
                           }}
                         >
-                          <Box sx={{ minWidth: { md: 270 } }}>
-                            <Typography variant="subtitle2" sx={{ fontWeight: 800 }}>
-                              {entry.name}
-                            </Typography>
-                            <Stack direction="row" alignItems="center" spacing={0.9} sx={{ mt: 0.65 }}>
-                              <Chip
-                                size="small"
-                                label={entry.status}
+                          <TableCell>Data file</TableCell>
+                          <TableCell>Source</TableCell>
+                          <TableCell>Last change</TableCell>
+                          <TableCell>Freshness</TableCell>
+                          <TableCell>Notes</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {dataStatusRows.map(({ df, ts, note, health }) => (
+                          <TableRow
+                            key={df.file}
+                            hover
+                            sx={{
+                              transition: 'background-color 0.15s ease',
+                              '&:nth-of-type(even)': {
+                                bgcolor: 'rgba(15,23,42,0.35)',
+                              },
+                              '&:hover': {
+                                bgcolor: 'rgba(30,41,64,0.65)',
+                              },
+                              '&:last-of-type td': { borderBottom: 'none' },
+                              borderLeft: '3px solid',
+                              borderLeftColor: health.color,
+                            }}
+                          >
+                            <TableCell sx={{ ...freshnessBodyCellSx, pl: 1.5, pr: 1 }}>
+                              <Box
+                                component="span"
                                 sx={{
-                                  height: 22,
-                                  fontWeight: 800,
-                                  fontSize: '0.68rem',
-                                  color: toneColor,
-                                  bgcolor: `${toneColor}22`,
-                                  border: `1px solid ${toneColor}55`,
+                                  display: 'inline-block',
+                                  fontFamily: 'ui-monospace, monospace',
+                                  fontWeight: 700,
+                                  fontSize: '0.8rem',
+                                  px: 1,
+                                  py: 0.35,
+                                  borderRadius: 1,
+                                  bgcolor: 'rgba(15,23,42,0.55)',
+                                  border: '1px solid rgba(148,163,184,0.22)',
+                                  color: 'rgba(248,250,252,0.95)',
                                 }}
-                              />
-                              <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                                {entry.when ? `${formatAbsolute(entry.when)} (${formatRelative(entry.when)})` : 'No timestamp yet'}
-                              </Typography>
-                            </Stack>
-                          </Box>
-
-                          <Box sx={{ flex: 1, minWidth: 0 }}>
-                            <Typography
-                              variant="body2"
+                              >
+                                {df.file}
+                              </Box>
+                            </TableCell>
+                            <TableCell sx={{ ...freshnessBodyCellSx, color: 'text.secondary', maxWidth: 200 }}>
+                              {df.updatedBy}
+                            </TableCell>
+                            <TableCell
                               sx={{
+                                ...freshnessBodyCellSx,
+                                color: 'text.primary',
+                                fontVariantNumeric: 'tabular-nums',
+                                whiteSpace: 'nowrap',
+                              }}
+                            >
+                              {formatAbsolute(ts)}
+                            </TableCell>
+                            <TableCell sx={{ ...freshnessBodyCellSx, minWidth: 140 }}>
+                              <Stack direction="row" alignItems="center" spacing={1} flexWrap="wrap" useFlexGap>
+                                <Chip
+                                  size="small"
+                                  label={health.label}
+                                  sx={{
+                                    height: 24,
+                                    fontWeight: 800,
+                                    fontSize: '0.7rem',
+                                    color: health.color,
+                                    bgcolor: `${health.color}1a`,
+                                    border: `1px solid ${health.color}66`,
+                                    '& .MuiChip-label': { px: 1.1 },
+                                  }}
+                                />
+                                <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                                  {health.ageText}
+                                </Typography>
+                              </Stack>
+                            </TableCell>
+                            <TableCell
+                              sx={{
+                                ...freshnessBodyCellSx,
                                 color: 'text.secondary',
-                                lineHeight: 1.5,
+                                fontSize: '0.8125rem',
+                                lineHeight: 1.45,
+                                maxWidth: { xs: 200, sm: 280, md: 360 },
+                                whiteSpace: 'normal',
                                 overflowWrap: 'anywhere',
                               }}
                             >
-                              {entry.note}
-                            </Typography>
-                          </Box>
-
-                          <Box sx={{ alignSelf: { xs: 'flex-start', md: 'center' } }}>
-                            <Button
-                              component="a"
-                              href={entry.href}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              variant="outlined"
-                              size="small"
-                              sx={{ ...ADMIN_EXTERNAL_LINK_OUTLINED_SX }}
-                            >
-                              View logs
-                            </Button>
-                          </Box>
-                        </Stack>
-                      );
-                    })}
-                  </Stack>
+                              {note || '—'}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
                 </Paper>
 
-                <Paper sx={{ ...GLASS_PANEL_COMPACT_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(3) }}>
+                <Paper sx={{ ...GLASS_PANEL_COMPACT_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(2) }}>
                   <Stack
                     direction={{ xs: 'column', sm: 'row' }}
                     justifyContent="space-between"
@@ -713,10 +704,10 @@ export default function Page() {
                   >
                     <Box>
                       <Typography variant="h6" sx={{ fontWeight: 800 }}>
-                        Live server quick state
+                        Game server (quick readout)
                       </Typography>
                       <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.4 }}>
-                        Server online state, track and session details for rapid race operations checks.
+                        Is the lobby up, which track is loaded, and how many drivers are connected — same idea players see on the homepage card.
                       </Typography>
                     </Box>
                     <Chip
@@ -766,228 +757,210 @@ export default function Page() {
                   </Grid>
                 </Paper>
 
-                <Paper sx={{ ...GLASS_PANEL_COMPACT_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(4) }}>
-                  <Typography variant="h6" sx={{ fontWeight: 800 }}>
-                    Data integrity exceptions
-                  </Typography>
-                  <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.4, mb: 2 }}>
-                    Shows non-live files by default. Enable all rows when you need a full audit.
-                  </Typography>
-                  <FormControlLabel
-                    control={<Switch size="small" checked={showAllFiles} onChange={(e) => setShowAllFiles(e.target.checked)} />}
-                    label={showAllFiles ? 'Showing all files' : 'Showing only delayed/stale/unknown'}
-                    sx={{ mb: 1.5, color: 'text.secondary' }}
-                  />
-
-                  <TableContainer
-                    sx={{
-                      ...GLASS_CARD_SX,
-                      maxWidth: '100%',
-                      overflowX: 'auto',
-                      overflowY: 'hidden',
-                      WebkitOverflowScrolling: 'touch',
-                      borderRadius: 2,
-                      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)',
-                    }}
-                  >
-                    <Table
-                      size="small"
-                      sx={{
-                        borderCollapse: 'separate',
-                        borderSpacing: 0,
-                        minWidth: 720,
-                      }}
-                    >
-                      <TableHead>
-                        <TableRow
-                          sx={{
-                            background:
-                              'linear-gradient(180deg, rgba(36,52,88,0.92) 0%, rgba(24,35,58,0.88) 100%)',
-                            '& th': {
-                              fontSize: '0.68rem',
-                              textTransform: 'uppercase',
-                              letterSpacing: '0.1em',
-                              fontWeight: 800,
-                              color: TABLE_HEAD_MUTED_COLOR,
-                              borderBottom: '1px solid rgba(148,163,184,0.28)',
-                              py: 1.35,
-                              px: 1.5,
-                            },
-                          }}
-                        >
-                          <TableCell>File</TableCell>
-                          <TableCell>Updated by</TableCell>
-                          <TableCell>Last update</TableCell>
-                          <TableCell>Age</TableCell>
-                          <TableCell>Note</TableCell>
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        {staleFileRows.map(({ df, ts, note, health }) => (
-                            <TableRow
-                              key={df.file}
-                              hover
-                              sx={{
-                                transition: 'background-color 0.15s ease',
-                                '&:nth-of-type(even)': {
-                                  bgcolor: 'rgba(15,23,42,0.35)',
-                                },
-                                '&:hover': {
-                                  bgcolor: 'rgba(30,41,64,0.65)',
-                                },
-                                '&:last-of-type td': { borderBottom: 'none' },
-                                borderLeft: '3px solid',
-                                borderLeftColor: health.color,
-                              }}
-                            >
-                              <TableCell sx={{ ...freshnessBodyCellSx, pl: 1.5, pr: 1 }}>
-                                <Box
-                                  component="span"
-                                  sx={{
-                                    display: 'inline-block',
-                                    fontFamily: 'ui-monospace, monospace',
-                                    fontWeight: 700,
-                                    fontSize: '0.8rem',
-                                    px: 1,
-                                    py: 0.35,
-                                    borderRadius: 1,
-                                    bgcolor: 'rgba(15,23,42,0.55)',
-                                    border: '1px solid rgba(148,163,184,0.22)',
-                                    color: 'rgba(248,250,252,0.95)',
-                                  }}
-                                >
-                                  {df.file}
-                                </Box>
-                              </TableCell>
-                              <TableCell sx={{ ...freshnessBodyCellSx, color: 'text.secondary', maxWidth: 200 }}>
-                                {df.updatedBy}
-                              </TableCell>
-                              <TableCell
-                                sx={{
-                                  ...freshnessBodyCellSx,
-                                  color: 'text.primary',
-                                  fontVariantNumeric: 'tabular-nums',
-                                  whiteSpace: 'nowrap',
-                                }}
-                              >
-                                {formatAbsolute(ts)}
-                              </TableCell>
-                              <TableCell sx={{ ...freshnessBodyCellSx, minWidth: 140 }}>
-                                <Stack direction="row" alignItems="center" spacing={1} flexWrap="wrap" useFlexGap>
-                                  <Chip
-                                    size="small"
-                                    label={health.label}
-                                    sx={{
-                                      height: 24,
-                                      fontWeight: 800,
-                                      fontSize: '0.7rem',
-                                      color: health.color,
-                                      bgcolor: `${health.color}1a`,
-                                      border: `1px solid ${health.color}66`,
-                                      '& .MuiChip-label': { px: 1.1 },
-                                    }}
-                                  />
-                                  <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                                    {health.ageText}
-                                  </Typography>
-                                </Stack>
-                              </TableCell>
-                              <TableCell
-                                sx={{
-                                  ...freshnessBodyCellSx,
-                                  color: 'text.secondary',
-                                  fontSize: '0.8125rem',
-                                  lineHeight: 1.45,
-                                  maxWidth: { xs: 200, sm: 280, md: 360 },
-                                  whiteSpace: 'normal',
-                                  overflowWrap: 'anywhere',
-                                }}
-                              >
-                                {note || '—'}
-                              </TableCell>
-                            </TableRow>
-                        ))}
-                        {staleFileRows.length === 0 && (
-                          <TableRow>
-                            <TableCell colSpan={5} sx={{ ...freshnessBodyCellSx, py: 2.2, color: '#86efac' }}>
-                              No delayed, stale, or unknown files detected.
-                            </TableCell>
-                          </TableRow>
-                        )}
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
-                </Paper>
-
-                <Paper sx={{ ...GLASS_PANEL_COMPACT_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(5) }}>
+                <Paper sx={{ ...GLASS_PANEL_COMPACT_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(3) }}>
                   <Stack direction={{ xs: 'column', md: 'row' }} justifyContent="space-between" spacing={1.5} sx={{ mb: 1 }}>
-                    <Typography variant="h6" sx={{ fontWeight: 800 }}>Secondary details</Typography>
+                    <Typography variant="h6" sx={{ fontWeight: 800 }}>Links & raw detail</Typography>
                     <Stack direction="row" spacing={1} flexWrap="wrap">
                       <Button component="a" href={AC_SERVER_INFO_URL} target="_blank" rel="noreferrer" variant="outlined" size="small" sx={{ ...ADMIN_EXTERNAL_LINK_OUTLINED_SX }}>
-                        Open live /INFO
+                        Live status page (advanced)
                       </Button>
                       <Button component="a" href={`${TEAM_GITHUB_REPO}/actions`} target="_blank" rel="noopener noreferrer" variant="outlined" size="small" sx={{ ...ADMIN_EXTERNAL_LINK_OUTLINED_SX }}>
-                        Actions
+                        Automation runs (GitHub)
                       </Button>
                       <Button component="a" href={TEAM_GAME_SERVER_JOIN} target="_blank" rel="noopener noreferrer" variant="outlined" size="small" sx={{ ...ADMIN_JOIN_SERVER_OUTLINED_SX }}>
-                        Join game server
+                        Join server (Content Manager)
                       </Button>
                     </Stack>
                   </Stack>
                   <Stack spacing={1.25}>
-                    <FormControlLabel
-                      control={<Switch size="small" checked={showRawServerInfo} onChange={(e) => setShowRawServerInfo(e.target.checked)} />}
-                      label="Show raw merged /INFO table"
-                      sx={{ color: 'text.secondary' }}
-                    />
-                    {showRawServerInfo && (
-                      <TableContainer sx={{ maxHeight: 400, borderRadius: 1, border: '1px solid rgba(148,163,184,0.14)', bgcolor: 'rgba(15,23,42,0.35)' }}>
-                        <Table size="small" stickyHeader>
-                          <TableHead>
-                            <TableRow>
-                              <TableCell sx={{ fontWeight: 800, width: '32%', bgcolor: 'rgba(15,23,42,0.88)' }}>Field</TableCell>
-                              <TableCell sx={{ fontWeight: 800, bgcolor: 'rgba(15,23,42,0.88)' }}>Value</TableCell>
+                    <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>
+                      Full field list (for tech helpers — most moderators can skip this)
+                    </Typography>
+                    <TableContainer sx={{ maxHeight: 400, borderRadius: 1, border: '1px solid rgba(148,163,184,0.14)', bgcolor: 'rgba(15,23,42,0.35)' }}>
+                      <Table size="small" stickyHeader>
+                        <TableHead>
+                          <TableRow>
+                            <TableCell sx={{ fontWeight: 800, width: '32%', bgcolor: 'rgba(15,23,42,0.88)' }}>Field</TableCell>
+                            <TableCell sx={{ fontWeight: 800, bgcolor: 'rgba(15,23,42,0.88)' }}>Value</TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {adminServerDetailRows.map((row, idx) => (
+                            <TableRow key={`${row.label}-${idx}`}>
+                              <TableCell sx={{ ...freshnessBodyCellSx, color: 'text.secondary', fontWeight: 700 }}>{row.label}</TableCell>
+                              <TableCell sx={{ ...freshnessBodyCellSx, fontFamily: row.value.length > 120 ? 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace' : 'inherit', fontSize: '0.8125rem', wordBreak: 'break-word' }}>
+                                {row.value}
+                              </TableCell>
                             </TableRow>
-                          </TableHead>
-                          <TableBody>
-                            {adminServerDetailRows.map((row, idx) => (
-                              <TableRow key={`${row.label}-${idx}`}>
-                                <TableCell sx={{ ...freshnessBodyCellSx, color: 'text.secondary', fontWeight: 700 }}>{row.label}</TableCell>
-                                <TableCell sx={{ ...freshnessBodyCellSx, fontFamily: row.value.length > 120 ? 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace' : 'inherit', fontSize: '0.8125rem', wordBreak: 'break-word' }}>
-                                  {row.value}
-                                </TableCell>
-                              </TableRow>
-                            ))}
-                          </TableBody>
-                        </Table>
-                      </TableContainer>
-                    )}
-                    <FormControlLabel
-                      control={<Switch size="small" checked={showSchedule} onChange={(e) => setShowSchedule(e.target.checked)} />}
-                      label="Show workflow cadence details"
-                      sx={{ color: 'text.secondary' }}
-                    />
-                    {showSchedule && (
-                      <Stack spacing={1}>
-                        {SCHEDULE.map((entry) => (
-                          <Box key={entry.workflow} sx={{ ...GLASS_INNER_PANEL_SX, py: 1.2 }}>
-                            <Typography variant="subtitle2" sx={{ fontWeight: 800 }}>{entry.workflow}</Typography>
-                            <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mt: 0.25 }}>
-                              {entry.agendaWhen} · {entry.agendaSub} · {entry.cron}
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
+                    <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', pt: 0.5 }}>
+                      When background tasks usually run (plain-language)
+                    </Typography>
+                    <Stack spacing={1}>
+                      {SCHEDULE.map((entry) => (
+                        <Box key={entry.workflow} sx={{ ...GLASS_INNER_PANEL_SX, py: 1.2 }}>
+                          <Typography variant="subtitle2" sx={{ fontWeight: 800 }}>{entry.workflow}</Typography>
+                          <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mt: 0.25 }}>
+                            {entry.agendaWhen} · {entry.agendaSub} · {entry.cron}
+                          </Typography>
+                          <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.65, lineHeight: 1.5 }}>
+                            {entry.what}
+                          </Typography>
+                          {entry.chain && (
+                            <Typography variant="caption" sx={{ color: 'rgba(191,219,254,0.95)', display: 'block', mt: 0.5 }}>
+                              {entry.chain}
                             </Typography>
-                            <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.65, lineHeight: 1.5 }}>
-                              {entry.what}
-                            </Typography>
-                            {entry.chain && (
-                              <Typography variant="caption" sx={{ color: 'rgba(191,219,254,0.95)', display: 'block', mt: 0.5 }}>
-                                {entry.chain}
-                              </Typography>
-                            )}
-                          </Box>
-                        ))}
-                      </Stack>
-                    )}
+                          )}
+                        </Box>
+                      ))}
+                    </Stack>
                   </Stack>
+                </Paper>
+
+                <Paper sx={{ ...GLASS_PANEL_COMPACT_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(4) }}>
+                  <Typography variant="h6" sx={{ fontWeight: 800 }}>
+                    Optional: try things in your browser
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5, mb: 2 }}>
+                    You never have to use this section. It is only for checking how the site looks in special cases. Nothing here changes the real game server.
+                  </Typography>
+                  <Stack spacing={2}>
+                    {DEBUG_QUICK_TRIES.map((block) => (
+                      <Box key={block.key} sx={{ ...GLASS_INNER_PANEL_SX, py: 1.5 }}>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 800 }}>
+                          {block.title}
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.75, lineHeight: 1.5 }}>
+                          {block.intro}
+                        </Typography>
+                        <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700, display: 'block', mt: 1.25 }}>
+                          Steps
+                        </Typography>
+                        <Box component="ol" sx={{ m: 0, mt: 0.5, pl: 2.25, color: 'text.secondary', fontSize: '0.875rem', lineHeight: 1.55 }}>
+                          {block.stepsBeforeSnippet.map((step, i) => (
+                            <Box component="li" key={`${block.key}-before-${i}`} sx={{ mb: 0.35 }}>
+                              {step}
+                            </Box>
+                          ))}
+                        </Box>
+                        <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mt: 1.25, fontWeight: 700 }}>
+                          Copy this whole line:
+                        </Typography>
+                        <Box
+                          component="code"
+                          sx={{
+                            display: 'block',
+                            mt: 0.5,
+                            mb: 1,
+                            px: 1.25,
+                            py: 1,
+                            borderRadius: 1,
+                            bgcolor: 'rgba(15,23,42,0.65)',
+                            border: '1px solid rgba(148,163,184,0.28)',
+                            fontFamily: 'ui-monospace, monospace',
+                            fontSize: '0.85rem',
+                            color: 'rgba(248,250,252,0.95)',
+                            wordBreak: 'break-all',
+                          }}
+                        >
+                          {block.paste}
+                        </Box>
+                        <Box
+                          component="ol"
+                          start={block.stepsBeforeSnippet.length + 1}
+                          sx={{ m: 0, mt: 0.5, pl: 2.25, color: 'text.secondary', fontSize: '0.875rem', lineHeight: 1.55 }}
+                        >
+                          {block.stepsAfterSnippet.map((step, i) => (
+                            <Box component="li" key={`${block.key}-after-${i}`} sx={{ mb: 0.35 }}>
+                              {step}
+                            </Box>
+                          ))}
+                        </Box>
+                        <Typography variant="caption" sx={{ color: 'rgba(191,219,254,0.95)', display: 'block', mt: 1 }}>
+                          When you are done: {block.turnOff}
+                        </Typography>
+                      </Box>
+                    ))}
+                  </Stack>
+                  <Button
+                    type="button"
+                    size="small"
+                    variant="text"
+                    onClick={() => setDebugTechOpen((o) => !o)}
+                    sx={{ mt: 2, fontWeight: 700, color: 'primary.light', textTransform: 'none' }}
+                  >
+                    {debugTechOpen ? '▲ Hide' : '▼ Show'} developer-only details (env variables & storage keys)
+                  </Button>
+                  <Collapse in={debugTechOpen} timeout="auto" unmountOnExit>
+                    <Typography variant="body2" sx={{ color: 'text.secondary', mt: 1.5, mb: 1, lineHeight: 1.55 }}>
+                      These are the same switches as above, written the way developers configure builds. If you use an <strong>address-bar</strong> trick, you can ignore this box.{' '}
+                      <strong>Env</strong> values need a site rebuild to apply on the live website.
+                    </Typography>
+                    <TableContainer
+                      sx={{
+                        ...GLASS_CARD_SX,
+                        maxWidth: '100%',
+                        overflowX: 'auto',
+                        borderRadius: 2,
+                        border: '1px solid rgba(148,163,184,0.14)',
+                      }}
+                    >
+                      <Table size="small" sx={{ borderCollapse: 'separate', borderSpacing: 0, minWidth: 640 }}>
+                        <TableHead>
+                          <TableRow
+                            sx={{
+                              background:
+                                'linear-gradient(180deg, rgba(36,52,88,0.92) 0%, rgba(24,35,58,0.88) 100%)',
+                              '& th': {
+                                fontSize: '0.68rem',
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.1em',
+                                fontWeight: 800,
+                                color: TABLE_HEAD_MUTED_COLOR,
+                                borderBottom: '1px solid rgba(148,163,184,0.28)',
+                                py: 1.1,
+                                px: 1.25,
+                              },
+                            }}
+                          >
+                            <TableCell>What</TableCell>
+                            <TableCell>Env variable (build)</TableCell>
+                            <TableCell>URL piece</TableCell>
+                            <TableCell>Browser storage key</TableCell>
+                            <TableCell>Allowed values</TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {DEBUG_TECH_REFERENCE.map((row) => (
+                            <TableRow
+                              key={row.title}
+                              sx={{
+                                '&:nth-of-type(even)': { bgcolor: 'rgba(15,23,42,0.35)' },
+                                '&:last-of-type td': { borderBottom: 'none' },
+                              }}
+                            >
+                              <TableCell sx={{ ...freshnessBodyCellSx, fontWeight: 700, maxWidth: 220 }}>{row.title}</TableCell>
+                              <TableCell sx={{ ...freshnessBodyCellSx, fontFamily: 'ui-monospace, monospace', fontSize: '0.75rem' }}>
+                                {row.env}
+                              </TableCell>
+                              <TableCell sx={{ ...freshnessBodyCellSx, fontFamily: 'ui-monospace, monospace', fontSize: '0.75rem' }}>
+                                ?{row.query}=…
+                              </TableCell>
+                              <TableCell sx={{ ...freshnessBodyCellSx, fontFamily: 'ui-monospace, monospace', fontSize: '0.75rem', wordBreak: 'break-all' }}>
+                                {row.storageKey}
+                              </TableCell>
+                              <TableCell sx={{ ...freshnessBodyCellSx, color: 'text.secondary', fontSize: '0.8125rem' }}>
+                                {row.values} (case-insensitive)
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
+                  </Collapse>
                 </Paper>
               </Stack>
             </PreviewLock>

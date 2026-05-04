@@ -131,23 +131,30 @@ function JoinGlyphIcon() {
 
 export function ServerJoinCard({ currentTrack, joinHref = AC_ELITE_SERVER_JOIN_HREF, sx }: ServerJoinCardProps) {
   const online = Boolean(currentTrack?.online);
-  const rawTrack = currentTrack?.track?.trim() ?? '';
+  /** When offline, do not surface merged static fallback (last track / lobby) — card must read as down. */
+  const rawTrack = online ? (currentTrack?.track?.trim() ?? '') : '';
   const fetchedAt = currentTrack?.fetchedAt;
-  const info = currentTrack?.info;
-  const liveDataAvailable = Boolean(fetchedAt && hasLiveSessionMetrics(info));
-  const trackTitle = rawTrack ? getTrackDisplayName(normalizeServerTrackId(rawTrack)) : 'No session';
+  const info = online ? currentTrack?.info : undefined;
+  const liveDataAvailable = Boolean(online && fetchedAt && hasLiveSessionMetrics(info));
+  const trackTitle = !online
+    ? 'Server offline'
+    : rawTrack
+      ? getTrackDisplayName(normalizeServerTrackId(rawTrack))
+      : 'No session';
   const updatedLine = fetchedAt ? `Updated ${formatTimeAgo(fetchedAt)}` : '—';
   const updatedTitle = formatSessionKicker(fetchedAt);
 
   const clients = typeof info?.clients === 'number' ? info.clients : null;
   const maxclients = typeof info?.maxclients === 'number' ? info.maxclients : null;
-  const slotsLabel = liveDataAvailable
-    ? clients != null && maxclients != null
-      ? `${clients} / ${maxclients}`
-      : clients != null
-        ? `${clients}`
-        : '-'
-    : 'Data unavailable';
+  const slotsLabel = !online
+    ? '—'
+    : liveDataAvailable
+      ? clients != null && maxclients != null
+        ? `${clients} / ${maxclients}`
+        : clients != null
+          ? `${clients}`
+          : '-'
+      : 'Data unavailable';
   const cars = Array.isArray(info?.cars)
     ? (info.cars as unknown[]).filter((c): c is string => typeof c === 'string' && Boolean(c))
     : [];
@@ -159,9 +166,11 @@ export function ServerJoinCard({ currentTrack, joinHref = AC_ELITE_SERVER_JOIN_H
     lobbyName: typeof info?.name === 'string' ? info.name : undefined,
   });
 
-  const phaseSummary = liveDataAvailable
-    ? [phase, timeLeft].filter((v) => v && v !== '-').join(' · ') || '-'
-    : 'Data unavailable';
+  const phaseSummary = !online
+    ? '—'
+    : liveDataAvailable
+      ? [phase, timeLeft].filter((v) => v && v !== '-').join(' · ') || '-'
+      : 'Data unavailable';
 
   const rawLobbyName = typeof info?.name === 'string' ? info.name.trim() : '';
   const lobbyName = rawLobbyName ? sanitizeServerLobbyDisplayName(rawLobbyName) : '';
@@ -263,11 +272,13 @@ export function ServerJoinCard({ currentTrack, joinHref = AC_ELITE_SERVER_JOIN_H
           }}
           title={lobbyName || undefined}
         >
-          {lobbyName
-            ? lobbyName
-            : liveDataAvailable
-              ? 'AC Elite official server'
-              : 'Live data unavailable'}
+          {!online
+            ? 'No live lobby while the server is down.'
+            : lobbyName
+              ? lobbyName
+              : liveDataAvailable
+                ? 'AC Elite official server'
+                : 'Live data unavailable'}
         </Typography>
 
         <Grid container spacing={0.85}>
@@ -288,14 +299,14 @@ export function ServerJoinCard({ currentTrack, joinHref = AC_ELITE_SERVER_JOIN_H
           <Grid size={{ xs: 6, md: 3 }} sx={{ minWidth: 0 }}>
             <ServerInfoBlock label="Cars">
               <Typography variant="body2" sx={infoValueSx} noWrap title={cars.join(', ')}>
-                {liveDataAvailable ? (cars.length ? cars.join(', ') : '-') : 'Data unavailable'}
+                {!online ? '—' : liveDataAvailable ? (cars.length ? cars.join(', ') : '-') : 'Data unavailable'}
               </Typography>
             </ServerInfoBlock>
           </Grid>
           <Grid size={{ xs: 12, md: 4 }} sx={{ minWidth: 0 }}>
             <ServerInfoBlock label="Schedule">
               <Typography variant="body2" sx={infoValueSx} noWrap title={schedule ?? '-'}>
-                {liveDataAvailable ? (schedule ?? '-') : 'Data unavailable'}
+                {!online ? '—' : liveDataAvailable ? (schedule ?? '-') : 'Data unavailable'}
               </Typography>
             </ServerInfoBlock>
           </Grid>

@@ -200,6 +200,17 @@ export function mergeInfoWhenPreferringLiveSnapshot(
   return l ?? s;
 }
 
+/** When server is offline: overlay static /INFO on live so last-known lobby fields win on overlap. */
+export function mergeInfoStaticOverlayLive(
+  liveInfo: AcServerInfo | null | undefined,
+  staticInfo: AcServerInfo | null | undefined
+): AcServerInfo | null | undefined {
+  const l = liveInfo ?? undefined;
+  const s = staticInfo ?? undefined;
+  if (l && s) return { ...l, ...s };
+  return s ?? l;
+}
+
 /** PostgREST/jsonb en oude snapshots: soms string-getallen of dubbel-gecodeerde JSON. */
 export function parseAcServerInfo(raw: unknown): AcServerInfo | undefined {
   let parsed: unknown = raw;

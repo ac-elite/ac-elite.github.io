@@ -1,20 +1,21 @@
 /**
- * Live server track uit Supabase (`server_status`), gevuld door Edge Function + cron-job.org.
- * Zie scripts/supabase-server-status.sql voor setup.
+ * Live lobby row from Supabase (`server_status`), filled by Edge Function + cron-job.org.
+ * See `scripts/supabase-server-status.sql` for setup.
  *
- * Zonder `VITE_SUPABASE_LIVE_SERVER_STATUS`: als `VITE_SUPABASE_URL` + anon key gezet zijn,
- * wordt één keer (en daarna periodiek na succes) uit `server_status` gelezen. Zo volgt
- * “time ago” de cron, niet alleen `public/data/current-track.json`.
- * Uitzetten: `VITE_SUPABASE_LIVE_SERVER_STATUS=0` (of `false` / `off`).
+ * Without `VITE_SUPABASE_LIVE_SERVER_STATUS`: if `VITE_SUPABASE_URL` + anon key are set,
+ * one read (then periodic after success) from `server_status` is allowed so “time ago” follows
+ * the cron, not only `public/data/current-track.json`.
+ * Disable with `VITE_SUPABASE_LIVE_SERVER_STATUS=0` (or `false` / `off`).
  */
 
 import {
   type AcServerInfo,
   parseAcServerInfo,
+  mergeInfoStaticOverlayLive,
   mergeInfoWhenPreferringLiveSnapshot,
 } from 'src/lib/server-info';
 
-/** Poll-interval zodra live `server_status`-reads succesvol zijn (of expliciet geforceerd). */
+/** Browser poll interval once live `server_status` reads succeed (or when forced on). */
 export const LIVE_SERVER_STATUS_POLL_MS = 90_000;
 
 type LiveServerFetchState = 'unknown' | 'ok' | 'missing';
@@ -25,7 +26,7 @@ function isBrowser(): boolean {
   return typeof window !== 'undefined';
 }
 
-/** Opt-in debug: `?serverStatusDebug=1` of localStorage `acelite:server-status-debug=1`. */
+/** Opt-in debug: `?serverStatusDebug=1` or localStorage `acelite:server-status-debug=1`. */
 export function isServerStatusDebugEnabled(): boolean {
   const env = import.meta.env.VITE_SERVER_STATUS_DEBUG?.trim().toLowerCase();
   if (env === '1' || env === 'true' || env === 'yes') return true;
@@ -40,9 +41,37 @@ export type CurrentTrackPayload = {
   online: boolean;
   track: string;
   fetchedAt: string;
-  /** Volledige /INFO snapshot (track al genormaliseerd door Edge/workflow). */
+  /** Full /INFO snapshot (track normalized by Edge/workflow). */
   info?: AcServerInfo | null;
 };
+
+/** Treats `1` / `true` / `yes` / `on` as enabled (case-insensitive). */
+function isServerOfflineDebugRawOn(raw: string | null | undefined): boolean {
+  const v = raw?.trim().toLowerCase();
+  return v === '1' || v === 'true' || v === 'yes' || v === 'on';
+}
+
+/**
+ * When enabled, server payloads behave as if the game server is offline (`online: false`)
+ * so you can test join card / fallback UI without stopping the real server.
+ *
+ * - Env: `VITE_SERVER_OFFLINE_DEBUG`
+ * - URL: `?serverOfflineDebug=1` (or `on`, `true`, …)
+ * - Storage: `localStorage['acelite:server-offline-debug']`
+ */
+export function isServerOfflineDebugEnabled(): boolean {
+  if (isServerOfflineDebugRawOn(import.meta.env.VITE_SERVER_OFFLINE_DEBUG)) return true;
+  if (!isBrowser()) return false;
+  const qp = new URLSearchParams(window.location.search).get('serverOfflineDebug');
+  if (isServerOfflineDebugRawOn(qp)) return true;
+  return isServerOfflineDebugRawOn(window.localStorage.getItem('acelite:server-offline-debug'));
+}
+
+/** If offline debug is on, force `online: false` on the payload (rest unchanged). */
+export function applyServerOfflineDebug(payload: CurrentTrackPayload | null): CurrentTrackPayload | null {
+  if (!payload || !isServerOfflineDebugEnabled()) return payload;
+  return { ...payload, online: false };
+}
 
 function supabaseReadConfigured(): boolean {
   const url = import.meta.env.VITE_SUPABASE_URL?.trim();
@@ -60,7 +89,7 @@ function explicitLiveServerEnabled(): boolean {
   return v === '1' || v === 'true' || v === 'yes';
 }
 
-/** Eén REST-read naar `server_status` is toegestaan (keys aan, niet expliciet uit). */
+/** One REST read to `server_status` is allowed (keys present, not explicitly disabled). */
 export function canAttemptLiveServerStatusFetch(): boolean {
   if (!supabaseReadConfigured()) return false;
   if (explicitLiveServerDisabled()) return false;
@@ -68,17 +97,13 @@ export function canAttemptLiveServerStatusFetch(): boolean {
   return liveServerFetchState !== 'missing';
 }
 
-/** Na eerste geslaagde read (of bij expliciet aan): periodiek pollen. */
+/** After first successful read (or when explicitly enabled): poll periodically. */
 export function shouldPollLiveServerStatus(): boolean {
   if (!canAttemptLiveServerStatusFetch()) return false;
   return explicitLiveServerEnabled() || liveServerFetchState === 'ok';
 }
 
-function preferLiveServerSnapshotInMerge(): boolean {
-  return explicitLiveServerEnabled() || liveServerFetchState === 'ok';
-}
-
-/** @deprecated Gebruik `shouldPollLiveServerStatus`; zelfde gedrag. */
+/** @deprecated Use `shouldPollLiveServerStatus` — same behaviour. */
 export function isSupabaseLiveServerStatusEnabled(): boolean {
   return shouldPollLiveServerStatus();
 }
@@ -99,7 +124,7 @@ function supabaseBaseUrl(): string {
   return import.meta.env.VITE_SUPABASE_URL!.trim().replace(/\/$/, '');
 }
 
-/** Eén rij uit PostgREST, of null bij fout / lege response. */
+/** Single PostgREST row, or null on error / empty response. */
 export async function fetchLiveServerStatusFromSupabase(): Promise<CurrentTrackPayload | null> {
   if (!canAttemptLiveServerStatusFetch()) return null;
   try {
@@ -160,21 +185,17 @@ export async function fetchLiveServerStatusFromSupabase(): Promise<CurrentTrackP
   }
 }
 
-function parseTime(iso: string | undefined): number {
-  if (!iso) return 0;
-  const t = new Date(iso).getTime();
-  return Number.isNaN(t) ? 0 : t;
-}
-
 /**
- * Kiest static vs live server-snapshot.
- * Zodra live `server_status` bereikbaar is, wint die snapshot: `fetchedAt` volgt de cron/Edge,
- * terwijl `current-track.json` een nieuwere (maar minder frequente) GitHub-timestamp kan hebben.
+ * Merges live server_status with static `current-track.json`.
+ * Live wins for `online` and `fetchedAt`. Track + /INFO: live when online; when offline, prefer
+ * static for last driven track and richer last-known lobby (static overlays live on same keys).
  */
 export function pickNewerCurrentTrack(
   staticJson: CurrentTrackPayload | null,
   live: CurrentTrackPayload | null
 ): CurrentTrackPayload | null {
+  let result: CurrentTrackPayload | null;
+
   if (!live) {
     if (isServerStatusDebugEnabled()) {
       console.info('[server-status] pickNewerCurrentTrack -> static (no live)', {
@@ -182,62 +203,55 @@ export function pickNewerCurrentTrack(
         staticClients: staticJson?.info?.clients,
       });
     }
-    return staticJson;
-  }
-  if (!staticJson) {
+    result = staticJson;
+  } else if (!staticJson) {
     if (isServerStatusDebugEnabled()) {
       console.info('[server-status] pickNewerCurrentTrack -> live (no static)', {
         liveFetchedAt: live.fetchedAt,
         liveClients: live.info?.clients,
       });
     }
-    return live;
-  }
-  if (preferLiveServerSnapshotInMerge()) {
-    const tLive = live.track?.trim();
-    const tStatic = staticJson.track?.trim();
+    result = live;
+  } else {
+    const tLive = live.track?.trim() ?? '';
+    const tStatic = staticJson.track?.trim() ?? '';
     const liveInfo = parseAcServerInfo(live.info);
     const staticInfo = parseAcServerInfo(staticJson.info);
-    const info = mergeInfoWhenPreferringLiveSnapshot(liveInfo, staticInfo) ?? null;
-    if (live.online && !tLive && tStatic) {
-      const merged = { ...live, track: tStatic, info };
-      if (isServerStatusDebugEnabled()) {
-        console.info('[server-status] pickNewerCurrentTrack -> merged/live with static track', {
-          staticFetchedAt: staticJson.fetchedAt,
-          staticClients: staticInfo?.clients,
-          liveFetchedAt: live.fetchedAt,
-          liveClients: liveInfo?.clients,
-          finalClients: merged.info?.clients,
-        });
-      }
-      return merged;
+    const online = live.online;
+
+    let track = tLive;
+    if (online && !tLive && tStatic) {
+      track = tStatic;
+    } else if (!online && (tStatic || tLive)) {
+      track = tStatic || tLive;
     }
-    const merged = { ...live, info };
+
+    const info = online
+      ? mergeInfoWhenPreferringLiveSnapshot(liveInfo, staticInfo) ?? null
+      : mergeInfoStaticOverlayLive(liveInfo, staticInfo) ?? staticInfo ?? liveInfo ?? null;
+
+    result = {
+      ...live,
+      online,
+      fetchedAt: live.fetchedAt,
+      track,
+      info,
+    };
+
     if (isServerStatusDebugEnabled()) {
-      console.info('[server-status] pickNewerCurrentTrack -> merged/live', {
+      console.info('[server-status] pickNewerCurrentTrack -> merged', {
+        online,
+        track,
         staticFetchedAt: staticJson.fetchedAt,
-        staticClients: staticInfo?.clients,
         liveFetchedAt: live.fetchedAt,
-        liveClients: liveInfo?.clients,
-        finalClients: merged.info?.clients,
       });
     }
-    return merged;
   }
-  const chosen = parseTime(live.fetchedAt) >= parseTime(staticJson.fetchedAt) ? live : staticJson;
-  if (isServerStatusDebugEnabled()) {
-    console.info('[server-status] pickNewerCurrentTrack -> timestamp compare', {
-      staticFetchedAt: staticJson.fetchedAt,
-      staticClients: staticJson.info?.clients,
-      liveFetchedAt: live.fetchedAt,
-      liveClients: live.info?.clients,
-      finalClients: chosen.info?.clients,
-    });
-  }
-  return chosen;
+
+  return applyServerOfflineDebug(result);
 }
 
-/** Admin / loose JSON → vaste vorm voor merge. */
+/** Normalize admin / loose JSON into the merge payload shape. */
 export function toCurrentTrackPayload(row: {
   online?: boolean;
   track?: string;

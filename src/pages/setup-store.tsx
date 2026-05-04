@@ -88,13 +88,13 @@ export default function Page() {
                     Setup Store
                   </Typography>
                   <Typography color="text.secondary">
-                    Private preview for mod team feedback — mock listings until the store goes live.
+                    Setup hub for the team — real downloads are still on the way.
                   </Typography>
                   <Typography variant="body2" sx={{ color: 'rgba(147,197,253,0.92)', fontWeight: 700 }}>
-                    Preview · mock data
+                    Sample listings only
                   </Typography>
                   <Typography variant="caption" sx={{ ...HERO_FOOTNOTE_CAPTION_SX }}>
-                    Nothing here is tied to live race data; unlock below to browse placeholder setups and test layout.
+                    Not connected to live race data. Unlock below to try the layout and give feedback.
                   </Typography>
                 </Stack>
               </Box>
@@ -103,8 +103,8 @@ export default function Page() {
             <PreviewLock
               storageKey={SITE_PREVIEW.setupStore.storageKey}
               password={SITE_PREVIEW.setupStore.password}
-              title="Setup Store Preview Locked"
-              description="This section is in preview state with mock data."
+              title="Setup store — team access"
+              description="Enter the team password to browse the sample setup cards."
             >
               <Grid container spacing={2}>
                 {mockSetups.map((setup, i) => (
