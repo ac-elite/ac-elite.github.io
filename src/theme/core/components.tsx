@@ -4,7 +4,11 @@ import { varAlpha } from 'minimal-shared/utils';
 
 import SvgIcon from '@mui/material/SvgIcon';
 
-import { GLASS_SYNC_CYCLE_SEC, buttonGlassReflectPulse } from 'src/lib/glass';
+import {
+  buttonGlassReflectPulse,
+  GLASS_SYNC_CYCLE_SEC,
+  GLASS_SPECULAR_SWEEP_GRADIENT,
+} from 'src/lib/glass';
 
 // ----------------------------------------------------------------------
 
@@ -20,15 +24,14 @@ const buttonGlassSheenSx = {
     borderRadius: 'inherit',
     zIndex: 0,
     pointerEvents: 'none',
-    backgroundImage:
-      'linear-gradient(115deg, transparent 16%, rgba(255,255,255,0.07) 36%, rgba(255,255,255,0.24) 49.2%, rgba(191,225,255,0.32) 50%, rgba(255,255,255,0.18) 50.8%, rgba(255,255,255,0.06) 64%, transparent 84%)',
+    backgroundImage: GLASS_SPECULAR_SWEEP_GRADIENT,
     backgroundSize: '260% 260%',
     backgroundRepeat: 'no-repeat',
     mixBlendMode: 'soft-light',
     animation: `${buttonGlassReflectPulse} ${GLASS_SYNC_CYCLE_SEC}s ease-in-out infinite`,
     '@media (prefers-reduced-motion: reduce)': {
       animation: 'none',
-      opacity: 0.5,
+      opacity: 0.46,
       backgroundPosition: '48% 50%',
     },
   },

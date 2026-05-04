@@ -66,20 +66,27 @@ export const GLASS_INNER_SYNC_CYCLE_SEC = 7.5;
  */
 export const buttonGlassReflectPulse = keyframes`
   0%, 100% {
-    opacity: 0.48;
+    opacity: 0.4;
     background-position: 10% 42%;
   }
   50% {
-    opacity: 0.78;
+    opacity: 0.68;
     background-position: 90% 58%;
   }
 `;
 
-/** License / SR chips — same sheen + period as theme buttons ({@link GLASS_SYNC_CYCLE_SEC}). */
-export const GLASS_CHIP_SHEEN_SX: SxProps<Theme> = {
-  position: 'relative',
-  overflow: 'hidden',
-  isolation: 'isolate',
+/**
+ * Narrow specular band for the animated glass sweep (buttons, chips, medal panels): tight core
+ * (~49.4–50.6%) so it stays a glint, with enough alpha that the pulse reads clearly on soft-light.
+ */
+export const GLASS_SPECULAR_SWEEP_GRADIENT =
+  'linear-gradient(115deg, transparent 41%, rgba(255,255,255,0.042) 47%, rgba(255,255,255,0.14) 49.4%, rgba(191,225,255,0.2) 50%, rgba(255,255,255,0.12) 50.6%, rgba(255,255,255,0.042) 52.5%, transparent 58%)';
+
+/**
+ * Animated specular highlight (same timing as theme buttons).
+ * Merge onto panels that use `::before`; chips also set overflow/label z-index via {@link GLASS_CHIP_SHEEN_SX}.
+ */
+export const GLASS_SPECULAR_SWEEP_SX: SxProps<Theme> = {
   '&::before': {
     content: '""',
     position: 'absolute',
@@ -87,18 +94,25 @@ export const GLASS_CHIP_SHEEN_SX: SxProps<Theme> = {
     borderRadius: 'inherit',
     zIndex: 0,
     pointerEvents: 'none',
-    backgroundImage:
-      'linear-gradient(115deg, transparent 16%, rgba(255,255,255,0.07) 36%, rgba(255,255,255,0.24) 49.2%, rgba(191,225,255,0.32) 50%, rgba(255,255,255,0.18) 50.8%, rgba(255,255,255,0.06) 64%, transparent 84%)',
+    backgroundImage: GLASS_SPECULAR_SWEEP_GRADIENT,
     backgroundSize: '260% 260%',
     backgroundRepeat: 'no-repeat',
     mixBlendMode: 'soft-light',
     animation: `${buttonGlassReflectPulse} ${GLASS_SYNC_CYCLE_SEC}s ease-in-out infinite`,
     '@media (prefers-reduced-motion: reduce)': {
       animation: 'none',
-      opacity: 0.5,
+      opacity: 0.46,
       backgroundPosition: '48% 50%',
     },
   },
+};
+
+/** License / SR chips — same sheen + period as theme buttons ({@link GLASS_SYNC_CYCLE_SEC}). */
+export const GLASS_CHIP_SHEEN_SX: SxProps<Theme> = {
+  position: 'relative',
+  overflow: 'hidden',
+  isolation: 'isolate',
+  ...GLASS_SPECULAR_SWEEP_SX,
   '& .MuiChip-label, & .MuiChip-icon': {
     position: 'relative',
     zIndex: 1,

@@ -1,6 +1,6 @@
 import type { Theme, SxProps } from '@mui/material/styles';
 
-import { GLASS_CHIP_SHEEN_SX } from 'src/lib/glass';
+import { GLASS_CHIP_SHEEN_SX, GLASS_SPECULAR_SWEEP_SX } from 'src/lib/glass';
 
 export type CarLap = { laptime?: number; laps?: number; ts?: number };
 /** One driver row under a car id in `leaderboard.json` (e.g. per track). */
@@ -484,9 +484,6 @@ function withBadgeGlassHover(base: SxProps<Theme>): SxProps<Theme> {
         filter: 'brightness(1.08)',
         boxShadow:
           'inset 0 1px 0 rgba(255,255,255,0.48), 0 0 0 1px rgba(255,255,255,0.2), 0 10px 28px rgba(0,0,0,0.38), 0 0 20px rgba(255,255,255,0.14)',
-        '&::before': {
-          mixBlendMode: 'screen',
-        },
       },
     },
     '@media (prefers-reduced-motion: reduce)': {
@@ -549,14 +546,37 @@ export function getSRBadgeSx(tier: string): SxProps<Theme> {
   return withBadgeGlassHover(glass('#FB7185', '#FF1F2D', 'rgba(251,113,133,0.86)'));
 }
 
-/** Medal-style tinted panel for license tier — used on driver profile stat cards. */
-export function getLicensePanelSx(license: string): SxProps<Theme> {
-  const medal = (rgb: string, opacity = 0.38, borderOpacity = 0.85): SxProps<Theme> => ({
-    background: `linear-gradient(135deg, rgba(${rgb},${opacity}) 0%, rgba(${rgb},${opacity * 0.55}) 55%, rgba(${rgb},${opacity * 0.28}) 100%)`,
+/**
+ * Tier-tinted medal panel + static gloss layers + animated specular sweep ({@link GLASS_SPECULAR_SWEEP_SX}, same
+ * rhythm as license/SR chips).
+ */
+function medalPanelShinySx(rgb: string, opacity: number, borderOpacity: number): SxProps<Theme> {
+  const o = opacity;
+  const base = `linear-gradient(135deg, rgba(${rgb},${o}) 0%, rgba(${rgb},${o * 0.55}) 55%, rgba(${rgb},${o * 0.28}) 100%)`;
+  const topSheen = `linear-gradient(180deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.04) 24%, rgba(255,255,255,0) 46%)`;
+  const bottomDepth = `linear-gradient(180deg, rgba(0,0,0,0) 50%, rgba(0,0,0,0.16) 100%)`;
+  return {
+    background: `${topSheen}, ${bottomDepth}, ${base}`,
     border: `1.5px solid rgba(${rgb},${borderOpacity * 0.7})`,
     borderLeft: `3.5px solid rgba(${rgb},${borderOpacity})`,
-    boxShadow: `inset 0 1px 0 rgba(255,255,255,0.14), 0 0 18px rgba(${rgb},${opacity * 0.6}), 0 0 4px rgba(${rgb},${opacity * 0.35})`,
-  });
+    boxShadow: [
+      'inset 0 1px 0 rgba(255,255,255,0.28)',
+      'inset 0 -1px 0 rgba(0,0,0,0.14)',
+      `0 0 18px rgba(${rgb},${o * 0.6})`,
+      `0 0 4px rgba(${rgb},${o * 0.35})`,
+    ].join(', '),
+    ...GLASS_SPECULAR_SWEEP_SX,
+    '& > *': {
+      position: 'relative',
+      zIndex: 1,
+    },
+  };
+}
+
+/** Medal-style tinted panel for license tier — used on driver profile stat cards. */
+export function getLicensePanelSx(license: string): SxProps<Theme> {
+  const medal = (rgb: string, opacity = 0.38, borderOpacity = 0.85) =>
+    medalPanelShinySx(rgb, opacity, borderOpacity);
   const map: Record<string, SxProps<Theme>> = {
     Elite: medal('192,132,252', 0.42, 0.9),
     'Diamond+': medal('96,165,250', 0.4, 0.85),
@@ -576,12 +596,8 @@ export function getLicensePanelSx(license: string): SxProps<Theme> {
 
 /** Medal-style tinted panel for safety rating tier. */
 export function getSRPanelSx(tier: string): SxProps<Theme> {
-  const medal = (rgb: string, opacity = 0.38, borderOpacity = 0.85): SxProps<Theme> => ({
-    background: `linear-gradient(135deg, rgba(${rgb},${opacity}) 0%, rgba(${rgb},${opacity * 0.55}) 55%, rgba(${rgb},${opacity * 0.28}) 100%)`,
-    border: `1.5px solid rgba(${rgb},${borderOpacity * 0.7})`,
-    borderLeft: `3.5px solid rgba(${rgb},${borderOpacity})`,
-    boxShadow: `inset 0 1px 0 rgba(255,255,255,0.14), 0 0 18px rgba(${rgb},${opacity * 0.6}), 0 0 4px rgba(${rgb},${opacity * 0.35})`,
-  });
+  const medal = (rgb: string, opacity = 0.38, borderOpacity = 0.85) =>
+    medalPanelShinySx(rgb, opacity, borderOpacity);
   const first = tier.charAt(0);
   if (first === 'S') return medal('34,197,94', 0.42, 0.9);
   if (first === 'A') return medal('124,58,237', 0.4, 0.85);
