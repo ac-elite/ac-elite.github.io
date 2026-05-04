@@ -20,7 +20,7 @@ let visitIncrementInFlight = false;
  * so parallel tabs share the same throttle.
  */
 const PAGE_STAT_COOLDOWN_MS = 7_000;
-const PAGE_STAT_COOLDOWN_KEY = 'ace:site-page-stat-cooldown-v2';
+const PAGE_STAT_COOLDOWN_KEY_PREFIX = 'ace:site-page-stat-last-at:v3:';
 
 /**
  * In-memory fallback if localStorage is unavailable (private mode, blocked storage, etc.).
@@ -182,30 +182,26 @@ async function incrementSitePageOnly(statsPath: string): Promise<boolean> {
   return res.ok;
 }
 
-type PageStatCooldownState = Record<string, number>;
+function pageStatStorageKey(statsPath: string): string {
+  return `${PAGE_STAT_COOLDOWN_KEY_PREFIX}${encodeURIComponent(statsPath)}`;
+}
 
-function readPageStatCooldownState(): PageStatCooldownState {
-  if (typeof window === 'undefined') return {};
+function readLastPageStatAtMs(statsPath: string): number {
+  if (typeof window === 'undefined') return NaN;
   try {
-    const raw = localStorage.getItem(PAGE_STAT_COOLDOWN_KEY);
-    if (!raw) return {};
-    const parsed: unknown = JSON.parse(raw);
-    if (!parsed || typeof parsed !== 'object') return {};
-    const out: PageStatCooldownState = {};
-    for (const [k, v] of Object.entries(parsed as Record<string, unknown>)) {
-      if (typeof k !== 'string' || typeof v !== 'number' || !Number.isFinite(v)) continue;
-      out[k] = v;
-    }
-    return out;
+    const raw = localStorage.getItem(pageStatStorageKey(statsPath));
+    if (raw == null) return NaN;
+    const n = Number(raw);
+    return Number.isFinite(n) ? n : NaN;
   } catch {
-    return {};
+    return NaN;
   }
 }
 
-function writePageStatCooldownState(state: PageStatCooldownState): void {
+function writeLastPageStatAtMs(statsPath: string, nowMs: number): void {
   if (typeof window === 'undefined') return;
   try {
-    localStorage.setItem(PAGE_STAT_COOLDOWN_KEY, JSON.stringify(state));
+    localStorage.setItem(pageStatStorageKey(statsPath), String(nowMs));
   } catch {
     /* storage unavailable — in-memory fallback is still used */
   }
@@ -242,9 +238,8 @@ function canRecordPageStatNow(statsPath: string, nowMs: number): boolean {
     return false;
   }
 
-  const cooldownState = readPageStatCooldownState();
-  const last = cooldownState[statsPath];
-  if (typeof last === 'number' && nowMs - last < PAGE_STAT_COOLDOWN_MS) {
+  const last = readLastPageStatAtMs(statsPath);
+  if (Number.isFinite(last) && nowMs - last < PAGE_STAT_COOLDOWN_MS) {
     return false;
   }
 
@@ -253,18 +248,7 @@ function canRecordPageStatNow(statsPath: string, nowMs: number): boolean {
 
 function markPageStatRecorded(statsPath: string, nowMs: number): void {
   pageStatCooldownMemory.set(statsPath, nowMs);
-
-  const cooldownState = readPageStatCooldownState();
-  cooldownState[statsPath] = nowMs;
-
-  // Keep storage compact by dropping stale path entries.
-  for (const [path, ts] of Object.entries(cooldownState)) {
-    if (!Number.isFinite(ts) || nowMs - ts > PAGE_STAT_COOLDOWN_MS * 12) {
-      delete cooldownState[path];
-    }
-  }
-
-  writePageStatCooldownState(cooldownState);
+  writeLastPageStatAtMs(statsPath, nowMs);
 }
 
 /**

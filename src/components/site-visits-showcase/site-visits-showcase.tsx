@@ -126,6 +126,7 @@ function useAnimatedCount(target: number | undefined, run: boolean) {
  * Do not add `glassCardMotionSx` on this `Paper` — merge with the rim animation can break dev `String()` on this chunk.
  */
 export function SiteVisitsShowcase({ phase, count, configured, pageRows, onRefresh }: SiteVisitsShowcaseProps) {
+  const [showPageBreakdown, setShowPageBreakdown] = useState(false);
   const safeCount =
     typeof count === 'number' && Number.isFinite(count)
       ? count
@@ -271,67 +272,84 @@ export function SiteVisitsShowcase({ phase, count, configured, pageRows, onRefre
                   )}
                   {pageRows !== undefined && (
                     <Stack spacing={1}>
-                      <Typography variant="subtitle2" sx={{ fontWeight: 800 }}>
-                        Where people opened the site
-                      </Typography>
-                      {pageRows.length === 0 ? (
-                        <Typography variant="body2" sx={{ color: 'text.secondary', lineHeight: 1.55 }}>
-                          No breakdown by page yet. <strong>Moderators:</strong> you can ignore this — the big number
-                          above may still be correct. <strong>Tech team:</strong> run the latest{' '}
-                          <Box component="span" sx={{ fontFamily: 'ui-monospace, monospace', color: 'text.primary' }}>
-                            scripts/supabase-site-stats.sql
-                          </Box>{' '}
-                          in Supabase if you expect a list here.
+                      <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={1}>
+                        <Typography variant="subtitle2" sx={{ fontWeight: 800 }}>
+                          Where people opened the site
                         </Typography>
-                      ) : (
-                        <TableContainer
+                        <Button
+                          size="small"
+                          variant="text"
+                          onClick={() => setShowPageBreakdown((prev) => !prev)}
                           sx={{
-                            maxHeight: 280,
-                            borderRadius: 1,
-                            border: '1px solid rgba(148,163,184,0.14)',
-                            bgcolor: 'rgba(15,23,42,0.35)',
+                            minWidth: 0,
+                            px: 1,
+                            color: 'text.secondary',
+                            textTransform: 'none',
+                            fontWeight: 700,
                           }}
                         >
-                          <Table size="small" stickyHeader>
-                            <TableHead>
-                              <TableRow>
-                                <TableCell sx={{ fontWeight: 800, bgcolor: 'rgba(15,23,42,0.92)' }}>Site area</TableCell>
-                                <TableCell align="right" sx={{ fontWeight: 800, width: 120, bgcolor: 'rgba(15,23,42,0.92)' }}>
-                                  Count
-                                </TableCell>
-                              </TableRow>
-                            </TableHead>
-                            <TableBody>
-                              {pageRows.map((row) => (
-                                <TableRow key={row.path} hover>
-                                  <TableCell
-                                    sx={{
-                                      fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
-                                      fontSize: '0.78rem',
-                                      color: 'rgba(248,250,252,0.92)',
-                                      borderColor: 'rgba(148,163,184,0.12)',
-                                      wordBreak: 'break-all',
-                                    }}
-                                  >
-                                    {row.path}
-                                  </TableCell>
-                                  <TableCell
-                                    align="right"
-                                    sx={{
-                                      fontVariantNumeric: 'tabular-nums',
-                                      fontWeight: 800,
-                                      color: 'rgba(248,250,252,0.95)',
-                                      borderColor: 'rgba(148,163,184,0.12)',
-                                    }}
-                                  >
-                                    {fmt(row.visit_count)}
+                          {showPageBreakdown ? 'Hide' : 'Show'}
+                        </Button>
+                      </Stack>
+                      {showPageBreakdown &&
+                        (pageRows.length === 0 ? (
+                          <Typography variant="body2" sx={{ color: 'text.secondary', lineHeight: 1.55 }}>
+                            No breakdown by page yet. <strong>Moderators:</strong> you can ignore this — the big number
+                            above may still be correct. <strong>Tech team:</strong> run the latest{' '}
+                            <Box component="span" sx={{ fontFamily: 'ui-monospace, monospace', color: 'text.primary' }}>
+                              scripts/supabase-site-stats.sql
+                            </Box>{' '}
+                            in Supabase if you expect a list here.
+                          </Typography>
+                        ) : (
+                          <TableContainer
+                            sx={{
+                              maxHeight: 280,
+                              borderRadius: 1,
+                              border: '1px solid rgba(148,163,184,0.14)',
+                              bgcolor: 'rgba(15,23,42,0.35)',
+                            }}
+                          >
+                            <Table size="small" stickyHeader>
+                              <TableHead>
+                                <TableRow>
+                                  <TableCell sx={{ fontWeight: 800, bgcolor: 'rgba(15,23,42,0.92)' }}>Site area</TableCell>
+                                  <TableCell align="right" sx={{ fontWeight: 800, width: 120, bgcolor: 'rgba(15,23,42,0.92)' }}>
+                                    Count
                                   </TableCell>
                                 </TableRow>
-                              ))}
-                            </TableBody>
-                          </Table>
-                        </TableContainer>
-                      )}
+                              </TableHead>
+                              <TableBody>
+                                {pageRows.map((row) => (
+                                  <TableRow key={row.path} hover>
+                                    <TableCell
+                                      sx={{
+                                        fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
+                                        fontSize: '0.78rem',
+                                        color: 'rgba(248,250,252,0.92)',
+                                        borderColor: 'rgba(148,163,184,0.12)',
+                                        wordBreak: 'break-all',
+                                      }}
+                                    >
+                                      {row.path}
+                                    </TableCell>
+                                    <TableCell
+                                      align="right"
+                                      sx={{
+                                        fontVariantNumeric: 'tabular-nums',
+                                        fontWeight: 800,
+                                        color: 'rgba(248,250,252,0.95)',
+                                        borderColor: 'rgba(148,163,184,0.12)',
+                                      }}
+                                    >
+                                      {fmt(row.visit_count)}
+                                    </TableCell>
+                                  </TableRow>
+                                ))}
+                              </TableBody>
+                            </Table>
+                          </TableContainer>
+                        ))}
                     </Stack>
                   )}
                 </Stack>
