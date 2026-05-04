@@ -3,6 +3,7 @@ import { useMemo, useState, useEffect } from 'react';
 
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
+import Link from '@mui/material/Link';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import Table from '@mui/material/Table';
@@ -22,9 +23,9 @@ import TableContainer from '@mui/material/TableContainer';
 import { CONFIG } from 'src/config-global';
 import { fetchJson } from 'src/lib/fetch-json';
 import { getDriverProfileHref } from 'src/lib/routes';
-import { subtleRowEnterSx, glassCardMotionSx } from 'src/lib/subtle-motion';
 import { computeDeltas, type DriverDelta, fetchPrevRankData } from 'src/lib/delta';
 import { getSyncHealth, type SiteMetadata, getEffectiveLastSync } from 'src/lib/sync-utils';
+import { subtleRowEnterSx, glassCardMotionSx, softFloatWrapperSx } from 'src/lib/subtle-motion';
 import { brandAccentBorderSx, statusAccentBorderSx, statusAccentSplitRimSx } from 'src/lib/status-accent';
 import {
   DATA_PAGE_SHELL_SX,
@@ -196,18 +197,20 @@ export default function Page() {
 
         <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1 }}>
           <Stack spacing={3}>
-            <Box sx={{ ...GLASS_PANEL_SX, ...statusAccentBorderSx(syncHealth.color), ...statusAccentSplitRimSx(syncHealth.color), ...glassCardMotionSx(0) }}>
-              <Stack spacing={0.75} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: { xs: 'center', md: 'flex-start' } }}>
-                <Typography variant="h4" fontWeight={800}>
-                  Leaderboard
-                </Typography>
-                <Typography color="text.secondary">
-                  Track-based leaderboard for {CAR}. Click a driver to open the full profile.
-                </Typography>
-                <Typography variant="body2" sx={{ color: syncHealth.color, fontWeight: 700 }}>
-                  {syncHealth.label} · {syncHealth.ageText}
-                </Typography>
-              </Stack>
+            <Box sx={softFloatWrapperSx()}>
+              <Box sx={{ ...GLASS_PANEL_SX, ...statusAccentBorderSx(syncHealth.color), ...statusAccentSplitRimSx(syncHealth.color), ...glassCardMotionSx(0) }}>
+                <Stack spacing={0.75} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: { xs: 'center', md: 'flex-start' } }}>
+                  <Typography variant="h4" fontWeight={800}>
+                    Leaderboard
+                  </Typography>
+                  <Typography color="text.secondary">
+                    Track-based leaderboard for {CAR}. Click a driver to open the full profile.
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: syncHealth.color, fontWeight: 700 }}>
+                    {syncHealth.label} · {syncHealth.ageText}
+                  </Typography>
+                </Stack>
+              </Box>
             </Box>
 
             {loading && (
@@ -373,7 +376,17 @@ export default function Page() {
                                   }}
                                 />
                               </TableCell>
-                              <TableCell sx={{ fontWeight: 700 }}>{entry.name || driver.name || 'Unknown'}</TableCell>
+                              <TableCell sx={{ fontWeight: 700 }}>
+                                <Link
+                                  href={getDriverProfileHref(entry.guid)}
+                                  onClick={(e) => e.stopPropagation()}
+                                  underline="hover"
+                                  color="inherit"
+                                  sx={{ fontWeight: 700 }}
+                                >
+                                  {entry.name || driver.name || 'Unknown'}
+                                </Link>
+                              </TableCell>
                               <TableCell>
                                 <Stack direction="row" spacing={1} alignItems="center">
                                   <Chip

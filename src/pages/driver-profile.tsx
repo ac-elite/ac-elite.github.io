@@ -20,14 +20,21 @@ import { RouterLink } from 'src/routes/components';
 
 import { CONFIG } from 'src/config-global';
 import { fetchJson } from 'src/lib/fetch-json';
+import { SITE_TEAM_ROLES } from 'src/site-manual-config';
+import { getDiscordRolesForGuid } from 'src/lib/team-roles';
 import { getHomeHref, getLeaderboardTrackSearch } from 'src/lib/routes';
 import { BRAND_ACCENT, brandAccentBorderSx } from 'src/lib/status-accent';
-import { type TeamRoles, getDiscordRolesForGuid } from 'src/lib/team-roles';
 import { liveriesAssetUrl, getTeamLiveryMeta } from 'src/lib/driver-liveries';
 import { computeDeltas, type DriverDelta, fetchPrevRankData } from 'src/lib/delta';
 import { getSyncHealth, type SiteMetadata, getEffectiveLastSync } from 'src/lib/sync-utils';
 import { GLASS_PANEL_SX, GLASS_INNER_PANEL_SX, GLASS_TABLE_WRAPPER_SX } from 'src/lib/glass';
-import { subtleEnterUpSx, subtleRowEnterSx, glassCardMotionSx, glassCardEnterOnlySx } from 'src/lib/subtle-motion';
+import {
+  subtleEnterUpSx,
+  subtleRowEnterSx,
+  glassCardMotionSx,
+  softFloatWrapperSx,
+  glassCardEnterOnlySx,
+} from 'src/lib/subtle-motion';
 import {
   DATA_PAGE_SHELL_SX,
   ACTION_PRIMARY_SMALL_SX,
@@ -160,7 +167,7 @@ export default function Page() {
   const [error, setError] = useState<string | null>(null);
   const [rankData, setRankData] = useState<RankDriver[]>([]);
   const [leaderboardData, setLeaderboardData] = useState<Record<string, any>>({});
-  const [teamRoles, setTeamRoles] = useState<TeamRoles>({ creator: [], admin: [], moderator: [] });
+  const teamRoles = SITE_TEAM_ROLES;
   const [metadata, setMetadata] = useState<SiteMetadata>({});
   const [delta, setDelta] = useState<DriverDelta | null>(null);
   const [liveryShowcaseSections, setLiveryShowcaseSections] = useState<LiveryShowcaseSectionsFile | null>(null);
@@ -171,10 +178,9 @@ export default function Page() {
       setLoading(true);
       setError(null);
       try {
-        const [rank, leaderboard, roles, prevRank, meta, liverySectionsRaw] = await Promise.all([
+        const [rank, leaderboard, prevRank, meta, liverySectionsRaw] = await Promise.all([
           fetchJson<RankDriver[]>('/data/rank.json'),
           fetchJson<Record<string, any>>('/data/leaderboard.json'),
-          fetchJson<TeamRoles>('/data/team-roles.json'),
           fetchPrevRankData(),
           fetchJson<SiteMetadata>('/data/metadata.json').catch(() => ({})),
           fetchJson<LiveryShowcaseSectionsFile>('/data/livery-showcase-sections.json').catch(() => ({})),
@@ -182,7 +188,6 @@ export default function Page() {
         if (!mounted) return;
         setRankData(rank);
         setLeaderboardData(leaderboard);
-        setTeamRoles(roles);
         setMetadata(meta);
         setLiveryShowcaseSections(liverySectionsRaw && typeof liverySectionsRaw === 'object' ? liverySectionsRaw : {});
         const allDeltas = computeDeltas(rank, prevRank);
@@ -419,6 +424,7 @@ export default function Page() {
 
             {!loading && !error && driver && license && sr && (
               <>
+                <Box sx={softFloatWrapperSx()}>
                 <Paper sx={{ ...GLASS_PANEL_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(0), textAlign: { xs: 'center', md: 'left' } }}>
                   <Stack spacing={1.5} sx={{ width: 1 }}>
                     <Box sx={driverSeasonHeaderBandSx}>
@@ -697,6 +703,7 @@ export default function Page() {
                     </Box>
                   </Stack>
                 </Paper>
+                </Box>
 
                 <Paper
                   sx={{

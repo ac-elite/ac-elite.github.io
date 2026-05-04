@@ -73,10 +73,24 @@ jobs:
           cp "$SRC" "$DEST"
           echo "Created 24h snapshot from rank.json"
 
+          META="public/data/metadata.json"
+          if [ -f "$META" ]; then
+            node -e "
+              const fs = require('fs');
+              const p = 'public/data/metadata.json';
+              const m = JSON.parse(fs.readFileSync(p, 'utf8'));
+              m.rank24hSnapshotAt = new Date().toISOString();
+              fs.writeFileSync(p, JSON.stringify(m, null, 2) + '\n');
+            "
+            echo "Stamped rank24hSnapshotAt in metadata.json"
+          else
+            echo "Warning: metadata.json missing; rank-24h freshness will stay unknown until metadata exists"
+          fi
+
       - name: Commit and push snapshot
         if: steps.guard.outputs.run == 'true'
         run: |
-          git add public/data/rank-24h.json
+          git add public/data/rank-24h.json public/data/metadata.json
 
           if git diff --staged --quiet; then
             echo "No changes to commit"

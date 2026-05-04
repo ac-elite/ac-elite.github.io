@@ -75,6 +75,18 @@ jobs:
               }
           }
 
+          function readRank24hSnapshotAt(dataDir) {
+              const metaPath = path.join(dataDir, 'metadata.json');
+              try {
+                  if (!fs.existsSync(metaPath)) return undefined;
+                  const prev = JSON.parse(fs.readFileSync(metaPath, 'utf8'));
+                  const v = prev && typeof prev.rank24hSnapshotAt === 'string' ? prev.rank24hSnapshotAt.trim() : '';
+                  return v || undefined;
+              } catch {
+                  return undefined;
+              }
+          }
+
           async function syncData() {
               const client = new ftp.Client();
               client.ftp.verbose = false;
@@ -84,6 +96,7 @@ jobs:
               if (!fs.existsSync(dataDir)) {
                   fs.mkdirSync(dataDir, { recursive: true });
               }
+              const preservedRank24hAt = readRank24hSnapshotAt(dataDir);
               
               try {
                   console.log('Connecting to FTP server...');
@@ -110,10 +123,11 @@ jobs:
                       throw new Error('leaderboard.json must contain a JSON object');
                   }
 
-                  // Create metadata file with sync timestamp
+                  // Create metadata file with sync timestamp (preserve daily snapshot stamp)
                   const metadata = {
                       lastSync: new Date().toISOString(),
-                      status: 'success'
+                      status: 'success',
+                      ...(preservedRank24hAt ? { rank24hSnapshotAt: preservedRank24hAt } : {})
                   };
                   fs.writeFileSync(
                       path.join(dataDir, 'metadata.json'),
@@ -124,11 +138,12 @@ jobs:
               } catch (err) {
                   console.error('Sync failed:', err.message);
                   
-                  // Create error metadata
+                  // Create error metadata (preserve daily snapshot stamp when possible)
                   const metadata = {
                       lastSync: new Date().toISOString(),
                       status: 'error',
-                      error: err.message
+                      error: err.message,
+                      ...(preservedRank24hAt ? { rank24hSnapshotAt: preservedRank24hAt } : {})
                   };
                   fs.writeFileSync(
                       path.join(dataDir, 'metadata.json'),

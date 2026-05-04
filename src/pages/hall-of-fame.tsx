@@ -13,10 +13,10 @@ import { CONFIG } from 'src/config-global';
 import { fetchJson } from 'src/lib/fetch-json';
 import { getDriverProfileHref } from 'src/lib/routes';
 import { DATA_PAGE_SHELL_SX } from 'src/lib/page-shell';
+import { SITE_TEAM_ROLES } from 'src/site-manual-config';
 import { GLASS_PANEL_SX, GLASS_INNER_ROW_SX } from 'src/lib/glass';
-import { type TeamRoles, EMPTY_TEAM_ROLES } from 'src/lib/team-roles';
 import { getSyncHealth, type SiteMetadata, getEffectiveLastSync } from 'src/lib/sync-utils';
-import { subtleEnterUpSx, glassCardMotionSx, subtleEnterOnceSx } from 'src/lib/subtle-motion';
+import { subtleEnterUpSx, glassCardMotionSx, subtleEnterOnceSx, softFloatWrapperSx } from 'src/lib/subtle-motion';
 import { BRAND_ACCENT, brandAccentBorderSx, statusAccentBorderSx, statusAccentSplitRimSx } from 'src/lib/status-accent';
 import {
   CAR,
@@ -95,6 +95,7 @@ function CategoryCard({
               sx={{
                 ...GLASS_INNER_ROW_SX,
                 ...subtleEnterUpSx(index, { baseDelayMs: 320 + enterIndex * 36 }),
+                cursor: 'pointer',
               }}
             >
               <Stack spacing={0.8}>
@@ -251,6 +252,7 @@ function TeamRoleColumn({
             sx={{
               ...GLASS_INNER_ROW_SX,
               ...subtleEnterUpSx(mi, { baseDelayMs: 380 }),
+              cursor: 'pointer',
             }}
           >
             <Typography variant="subtitle2" sx={{ fontWeight: 700, textAlign: { xs: 'center', md: 'left' } }}>
@@ -294,7 +296,7 @@ export default function Page() {
   const [error, setError] = useState<string | null>(null);
   const [drivers, setDrivers] = useState<RankDriver[]>([]);
   const [metadata, setMetadata] = useState<SiteMetadata>({});
-  const [teamRoles, setTeamRoles] = useState<TeamRoles>(EMPTY_TEAM_ROLES);
+  const teamRoles = SITE_TEAM_ROLES;
 
   useEffect(() => {
     let mounted = true;
@@ -302,14 +304,12 @@ export default function Page() {
       setLoading(true);
       setError(null);
       try {
-        const [rank, roles, meta] = await Promise.all([
+        const [rank, meta] = await Promise.all([
           fetchJson<RankDriver[]>('/data/rank.json'),
-          fetchJson<TeamRoles>('/data/team-roles.json'),
           fetchJson<SiteMetadata>('/data/metadata.json').catch(() => ({})),
         ]);
         if (!mounted) return;
         setDrivers(rank);
-        setTeamRoles(roles);
         setMetadata(meta);
       } catch (e) {
         if (!mounted) return;
@@ -485,18 +485,20 @@ export default function Page() {
 
         <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1 }}>
           <Stack spacing={3}>
-            <Box sx={{ ...GLASS_PANEL_SX, ...statusAccentBorderSx(syncHealth.color), ...statusAccentSplitRimSx(syncHealth.color), ...glassCardMotionSx(0) }}>
-              <Stack spacing={0.75} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: { xs: 'center', md: 'flex-start' } }}>
-                <Typography variant="h4" fontWeight={800}>
-                  Hall of Fame
-                </Typography>
-                <Typography color="text.secondary">
-                  Standout drivers, iconic stats, and the AC Elite team behind the community.
-                </Typography>
-                <Typography variant="body2" sx={{ color: syncHealth.color, fontWeight: 700 }}>
-                  {syncHealth.label} · {syncHealth.ageText}
-                </Typography>
-              </Stack>
+            <Box sx={softFloatWrapperSx()}>
+              <Box sx={{ ...GLASS_PANEL_SX, ...statusAccentBorderSx(syncHealth.color), ...statusAccentSplitRimSx(syncHealth.color), ...glassCardMotionSx(0) }}>
+                <Stack spacing={0.75} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: { xs: 'center', md: 'flex-start' } }}>
+                  <Typography variant="h4" fontWeight={800}>
+                    Hall of Fame
+                  </Typography>
+                  <Typography color="text.secondary">
+                    Standout drivers, iconic stats, and the AC Elite team behind the community.
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: syncHealth.color, fontWeight: 700 }}>
+                    {syncHealth.label} · {syncHealth.ageText}
+                  </Typography>
+                </Stack>
+              </Box>
             </Box>
 
             {loading && (

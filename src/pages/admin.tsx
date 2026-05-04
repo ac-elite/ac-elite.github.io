@@ -18,16 +18,17 @@ import TableContainer from '@mui/material/TableContainer';
 import { CONFIG } from 'src/config-global';
 import { fetchJson } from 'src/lib/fetch-json';
 import { getSyncHealth } from 'src/lib/sync-utils';
-import { glassCardMotionSx } from 'src/lib/subtle-motion';
+import { SITE_PREVIEW } from 'src/site-manual-config';
 import { formatNumber, getTrackDisplayName } from 'src/lib/ac-elite-data';
+import { glassCardMotionSx, softFloatWrapperSx } from 'src/lib/subtle-motion';
 import { fetchSiteVisitCount, isSiteVisitsConfigured } from 'src/lib/site-visits';
-import { STATUS_ACCENT, brandAccentBorderSx, statusAccentBorderSx, statusAccentSplitRimSx } from 'src/lib/status-accent';
 import {
   GLASS_CARD_SX,
   GLASS_PANEL_SX,
   GLASS_INNER_PANEL_SX,
   GLASS_PANEL_COMPACT_SX,
 } from 'src/lib/glass';
+import { STATUS_ACCENT, brandAccentBorderSx, statusAccentBorderSx, statusAccentSplitRimSx } from 'src/lib/status-accent';
 import {
   DATA_PAGE_SHELL_SX,
   TABLE_HEAD_MUTED_COLOR,
@@ -36,12 +37,13 @@ import {
   ADMIN_EXTERNAL_LINK_OUTLINED_SX,
 } from 'src/lib/page-shell';
 import {
-  AC_SESSION_TYPE_RACE,
   acSessionTypeLabel,
+  AC_SESSION_TYPE_RACE,
   acCurrentSessionLabel,
   formatTimeLeftSeconds,
   formatSessionDurationsLine,
   sanitizeServerLobbyDisplayName,
+  shouldAppendReversedGridRaceHint,
 } from 'src/lib/server-info';
 import {
   pickNewerCurrentTrack,
@@ -57,9 +59,6 @@ import { PreviewLock } from 'src/components/preview-lock/preview-lock';
 import { PageGridOverlay } from 'src/components/page-background/page-grid-overlay';
 import { SiteVisitsShowcase } from 'src/components/site-visits-showcase/site-visits-showcase';
 
-/** Preview gate (client-side only; edit here to rotate the admin preview password). */
-const ADMIN_PREVIEW_PASSWORD = 'acelite-mod-team';
-
 /** Public site + repo (same URLs as elsewhere in the project). */
 const TEAM_PUBLIC_SITE = 'https://ac-elite.github.io/';
 const TEAM_GITHUB_REPO = 'https://github.com/ac-elite/ac-elite.github.io';
@@ -71,7 +70,7 @@ const TEAM_GAME_SERVER_JOIN =
 // Types for fetched data
 // ---------------------------------------------------------------------------
 
-type MetadataData = { lastSync?: string; status?: string };
+type MetadataData = { lastSync?: string; status?: string; rank24hSnapshotAt?: string };
 type CurrentTrackData = CurrentTrackPayload;
 type AceSkinPackData = { generatedAt?: string; entries?: unknown[] };
 type LiverySectionsData = { officialPack?: boolean; aceSkinPack?: boolean; teamLiveries?: boolean };
@@ -225,8 +224,11 @@ const DATA_FILES: readonly DataFileEntry[] = [
   {
     file: 'rank-24h.json',
     updatedBy: 'Daily Rank Snapshot',
-    getTimestamp: () => undefined,
-    getNote: () => 'snapshot: see git log',
+    getTimestamp: (s) => s.metadata?.rank24hSnapshotAt,
+    getNote: (s) =>
+      s.metadata?.rank24hSnapshotAt
+        ? 'metadata.rank24hSnapshotAt (Daily Rank Snapshot; preserved when KMR sync rewrites metadata)'
+        : 'set automatically on next snapshot run after workflow update',
   },
   {
     file: 'leaderboard.json',
@@ -234,9 +236,10 @@ const DATA_FILES: readonly DataFileEntry[] = [
     getTimestamp: (s) => s.metadata?.lastSync,
   },
   {
-    file: 'team-roles.json',
-    updatedBy: 'Sync KMR Data',
-    getTimestamp: (s) => s.metadata?.lastSync,
+    file: 'site-manual-config.ts',
+    updatedBy: 'Manual edit (repo)',
+    getTimestamp: () => undefined,
+    getNote: () => 'Team roles + preview passwords; bundled at build',
   },
   {
     file: 'ace-skin-pack.json',
@@ -392,18 +395,31 @@ function buildAdminServerInfoRows(ct: CurrentTrackPayload | null): { label: stri
   rows.push({ label: 'Session index', value: fmtAdminScalar(info.session) });
   rows.push({ label: 'Current phase', value: acCurrentSessionLabel(info) });
   rows.push({ label: 'Time left', value: formatAdminTimeleft(info.timeleft) });
+  const scheduleHints = {
+    inverted: typeof info.inverted === 'number' ? info.inverted : undefined,
+    lobbyName: typeof info.name === 'string' ? info.name : undefined,
+  };
   rows.push({
     label: 'Schedule (short)',
-    value: formatSessionDurationsLine(info.sessiontypes, info.durations, info.timed) ?? '—',
+    value: formatSessionDurationsLine(info.sessiontypes, info.durations, info.timed, scheduleHints) ?? '—',
   });
 
   if (Array.isArray(info.sessiontypes) && Array.isArray(info.durations)) {
     const n = Math.min(info.sessiontypes.length, info.durations.length);
     const parts: string[] = [];
+    const doubleRevRace = shouldAppendReversedGridRaceHint(info.sessiontypes, info.timed, scheduleHints);
     for (let i = 0; i < n; i += 1) {
       const typeId = info.sessiontypes[i];
-      const unit = typeId === AC_SESSION_TYPE_RACE && info.timed === false ? 'laps' : 'min';
-      parts.push(`${acSessionTypeLabel(typeId)}: ${fmtAdminScalar(info.durations[i])} ${unit}`);
+      const isRaceLaps = typeId === AC_SESSION_TYPE_RACE && info.timed === false;
+      if (isRaceLaps && doubleRevRace) {
+        const rawLaps = info.durations[i];
+        const per = typeof rawLaps === 'number' ? rawLaps : Number(rawLaps);
+        const lapWord = Number.isFinite(per) && per === 1 ? 'lap' : 'laps';
+        parts.push(`Race: 2×${fmtAdminScalar(rawLaps)} ${lapWord} (rev grid)`);
+      } else {
+        const unit = typeId === AC_SESSION_TYPE_RACE && info.timed === false ? 'laps' : 'min';
+        parts.push(`${acSessionTypeLabel(typeId)}: ${fmtAdminScalar(info.durations[i])} ${unit}`);
+      }
     }
     if (parts.length) rows.push({ label: 'Durations (per type)', value: parts.join(' · ') });
   }
@@ -584,24 +600,26 @@ export default function Page() {
 
         <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1 }}>
           <Stack spacing={3}>
-            <Box sx={{ ...GLASS_PANEL_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(0) }}>
-              <Stack spacing={0.75} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: { xs: 'center', md: 'flex-start' } }}>
-                <Typography variant="h4" fontWeight={800}>
-                  Admin Panel
-                </Typography>
-                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                  Internal overview for moderators and admins — schedules, data freshness, and site status at a glance.
-                </Typography>
-                <Typography variant="caption" sx={{ ...HERO_FOOTNOTE_CAPTION_SX, maxWidth: 720 }}>
-                  Live KMR sync and server snapshot cards are directly below, then workflow schedule, file freshness (incl.
-                  current-track.json vs Supabase), and team shortcuts.
-                </Typography>
-              </Stack>
+            <Box sx={softFloatWrapperSx()}>
+              <Box sx={{ ...GLASS_PANEL_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(0) }}>
+                <Stack spacing={0.75} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: { xs: 'center', md: 'flex-start' } }}>
+                  <Typography variant="h4" fontWeight={800}>
+                    Admin Panel
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                    Internal overview for moderators and admins — schedules, data freshness, and site status at a glance.
+                  </Typography>
+                  <Typography variant="caption" sx={{ ...HERO_FOOTNOTE_CAPTION_SX, maxWidth: 720 }}>
+                    Live KMR sync and server snapshot cards are directly below, then workflow schedule, file freshness (incl.
+                    current-track.json vs Supabase), and team shortcuts.
+                  </Typography>
+                </Stack>
+              </Box>
             </Box>
 
             <PreviewLock
-              storageKey="acelite-preview-admin-panel"
-              password={ADMIN_PREVIEW_PASSWORD}
+              storageKey={SITE_PREVIEW.adminPanel.storageKey}
+              password={SITE_PREVIEW.adminPanel.password}
               title="Admin Panel Locked"
               description="Use the internal preview password to access operational dashboards."
             >
@@ -1366,9 +1384,9 @@ export default function Page() {
                             sx={{ color: 'text.secondary', lineHeight: 1.65, maxWidth: 520 }}
                           >
                             <Box component="code" sx={TEAM_HUB_INLINE_CODE_SX}>
-                              team-roles.json
+                              src/site-manual-config.ts
                             </Box>{' '}
-                            is not part of the FTP sync. Update it in the repo when Discord roles change.
+                            holds team GUID lists and preview passwords; edit in the repo when roles or gates change.
                           </Typography>
                         </Box>
                       </Stack>

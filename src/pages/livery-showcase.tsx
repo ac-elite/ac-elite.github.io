@@ -14,9 +14,9 @@ import { RouterLink } from 'src/routes/components';
 import { CONFIG } from 'src/config-global';
 import { fetchJson } from 'src/lib/fetch-json';
 import { getDriverProfileHref } from 'src/lib/routes';
-import { glassCardMotionSx } from 'src/lib/subtle-motion';
 import { getSyncHealth, type SiteMetadata } from 'src/lib/sync-utils';
 import { ACE_SKIN_PACK_DOWNLOAD_URL } from 'src/lib/ace-skin-pack-download';
+import { glassCardMotionSx, softFloatWrapperSx } from 'src/lib/subtle-motion';
 import { GLASS_PANEL_SX, GLASS_PANEL_TIGHT_SX, GLASS_INNER_PANEL_SX } from 'src/lib/glass';
 import { liveriesAssetUrl, promoLiveryAssetUrl, TEAM_LIVERY_ENTRIES } from 'src/lib/driver-liveries';
 import { brandAccentBorderSx, statusAccentBorderSx, statusAccentSplitRimSx } from 'src/lib/status-accent';
@@ -296,26 +296,28 @@ export default function Page() {
 
         <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1 }}>
           <Stack spacing={3}>
-            <Box
-              sx={{
-                ...GLASS_PANEL_SX,
-                ...statusAccentBorderSx(syncHealth.color),
-                ...statusAccentSplitRimSx(syncHealth.color),
-                ...glassCardMotionSx(0),
-              }}
-            >
-              <Stack spacing={0.75} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: { xs: 'center', md: 'flex-start' } }}>
-                <Typography variant="h4" fontWeight={800}>
-                  Livery Showcase
-                </Typography>
-                <Typography color="text.secondary">{showcaseCopy.heroSubtitle}</Typography>
-                <Typography variant="body2" sx={{ color: syncHealth.color, fontWeight: 700 }}>
-                  {syncHealth.label} · {syncHealth.ageText}
-                </Typography>
-                <Typography variant="caption" sx={{ ...HERO_FOOTNOTE_CAPTION_SX }}>
-                  Click any image for a full-size view.
-                </Typography>
-              </Stack>
+            <Box sx={softFloatWrapperSx()}>
+              <Box
+                sx={{
+                  ...GLASS_PANEL_SX,
+                  ...statusAccentBorderSx(syncHealth.color),
+                  ...statusAccentSplitRimSx(syncHealth.color),
+                  ...glassCardMotionSx(0),
+                }}
+              >
+                <Stack spacing={0.75} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: { xs: 'center', md: 'flex-start' } }}>
+                  <Typography variant="h4" fontWeight={800}>
+                    Livery Showcase
+                  </Typography>
+                  <Typography color="text.secondary">{showcaseCopy.heroSubtitle}</Typography>
+                  <Typography variant="body2" sx={{ color: syncHealth.color, fontWeight: 700 }}>
+                    {syncHealth.label} · {syncHealth.ageText}
+                  </Typography>
+                  <Typography variant="caption" sx={{ ...HERO_FOOTNOTE_CAPTION_SX }}>
+                    Click any image for a full-size view.
+                  </Typography>
+                </Stack>
+              </Box>
             </Box>
 
             <Stack spacing={3}>

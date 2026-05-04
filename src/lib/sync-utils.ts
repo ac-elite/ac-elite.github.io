@@ -6,6 +6,8 @@ export type SiteMetadata = {
   lastSync?: string;
   status?: string;
   error?: string;
+  /** Set when Daily Rank Snapshot commits `rank-24h.json` (ISO 8601). Preserved across KMR syncs. */
+  rank24hSnapshotAt?: string;
 };
 
 export type SyncHealthLabel = 'Live' | 'Delayed' | 'Stale' | 'Unknown';

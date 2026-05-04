@@ -3,6 +3,7 @@ import { useMemo, useState, useEffect } from 'react';
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
 import Grid from '@mui/material/Grid';
+import Link from '@mui/material/Link';
 import List from '@mui/material/List';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
@@ -24,18 +25,19 @@ import { useTheme, keyframes } from '@mui/material/styles';
 import { CONFIG } from 'src/config-global';
 import { fetchJson } from 'src/lib/fetch-json';
 import { getDriverProfileHref } from 'src/lib/routes';
+import { SITE_TEAM_ROLES } from 'src/site-manual-config';
 import { ACE_SKIN_PACK_DOWNLOAD_URL } from 'src/lib/ace-skin-pack-download';
 import { computeDeltas, type DriverDelta, fetchPrevRankData } from 'src/lib/delta';
+import { getTeamRole, type TeamRole, teamRoleToDiscordRole } from 'src/lib/team-roles';
 import { brandAccentBorderSx, statusAccentBorderSx, statusAccentSplitRimSx } from 'src/lib/status-accent';
 import { getSyncHealth, type SyncHealth, type SiteMetadata, getEffectiveLastSync } from 'src/lib/sync-utils';
-import { subtleEnterUpSx, subtleRowEnterSx, glassCardMotionSx, subtleEnterOnceSx } from 'src/lib/subtle-motion';
 import {
-  getTeamRole,
-  type TeamRole,
-  type TeamRoles,
-  EMPTY_TEAM_ROLES,
-  teamRoleToDiscordRole,
-} from 'src/lib/team-roles';
+  subtleEnterUpSx,
+  subtleRowEnterSx,
+  glassCardMotionSx,
+  subtleEnterOnceSx,
+  softFloatWrapperSx,
+} from 'src/lib/subtle-motion';
 import {
   DATA_PAGE_SHELL_SX,
   PAGINATION_NAV_BUTTON_SX,
@@ -292,16 +294,17 @@ function HeroSection({
 
           <Grid size={{ xs: 12, md: 5 }}>
             <Stack spacing={2}>
-              <Box
-                sx={{
-                  ...GLASS_PANEL_SX,
-                  ...statusAccentBorderSx(syncStatus.color),
-                  ...statusAccentSplitRimSx(syncStatus.color),
-                  textAlign: { xs: 'center', md: 'left' },
-                  ...glassCardMotionSx(1),
-                }}
-              >
-                <Stack spacing={2}>
+              <Box sx={softFloatWrapperSx({ alternatePhase: true })}>
+                <Box
+                  sx={{
+                    ...GLASS_PANEL_SX,
+                    ...statusAccentBorderSx(syncStatus.color),
+                    ...statusAccentSplitRimSx(syncStatus.color),
+                    textAlign: { xs: 'center', md: 'left' },
+                    ...glassCardMotionSx(1),
+                  }}
+                >
+                  <Stack spacing={2}>
                   <Box>
                     <Typography
                       variant="overline"
@@ -362,6 +365,7 @@ function HeroSection({
                     ))}
                   </Grid>
                 </Stack>
+                </Box>
               </Box>
 
             </Stack>
@@ -552,7 +556,17 @@ function CurrentTrackLeaderboardSection({
                             }}
                           />
                         </TableCell>
-                        <TableCell sx={{ fontWeight: 700 }}>{entry.name || driver.name || 'Unknown'}</TableCell>
+                        <TableCell sx={{ fontWeight: 700 }}>
+                          <Link
+                            href={getDriverProfileHref(entry.guid)}
+                            onClick={(e) => e.stopPropagation()}
+                            underline="hover"
+                            color="inherit"
+                            sx={{ fontWeight: 700 }}
+                          >
+                            {entry.name || driver.name || 'Unknown'}
+                          </Link>
+                        </TableCell>
                         <TableCell>
                           <Stack direction="row" spacing={1} alignItems="center">
                             <Chip
@@ -796,7 +810,16 @@ function DriverSearchSection({
                             sx={{ width: '100%', m: 0 }}
                             primary={
                               <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" sx={{ width: '100%' }}>
-                                <Typography variant="body2">{driver.name}</Typography>
+                                <Link
+                                  href={getDriverProfileHref(driver.guid)}
+                                  onClick={(e) => e.stopPropagation()}
+                                  underline="hover"
+                                  color="inherit"
+                                  variant="body2"
+                                  sx={{ fontWeight: 400 }}
+                                >
+                                  {driver.name}
+                                </Link>
                                 {driver.teamRole && teamRoleToDiscordRole(driver.teamRole) && (
                                   <Chip
                                     size="small"
@@ -851,7 +874,7 @@ export default function Page() {
   const [rankData, setRankData] = useState<RankDriver[]>([]);
   const [leaderboardData, setLeaderboardData] = useState<Record<string, any>>({});
   const [deltas, setDeltas] = useState<Map<string, DriverDelta>>(new Map());
-  const [teamRoles, setTeamRoles] = useState<TeamRoles>(EMPTY_TEAM_ROLES);
+  const teamRoles = SITE_TEAM_ROLES;
   const [metadata, setMetadata] = useState<SiteMetadata>({});
   const [currentTrack, setCurrentTrack] = useState<CurrentTrackData | null>(null);
   const [currentTrackPage, setCurrentTrackPage] = useState(1);
@@ -879,10 +902,9 @@ export default function Page() {
       setLoading(true);
       setError(null);
       try {
-        const [rank, leaderboard, roles, meta, prevRank] = await Promise.all([
+        const [rank, leaderboard, meta, prevRank] = await Promise.all([
           fetchJson<RankDriver[]>('/data/rank.json'),
           fetchJson<Record<string, any>>('/data/leaderboard.json'),
-          fetchJson<TeamRoles>('/data/team-roles.json'),
           fetchJson<SiteMetadata>('/data/metadata.json'),
           fetchPrevRankData(),
         ]);
@@ -891,7 +913,6 @@ export default function Page() {
         setRankData(rank);
         setLeaderboardData(leaderboard);
         setDeltas(computeDeltas(rank, prevRank));
-        setTeamRoles(roles);
         setMetadata(meta);
       } catch (e) {
         if (!mounted) return;

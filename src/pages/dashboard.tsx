@@ -4,6 +4,7 @@ import { useMemo, useState, useEffect } from 'react';
 
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
+import Link from '@mui/material/Link';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import Skeleton from '@mui/material/Skeleton';
@@ -13,15 +14,16 @@ import Typography from '@mui/material/Typography';
 import { CONFIG } from 'src/config-global';
 import { fetchJson } from 'src/lib/fetch-json';
 import { DATA_PAGE_SHELL_SX } from 'src/lib/page-shell';
-import { subtleEnterUpSx, glassCardMotionSx } from 'src/lib/subtle-motion';
+import { getLeaderboardHref, getDriverProfileHref } from 'src/lib/routes';
 import { GLASS_CARD_SX, GLASS_PANEL_SX, GLASS_CARD_INNER_SX } from 'src/lib/glass';
 import { getSyncHealth, type SiteMetadata, getEffectiveLastSync } from 'src/lib/sync-utils';
-import { brandAccentBorderSx, statusAccentBorderSx, statusAccentSplitRimSx } from 'src/lib/status-accent';
+import { subtleEnterUpSx, glassCardMotionSx, softFloatWrapperSx } from 'src/lib/subtle-motion';
 import {
   formatSignedKm,
   fetchPrevRankData,
   computeCommunitySnapshotDelta,
 } from 'src/lib/delta';
+import { brandAccentBorderSx, statusAccentBorderSx, statusAccentSplitRimSx } from 'src/lib/status-accent';
 import { CAR, formatNumber, formatLaptime, type RankDriver, getTrackDisplayName } from 'src/lib/ac-elite-data';
 
 import { ErrorPanel, LoadingPanel } from 'src/components/data-state';
@@ -174,37 +176,39 @@ export default function Page() {
 
       <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1 }}>
         <Stack spacing={3}>
-          <Box sx={{ ...GLASS_PANEL_SX, ...statusAccentBorderSx(syncHealth.color), ...statusAccentSplitRimSx(syncHealth.color), ...glassCardMotionSx(0) }}>
-            <Stack spacing={0.75} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: { xs: 'center', md: 'flex-start' } }}>
-              <Typography variant="h4" fontWeight={800}>
-                Stats
-              </Typography>
-              <Typography color="text.secondary">
-                Community-wide totals for drivers, tracks, laps, and distance.
-              </Typography>
-              <Typography variant="body2" sx={{ color: syncHealth.color, fontWeight: 700 }}>
-                {syncHealth.label} · {syncHealth.ageText}
-              </Typography>
-              {communityDelta.hasBaseline ? (
-                <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 720 }}>
-                  vs daily snapshot:{' '}
-                  <Box component="span" sx={{ fontWeight: 700, color: 'rgba(255,255,255,0.92)' }}>
-                    {formatSignedKm(communityDelta.deltaKm)} km
-                  </Box>{' '}
-                  community-wide
-                  {communityDelta.newDrivers > 0 ? (
-                    <>
-                      {' '}
-                      ·{' '}
-                      <Box component="span" sx={{ fontWeight: 700, color: 'rgba(255,255,255,0.92)' }}>
-                        +{communityDelta.newDrivers}
-                      </Box>{' '}
-                      new driver{communityDelta.newDrivers === 1 ? '' : 's'}
-                    </>
-                  ) : null}
+          <Box sx={softFloatWrapperSx()}>
+            <Box sx={{ ...GLASS_PANEL_SX, ...statusAccentBorderSx(syncHealth.color), ...statusAccentSplitRimSx(syncHealth.color), ...glassCardMotionSx(0) }}>
+              <Stack spacing={0.75} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: { xs: 'center', md: 'flex-start' } }}>
+                <Typography variant="h4" fontWeight={800}>
+                  Stats
                 </Typography>
-              ) : null}
-            </Stack>
+                <Typography color="text.secondary">
+                  Community-wide totals for drivers, tracks, laps, and distance.
+                </Typography>
+                <Typography variant="body2" sx={{ color: syncHealth.color, fontWeight: 700 }}>
+                  {syncHealth.label} · {syncHealth.ageText}
+                </Typography>
+                {communityDelta.hasBaseline ? (
+                  <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 720 }}>
+                    vs daily snapshot:{' '}
+                    <Box component="span" sx={{ fontWeight: 700, color: 'rgba(255,255,255,0.92)' }}>
+                      {formatSignedKm(communityDelta.deltaKm)} km
+                    </Box>{' '}
+                    community-wide
+                    {communityDelta.newDrivers > 0 ? (
+                      <>
+                        {' '}
+                        ·{' '}
+                        <Box component="span" sx={{ fontWeight: 700, color: 'rgba(255,255,255,0.92)' }}>
+                          +{communityDelta.newDrivers}
+                        </Box>{' '}
+                        new driver{communityDelta.newDrivers === 1 ? '' : 's'}
+                      </>
+                    ) : null}
+                  </Typography>
+                ) : null}
+              </Stack>
+            </Box>
           </Box>
 
           {loading && (
@@ -489,11 +493,15 @@ export default function Page() {
                         direction="row"
                         justifyContent="space-between"
                         alignItems="center"
+                        onClick={() => {
+                          window.location.href = getDriverProfileHref(driver.guid);
+                        }}
                         sx={{
                           ...GLASS_CARD_INNER_SX,
                           ...subtleEnterUpSx(idx, { baseDelayMs: 520 }),
                           p: 1.1,
                           borderRadius: 1.5,
+                          cursor: 'pointer',
                           transition: (t: Theme) => t.transitions.create(['background-color', 'border-color'], { duration: 200 }),
                           '@media (hover: hover)': {
                             '&:hover': {
@@ -527,11 +535,15 @@ export default function Page() {
                         direction="row"
                         justifyContent="space-between"
                         alignItems="center"
+                        onClick={() => {
+                          window.location.href = getLeaderboardHref(track.trackId);
+                        }}
                         sx={{
                           ...GLASS_CARD_INNER_SX,
                           ...subtleEnterUpSx(idx, { baseDelayMs: 520 }),
                           p: 1.1,
                           borderRadius: 1.5,
+                          cursor: 'pointer',
                           transition: (t: Theme) => t.transitions.create(['background-color', 'border-color'], { duration: 200 }),
                           '@media (hover: hover)': {
                             '&:hover': {
@@ -543,7 +555,16 @@ export default function Page() {
                       >
                         <Box>
                           <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                            #{idx + 1} {getTrackDisplayName(track.trackId)}
+                            #{idx + 1}{' '}
+                            <Link
+                              href={getLeaderboardHref(track.trackId)}
+                              onClick={(e) => e.stopPropagation()}
+                              underline="hover"
+                              color="inherit"
+                              sx={{ fontWeight: 600 }}
+                            >
+                              {getTrackDisplayName(track.trackId)}
+                            </Link>
                           </Typography>
                           <Typography variant="caption" sx={{ color: 'text.secondary' }}>
                             Best lap: {formatLaptime(track.bestLap)}

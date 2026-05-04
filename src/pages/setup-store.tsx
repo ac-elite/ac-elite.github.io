@@ -9,16 +9,14 @@ import Typography from '@mui/material/Typography';
 
 import { CONFIG } from 'src/config-global';
 import { CAR } from 'src/lib/ac-elite-data';
-import { glassCardMotionSx } from 'src/lib/subtle-motion';
+import { SITE_PREVIEW } from 'src/site-manual-config';
 import { brandAccentBorderSx } from 'src/lib/status-accent';
 import { GLASS_PANEL_SX, GLASS_PANEL_COMPACT_SX } from 'src/lib/glass';
+import { glassCardMotionSx, softFloatWrapperSx } from 'src/lib/subtle-motion';
 import { DATA_PAGE_SHELL_SX, ACTION_PRIMARY_SMALL_SX, HERO_FOOTNOTE_CAPTION_SX } from 'src/lib/page-shell';
 
 import { PreviewLock } from 'src/components/preview-lock/preview-lock';
 import { PageGridOverlay } from 'src/components/page-background/page-grid-overlay';
-
-/** Preview gate (client-side only; edit here to rotate). */
-const SETUP_STORE_PREVIEW_PASSWORD = 'acelite-setup-store';
 
 const mockSetups = [
   {
@@ -83,26 +81,28 @@ export default function Page() {
 
         <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1 }}>
           <Stack spacing={3}>
-            <Box sx={{ ...GLASS_PANEL_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(0) }}>
-              <Stack spacing={0.75} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: { xs: 'center', md: 'flex-start' } }}>
-                <Typography variant="h4" fontWeight={800}>
-                  Setup Store
-                </Typography>
-                <Typography color="text.secondary">
-                  Private preview for mod team feedback — mock listings until the store goes live.
-                </Typography>
-                <Typography variant="body2" sx={{ color: 'rgba(147,197,253,0.92)', fontWeight: 700 }}>
-                  Preview · mock data
-                </Typography>
-                <Typography variant="caption" sx={{ ...HERO_FOOTNOTE_CAPTION_SX }}>
-                  Nothing here is tied to live race data; unlock below to browse placeholder setups and test layout.
-                </Typography>
-              </Stack>
+            <Box sx={softFloatWrapperSx()}>
+              <Box sx={{ ...GLASS_PANEL_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(0) }}>
+                <Stack spacing={0.75} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: { xs: 'center', md: 'flex-start' } }}>
+                  <Typography variant="h4" fontWeight={800}>
+                    Setup Store
+                  </Typography>
+                  <Typography color="text.secondary">
+                    Private preview for mod team feedback — mock listings until the store goes live.
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: 'rgba(147,197,253,0.92)', fontWeight: 700 }}>
+                    Preview · mock data
+                  </Typography>
+                  <Typography variant="caption" sx={{ ...HERO_FOOTNOTE_CAPTION_SX }}>
+                    Nothing here is tied to live race data; unlock below to browse placeholder setups and test layout.
+                  </Typography>
+                </Stack>
+              </Box>
             </Box>
 
             <PreviewLock
-              storageKey="acelite-preview-setup-store"
-              password={SETUP_STORE_PREVIEW_PASSWORD}
+              storageKey={SITE_PREVIEW.setupStore.storageKey}
+              password={SITE_PREVIEW.setupStore.password}
               title="Setup Store Preview Locked"
               description="This section is in preview state with mock data."
             >

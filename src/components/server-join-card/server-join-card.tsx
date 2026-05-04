@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import type { AcServerInfo } from 'src/lib/server-info';
 import type { Theme, SxProps } from '@mui/material/styles';
 import type { CurrentTrackPayload } from 'src/lib/server-status';
@@ -11,6 +12,7 @@ import Typography from '@mui/material/Typography';
 
 import { formatTimeAgo } from 'src/lib/sync-utils';
 import { BRAND_ACCENT } from 'src/lib/status-accent';
+import { softFloatWrapperSx } from 'src/lib/subtle-motion';
 import { getTrackDisplayName, normalizeServerTrackId } from 'src/lib/ac-elite-data';
 import {
   acCurrentSessionLabel,
@@ -41,11 +43,38 @@ const badgeSx = {
 
 const infoBlockSx = {
   borderRadius: 1.1,
-  px: 0.9,
-  py: 0.65,
+  px: 1.0,
+  /** Equal top/bottom padding; inner Stack uses fixed gap + lineHeight so content looks balanced. */
+  py: 1.5,
   bgcolor: 'rgba(255,255,255,0.04)',
   border: '1px solid rgba(255,255,255,0.08)',
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'center',
 } as const;
+
+const infoLabelSx = {
+  color: 'rgba(255,255,255,0.55)',
+  lineHeight: 1.2,
+} as const;
+
+const infoValueSx = {
+  fontWeight: 800,
+  lineHeight: 1.25,
+} as const;
+
+function ServerInfoBlock({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <Box sx={infoBlockSx}>
+      <Stack spacing={0.55} sx={{ width: '100%' }}>
+        <Typography variant="caption" sx={infoLabelSx}>
+          {label}
+        </Typography>
+        {children}
+      </Stack>
+    </Box>
+  );
+}
 
 export type ServerJoinCardProps = {
   currentTrack: CurrentTrackPayload | null;
@@ -121,25 +150,29 @@ export function ServerJoinCard({ currentTrack, joinHref = AC_ELITE_SERVER_JOIN_H
 
   const phase = acCurrentSessionLabel(info);
   const timeLeft = formatTimeLeftSeconds(info?.timeleft);
-  const schedule = formatSessionDurationsLine(info?.sessiontypes, info?.durations, info?.timed);
+  const schedule = formatSessionDurationsLine(info?.sessiontypes, info?.durations, info?.timed, {
+    inverted: typeof info?.inverted === 'number' ? info.inverted : undefined,
+    lobbyName: typeof info?.name === 'string' ? info.name : undefined,
+  });
 
   const rawLobbyName = typeof info?.name === 'string' ? info.name.trim() : '';
   const lobbyName = rawLobbyName ? sanitizeServerLobbyDisplayName(rawLobbyName) : '';
 
   return (
-    <Box
-      sx={{
-        width: '100%',
-        borderRadius: 2,
-        border: `1px solid ${online ? ACCENT_BORDER : 'rgba(148,163,184,0.38)'}`,
-        background:
-          `linear-gradient(180deg, rgba(16,18,25,0.98) 0%, rgba(10,12,17,0.98) 100%), radial-gradient(circle at 88% 5%, ${ACCENT_GLOW}, transparent 45%)`,
-        boxShadow: `0 14px 30px rgba(0,0,0,0.4), inset 0 0 0 1px ${online ? ACCENT_INNER : 'rgba(148,163,184,0.08)'}`,
-        p: 1.25,
-        ...sx,
-      }}
-    >
-      <Stack spacing={1}>
+    <Box sx={softFloatWrapperSx()}>
+      <Box
+        sx={{
+          width: '100%',
+          borderRadius: 2,
+          border: `1px solid ${online ? ACCENT_BORDER : 'rgba(148,163,184,0.38)'}`,
+          background:
+            `linear-gradient(180deg, rgba(16,18,25,0.98) 0%, rgba(10,12,17,0.98) 100%), radial-gradient(circle at 88% 5%, ${ACCENT_GLOW}, transparent 45%)`,
+          boxShadow: `0 14px 30px rgba(0,0,0,0.4), inset 0 0 0 1px ${online ? ACCENT_INNER : 'rgba(148,163,184,0.08)'}`,
+          p: 1.65,
+          ...sx,
+        }}
+      >
+        <Stack spacing={1.75}>
         <Stack direction="row" justifyContent="space-between" alignItems="center">
           <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.72)', fontWeight: 700, letterSpacing: 0.5 }}>
             AC ELITE SERVER
@@ -178,7 +211,7 @@ export function ServerJoinCard({ currentTrack, joinHref = AC_ELITE_SERVER_JOIN_H
             fontWeight: 700,
             fontSize: '0.9375rem',
             lineHeight: 1.35,
-            minHeight: 34,
+            minHeight: 38,
           }}
           title={lobbyName || undefined}
         >
@@ -189,36 +222,34 @@ export function ServerJoinCard({ currentTrack, joinHref = AC_ELITE_SERVER_JOIN_H
               : 'Live data unavailable'}
         </Typography>
 
-        <Grid container spacing={0.6}>
+        <Grid container spacing={0.85}>
           <Grid size={{ xs: 6 }}>
-            <Box sx={infoBlockSx}>
-              <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.55)' }}>Players</Typography>
-              <Typography variant="body2" sx={{ fontWeight: 800 }}>{slotsLabel}</Typography>
-            </Box>
+            <ServerInfoBlock label="Players">
+              <Typography variant="body2" sx={infoValueSx}>
+                {slotsLabel}
+              </Typography>
+            </ServerInfoBlock>
           </Grid>
           <Grid size={{ xs: 6 }}>
-            <Box sx={infoBlockSx}>
-              <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.55)' }}>Phase</Typography>
-              <Typography variant="body2" sx={{ fontWeight: 800 }}>
+            <ServerInfoBlock label="Phase">
+              <Typography variant="body2" sx={infoValueSx}>
                 {liveDataAvailable ? ([phase, timeLeft].filter((v) => v && v !== '-').join(' · ') || '-') : 'Data unavailable'}
               </Typography>
-            </Box>
+            </ServerInfoBlock>
           </Grid>
           <Grid size={{ xs: 6 }}>
-            <Box sx={infoBlockSx}>
-              <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.55)' }}>Cars</Typography>
-              <Typography variant="body2" sx={{ fontWeight: 800 }} noWrap title={cars.join(', ')}>
+            <ServerInfoBlock label="Cars">
+              <Typography variant="body2" sx={infoValueSx} noWrap title={cars.join(', ')}>
                 {liveDataAvailable ? (cars.length ? cars.join(', ') : '-') : 'Data unavailable'}
               </Typography>
-            </Box>
+            </ServerInfoBlock>
           </Grid>
           <Grid size={{ xs: 6 }}>
-            <Box sx={infoBlockSx}>
-              <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.55)' }}>Schedule</Typography>
-              <Typography variant="body2" sx={{ fontWeight: 800 }} noWrap title={schedule ?? '-'}>
+            <ServerInfoBlock label="Schedule">
+              <Typography variant="body2" sx={infoValueSx} noWrap title={schedule ?? '-'}>
                 {liveDataAvailable ? (schedule ?? '-') : 'Data unavailable'}
               </Typography>
-            </Box>
+            </ServerInfoBlock>
           </Grid>
         </Grid>
 
@@ -232,7 +263,6 @@ export function ServerJoinCard({ currentTrack, joinHref = AC_ELITE_SERVER_JOIN_H
           aria-label="Join official server in Content Manager"
           startIcon={<JoinGlyphIcon />}
           sx={{
-            mt: 0.35,
             minHeight: 40,
             borderRadius: 1.2,
             border: `1px solid ${ACCENT_BORDER_STRONG}`,
@@ -248,7 +278,8 @@ export function ServerJoinCard({ currentTrack, joinHref = AC_ELITE_SERVER_JOIN_H
         >
           Join in Content Manager
         </Button>
-      </Stack>
+        </Stack>
+      </Box>
     </Box>
   );
 }

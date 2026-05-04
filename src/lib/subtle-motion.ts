@@ -1,4 +1,4 @@
-import { keyframes, type Theme } from '@mui/material/styles';
+import { keyframes, type Theme, type SxProps } from '@mui/material/styles';
 
 /** Soft one-shot entrance: fade + slight lift. No infinite loops. */
 export const subtleFadeUp = keyframes`
@@ -34,6 +34,37 @@ export function subtleEnterUpSx(index: number, options: SubtleEnterOptions = {})
     },
   };
 }
+
+/** Gentle vertical drift for hero panels; use on an outer wrapper so inner `glassCardHoverSx` still works. */
+const softFloatDrift = keyframes`
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+`;
+
+export type SoftFloatWrapperOptions = {
+  /** Half-cycle delay so two floats on one screen do not pulse in sync. */
+  alternatePhase?: boolean;
+};
+
+export function softFloatWrapperSx(options?: SoftFloatWrapperOptions): SxProps<Theme> {
+  return {
+    width: '100%',
+    animation: `${softFloatDrift} 5.5s ease-in-out infinite`,
+    ...(options?.alternatePhase ? { animationDelay: '2.75s' } : {}),
+    '@media (prefers-reduced-motion: reduce)': {
+      animation: 'none',
+      animationDelay: '0s',
+    },
+  };
+}
+
+/** @deprecated Use {@link softFloatWrapperSx} — kept for older imports. */
+export const serverJoinCardFloatWrapperSx = softFloatWrapperSx();
 
 /** Fade/slide without stagger (single block). */
 export function subtleEnterOnceSx(delayMs = 0) {

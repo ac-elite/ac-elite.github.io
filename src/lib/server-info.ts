@@ -73,16 +73,58 @@ export function formatTimeLeftSeconds(sec: number | undefined | null): string {
   return `${m}:${String(r).padStart(2, '0')}`;
 }
 
+export type SessionDurationsHints = {
+  /** `/INFO` `inverted` (reverse grid positions); 0 = off, -1 or N = feature active. */
+  inverted?: number;
+  /** Raw lobby name (before sanitise); used as fallback when `inverted` is missing. */
+  lobbyName?: string;
+};
+
+/**
+ * Kunos `/INFO` often lists only one Race row even when `server_cfg` runs a second reversed-grid race;
+ * that leg is not a separate `sessiontypes` entry. We append a segment when that case is likely.
+ */
+/** Exported for admin / tooling when mirroring the join-card schedule logic. */
+export function shouldAppendReversedGridRaceHint(
+  sessiontypes: number[],
+  timed: boolean | undefined,
+  hints: SessionDurationsHints | undefined
+): boolean {
+  if (timed !== false) return false;
+  const raceCount = sessiontypes.filter((t) => t === AC_SESSION_TYPE_RACE).length;
+  if (raceCount !== 1) return false;
+  if (!sessiontypes.includes(2)) return false;
+
+  const inv = hints?.inverted;
+  if (typeof inv === 'number' && inv !== 0) return true;
+  if (/reversed\s*grid/i.test(hints?.lobbyName ?? '')) return true;
+  return false;
+}
+
+function formatRaceLapsSegment(value: number): string {
+  const lapWord = value === 1 ? 'lap' : 'laps';
+  return `${value} ${lapWord}`;
+}
+
+/** Two sprint races (e.g. + reversed grid), same lap count — compact for narrow UI. */
+function formatDoubleRaceLapsSegment(perRaceLaps: number): string {
+  const lapWord = perRaceLaps === 1 ? 'lap' : 'laps';
+  return `2×${perRaceLaps} ${lapWord}`;
+}
+
 /**
  * Schedule line from `/INFO` `sessiontypes` + `durations`.
  * Time sessions: `Q 10 min`. Race with `timed === false`: lap count, e.g. `R 6 laps`.
+ * Optional `hints`: when a second reversed-grid race is likely but omitted from `/INFO`, show `R 2×6 laps`.
  */
 export function formatSessionDurationsLine(
   sessiontypes: number[] | undefined,
   durations: number[] | undefined,
-  timed?: boolean
+  timed?: boolean,
+  hints?: SessionDurationsHints
 ): string | null {
   if (!sessiontypes?.length || !durations?.length) return null;
+  const doubleRevRace = shouldAppendReversedGridRaceHint(sessiontypes, timed, hints);
   const n = Math.min(sessiontypes.length, durations.length);
   const parts: string[] = [];
   for (let i = 0; i < n; i += 1) {
@@ -97,9 +139,10 @@ export function formatSessionDurationsLine(
           : NaN;
     if (Number.isFinite(value)) {
       const raceIsLaps = typeId === AC_SESSION_TYPE_RACE && timed === false;
-      if (raceIsLaps) {
-        const lapWord = value === 1 ? 'lap' : 'laps';
-        parts.push(`${label} ${value} ${lapWord}`);
+      if (raceIsLaps && doubleRevRace) {
+        parts.push(`${label} ${formatDoubleRaceLapsSegment(value)}`);
+      } else if (raceIsLaps) {
+        parts.push(`${label} ${formatRaceLapsSegment(value)}`);
       } else {
         parts.push(`${label} ${value} min`);
       }
