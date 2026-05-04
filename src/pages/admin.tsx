@@ -1,4 +1,4 @@
-import { useRef, useMemo, useState, useEffect } from 'react';
+import { useRef, useMemo, useState, useEffect, useCallback } from 'react';
 
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
@@ -23,12 +23,7 @@ import { SITE_PREVIEW } from 'src/site-manual-config';
 import { getTrackDisplayName } from 'src/lib/ac-elite-data';
 import { glassCardMotionSx, softFloatWrapperSx } from 'src/lib/subtle-motion';
 import { brandAccentBorderSx } from 'src/lib/status-accent';
-import {
-  GLASS_CARD_SX,
-  GLASS_PANEL_SX,
-  GLASS_INNER_PANEL_SX,
-  GLASS_PANEL_COMPACT_SX,
-} from 'src/lib/glass';
+import { GLASS_PANEL_SX, GLASS_INNER_PANEL_SX, GLASS_PANEL_COMPACT_SX } from 'src/lib/glass';
 import {
   DATA_PAGE_SHELL_SX,
   TABLE_HEAD_MUTED_COLOR,
@@ -56,6 +51,13 @@ import {
 
 import { PreviewLock } from 'src/components/preview-lock/preview-lock';
 import { PageGridOverlay } from 'src/components/page-background/page-grid-overlay';
+import { SiteVisitsShowcase } from 'src/components/site-visits-showcase/site-visits-showcase';
+import {
+  fetchSiteVisitCount,
+  fetchSitePageVisitCounts,
+  isSiteVisitsConfigured,
+  type SitePageVisitRow,
+} from 'src/lib/site-visits';
 
 /** Public site + repo (same URLs as elsewhere in the project). */
 const TEAM_GITHUB_REPO = 'https://github.com/ac-elite/ac-elite.github.io';
@@ -450,7 +452,51 @@ export default function Page() {
   });
   const [debugTechOpen, setDebugTechOpen] = useState(false);
 
+  const siteVisitsConfigured = isSiteVisitsConfigured();
+  const [visitPhase, setVisitPhase] = useState<'off' | 'loading' | 'ready' | 'error'>(() =>
+    siteVisitsConfigured ? 'loading' : 'off'
+  );
+  const [visitCount, setVisitCount] = useState<number | undefined>(undefined);
+  const [visitPageRows, setVisitPageRows] = useState<SitePageVisitRow[] | undefined>(undefined);
+
   const staticCurrentTrackRef = useRef<CurrentTrackData | null>(null);
+
+  const applyVisitStatsResult = useCallback((n: number | null, pages: SitePageVisitRow[] | null) => {
+    if (n !== null) {
+      setVisitCount(n);
+      setVisitPhase('ready');
+      setVisitPageRows(pages ?? []);
+    } else {
+      setVisitPhase('error');
+      setVisitPageRows(undefined);
+    }
+  }, []);
+
+  const loadVisitStats = useCallback(async () => {
+    if (!isSiteVisitsConfigured()) return;
+    const [n, pages] = await Promise.all([fetchSiteVisitCount(), fetchSitePageVisitCounts()]);
+    applyVisitStatsResult(n, pages);
+  }, [applyVisitStatsResult]);
+
+  const refreshSiteVisits = useCallback(() => {
+    if (!isSiteVisitsConfigured()) return;
+    setVisitPhase('loading');
+    void loadVisitStats();
+  }, [loadVisitStats]);
+
+  useEffect(() => {
+    let cancelled = false;
+    if (siteVisitsConfigured) {
+      void (async () => {
+        const [n, pages] = await Promise.all([fetchSiteVisitCount(), fetchSitePageVisitCounts()]);
+        if (cancelled) return;
+        applyVisitStatsResult(n, pages);
+      })();
+    }
+    return () => {
+      cancelled = true;
+    };
+  }, [siteVisitsConfigured, applyVisitStatsResult]);
 
   useEffect(() => {
     let mounted = true;
@@ -544,6 +590,15 @@ export default function Page() {
               description="Ask your team lead for the shared password, then type it below."
             >
               <Stack spacing={3}>
+                <Box sx={glassCardMotionSx(0)}>
+                  <SiteVisitsShowcase
+                    phase={visitPhase}
+                    count={visitCount}
+                    configured={siteVisitsConfigured}
+                    pageRows={visitPageRows}
+                    onRefresh={refreshSiteVisits}
+                  />
+                </Box>
                 <Paper sx={{ ...GLASS_PANEL_COMPACT_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(1) }}>
                   <Typography variant="h6" sx={{ fontWeight: 800 }}>
                     Data freshness
@@ -563,12 +618,13 @@ export default function Page() {
 
                   <TableContainer
                     sx={{
-                      ...GLASS_CARD_SX,
                       maxWidth: '100%',
                       overflowX: 'auto',
                       overflowY: 'hidden',
                       WebkitOverflowScrolling: 'touch',
                       borderRadius: 2,
+                      border: '1px solid rgba(148,163,184,0.14)',
+                      bgcolor: 'rgba(15,23,42,0.35)',
                       boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)',
                     }}
                   >
@@ -760,7 +816,13 @@ export default function Page() {
                 <Paper sx={{ ...GLASS_PANEL_COMPACT_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(3) }}>
                   <Stack direction={{ xs: 'column', md: 'row' }} justifyContent="space-between" spacing={1.5} sx={{ mb: 1 }}>
                     <Typography variant="h6" sx={{ fontWeight: 800 }}>Links & raw detail</Typography>
-                    <Stack direction="row" spacing={1} flexWrap="wrap">
+                    <Stack
+                      direction={{ xs: 'column', sm: 'row' }}
+                      spacing={1.25}
+                      useFlexGap
+                      flexWrap="wrap"
+                      alignItems={{ xs: 'stretch', sm: 'center' }}
+                    >
                       <Button component="a" href={AC_SERVER_INFO_URL} target="_blank" rel="noreferrer" variant="outlined" size="small" sx={{ ...ADMIN_EXTERNAL_LINK_OUTLINED_SX }}>
                         Live status page (advanced)
                       </Button>
@@ -890,7 +952,13 @@ export default function Page() {
                     size="small"
                     variant="text"
                     onClick={() => setDebugTechOpen((o) => !o)}
-                    sx={{ mt: 2, fontWeight: 700, color: 'primary.light', textTransform: 'none' }}
+                    sx={{
+                      mt: 2,
+                      fontWeight: 700,
+                      textTransform: 'none',
+                      color: 'rgba(248,250,252,0.88)',
+                      '&:hover': { bgcolor: 'rgba(255,255,255,0.06)', color: 'rgba(248,250,252,0.98)' },
+                    }}
                   >
                     {debugTechOpen ? '▲ Hide' : '▼ Show'} developer-only details (env variables & storage keys)
                   </Button>
@@ -901,11 +969,14 @@ export default function Page() {
                     </Typography>
                     <TableContainer
                       sx={{
-                        ...GLASS_CARD_SX,
                         maxWidth: '100%',
                         overflowX: 'auto',
+                        overflowY: 'hidden',
+                        WebkitOverflowScrolling: 'touch',
                         borderRadius: 2,
                         border: '1px solid rgba(148,163,184,0.14)',
+                        bgcolor: 'rgba(15,23,42,0.35)',
+                        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)',
                       }}
                     >
                       <Table size="small" sx={{ borderCollapse: 'separate', borderSpacing: 0, minWidth: 640 }}>

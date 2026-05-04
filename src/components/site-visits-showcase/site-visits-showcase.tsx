@@ -7,14 +7,21 @@ import Button from '@mui/material/Button';
 import { alpha } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import LinearProgress from '@mui/material/LinearProgress';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
 
 import { GLASS_PANEL_COMPACT_SX } from 'src/lib/glass';
+import { brandAccentBorderSx } from 'src/lib/status-accent';
 import {
   DATA_STATE_HELP_TEXT_SX,
   PANEL_OVERLINE_MUTED_SX,
-  HERO_FOOTNOTE_CAPTION_SX,
   ACTION_OUTLINED_SMALL_DENSE_SX,
 } from 'src/lib/page-shell';
+import { SITE_VISIT_COUNT_GAP_MINUTES, type SitePageVisitRow } from 'src/lib/site-visits';
 
 // ----------------------------------------------------------------------
 
@@ -32,18 +39,21 @@ export type SiteVisitsShowcaseProps = {
   /** Defined when phase is `ready`, or carried during `loading` after refresh. */
   count: number | undefined;
   configured: boolean;
+  /** When defined (including `[]`), per-route breakdown is shown under the milestone. */
+  pageRows?: SitePageVisitRow[];
   onRefresh: () => void;
 };
 
 const MILESTONES = [100, 250, 500, 1000, 2500, 5000, 10_000, 25_000, 50_000, 100_000] as const;
 
+/** Short encouragement under the total — plain language for moderators. */
 function blurbForCount(n: number): string {
-  if (n < 50) return 'Early laps — every pit crew started somewhere.';
-  if (n < 200) return 'The paddock is waking up. Keep pushing laps.';
-  if (n < 1000) return 'Grid energy building — drivers are finding the line.';
-  if (n < 5000) return 'Serious traction. The community is on throttle.';
-  if (n < 20_000) return 'Full-send territory. This is a hot track.';
-  return 'Legend traffic. The server browser would be proud.';
+  if (n < 50) return 'Still early — every site starts small.';
+  if (n < 200) return 'Growing — more people are opening the site.';
+  if (n < 1000) return 'Healthy traffic — the community is finding us.';
+  if (n < 5000) return 'Strong usage — lots of people check in regularly.';
+  if (n < 20_000) return 'Very busy — the site is a well-used hub.';
+  return 'Huge numbers — thank you for helping keep the community informed here.';
 }
 
 function nextMilestone(n: number): { next: number; progress: number } {
@@ -112,11 +122,10 @@ function useAnimatedCount(target: number | undefined, run: boolean) {
 // ----------------------------------------------------------------------
 
 /**
- * Site visit stats card (admin). Avoid stacking `keyframes`-based `sx` helpers on one `Paper`
- * (`statusAccentBorderSx` + `glassCardMotionSx`) — Emotion merge can yield values that break
- * `String()` during dev error reporting when this module loads with the lazy admin chunk.
+ * Site visit stats card (admin). Uses the same title + body2 header pattern as other admin Papers.
+ * Do not add `glassCardMotionSx` on this `Paper` — merge with the rim animation can break dev `String()` on this chunk.
  */
-export function SiteVisitsShowcase({ phase, count, configured, onRefresh }: SiteVisitsShowcaseProps) {
+export function SiteVisitsShowcase({ phase, count, configured, pageRows, onRefresh }: SiteVisitsShowcaseProps) {
   const safeCount =
     typeof count === 'number' && Number.isFinite(count)
       ? count
@@ -135,114 +144,116 @@ export function SiteVisitsShowcase({ phase, count, configured, onRefresh }: Site
     <Paper
       sx={{
         ...GLASS_PANEL_COMPACT_SX,
+        ...brandAccentBorderSx(),
         overflow: 'hidden',
-        p: 2.5,
-        borderTop: `3px solid ${VISIT_ACCENT}`,
-        boxShadow:
-          '0 12px 30px rgba(0,0,0,0.32), inset 0 1px 0 rgba(255,255,255,0.08), 0 -1px 0 rgba(196,181,253,0.22)',
-        transition: 'transform 200ms ease, box-shadow 200ms ease',
-        '@media (hover: hover)': {
-          '&:hover': {
-            transform: 'translateY(-2px)',
-            boxShadow:
-              '0 18px 44px rgba(0,0,0,0.38), inset 0 1px 0 rgba(255,255,255,0.12), 0 -1px 0 rgba(196,181,253,0.28)',
-          },
-        },
       }}
     >
-      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems={{ sm: 'flex-start' }}>
-        <Box sx={{ flex: 1, minWidth: 0 }}>
-          <Box sx={{ mb: 0.75 }}>
-            <Typography
-              variant="overline"
-              sx={{
-                letterSpacing: 0.16,
-                color: 'text.secondary',
-                fontWeight: 800,
-                lineHeight: 1.2,
-                display: 'block',
-              }}
-            >
-              Site visits
+      <Stack spacing={2}>
+        <Stack
+          direction={{ xs: 'column', sm: 'row' }}
+          justifyContent="space-between"
+          alignItems={{ xs: 'flex-start', sm: 'center' }}
+          spacing={1}
+        >
+          <Box sx={{ flex: 1, minWidth: 0, pr: { sm: 1 } }}>
+            <Typography variant="h6" sx={{ fontWeight: 800 }}>
+              Public site visits
             </Typography>
-            <Typography
-              variant="caption"
-              sx={{
-                ...HERO_FOOTNOTE_CAPTION_SX,
-                display: 'block',
-                mt: 0.35,
-                fontWeight: 600,
-                letterSpacing: 0.06,
-              }}
-            >
-              Pit-lane traffic · total public sessions (one per browser session, not per page)
+            <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.4, lineHeight: 1.55, maxWidth: 900 }}>
+              <strong>Total:</strong> +1 after ~{SITE_VISIT_COUNT_GAP_MINUTES} min away on this device; same visit,
+              more clicks = still one. <strong>Table below:</strong> +1 each time someone opens that part of the site
+              (e.g. Home then Dashboard adds both).
             </Typography>
           </Box>
+          {configured && (
+            <Button
+              size="small"
+              variant="outlined"
+              disabled={phase === 'loading'}
+              onClick={onRefresh}
+              sx={{
+                flexShrink: 0,
+                alignSelf: { xs: 'flex-start', sm: 'auto' },
+                mt: { xs: 0.5, sm: 0 },
+                ...ACTION_OUTLINED_SMALL_DENSE_SX,
+                borderColor: alpha(VISIT_ACCENT, 0.55),
+                color: 'rgba(255,255,255,0.92)',
+                '&:hover': {
+                  borderColor: VISIT_ACCENT_2,
+                  bgcolor: alpha(VISIT_ACCENT_2, 0.08),
+                },
+              }}
+            >
+              Refresh
+            </Button>
+          )}
+        </Stack>
 
+        <Stack spacing={2} sx={{ minWidth: 0 }}>
           {phase === 'off' && (
-            <Typography variant="body2" sx={{ ...DATA_STATE_HELP_TEXT_SX, maxWidth: 640 }}>
-              Counter not active. Add{' '}
-              <Box component="span" sx={{ fontFamily: 'monospace', color: 'text.primary' }}>
-                VITE_SUPABASE_URL
-              </Box>{' '}
-              and{' '}
-              <Box component="span" sx={{ fontFamily: 'monospace', color: 'text.primary' }}>
-                VITE_SUPABASE_ANON_KEY
-              </Box>{' '}
-              (Supabase publishable key or legacy anon JWT) to your build, then run{' '}
-              <Box component="span" sx={{ fontFamily: 'monospace', color: 'text.primary' }}>
-                scripts/supabase-site-stats.sql
-              </Box>{' '}
-              in the Supabase SQL editor (one session ≈ one count).
-            </Typography>
+            <Stack spacing={1} sx={{ maxWidth: 680 }}>
+              <Typography variant="body2" sx={{ ...DATA_STATE_HELP_TEXT_SX, lineHeight: 1.55 }}>
+                Visitor counting is not set up on this copy of the site. <strong>Moderators:</strong> you do not need
+                to change anything here. <strong>If you need this on the live site,</strong> ask a tech lead — they turn
+                it on once (build settings + a small database step).
+              </Typography>
+              <Typography variant="caption" sx={{ color: 'text.secondary', lineHeight: 1.55, display: 'block' }}>
+                Tech reference: set <Box component="span" sx={{ fontFamily: 'monospace', color: 'text.primary' }}>VITE_SUPABASE_URL</Box> and{' '}
+                <Box component="span" sx={{ fontFamily: 'monospace', color: 'text.primary' }}>VITE_SUPABASE_ANON_KEY</Box>, then run{' '}
+                <Box component="span" sx={{ fontFamily: 'monospace', color: 'text.primary' }}>scripts/supabase-site-stats.sql</Box> in the Supabase SQL editor.
+              </Typography>
+            </Stack>
           )}
 
           {phase === 'loading' && !showCount && (
             <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-              Warming tyres…
+              Loading visitor numbers…
             </Typography>
           )}
 
           {phase === 'error' && (
-            <Typography variant="body2" sx={{ color: 'error.light' }}>
-              Could not load the counter. Check Supabase RLS and that the SQL script was applied.
+            <Typography variant="body2" sx={{ color: 'error.light', lineHeight: 1.55, maxWidth: 640 }}>
+              We could not load the visitor count. This is usually a connection or database setup issue —{' '}
+              <strong>ask a tech lead</strong>, not something you fix with the admin password.
             </Typography>
           )}
 
           {showCount && (
-            <Stack spacing={1.25}>
-              <Typography
-                variant="h3"
-                sx={{
-                  fontWeight: 900,
-                  letterSpacing: '-0.04em',
-                  lineHeight: 1.05,
-                  fontFeatureSettings: '"tnum"',
-                  background: `linear-gradient(115deg, ${VISIT_ACCENT} 0%, #e9d5ff 38%, ${VISIT_ACCENT_2} 88%)`,
-                  WebkitBackgroundClip: 'text',
-                  backgroundClip: 'text',
-                  color: 'transparent',
-                  opacity: phase === 'loading' ? 0.55 : 1,
-                  transition: 'opacity 0.25s ease',
-                }}
-              >
-                {fmt(animated)}
-              </Typography>
-              {phase === 'loading' && (
-                <Typography variant="caption" sx={{ ...PANEL_OVERLINE_MUTED_SX, fontWeight: 600 }}>
-                  Refreshing lap count…
+            <Stack spacing={2} sx={{ pt: 0.25 }}>
+              <Stack spacing={0.75}>
+                <Typography
+                  variant="h3"
+                  sx={{
+                    fontWeight: 900,
+                    letterSpacing: '-0.04em',
+                    lineHeight: 1.05,
+                    fontFeatureSettings: '"tnum"',
+                    background: `linear-gradient(115deg, ${VISIT_ACCENT} 0%, #e9d5ff 38%, ${VISIT_ACCENT_2} 88%)`,
+                    WebkitBackgroundClip: 'text',
+                    backgroundClip: 'text',
+                    color: 'transparent',
+                    opacity: phase === 'loading' ? 0.55 : 1,
+                    transition: 'opacity 0.25s ease',
+                  }}
+                >
+                  {fmt(animated)}
                 </Typography>
-              )}
-              {phase === 'ready' && safeCount !== undefined && (
-                <>
-                  <Typography variant="body2" sx={{ ...DATA_STATE_HELP_TEXT_SX, color: 'rgba(255,255,255,0.72)', lineHeight: 1.5 }}>
+                {phase === 'loading' && (
+                  <Typography variant="caption" sx={{ ...PANEL_OVERLINE_MUTED_SX, fontWeight: 600 }}>
+                    Updating numbers…
+                  </Typography>
+                )}
+              </Stack>
+              {(phase === 'ready' || (phase === 'loading' && showCount)) && safeCount !== undefined && (
+                <Stack spacing={2}>
+                  <Typography variant="body2" sx={{ color: 'text.secondary', lineHeight: 1.55 }}>
                     {blurbForCount(safeCount)}
                   </Typography>
                   {milestone && (
-                    <Box sx={{ pt: 0.25 }}>
-                      <Stack direction="row" justifyContent="space-between" alignItems="baseline" sx={{ mb: 0.5 }}>
+                    <Stack spacing={1}>
+                      <Stack direction="row" justifyContent="space-between" alignItems="baseline">
                         <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700 }}>
-                          Next milestone
+                          Next fun target
                         </Typography>
                         <Typography variant="caption" sx={{ color: VISIT_ACCENT_2, fontWeight: 800 }}>
                           {fmt(milestone.next)}
@@ -261,34 +272,84 @@ export function SiteVisitsShowcase({ phase, count, configured, onRefresh }: Site
                           },
                         }}
                       />
-                    </Box>
+                    </Stack>
                   )}
-                </>
+                  {pageRows !== undefined && (
+                    <Stack spacing={1}>
+                      <Typography variant="subtitle2" sx={{ fontWeight: 800 }}>
+                        Where people opened the site
+                      </Typography>
+                      <Typography variant="body2" sx={{ color: 'text.secondary', lineHeight: 1.55 }}>
+                        Each row counts how often that page was opened (every navigation). Driver profiles are grouped as{' '}
+                        <Box component="span" sx={{ fontFamily: 'ui-monospace, monospace' }}>/driver/:id</Box>. Up to 40
+                        rows, busiest first. The big total uses the longer ‘visit’ rule — the two numbers will not
+                        match.
+                      </Typography>
+                      {pageRows.length === 0 ? (
+                        <Typography variant="body2" sx={{ color: 'text.secondary', lineHeight: 1.55 }}>
+                          No breakdown by page yet. <strong>Moderators:</strong> you can ignore this — the big number
+                          above may still be correct. <strong>Tech team:</strong> run the latest{' '}
+                          <Box component="span" sx={{ fontFamily: 'ui-monospace, monospace', color: 'text.primary' }}>
+                            scripts/supabase-site-stats.sql
+                          </Box>{' '}
+                          in Supabase if you expect a list here.
+                        </Typography>
+                      ) : (
+                        <TableContainer
+                          sx={{
+                            maxHeight: 280,
+                            borderRadius: 1,
+                            border: '1px solid rgba(148,163,184,0.14)',
+                            bgcolor: 'rgba(15,23,42,0.35)',
+                          }}
+                        >
+                          <Table size="small" stickyHeader>
+                            <TableHead>
+                              <TableRow>
+                                <TableCell sx={{ fontWeight: 800, bgcolor: 'rgba(15,23,42,0.92)' }}>Site area</TableCell>
+                                <TableCell align="right" sx={{ fontWeight: 800, width: 120, bgcolor: 'rgba(15,23,42,0.92)' }}>
+                                  Count
+                                </TableCell>
+                              </TableRow>
+                            </TableHead>
+                            <TableBody>
+                              {pageRows.map((row) => (
+                                <TableRow key={row.path} hover>
+                                  <TableCell
+                                    sx={{
+                                      fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
+                                      fontSize: '0.78rem',
+                                      color: 'rgba(248,250,252,0.92)',
+                                      borderColor: 'rgba(148,163,184,0.12)',
+                                      wordBreak: 'break-all',
+                                    }}
+                                  >
+                                    {row.path}
+                                  </TableCell>
+                                  <TableCell
+                                    align="right"
+                                    sx={{
+                                      fontVariantNumeric: 'tabular-nums',
+                                      fontWeight: 800,
+                                      color: 'rgba(248,250,252,0.95)',
+                                      borderColor: 'rgba(148,163,184,0.12)',
+                                    }}
+                                  >
+                                    {fmt(row.visit_count)}
+                                  </TableCell>
+                                </TableRow>
+                              ))}
+                            </TableBody>
+                          </Table>
+                        </TableContainer>
+                      )}
+                    </Stack>
+                  )}
+                </Stack>
               )}
             </Stack>
           )}
-        </Box>
-
-        {configured && (
-          <Button
-            size="small"
-            variant="outlined"
-            disabled={phase === 'loading'}
-            onClick={onRefresh}
-            sx={{
-              flexShrink: 0,
-              ...ACTION_OUTLINED_SMALL_DENSE_SX,
-              borderColor: alpha(VISIT_ACCENT, 0.55),
-              color: 'rgba(255,255,255,0.92)',
-              '&:hover': {
-                borderColor: VISIT_ACCENT_2,
-                bgcolor: alpha(VISIT_ACCENT_2, 0.08),
-              },
-            }}
-          >
-            Refresh
-          </Button>
-        )}
+        </Stack>
       </Stack>
     </Paper>
   );

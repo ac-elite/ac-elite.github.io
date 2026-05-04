@@ -5,7 +5,11 @@ import { useEffect } from 'react';
 import { usePathname } from 'src/routes/hooks';
 
 import { ThemeProvider } from 'src/theme/theme-provider';
-import { recordVisitOncePerSession, isPathExcludedFromSiteVisitCount } from 'src/lib/site-visits';
+import {
+  recordSiteVisitIfDue,
+  recordSitePageStat,
+  isPathExcludedFromSiteVisitCount,
+} from 'src/lib/site-visits';
 
 import { SyncCanonicalMeta } from 'src/components/seo/sync-canonical';
 
@@ -44,7 +48,8 @@ function useRecordSiteVisit() {
 
   useEffect(() => {
     if (isPathExcludedFromSiteVisitCount(pathname)) return;
-    recordVisitOncePerSession();
+    recordSitePageStat(pathname);
+    recordSiteVisitIfDue(pathname);
   }, [pathname]);
 
   return null;

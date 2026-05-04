@@ -1,6 +1,57 @@
-const SESSION_KEY = 'ace:site-visit-recorded';
-const PENDING = 'pending';
-const DONE = '1';
+/** localStorage: epoch ms of last successful increment (same browser, any tab). */
+const LAST_COUNTED_AT_KEY = 'ace:site-visit-last-counted-at';
+
+/**
+ * Min time between counted visits for one browser. After this gap, a return to the site counts
+ * again (e.g. three separate sit-downs in a day → +3). Navigating pages within one visit does not.
+ */
+export const SITE_VISIT_COUNT_GAP_MINUTES = 10;
+const VISIT_COUNT_GAP_MS = SITE_VISIT_COUNT_GAP_MINUTES * 60 * 1000;
+
+/** Avoid overlapping RPC calls (e.g. React StrictMode double effect). */
+let visitIncrementInFlight = false;
+
+/**
+ * Cooldown for per-page stats within the same browser tab/session.
+ * Prevents F5-spam from creating artificial spikes and avoids unnecessary RPC load.
+ */
+const PAGE_STAT_COOLDOWN_MS = 7_000;
+const PAGE_STAT_COOLDOWN_KEY = 'ace:site-page-stat-cooldown-v1';
+
+/**
+ * In-memory fallback if sessionStorage is unavailable (private mode, blocked storage, etc.).
+ * Also helps dedupe immediate same-tick calls in React StrictMode.
+ */
+const pageStatCooldownMemory = new Map<string, number>();
+
+/**
+ * Disable analytics writes during local development so manual testing does not pollute production stats.
+ * Kept runtime-based (hostname) so it also works for production builds run locally.
+ */
+function isAnalyticsWriteDisabled(): boolean {
+  if (typeof window === 'undefined') return false;
+  const host = window.location.hostname.toLowerCase();
+  return host === 'localhost' || host === '127.0.0.1' || host === '::1';
+}
+
+function readLastCountedAtMs(): number {
+  try {
+    const raw = localStorage.getItem(LAST_COUNTED_AT_KEY);
+    if (raw == null) return NaN;
+    const n = Number(raw);
+    return Number.isFinite(n) ? n : NaN;
+  } catch {
+    return NaN;
+  }
+}
+
+function writeLastCountedAtMs(ms: number): void {
+  try {
+    localStorage.setItem(LAST_COUNTED_AT_KEY, String(ms));
+  } catch {
+    /* private mode / blocked storage — counter still incremented server-side */
+  }
+}
 
 // ----------------------------------------------------------------------
 
@@ -9,6 +60,24 @@ export function isPathExcludedFromSiteVisitCount(pathname: string): boolean {
   const p = pathname.replace(/\/$/, '') || '/';
   return p === '/admin' || p.startsWith('/admin/');
 }
+
+/**
+ * Single bucket for all driver profile URLs so the per-route table stays readable.
+ * Must match what we send to `increment_site_visits` (stored in `site_page_stats.path`).
+ */
+export function normalizePathForVisitStats(pathname: string): string {
+  const trimmed = pathname.trim() || '/';
+  const p = trimmed.replace(/\/+$/, '') || '/';
+  if (p.length > 200) {
+    return `${p.slice(0, 197)}...`;
+  }
+  if (/^\/driver\/[^/]+$/i.test(p)) {
+    return '/driver/:id';
+  }
+  return p;
+}
+
+export type SitePageVisitRow = { path: string; visit_count: number };
 
 export function isSiteVisitsConfigured(): boolean {
   const url = import.meta.env.VITE_SUPABASE_URL?.trim();
@@ -46,6 +115,28 @@ function parseFiniteNumber(raw: unknown): number | null {
   return null;
 }
 
+/** Per-route totals from `site_page_stats` (read-only), highest first. */
+export async function fetchSitePageVisitCounts(limit = 40): Promise<SitePageVisitRow[] | null> {
+  if (!isSiteVisitsConfigured()) return null;
+  const res = await fetch(
+    `${supabaseBaseUrl()}/rest/v1/site_page_stats?select=path,visit_count&order=visit_count.desc&limit=${limit}`,
+    { headers: supabaseHeaders() }
+  );
+  if (!res.ok) return null;
+  const data: unknown = await res.json();
+  if (!Array.isArray(data)) return null;
+  const rows: SitePageVisitRow[] = [];
+  for (const row of data) {
+    if (!row || typeof row !== 'object') continue;
+    const r = row as { path?: unknown; visit_count?: unknown };
+    if (typeof r.path !== 'string') continue;
+    const c = parseFiniteNumber(r.visit_count);
+    if (c === null) continue;
+    rows.push({ path: r.path, visit_count: c });
+  }
+  return rows;
+}
+
 /** Current total from `site_stats` (read-only). */
 export async function fetchSiteVisitCount(): Promise<number | null> {
   if (!isSiteVisitsConfigured()) return null;
@@ -60,7 +151,7 @@ export async function fetchSiteVisitCount(): Promise<number | null> {
   return parseFiniteNumber(raw);
 }
 
-/** Increments global counter via RPC (one per browser session). */
+/** Increments global visit total only (per-route uses {@link incrementSitePageOnly}). */
 async function incrementSiteVisit(): Promise<number | null> {
   const res = await fetch(`${supabaseBaseUrl()}/rest/v1/rpc/increment_site_visits`, {
     method: 'POST',
@@ -77,23 +168,120 @@ async function incrementSiteVisit(): Promise<number | null> {
   }
 }
 
+async function incrementSitePageOnly(statsPath: string): Promise<boolean> {
+  const res = await fetch(`${supabaseBaseUrl()}/rest/v1/rpc/increment_site_page_only`, {
+    method: 'POST',
+    headers: supabaseHeaders(),
+    body: JSON.stringify({ p_path: statsPath }),
+  });
+  return res.ok;
+}
+
+type PageStatCooldownState = Record<string, number>;
+
+function readPageStatCooldownState(): PageStatCooldownState {
+  if (typeof window === 'undefined') return {};
+  try {
+    const raw = sessionStorage.getItem(PAGE_STAT_COOLDOWN_KEY);
+    if (!raw) return {};
+    const parsed: unknown = JSON.parse(raw);
+    if (!parsed || typeof parsed !== 'object') return {};
+    const out: PageStatCooldownState = {};
+    for (const [k, v] of Object.entries(parsed as Record<string, unknown>)) {
+      if (typeof k !== 'string' || typeof v !== 'number' || !Number.isFinite(v)) continue;
+      out[k] = v;
+    }
+    return out;
+  } catch {
+    return {};
+  }
+}
+
+function writePageStatCooldownState(state: PageStatCooldownState): void {
+  if (typeof window === 'undefined') return;
+  try {
+    sessionStorage.setItem(PAGE_STAT_COOLDOWN_KEY, JSON.stringify(state));
+  } catch {
+    /* storage unavailable — in-memory fallback is still used */
+  }
+}
+
+function canRecordPageStatNow(statsPath: string, nowMs: number): boolean {
+  const memoryLast = pageStatCooldownMemory.get(statsPath);
+  if (typeof memoryLast === 'number' && nowMs - memoryLast < PAGE_STAT_COOLDOWN_MS) {
+    return false;
+  }
+
+  const cooldownState = readPageStatCooldownState();
+  const last = cooldownState[statsPath];
+  if (typeof last === 'number' && nowMs - last < PAGE_STAT_COOLDOWN_MS) {
+    return false;
+  }
+
+  return true;
+}
+
+function markPageStatRecorded(statsPath: string, nowMs: number): void {
+  pageStatCooldownMemory.set(statsPath, nowMs);
+
+  const cooldownState = readPageStatCooldownState();
+  cooldownState[statsPath] = nowMs;
+
+  // Keep storage compact by dropping stale path entries.
+  for (const [path, ts] of Object.entries(cooldownState)) {
+    if (!Number.isFinite(ts) || nowMs - ts > PAGE_STAT_COOLDOWN_MS * 12) {
+      delete cooldownState[path];
+    }
+  }
+
+  writePageStatCooldownState(cooldownState);
+}
+
 /**
- * Records one visit per browser tab session (`sessionStorage`), first eligible load only.
- * Call when the user is on a route that should count (e.g. not `/admin`).
- * Safe under React StrictMode: concurrent mounts share the same pending flag.
+ * Bumps `site_page_stats` for the current route on every SPA navigation (public routes only).
+ * Applies a short per-path cooldown so repeated refreshes do not inflate pageviews.
  */
-export function recordVisitOncePerSession(): void {
+export function recordSitePageStat(pathname: string): void {
   if (typeof window === 'undefined' || !isSiteVisitsConfigured()) return;
+  if (isAnalyticsWriteDisabled()) return;
+  if (isPathExcludedFromSiteVisitCount(pathname)) return;
 
-  const cur = sessionStorage.getItem(SESSION_KEY);
-  if (cur === DONE || cur === PENDING) return;
-  sessionStorage.setItem(SESSION_KEY, PENDING);
+  const statsPath = normalizePathForVisitStats(pathname);
+  const now = Date.now();
+  if (!canRecordPageStatNow(statsPath, now)) return;
+  markPageStatRecorded(statsPath, now);
 
+  void incrementSitePageOnly(statsPath);
+}
+
+/**
+ * Records a site visit when due: at most once per {@link SITE_VISIT_COUNT_GAP_MINUTES} minutes
+ * per browser (`localStorage`, shared across tabs on this origin). Returning later the same day
+ * after a gap counts again; clicking around the SPA does not.
+ *
+ * Call from a route that should count (caller should skip `/admin` via {@link isPathExcludedFromSiteVisitCount}).
+ * `pathname` is only used for the public-route check. Per-route counts use {@link recordSitePageStat}.
+ * Safe under React StrictMode: a module-level in-flight guard prevents duplicate global RPCs.
+ */
+export function recordSiteVisitIfDue(_pathname: string): void {
+  if (typeof window === 'undefined' || !isSiteVisitsConfigured()) return;
+  if (isAnalyticsWriteDisabled()) return;
+  if (visitIncrementInFlight) return;
+
+  const now = Date.now();
+  const last = readLastCountedAtMs();
+  if (Number.isFinite(last) && now - last < VISIT_COUNT_GAP_MS) return;
+
+  visitIncrementInFlight = true;
   void incrementSiteVisit().then(
     (n) => {
-      if (n != null) sessionStorage.setItem(SESSION_KEY, DONE);
-      else sessionStorage.removeItem(SESSION_KEY);
+      visitIncrementInFlight = false;
+      if (n != null) {
+        writeLastCountedAtMs(Date.now());
+      }
     },
-    () => sessionStorage.removeItem(SESSION_KEY)
+    () => {
+      visitIncrementInFlight = false;
+    }
   );
 }
