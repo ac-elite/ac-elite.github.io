@@ -7,6 +7,7 @@ import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import Table from '@mui/material/Table';
 import Button from '@mui/material/Button';
+import Switch from '@mui/material/Switch';
 import TableRow from '@mui/material/TableRow';
 import Container from '@mui/material/Container';
 import TableBody from '@mui/material/TableBody';
@@ -14,15 +15,15 @@ import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import Typography from '@mui/material/Typography';
 import TableContainer from '@mui/material/TableContainer';
+import FormControlLabel from '@mui/material/FormControlLabel';
 
 import { CONFIG } from 'src/config-global';
 import { fetchJson } from 'src/lib/fetch-json';
 import { getSyncHealth } from 'src/lib/sync-utils';
 import { SITE_PREVIEW } from 'src/site-manual-config';
-import { formatNumber, getTrackDisplayName } from 'src/lib/ac-elite-data';
+import { getTrackDisplayName } from 'src/lib/ac-elite-data';
 import { glassCardMotionSx, softFloatWrapperSx } from 'src/lib/subtle-motion';
-import { fetchSiteVisitCount, isSiteVisitsConfigured } from 'src/lib/site-visits';
-import { STATUS_ACCENT, brandAccentBorderSx, statusAccentBorderSx, statusAccentSplitRimSx } from 'src/lib/status-accent';
+import { brandAccentBorderSx } from 'src/lib/status-accent';
 import {
   GLASS_CARD_SX,
   GLASS_PANEL_SX,
@@ -57,12 +58,9 @@ import {
 
 import { PreviewLock } from 'src/components/preview-lock/preview-lock';
 import { PageGridOverlay } from 'src/components/page-background/page-grid-overlay';
-import { SiteVisitsShowcase } from 'src/components/site-visits-showcase/site-visits-showcase';
 
 /** Public site + repo (same URLs as elsewhere in the project). */
-const TEAM_PUBLIC_SITE = 'https://ac-elite.github.io/';
 const TEAM_GITHUB_REPO = 'https://github.com/ac-elite/ac-elite.github.io';
-const TEAM_DISCORD = 'https://discord.gg/d2EbxGYBbj';
 const TEAM_GAME_SERVER_JOIN =
   'https://acstuff.ru/s/q:race/online/join?httpPort=18283&ip=157.90.3.32';
 
@@ -72,16 +70,10 @@ const TEAM_GAME_SERVER_JOIN =
 
 type MetadataData = { lastSync?: string; status?: string; error?: string; rank24hSnapshotAt?: string };
 type CurrentTrackData = CurrentTrackPayload;
-type AceSkinPackData = { generatedAt?: string; entries?: unknown[] };
-type LiverySectionsData = { officialPack?: boolean; aceSkinPack?: boolean; teamLiveries?: boolean };
 
 type AdminState = {
   metadata: MetadataData | null;
   currentTrack: CurrentTrackData | null;
-  aceSkinPack: AceSkinPackData | null;
-  liverySections: LiverySectionsData | null;
-  /** Length of rank.json when loaded (drivers in KMR rank export). */
-  rankDriverCount: number | null;
 };
 
 // ---------------------------------------------------------------------------
@@ -149,43 +141,6 @@ const SCHEDULE: readonly ScheduleEntry[] = [
   },
 ];
 
-const SCHEDULE_KIND_ACCENT: Record<ScheduleKind, { dot: string; label: string }> = {
-  recurring: {
-    dot: '#38bdf8',
-    label: 'Recurring',
-  },
-  chained: {
-    dot: '#a78bfa',
-    label: 'Chained',
-  },
-  deploy: {
-    dot: '#f6d365',
-    label: 'Deploy',
-  },
-};
-
-function scheduleHexToRgb(hex: string) {
-  const x = hex.replace('#', '');
-  const n = Number.parseInt(x.length === 6 ? x : x.slice(0, 6), 16);
-  return {
-    r: Math.floor(n / 65536) % 256,
-    g: Math.floor(n / 256) % 256,
-    b: n % 256,
-  };
-}
-
-/** Mobile timeline rail: tinted segment between this dot and the next (desktop rail uses the same hues). */
-function scheduleMobileRailGradient(fromHex: string, toHex: string) {
-  const a = scheduleHexToRgb(fromHex);
-  const b = scheduleHexToRgb(toHex);
-  return `linear-gradient(180deg, rgba(${a.r},${a.g},${a.b},0.62) 0%, rgba(${b.r},${b.g},${b.b},0.52) 100%)`;
-}
-
-function scheduleMobileRailGradientLast(fromHex: string) {
-  const a = scheduleHexToRgb(fromHex);
-  return `linear-gradient(180deg, rgba(${a.r},${a.g},${a.b},0.58) 0%, rgba(${a.r},${a.g},${a.b},0.12) 100%)`;
-}
-
 // ---------------------------------------------------------------------------
 // Data files we track
 // ---------------------------------------------------------------------------
@@ -235,35 +190,7 @@ const DATA_FILES: readonly DataFileEntry[] = [
     updatedBy: 'Sync KMR Data',
     getTimestamp: (s) => s.metadata?.lastSync,
   },
-  {
-    file: 'site-manual-config.ts',
-    updatedBy: 'Manual edit (repo)',
-    getTimestamp: () => undefined,
-    getNote: () => 'Team roles + preview passwords; bundled at build',
-  },
-  {
-    file: 'ace-skin-pack.json',
-    updatedBy: 'Build (manifest script)',
-    getTimestamp: (s) => s.aceSkinPack?.generatedAt,
-    getNote: (s) => (s.aceSkinPack?.entries ? `${(s.aceSkinPack.entries as unknown[]).length} entries` : ''),
-  },
-  {
-    file: 'livery-showcase-sections.json',
-    updatedBy: 'Manual edit',
-    getTimestamp: () => undefined,
-    getNote: (s) => {
-      if (!s.liverySections) return '';
-      const on = [s.liverySections.officialPack, s.liverySections.aceSkinPack, s.liverySections.teamLiveries].filter(
-        Boolean
-      ).length;
-      return `${on}/3 sections on`;
-    },
-  },
 ];
-
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
 
 function formatAbsolute(iso?: string): string {
   if (!iso) return '—';
@@ -445,12 +372,6 @@ function buildAdminServerInfoRows(ct: CurrentTrackPayload | null): { label: stri
   return rows;
 }
 
-type SiteVisitPanelState =
-  | { kind: 'off' }
-  | { kind: 'loading'; lastCount?: number }
-  | { kind: 'ready'; count: number }
-  | { kind: 'error' };
-
 type ActionStatusTone = 'ok' | 'warn' | 'error';
 
 type ActionPanelEntry = {
@@ -471,25 +392,6 @@ const freshnessBodyCellSx = {
   verticalAlign: 'top' as const,
 };
 
-const TEAM_HUB_INLINE_CODE_SX = {
-  display: 'inline' as const,
-  fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
-  fontSize: '0.8125rem',
-  bgcolor: 'rgba(15,23,42,0.55)',
-  px: 0.45,
-  py: 0.15,
-  borderRadius: 0.5,
-  border: '1px solid rgba(148,163,184,0.2)',
-};
-
-const TEAM_HUB_NOTE_PANEL_SX = {
-  borderRadius: 2,
-  bgcolor: 'rgba(15,23,42,0.4)',
-  border: '1px solid rgba(148,163,184,0.14)',
-  px: 1.5,
-  py: 1.25,
-};
-
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
@@ -498,50 +400,25 @@ export default function Page() {
   const [data, setData] = useState<AdminState>({
     metadata: null,
     currentTrack: null,
-    aceSkinPack: null,
-    liverySections: null,
-    rankDriverCount: null,
   });
-
-  const [siteVisitPanel, setSiteVisitPanel] = useState<SiteVisitPanelState>(() =>
-    isSiteVisitsConfigured() ? { kind: 'loading' } : { kind: 'off' }
-  );
+  const [showAllFiles, setShowAllFiles] = useState(false);
+  const [showRawServerInfo, setShowRawServerInfo] = useState(false);
+  const [showSchedule, setShowSchedule] = useState(false);
 
   const staticCurrentTrackRef = useRef<CurrentTrackData | null>(null);
-
-  useEffect(() => {
-    if (!isSiteVisitsConfigured()) return undefined;
-    let mounted = true;
-    fetchSiteVisitCount().then((n) => {
-      if (!mounted) return;
-      setSiteVisitPanel(n == null ? { kind: 'error' } : { kind: 'ready', count: n });
-    });
-    return () => {
-      mounted = false;
-    };
-  }, []);
 
   useEffect(() => {
     let mounted = true;
     Promise.allSettled([
       fetchJson<MetadataData>('/data/metadata.json'),
       fetchJson<CurrentTrackData>('/data/current-track.json'),
-      fetchJson<AceSkinPackData>('/data/ace-skin-pack.json'),
-      fetchJson<LiverySectionsData>('/data/livery-showcase-sections.json'),
-      fetchJson<unknown[]>('/data/rank.json'),
     ]).then((results) => {
       if (!mounted) return;
-      const rankResult = results[4];
-      const rankLen =
-        rankResult.status === 'fulfilled' && Array.isArray(rankResult.value) ? rankResult.value.length : null;
       const staticTrack = results[1].status === 'fulfilled' ? results[1].value : null;
       staticCurrentTrackRef.current = staticTrack;
       setData({
         metadata: results[0].status === 'fulfilled' ? results[0].value : null,
         currentTrack: staticTrack,
-        aceSkinPack: results[2].status === 'fulfilled' ? results[2].value : null,
-        liverySections: results[3].status === 'fulfilled' ? results[3].value : null,
-        rankDriverCount: rankLen,
       });
       if (canAttemptLiveServerStatusFetch()) {
         void fetchLiveServerStatusFromSupabase().then((live) => {
@@ -577,26 +454,6 @@ export default function Page() {
       window.clearInterval(id);
     };
   }, [data.currentTrack?.fetchedAt]);
-
-  const syncStatus = useMemo(() => getSyncHealth(data.metadata?.lastSync), [data.metadata?.lastSync]);
-
-  const trackStatusAccent = data.currentTrack?.online ? STATUS_ACCENT.online : STATUS_ACCENT.offline;
-
-  const liveSiteHref =
-    typeof window !== 'undefined'
-      ? `${window.location.origin}${import.meta.env.BASE_URL}`
-      : TEAM_PUBLIC_SITE;
-
-  const skinPackCount = Array.isArray(data.aceSkinPack?.entries)
-    ? (data.aceSkinPack.entries as unknown[]).length
-    : null;
-
-  const liverySectionsOn = useMemo(() => {
-    if (!data.liverySections) return null;
-    return [data.liverySections.officialPack, data.liverySections.aceSkinPack, data.liverySections.teamLiveries].filter(
-      Boolean
-    ).length;
-  }, [data.liverySections]);
 
   const adminServerDetailRows = useMemo(() => buildAdminServerInfoRows(data.currentTrack), [data.currentTrack]);
 
@@ -645,6 +502,34 @@ export default function Page() {
     ];
   }, [data.currentTrack?.fetchedAt, data.metadata?.error, data.metadata?.lastSync, data.metadata?.rank24hSnapshotAt, data.metadata?.status]);
 
+  const overallIncident = useMemo(() => {
+    const hasHardError = actionOverview.some((entry) => entry.tone === 'error');
+    const hasWarning = actionOverview.some((entry) => entry.tone === 'warn');
+    if (hasHardError) return { label: 'Down', color: '#ef4444', tone: 'error' as const };
+    if (hasWarning) return { label: 'Degraded', color: '#f59e0b', tone: 'warn' as const };
+    return { label: 'Healthy', color: '#22c55e', tone: 'ok' as const };
+  }, [actionOverview]);
+
+  const actionLastUpdate = useMemo(() => {
+    const stamps = actionOverview
+      .map((entry) => entry.when)
+      .filter((x): x is string => Boolean(x))
+      .map((ts) => new Date(ts).getTime())
+      .filter((ms) => Number.isFinite(ms));
+    if (!stamps.length) return undefined;
+    return new Date(Math.max(...stamps)).toISOString();
+  }, [actionOverview]);
+
+  const staleFileRows = useMemo(() => {
+    const rows = DATA_FILES.map((df) => {
+      const ts = df.getTimestamp(data);
+      const note = df.getNote?.(data) ?? '';
+      const health = getSyncHealth(ts);
+      return { df, ts, note, health };
+    });
+    return showAllFiles ? rows : rows.filter((row) => row.health.label !== 'Live');
+  }, [data, showAllFiles]);
+
   return (
     <>
       <title>{`Admin Panel - ${CONFIG.appName}`}</title>
@@ -680,144 +565,34 @@ export default function Page() {
               description="Use the internal preview password to access operational dashboards."
             >
               <Stack spacing={3}>
-                {/* ── Quick status (sync colors match home Race Intelligence) ── */}
-                <Grid container spacing={2}>
-                  <Grid size={{ xs: 12, md: 6 }}>
-                    <Paper
-                      sx={{
-                        ...GLASS_PANEL_COMPACT_SX,
-                        height: '100%',
-                        p: 2.25,
-                        ...statusAccentBorderSx(syncStatus.color),
-                        ...statusAccentSplitRimSx(syncStatus.color),
-                        ...glassCardMotionSx(1),
-                      }}
-                    >
-                      <Typography
-                        variant="overline"
-                        sx={{
-                          letterSpacing: 0.14,
-                          color: 'text.secondary',
-                          fontWeight: 700,
-                          lineHeight: 1.3,
-                          display: 'block',
-                          mb: 1.25,
-                        }}
-                      >
-                        KMR data sync
+                <Paper
+                  sx={{
+                    ...GLASS_PANEL_COMPACT_SX,
+                    ...glassCardMotionSx(1),
+                    border: `1px solid ${overallIncident.color}55`,
+                    borderLeft: `4px solid ${overallIncident.color}`,
+                  }}
+                >
+                  <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.25} alignItems={{ sm: 'center' }} justifyContent="space-between">
+                    <Box>
+                      <Typography variant="overline" sx={{ color: 'text.secondary', letterSpacing: 0.14, fontWeight: 700 }}>
+                        Incident overview
                       </Typography>
-                      <Stack direction="row" alignItems="center" spacing={1.25} flexWrap="wrap" useFlexGap>
-                        <Box
-                          sx={{
-                            width: 10,
-                            height: 10,
-                            borderRadius: '50%',
-                            flexShrink: 0,
-                            bgcolor: syncStatus.color,
-                            boxShadow: `0 0 0 4px ${syncStatus.color}28`,
-                          }}
-                        />
-                        <Typography component="span" sx={{ fontWeight: 800, color: syncStatus.color, fontSize: '1.1rem' }}>
-                          {syncStatus.label}
-                        </Typography>
-                        <Typography component="span" variant="body2" sx={{ color: 'text.secondary' }}>
-                          · {syncStatus.ageText}
-                        </Typography>
-                      </Stack>
-                      {data.metadata?.status && (
-                        <Typography
-                          variant="body2"
-                          sx={{ color: 'text.secondary', mt: 1.25, opacity: 0.92 }}
-                        >
-                          Last sync status:{' '}
-                          <Box component="span" sx={{ color: 'text.primary', fontWeight: 600 }}>
-                            {data.metadata.status}
-                          </Box>
-                        </Typography>
-                      )}
-                    </Paper>
-                  </Grid>
-                  <Grid size={{ xs: 12, md: 6 }}>
-                    <Paper
-                      sx={{
-                        ...GLASS_PANEL_COMPACT_SX,
-                        height: '100%',
-                        p: 2.25,
-                        ...statusAccentBorderSx(trackStatusAccent),
-                        ...statusAccentSplitRimSx(trackStatusAccent),
-                        ...glassCardMotionSx(2),
-                      }}
-                    >
-                      <Stack
-                        direction="row"
-                        alignItems="center"
-                        justifyContent="space-between"
-                        spacing={1}
-                        sx={{ mb: 1.25 }}
-                      >
-                        <Typography
-                          variant="overline"
-                          sx={{
-                            letterSpacing: 0.14,
-                            color: 'text.secondary',
-                            fontWeight: 700,
-                            lineHeight: 1.3,
-                          }}
-                        >
-                          Live server track
-                        </Typography>
+                      <Stack direction="row" spacing={1} alignItems="center" sx={{ mt: 0.25 }}>
                         <Chip
                           size="small"
-                          label={data.currentTrack?.online ? 'Online' : 'Offline'}
+                          label={overallIncident.label}
                           sx={{
-                            height: 22,
-                            fontWeight: 700,
-                            fontSize: '0.7rem',
-                            bgcolor: data.currentTrack?.online ? 'rgba(34,197,94,0.2)' : 'rgba(148,163,184,0.2)',
-                            color: data.currentTrack?.online ? '#86efac' : 'text.secondary',
-                            border: '1px solid',
-                            borderColor: data.currentTrack?.online ? 'rgba(34,197,94,0.45)' : 'rgba(148,163,184,0.35)',
+                            fontWeight: 800,
+                            color: overallIncident.color,
+                            bgcolor: `${overallIncident.color}22`,
+                            border: `1px solid ${overallIncident.color}55`,
                           }}
                         />
+                        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                          Last update: {actionLastUpdate ? `${formatAbsolute(actionLastUpdate)} (${formatRelative(actionLastUpdate)})` : 'Unknown'}
+                        </Typography>
                       </Stack>
-                      <Typography
-                        sx={{
-                          fontWeight: 800,
-                          fontSize: { xs: '1rem', sm: '1.15rem' },
-                          lineHeight: 1.35,
-                          wordBreak: 'break-word',
-                          fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
-                          letterSpacing: '-0.02em',
-                        }}
-                      >
-                        {data.currentTrack?.track?.trim()
-                          ? getTrackDisplayName(data.currentTrack.track)
-                          : '—'}
-                      </Typography>
-                      <Typography variant="body2" sx={{ color: 'text.secondary', mt: 1.25 }}>
-                        {data.currentTrack?.fetchedAt
-                          ? `Track info ${formatRelative(data.currentTrack.fetchedAt)}`
-                          : 'No fetch time yet'}
-                      </Typography>
-                    </Paper>
-                  </Grid>
-                </Grid>
-
-                <Paper sx={{ ...GLASS_PANEL_COMPACT_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(2.5) }}>
-                  <Stack
-                    direction={{ xs: 'column', sm: 'row' }}
-                    justifyContent="space-between"
-                    alignItems={{ xs: 'flex-start', sm: 'center' }}
-                    spacing={1.5}
-                    sx={{ mb: 1.75 }}
-                  >
-                    <Box>
-                      <Typography variant="h6" sx={{ fontWeight: 800 }}>
-                        Action status
-                      </Typography>
-                      <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.4 }}>
-                        Compact health view of the key workflows, with direct links to the run logs.
-                      </Typography>
                     </Box>
                     <Button
                       component="a"
@@ -830,6 +605,30 @@ export default function Page() {
                     >
                       Open Actions
                     </Button>
+                  </Stack>
+                  {data.metadata?.error && (
+                    <Typography variant="body2" sx={{ mt: 1.25, color: '#fca5a5', overflowWrap: 'anywhere' }}>
+                      Last failure: {data.metadata.error}
+                    </Typography>
+                  )}
+                </Paper>
+
+                <Paper sx={{ ...GLASS_PANEL_COMPACT_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(2) }}>
+                  <Stack
+                    direction={{ xs: 'column', sm: 'row' }}
+                    justifyContent="space-between"
+                    alignItems={{ xs: 'flex-start', sm: 'center' }}
+                    spacing={1.5}
+                    sx={{ mb: 1.75 }}
+                  >
+                    <Box>
+                      <Typography variant="h6" sx={{ fontWeight: 800 }}>
+                        Pipeline health
+                      </Typography>
+                      <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.4 }}>
+                        One row per critical workflow. Use this block as the primary triage signal.
+                      </Typography>
+                    </Box>
                   </Stack>
 
                   <Stack spacing={1.1}>
@@ -904,392 +703,81 @@ export default function Page() {
                   </Stack>
                 </Paper>
 
-                <Paper
-                  sx={{
-                    ...GLASS_PANEL_COMPACT_SX,
-                    p: 2.25,
-                    ...brandAccentBorderSx(),
-                    ...glassCardMotionSx(6),
-                  }}
-                >
-                  <Stack
-                    direction={{ xs: 'column', sm: 'row' }}
-                    justifyContent="space-between"
-                    alignItems={{ xs: 'flex-start', sm: 'flex-start' }}
-                    spacing={1.5}
-                    sx={{ mb: 2 }}
-                  >
-                    <Box>
-                      <Typography variant="h6" sx={{ fontWeight: 800 }}>
-                        Server /INFO
-                      </Typography>
-                      <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5, maxWidth: 720 }}>
-                        Merged <Box component="code" sx={{ px: 0.35 }}>currentTrack</Box> payload (GitHub static + Supabase live). Use this to verify Edge/cron vs the game server.
-                      </Typography>
-                    </Box>
-                    <Button
-                      component="a"
-                      href={AC_SERVER_INFO_URL}
-                      target="_blank"
-                      rel="noreferrer"
-                      size="small"
-                      variant="outlined"
-                      sx={{ ...ADMIN_EXTERNAL_LINK_OUTLINED_SX, flexShrink: 0, alignSelf: { xs: 'stretch', sm: 'flex-start' } }}
-                    >
-                      Open live /INFO
-                    </Button>
-                  </Stack>
-                  <TableContainer
-                    sx={{
-                      maxHeight: 440,
-                      borderRadius: 1,
-                      border: '1px solid rgba(148,163,184,0.14)',
-                      bgcolor: 'rgba(15,23,42,0.35)',
-                    }}
-                  >
-                    <Table size="small" stickyHeader>
-                      <TableHead>
-                        <TableRow>
-                          <TableCell sx={{ fontWeight: 800, width: '32%', bgcolor: 'rgba(15,23,42,0.88)' }}>Field</TableCell>
-                          <TableCell sx={{ fontWeight: 800, bgcolor: 'rgba(15,23,42,0.88)' }}>Value</TableCell>
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        {adminServerDetailRows.map((row, idx) => (
-                          <TableRow key={`${row.label}-${idx}`}>
-                            <TableCell sx={{ ...freshnessBodyCellSx, color: 'text.secondary', fontWeight: 700 }}>
-                              {row.label}
-                            </TableCell>
-                            <TableCell
-                              sx={{
-                                ...freshnessBodyCellSx,
-                                fontFamily: row.value.length > 120 ? 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace' : 'inherit',
-                                fontSize: '0.8125rem',
-                                wordBreak: 'break-word',
-                              }}
-                            >
-                              {row.value}
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
-                </Paper>
-
-                <SiteVisitsShowcase
-                  configured={isSiteVisitsConfigured()}
-                  phase={siteVisitPanel.kind}
-                  count={
-                    siteVisitPanel.kind === 'ready'
-                      ? siteVisitPanel.count
-                      : siteVisitPanel.kind === 'loading' && siteVisitPanel.lastCount != null
-                        ? siteVisitPanel.lastCount
-                        : undefined
-                  }
-                  onRefresh={() => {
-                    setSiteVisitPanel((prev) =>
-                      prev.kind === 'ready' ? { kind: 'loading', lastCount: prev.count } : { kind: 'loading' }
-                    );
-                    void fetchSiteVisitCount().then((n) =>
-                      setSiteVisitPanel(n == null ? { kind: 'error' } : { kind: 'ready', count: n })
-                    );
-                  }}
-                />
-
-                {/* ── Action schedule (agenda / timeline) ── */}
                 <Paper sx={{ ...GLASS_PANEL_COMPACT_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(3) }}>
                   <Stack
                     direction={{ xs: 'column', sm: 'row' }}
                     justifyContent="space-between"
-                    alignItems={{ xs: 'flex-start', sm: 'flex-end' }}
+                    alignItems={{ xs: 'flex-start', sm: 'center' }}
                     spacing={1}
-                    sx={{ mb: 2 }}
+                    sx={{ mb: 1.5 }}
                   >
                     <Box>
                       <Typography variant="h6" sx={{ fontWeight: 800 }}>
-                        Schedule agenda
+                        Live server quick state
                       </Typography>
                       <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.4 }}>
-                        <Box component="span" sx={{ display: { xs: 'none', md: 'inline' } }}>
-                          When workflows run: read left to right like a day planner — time on the
-                          left, details on the right.
-                        </Box>
-                        <Box component="span" sx={{ display: { xs: 'inline', md: 'none' } }}>
-                          When workflows run: read top to bottom — time first, then what runs in each
-                          block.
-                        </Box>
+                        Server online state, track and session details for rapid race operations checks.
                       </Typography>
                     </Box>
-                    <Stack direction="row" spacing={0.75} flexWrap="wrap" useFlexGap>
-                      {(['recurring', 'chained', 'deploy'] as const).map((k) => (
-                        <Chip
-                          key={k}
-                          size="small"
-                          label={SCHEDULE_KIND_ACCENT[k].label}
-                          sx={{
-                            fontWeight: 700,
-                            fontSize: '0.7rem',
-                            borderColor: `${SCHEDULE_KIND_ACCENT[k].dot}88`,
-                            color: SCHEDULE_KIND_ACCENT[k].dot,
-                            bgcolor: `${SCHEDULE_KIND_ACCENT[k].dot}18`,
-                          }}
-                          variant="outlined"
-                        />
-                      ))}
-                    </Stack>
-                  </Stack>
-
-                  <Box sx={{ position: 'relative' }}>
-                    {/* Vertical rail (desktop) */}
-                    <Box
+                    <Chip
+                      size="small"
+                      label={data.currentTrack?.online ? 'Online' : 'Offline'}
                       sx={{
-                        display: { xs: 'none', md: 'block' },
-                        position: 'absolute',
-                        left: 148,
-                        top: 8,
-                        bottom: 8,
-                        width: 3,
-                        borderRadius: 1,
-                        background:
-                          'linear-gradient(180deg, rgba(56,189,248,0.55) 0%, rgba(167,139,250,0.45) 45%, rgba(246,211,101,0.5) 100%)',
-                        opacity: 0.85,
+                        fontWeight: 800,
+                        color: data.currentTrack?.online ? '#22c55e' : '#f59e0b',
+                        bgcolor: data.currentTrack?.online ? 'rgba(34,197,94,0.12)' : 'rgba(245,158,11,0.12)',
+                        border: data.currentTrack?.online ? '1px solid rgba(34,197,94,0.45)' : '1px solid rgba(245,158,11,0.45)',
                       }}
                     />
-
-                    <Stack spacing={0}>
-                      {SCHEDULE.map((entry, idx) => {
-                        const accent = SCHEDULE_KIND_ACCENT[entry.kind];
-                        const nextDot =
-                          idx < SCHEDULE.length - 1
-                            ? SCHEDULE_KIND_ACCENT[SCHEDULE[idx + 1].kind].dot
-                            : accent.dot;
-                        const mobileRailBg =
-                          idx < SCHEDULE.length - 1
-                            ? scheduleMobileRailGradient(accent.dot, nextDot)
-                            : scheduleMobileRailGradientLast(accent.dot);
-                        return (
-                          <Stack
-                            key={entry.workflow}
-                            direction="row"
-                            spacing={{ xs: 1.25, md: 0 }}
-                            alignItems="stretch"
-                            sx={{
-                              position: 'relative',
-                              pb: idx < SCHEDULE.length - 1 ? 2.5 : 0,
-                            }}
-                          >
-                            {/* Desktop: time column */}
-                            <Box
-                              sx={{
-                                display: { xs: 'none', md: 'block' },
-                                width: 132,
-                                flexShrink: 0,
-                                textAlign: 'right',
-                                pr: 2.5,
-                                pt: 0.5,
-                              }}
-                            >
-                              <Typography
-                                variant="h5"
-                                sx={{
-                                  fontWeight: 900,
-                                  letterSpacing: '-0.02em',
-                                  fontFeatureSettings: '"tnum"',
-                                  color: 'common.white',
-                                  lineHeight: 1.1,
-                                }}
-                              >
-                                {entry.agendaWhen}
-                              </Typography>
-                              <Typography
-                                variant="caption"
-                                sx={{
-                                  color: 'text.secondary',
-                                  display: 'block',
-                                  mt: 0.35,
-                                  maxWidth: 220,
-                                  ml: 'auto',
-                                }}
-                              >
-                                {entry.agendaSub}
-                              </Typography>
-                            </Box>
-
-                            {/* Mobile: rail — line centered in column, dot on the line */}
-                            <Box
-                              sx={{
-                                display: { xs: 'block', md: 'none' },
-                                width: 22,
-                                flexShrink: 0,
-                                position: 'relative',
-                                alignSelf: 'stretch',
-                              }}
-                            >
-                              <Box
-                                sx={{
-                                  position: 'absolute',
-                                  left: '50%',
-                                  transform: 'translateX(-50%)',
-                                  width: 3,
-                                  top: 0,
-                                  bottom: idx < SCHEDULE.length - 1 ? -22 : 0,
-                                  borderRadius: 1,
-                                  background: mobileRailBg,
-                                  boxShadow: `0 0 12px ${accent.dot}22`,
-                                }}
-                              />
-                              <Box
-                                sx={{
-                                  position: 'absolute',
-                                  left: '50%',
-                                  top: 22,
-                                  transform: 'translate(-50%, -50%)',
-                                  width: 16,
-                                  height: 16,
-                                  borderRadius: '50%',
-                                  bgcolor: accent.dot,
-                                  boxShadow: `0 0 0 4px ${accent.dot}33, 0 0 18px ${accent.dot}44`,
-                                  border: '2px solid rgba(15,23,42,0.9)',
-                                  zIndex: 1,
-                                }}
-                              />
-                            </Box>
-
-                            {/* Desktop: timeline node */}
-                            <Box
-                              sx={{
-                                display: { xs: 'none', md: 'flex' },
-                                width: 32,
-                                flexShrink: 0,
-                                justifyContent: 'center',
-                                position: 'relative',
-                                pt: 0.5,
-                              }}
-                            >
-                              <Box
-                                sx={{
-                                  width: 16,
-                                  height: 16,
-                                  borderRadius: '50%',
-                                  flexShrink: 0,
-                                  mt: 1,
-                                  bgcolor: accent.dot,
-                                  boxShadow: `0 0 0 4px ${accent.dot}33, 0 0 18px ${accent.dot}44`,
-                                  border: '2px solid rgba(15,23,42,0.9)',
-                                  zIndex: 1,
-                                }}
-                              />
-                            </Box>
-
-                            {/* Time (mobile) + card */}
-                            <Box sx={{ flex: 1, minWidth: 0 }}>
-                              <Box sx={{ display: { xs: 'block', md: 'none' }, mb: 1.25 }}>
-                                <Typography
-                                  variant="h5"
-                                  sx={{
-                                    fontWeight: 900,
-                                    letterSpacing: '-0.02em',
-                                    fontFeatureSettings: '"tnum"',
-                                    color: 'common.white',
-                                    lineHeight: 1.1,
-                                  }}
-                                >
-                                  {entry.agendaWhen}
-                                </Typography>
-                                <Typography
-                                  variant="caption"
-                                  sx={{
-                                    color: 'text.secondary',
-                                    display: 'block',
-                                    mt: 0.35,
-                                    maxWidth: '100%',
-                                  }}
-                                >
-                                  {entry.agendaSub}
-                                </Typography>
-                              </Box>
-                              <Box
-                                sx={{
-                                  ...GLASS_INNER_PANEL_SX,
-                                  borderLeft: { md: '3px solid' },
-                                  borderLeftColor: `${accent.dot}aa`,
-                                  background:
-                                    'linear-gradient(135deg, rgba(31,44,73,0.92) 0%, rgba(23,33,59,0.88) 100%)',
-                                }}
-                              >
-                                <Stack
-                                  direction={{ xs: 'column', sm: 'row' }}
-                                  justifyContent="space-between"
-                                  alignItems={{ sm: 'flex-start' }}
-                                  spacing={1}
-                                >
-                                  <Box>
-                                    <Typography variant="subtitle1" sx={{ fontWeight: 800 }}>
-                                      {entry.workflow}
-                                    </Typography>
-                                    <Chip
-                                      size="small"
-                                      label={accent.label}
-                                      sx={{
-                                        mt: 0.75,
-                                        height: 22,
-                                        fontWeight: 800,
-                                        fontSize: '0.65rem',
-                                        color: accent.dot,
-                                        bgcolor: `${accent.dot}22`,
-                                        border: `1px solid ${accent.dot}55`,
-                                      }}
-                                    />
-                                  </Box>
-                                </Stack>
-                                <Typography variant="body2" sx={{ color: 'text.secondary', mt: 1.25, lineHeight: 1.55 }}>
-                                  {entry.what}
-                                </Typography>
-                                {entry.chain && (
-                                  <Typography
-                                    variant="caption"
-                                    sx={{
-                                      color: 'rgba(191,219,254,0.95)',
-                                      display: 'block',
-                                      mt: 1,
-                                      fontWeight: 600,
-                                      lineHeight: 1.5,
-                                    }}
-                                  >
-                                    {entry.chain}
-                                  </Typography>
-                                )}
-                                <Typography
-                                  variant="caption"
-                                  sx={{
-                                    color: 'rgba(148,163,184,0.85)',
-                                    display: 'block',
-                                    mt: 1,
-                                    fontFamily: 'ui-monospace, monospace',
-                                    wordBreak: 'break-all',
-                                  }}
-                                >
-                                  {entry.cron}
-                                </Typography>
-                              </Box>
-                            </Box>
-                          </Stack>
-                        );
-                      })}
-                    </Stack>
-                  </Box>
+                  </Stack>
+                  <Grid container spacing={1.25}>
+                    <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                      <Box sx={{ ...GLASS_INNER_PANEL_SX, py: 1.35 }}>
+                        <Typography variant="caption" sx={{ color: 'text.secondary' }}>Track</Typography>
+                        <Typography sx={{ fontWeight: 800, mt: 0.25 }}>
+                          {data.currentTrack?.track?.trim() ? getTrackDisplayName(data.currentTrack.track) : '—'}
+                        </Typography>
+                      </Box>
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                      <Box sx={{ ...GLASS_INNER_PANEL_SX, py: 1.35 }}>
+                        <Typography variant="caption" sx={{ color: 'text.secondary' }}>Drivers</Typography>
+                        <Typography sx={{ fontWeight: 800, mt: 0.25 }}>
+                          {data.currentTrack?.info?.clients ?? '—'} / {data.currentTrack?.info?.maxclients ?? '—'}
+                        </Typography>
+                      </Box>
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                      <Box sx={{ ...GLASS_INNER_PANEL_SX, py: 1.35 }}>
+                        <Typography variant="caption" sx={{ color: 'text.secondary' }}>Session</Typography>
+                        <Typography sx={{ fontWeight: 800, mt: 0.25 }}>
+                          {data.currentTrack?.info ? acCurrentSessionLabel(data.currentTrack.info) : '—'}
+                        </Typography>
+                      </Box>
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                      <Box sx={{ ...GLASS_INNER_PANEL_SX, py: 1.35 }}>
+                        <Typography variant="caption" sx={{ color: 'text.secondary' }}>Updated</Typography>
+                        <Typography sx={{ fontWeight: 800, mt: 0.25 }}>
+                          {data.currentTrack?.fetchedAt ? formatRelative(data.currentTrack.fetchedAt) : 'Unknown'}
+                        </Typography>
+                      </Box>
+                    </Grid>
+                  </Grid>
                 </Paper>
 
-                {/* ── Data freshness table ── */}
                 <Paper sx={{ ...GLASS_PANEL_COMPACT_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(4) }}>
                   <Typography variant="h6" sx={{ fontWeight: 800 }}>
-                    Data freshness
+                    Data integrity exceptions
                   </Typography>
                   <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.4, mb: 2 }}>
-                    Last update per public/data file. Uses the same labels and colours as the home page:
-                    Live (≤2h), Delayed (≤24h), Stale (&gt;24h), Unknown (missing/invalid time).
+                    Shows non-live files by default. Enable all rows when you need a full audit.
                   </Typography>
+                  <FormControlLabel
+                    control={<Switch size="small" checked={showAllFiles} onChange={(e) => setShowAllFiles(e.target.checked)} />}
+                    label={showAllFiles ? 'Showing all files' : 'Showing only delayed/stale/unknown'}
+                    sx={{ mb: 1.5, color: 'text.secondary' }}
+                  />
 
                   <TableContainer
                     sx={{
@@ -1335,11 +823,7 @@ export default function Page() {
                         </TableRow>
                       </TableHead>
                       <TableBody>
-                        {DATA_FILES.map((df) => {
-                          const ts = df.getTimestamp(data);
-                          const note = df.getNote?.(data) ?? '';
-                          const health = getSyncHealth(ts);
-                          return (
+                        {staleFileRows.map(({ df, ts, note, health }) => (
                             <TableRow
                               key={df.file}
                               hover
@@ -1422,231 +906,88 @@ export default function Page() {
                                 {note || '—'}
                               </TableCell>
                             </TableRow>
-                          );
-                        })}
+                        ))}
+                        {staleFileRows.length === 0 && (
+                          <TableRow>
+                            <TableCell colSpan={5} sx={{ ...freshnessBodyCellSx, py: 2.2, color: '#86efac' }}>
+                              No delayed, stale, or unknown files detected.
+                            </TableCell>
+                          </TableRow>
+                        )}
                       </TableBody>
                     </Table>
                   </TableContainer>
                 </Paper>
 
-                {/* ── Team hub: links + snapshot ── */}
                 <Paper sx={{ ...GLASS_PANEL_COMPACT_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(5) }}>
-                  <Typography variant="h6" sx={{ fontWeight: 800 }}>
-                    Team hub
-                  </Typography>
-                  <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.4, mb: 2 }}>
-                    Shortcuts and bite-sized context — nothing here replaces the tables above.
-                  </Typography>
-
-                  <Grid container spacing={3}>
-                    <Grid size={{ xs: 12, md: 6 }}>
-                      <Stack spacing={2.25}>
-                        <Box>
-                          <Typography
-                            variant="caption"
-                            sx={{ color: 'text.secondary', fontWeight: 700, letterSpacing: 0.06 }}
-                          >
-                            Snapshot
-                          </Typography>
-                          <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mt: 0.35, mb: 1 }}>
-                            Live counts from the same JSON the site loads.
-                          </Typography>
-                          <Stack direction="row" flexWrap="wrap" useFlexGap spacing={1}>
-                            <Chip
-                              size="small"
-                              label={
-                                data.rankDriverCount != null
-                                  ? `${formatNumber(data.rankDriverCount)} drivers in rank.json`
-                                  : 'rank.json …'
-                              }
-                              sx={{
-                                fontWeight: 700,
-                                bgcolor: 'rgba(56,189,248,0.12)',
-                                border: '1px solid rgba(56,189,248,0.35)',
-                              }}
-                            />
-                            <Chip
-                              size="small"
-                              label={
-                                skinPackCount != null
-                                  ? `${formatNumber(skinPackCount)} skin pack entries`
-                                  : 'Skin pack …'
-                              }
-                              sx={{
-                                fontWeight: 700,
-                                bgcolor: 'rgba(246,211,101,0.1)',
-                                border: '1px solid rgba(246,211,101,0.35)',
-                              }}
-                            />
-                            {liverySectionsOn != null && (
-                              <Chip
-                                size="small"
-                                label={`${liverySectionsOn}/3 livery sections on`}
-                                sx={{
-                                  fontWeight: 700,
-                                  bgcolor: 'rgba(167,139,250,0.12)',
-                                  border: '1px solid rgba(167,139,250,0.35)',
-                                }}
-                              />
+                  <Stack direction={{ xs: 'column', md: 'row' }} justifyContent="space-between" spacing={1.5} sx={{ mb: 1 }}>
+                    <Typography variant="h6" sx={{ fontWeight: 800 }}>Secondary details</Typography>
+                    <Stack direction="row" spacing={1} flexWrap="wrap">
+                      <Button component="a" href={AC_SERVER_INFO_URL} target="_blank" rel="noreferrer" variant="outlined" size="small" sx={{ ...ADMIN_EXTERNAL_LINK_OUTLINED_SX }}>
+                        Open live /INFO
+                      </Button>
+                      <Button component="a" href={`${TEAM_GITHUB_REPO}/actions`} target="_blank" rel="noopener noreferrer" variant="outlined" size="small" sx={{ ...ADMIN_EXTERNAL_LINK_OUTLINED_SX }}>
+                        Actions
+                      </Button>
+                      <Button component="a" href={TEAM_GAME_SERVER_JOIN} target="_blank" rel="noopener noreferrer" variant="outlined" size="small" sx={{ ...ADMIN_JOIN_SERVER_OUTLINED_SX }}>
+                        Join game server
+                      </Button>
+                    </Stack>
+                  </Stack>
+                  <Stack spacing={1.25}>
+                    <FormControlLabel
+                      control={<Switch size="small" checked={showRawServerInfo} onChange={(e) => setShowRawServerInfo(e.target.checked)} />}
+                      label="Show raw merged /INFO table"
+                      sx={{ color: 'text.secondary' }}
+                    />
+                    {showRawServerInfo && (
+                      <TableContainer sx={{ maxHeight: 400, borderRadius: 1, border: '1px solid rgba(148,163,184,0.14)', bgcolor: 'rgba(15,23,42,0.35)' }}>
+                        <Table size="small" stickyHeader>
+                          <TableHead>
+                            <TableRow>
+                              <TableCell sx={{ fontWeight: 800, width: '32%', bgcolor: 'rgba(15,23,42,0.88)' }}>Field</TableCell>
+                              <TableCell sx={{ fontWeight: 800, bgcolor: 'rgba(15,23,42,0.88)' }}>Value</TableCell>
+                            </TableRow>
+                          </TableHead>
+                          <TableBody>
+                            {adminServerDetailRows.map((row, idx) => (
+                              <TableRow key={`${row.label}-${idx}`}>
+                                <TableCell sx={{ ...freshnessBodyCellSx, color: 'text.secondary', fontWeight: 700 }}>{row.label}</TableCell>
+                                <TableCell sx={{ ...freshnessBodyCellSx, fontFamily: row.value.length > 120 ? 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace' : 'inherit', fontSize: '0.8125rem', wordBreak: 'break-word' }}>
+                                  {row.value}
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </TableContainer>
+                    )}
+                    <FormControlLabel
+                      control={<Switch size="small" checked={showSchedule} onChange={(e) => setShowSchedule(e.target.checked)} />}
+                      label="Show workflow cadence details"
+                      sx={{ color: 'text.secondary' }}
+                    />
+                    {showSchedule && (
+                      <Stack spacing={1}>
+                        {SCHEDULE.map((entry) => (
+                          <Box key={entry.workflow} sx={{ ...GLASS_INNER_PANEL_SX, py: 1.2 }}>
+                            <Typography variant="subtitle2" sx={{ fontWeight: 800 }}>{entry.workflow}</Typography>
+                            <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mt: 0.25 }}>
+                              {entry.agendaWhen} · {entry.agendaSub} · {entry.cron}
+                            </Typography>
+                            <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.65, lineHeight: 1.5 }}>
+                              {entry.what}
+                            </Typography>
+                            {entry.chain && (
+                              <Typography variant="caption" sx={{ color: 'rgba(191,219,254,0.95)', display: 'block', mt: 0.5 }}>
+                                {entry.chain}
+                              </Typography>
                             )}
-                          </Stack>
-                        </Box>
-
-                        <Box sx={TEAM_HUB_NOTE_PANEL_SX}>
-                          <Typography
-                            variant="caption"
-                            sx={{
-                              color: 'text.secondary',
-                              fontWeight: 800,
-                              letterSpacing: 0.06,
-                              textTransform: 'uppercase',
-                              display: 'block',
-                              mb: 0.75,
-                            }}
-                          >
-                            Rank deltas
-                          </Typography>
-                          <Typography
-                            variant="body2"
-                            sx={{ color: 'text.secondary', lineHeight: 1.65, maxWidth: 520 }}
-                          >
-                            Day-to-day rank <strong>deltas</strong> compare{' '}
-                            <Box component="code" sx={TEAM_HUB_INLINE_CODE_SX}>
-                              rank-24h.json
-                            </Box>{' '}
-                            to{' '}
-                            <Box component="code" sx={TEAM_HUB_INLINE_CODE_SX}>
-                              rank.json
-                            </Box>
-                            . The daily snapshot workflow runs after 06:00 Amsterdam.
-                          </Typography>
-                        </Box>
-
-                        <Box sx={TEAM_HUB_NOTE_PANEL_SX}>
-                          <Typography
-                            variant="caption"
-                            sx={{
-                              color: 'text.secondary',
-                              fontWeight: 800,
-                              letterSpacing: 0.06,
-                              textTransform: 'uppercase',
-                              display: 'block',
-                              mb: 0.75,
-                            }}
-                          >
-                            Manual file
-                          </Typography>
-                          <Typography
-                            variant="body2"
-                            sx={{ color: 'text.secondary', lineHeight: 1.65, maxWidth: 520 }}
-                          >
-                            <Box component="code" sx={TEAM_HUB_INLINE_CODE_SX}>
-                              src/site-manual-config.ts
-                            </Box>{' '}
-                            holds team GUID lists and preview passwords; edit in the repo when roles or gates change.
-                          </Typography>
-                        </Box>
+                          </Box>
+                        ))}
                       </Stack>
-                    </Grid>
-
-                    <Grid size={{ xs: 12, md: 6 }}>
-                      <Stack spacing={2}>
-                        <Box>
-                          <Typography
-                            variant="caption"
-                            sx={{ color: 'text.secondary', fontWeight: 700, letterSpacing: 0.06 }}
-                          >
-                            Links
-                          </Typography>
-                          <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mt: 0.35, mb: 1 }}>
-                            External shortcuts; opens in a new tab.
-                          </Typography>
-                          <Stack direction="row" flexWrap="wrap" useFlexGap spacing={1}>
-                            <Button
-                              component="a"
-                              href={liveSiteHref}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              variant="outlined"
-                              size="small"
-                              sx={{ ...ADMIN_EXTERNAL_LINK_OUTLINED_SX }}
-                            >
-                              This site
-                            </Button>
-                            <Button
-                              component="a"
-                              href={TEAM_PUBLIC_SITE}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              variant="outlined"
-                              size="small"
-                              sx={{ ...ADMIN_EXTERNAL_LINK_OUTLINED_SX }}
-                            >
-                              Production
-                            </Button>
-                            <Button
-                              component="a"
-                              href={TEAM_GITHUB_REPO}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              variant="outlined"
-                              size="small"
-                              sx={{ ...ADMIN_EXTERNAL_LINK_OUTLINED_SX }}
-                            >
-                              GitHub
-                            </Button>
-                            <Button
-                              component="a"
-                              href={`${TEAM_GITHUB_REPO}/actions`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              variant="outlined"
-                              size="small"
-                              sx={{ ...ADMIN_EXTERNAL_LINK_OUTLINED_SX }}
-                            >
-                              Actions
-                            </Button>
-                            <Button
-                              component="a"
-                              href={TEAM_DISCORD}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              variant="outlined"
-                              size="small"
-                              sx={{ ...ADMIN_EXTERNAL_LINK_OUTLINED_SX }}
-                            >
-                              Discord
-                            </Button>
-                            <Button
-                              component="a"
-                              href={TEAM_GAME_SERVER_JOIN}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              variant="outlined"
-                              size="small"
-                              sx={{ ...ADMIN_JOIN_SERVER_OUTLINED_SX }}
-                            >
-                              Join game server
-                            </Button>
-                          </Stack>
-                        </Box>
-
-                        <Box
-                          sx={{
-                            borderRadius: 2,
-                            px: 1.5,
-                            py: 1.15,
-                            border: '1px solid rgba(148,163,184,0.14)',
-                            bgcolor: 'rgba(15,23,42,0.35)',
-                          }}
-                        >
-                          <Typography variant="caption" sx={{ color: 'text.secondary', lineHeight: 1.55, display: 'block' }}>
-                            App {CONFIG.appVersion} · same data as the rest of this page
-                          </Typography>
-                        </Box>
-                      </Stack>
-                    </Grid>
-                  </Grid>
+                    )}
+                  </Stack>
                 </Paper>
               </Stack>
             </PreviewLock>
