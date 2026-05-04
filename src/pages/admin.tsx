@@ -603,7 +603,7 @@ export default function Page() {
   const actionOverview = useMemo<ActionPanelEntry[]>(() => {
     const syncHealth = getSyncHealth(data.metadata?.lastSync);
     const syncFailed = data.metadata?.status?.toLowerCase() === 'error';
-    const syncStatus = syncFailed ? 'Failed' : data.metadata?.status === 'success' ? 'Healthy' : syncHealth.label;
+    const syncActionStatus = syncFailed ? 'Failed' : data.metadata?.status === 'success' ? 'Healthy' : syncHealth.label;
 
     const snapshotHealth = getSyncHealth(data.metadata?.rank24hSnapshotAt);
     const snapshotStatus = data.metadata?.rank24hSnapshotAt ? snapshotHealth.label : 'Pending';
@@ -618,8 +618,8 @@ export default function Page() {
     return [
       {
         name: 'Sync KMR Data',
-        tone: syncFailed ? 'error' : syncStatus === 'Live' || syncStatus === 'Healthy' ? 'ok' : 'warn',
-        status: syncStatus,
+        tone: syncFailed ? 'error' : syncActionStatus === 'Live' || syncActionStatus === 'Healthy' ? 'ok' : 'warn',
+        status: syncActionStatus,
         when: data.metadata?.lastSync,
         note: syncNote,
         href: `${TEAM_GITHUB_REPO}/actions/workflows/sync-data.yml`,
