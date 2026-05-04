@@ -10,8 +10,10 @@ import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 
+import { GLASS_PADDING } from 'src/lib/glass';
 import { formatTimeAgo } from 'src/lib/sync-utils';
 import { BRAND_ACCENT } from 'src/lib/status-accent';
+import { getTrackHeroImageSrc } from 'src/lib/track-hero';
 import { softFloatWrapperSx } from 'src/lib/subtle-motion';
 import { getTrackDisplayName, normalizeServerTrackId } from 'src/lib/ac-elite-data';
 import {
@@ -43,14 +45,15 @@ const badgeSx = {
 
 const infoBlockSx = {
   borderRadius: 1.1,
-  px: 1.0,
+  px: { xs: 1, md: 0.75 },
   /** Equal top/bottom padding; inner Stack uses fixed gap + lineHeight so content looks balanced. */
-  py: 1.5,
+  py: { xs: 1.5, md: 1.15 },
   bgcolor: 'rgba(255,255,255,0.04)',
   border: '1px solid rgba(255,255,255,0.08)',
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'center',
+  minWidth: 0,
 } as const;
 
 const infoLabelSx = {
@@ -61,6 +64,7 @@ const infoLabelSx = {
 const infoValueSx = {
   fontWeight: 800,
   lineHeight: 1.25,
+  fontSize: { xs: '0.875rem', md: '0.8125rem' },
 } as const;
 
 function ServerInfoBlock({ label, children }: { label: string; children: ReactNode }) {
@@ -155,8 +159,17 @@ export function ServerJoinCard({ currentTrack, joinHref = AC_ELITE_SERVER_JOIN_H
     lobbyName: typeof info?.name === 'string' ? info.name : undefined,
   });
 
+  const phaseSummary = liveDataAvailable
+    ? [phase, timeLeft].filter((v) => v && v !== '-').join(' · ') || '-'
+    : 'Data unavailable';
+
   const rawLobbyName = typeof info?.name === 'string' ? info.name.trim() : '';
   const lobbyName = rawLobbyName ? sanitizeServerLobbyDisplayName(rawLobbyName) : '';
+
+  const heroSrc = rawTrack ? getTrackHeroImageSrc(rawTrack) : null;
+  const cardBackground = heroSrc
+    ? undefined
+    : `linear-gradient(180deg, rgba(16,18,25,0.98) 0%, rgba(10,12,17,0.98) 100%), radial-gradient(circle at 88% 5%, ${ACCENT_GLOW}, transparent 45%)`;
 
   return (
     <Box sx={softFloatWrapperSx()}>
@@ -165,14 +178,49 @@ export function ServerJoinCard({ currentTrack, joinHref = AC_ELITE_SERVER_JOIN_H
           width: '100%',
           borderRadius: 2,
           border: `1px solid ${online ? ACCENT_BORDER : 'rgba(148,163,184,0.38)'}`,
-          background:
-            `linear-gradient(180deg, rgba(16,18,25,0.98) 0%, rgba(10,12,17,0.98) 100%), radial-gradient(circle at 88% 5%, ${ACCENT_GLOW}, transparent 45%)`,
+          background: cardBackground,
           boxShadow: `0 14px 30px rgba(0,0,0,0.4), inset 0 0 0 1px ${online ? ACCENT_INNER : 'rgba(148,163,184,0.08)'}`,
-          p: 1.65,
+          overflow: 'hidden',
           ...sx,
         }}
       >
-        <Stack spacing={1.75}>
+        {heroSrc ? (
+          <Box sx={{ position: 'relative', lineHeight: 0 }}>
+            <Box
+              component="img"
+              src={heroSrc}
+              alt=""
+              width={800}
+              height={450}
+              sx={{
+                width: '100%',
+                height: { xs: 148, sm: 168 },
+                objectFit: 'cover',
+                objectPosition: 'center',
+                display: 'block',
+              }}
+            />
+            <Box
+              aria-hidden
+              sx={{
+                pointerEvents: 'none',
+                position: 'absolute',
+                inset: 0,
+                background:
+                  'linear-gradient(180deg, rgba(10,12,17,0.05) 0%, rgba(10,12,17,0.55) 55%, rgba(10,12,17,0.96) 100%)',
+              }}
+            />
+          </Box>
+        ) : null}
+
+        <Stack
+          spacing={1.75}
+          sx={{
+            /** Same gutter as {@link GLASS_PANEL_SX} / Race Intelligence — one token for all glass cards. */
+            p: GLASS_PADDING.panel,
+            bgcolor: heroSrc ? 'rgba(12,14,20,0.98)' : 'transparent',
+          }}
+        >
         <Stack direction="row" justifyContent="space-between" alignItems="center">
           <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.72)', fontWeight: 700, letterSpacing: 0.5 }}>
             AC ELITE SERVER
@@ -223,28 +271,28 @@ export function ServerJoinCard({ currentTrack, joinHref = AC_ELITE_SERVER_JOIN_H
         </Typography>
 
         <Grid container spacing={0.85}>
-          <Grid size={{ xs: 6 }}>
+          <Grid size={{ xs: 6, md: 2 }} sx={{ minWidth: 0 }}>
             <ServerInfoBlock label="Players">
-              <Typography variant="body2" sx={infoValueSx}>
+              <Typography variant="body2" sx={infoValueSx} noWrap title={slotsLabel}>
                 {slotsLabel}
               </Typography>
             </ServerInfoBlock>
           </Grid>
-          <Grid size={{ xs: 6 }}>
+          <Grid size={{ xs: 6, md: 3 }} sx={{ minWidth: 0 }}>
             <ServerInfoBlock label="Phase">
-              <Typography variant="body2" sx={infoValueSx}>
-                {liveDataAvailable ? ([phase, timeLeft].filter((v) => v && v !== '-').join(' · ') || '-') : 'Data unavailable'}
+              <Typography variant="body2" sx={infoValueSx} noWrap title={phaseSummary}>
+                {phaseSummary}
               </Typography>
             </ServerInfoBlock>
           </Grid>
-          <Grid size={{ xs: 6 }}>
+          <Grid size={{ xs: 6, md: 3 }} sx={{ minWidth: 0 }}>
             <ServerInfoBlock label="Cars">
               <Typography variant="body2" sx={infoValueSx} noWrap title={cars.join(', ')}>
                 {liveDataAvailable ? (cars.length ? cars.join(', ') : '-') : 'Data unavailable'}
               </Typography>
             </ServerInfoBlock>
           </Grid>
-          <Grid size={{ xs: 6 }}>
+          <Grid size={{ xs: 12, md: 4 }} sx={{ minWidth: 0 }}>
             <ServerInfoBlock label="Schedule">
               <Typography variant="body2" sx={infoValueSx} noWrap title={schedule ?? '-'}>
                 {liveDataAvailable ? (schedule ?? '-') : 'Data unavailable'}

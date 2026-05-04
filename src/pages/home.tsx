@@ -156,19 +156,96 @@ const sectionKickerSx = {
   fontWeight: 700,
 };
 
-function HeroSection({
+function RaceIntelligenceCard({
+  syncStatus,
   totalDrivers,
   totalLaps,
   activeTracks,
-  syncStatus,
   currentTrack,
+  motionSxIndex = 1,
 }: {
+  syncStatus: SyncHealth;
   totalDrivers: number;
   totalLaps: number;
   activeTracks: number;
-  syncStatus: SyncHealth;
   currentTrack: CurrentTrackData | null;
+  motionSxIndex?: number;
 }) {
+  return (
+    <Box sx={softFloatWrapperSx({ alternatePhase: true })}>
+      <Box
+        sx={{
+          ...GLASS_PANEL_SX,
+          ...statusAccentBorderSx(syncStatus.color),
+          ...statusAccentSplitRimSx(syncStatus.color),
+          textAlign: { xs: 'center', md: 'left' },
+          ...glassCardMotionSx(motionSxIndex),
+        }}
+      >
+        <Stack spacing={2}>
+          <Box>
+            <Typography variant="overline" sx={sectionKickerSx}>
+              Race Intelligence
+            </Typography>
+            <Typography variant="h6" sx={{ fontWeight: 800, mt: 0.4 }}>
+              One view. All key data.
+            </Typography>
+            <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5 }}>
+              Live KMR-powered insights for driver search, safety rating, and license progression.
+            </Typography>
+          </Box>
+
+          <Typography
+            variant="body2"
+            sx={{ color: syncStatus.color, fontWeight: 700, textAlign: { xs: 'center', md: 'left' } }}
+          >
+            {syncStatus.label} · {syncStatus.ageText}
+          </Typography>
+
+          <Grid container spacing={1}>
+            {[
+              { label: 'Total drivers', value: formatNumber(totalDrivers) },
+              { label: 'Logged laps', value: formatNumber(totalLaps) },
+              { label: 'Active tracks', value: formatNumber(activeTracks) },
+              {
+                label: 'Live server track',
+                value: currentTrack?.track ? getTrackDisplayName(currentTrack.track) : '—',
+              },
+            ].map((item, tileIndex) => (
+              <Grid key={item.label} size={{ xs: 6 }}>
+                <Box
+                  sx={{
+                    ...GLASS_INNER_PANEL_SX,
+                    ...glassCardMotionSx(3 + tileIndex),
+                    minHeight: 78,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    alignItems: { xs: 'center', md: 'flex-start' },
+                  }}
+                >
+                  <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.68)' }}>
+                    {item.label}
+                  </Typography>
+                  <Typography
+                    variant="subtitle2"
+                    sx={{ fontWeight: 800, lineHeight: 1.25, mt: 0.2 }}
+                    noWrap
+                    title={typeof item.value === 'string' ? item.value : undefined}
+                  >
+                    {item.value}
+                  </Typography>
+                </Box>
+              </Grid>
+            ))}
+          </Grid>
+        </Stack>
+      </Box>
+    </Box>
+  );
+}
+
+function HeroSection({ currentTrack }: { currentTrack: CurrentTrackData | null }) {
   const theme = useTheme();
   const isMdUp = useMediaQuery(theme.breakpoints.up('md'));
 
@@ -293,81 +370,8 @@ function HeroSection({
           </Grid>
 
           <Grid size={{ xs: 12, md: 5 }}>
-            <Stack spacing={2}>
-              <Box sx={softFloatWrapperSx({ alternatePhase: true })}>
-                <Box
-                  sx={{
-                    ...GLASS_PANEL_SX,
-                    ...statusAccentBorderSx(syncStatus.color),
-                    ...statusAccentSplitRimSx(syncStatus.color),
-                    textAlign: { xs: 'center', md: 'left' },
-                    ...glassCardMotionSx(1),
-                  }}
-                >
-                  <Stack spacing={2}>
-                  <Box>
-                    <Typography
-                      variant="overline"
-                      sx={sectionKickerSx}
-                    >
-                      Race Intelligence
-                    </Typography>
-                    <Typography variant="h6" sx={{ fontWeight: 800, mt: 0.4 }}>
-                      One view. All key data.
-                    </Typography>
-                    <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5 }}>
-                      Live KMR-powered insights for driver search, safety rating, and license progression.
-                    </Typography>
-                  </Box>
-
-                  <Typography
-                    variant="body2"
-                    sx={{ color: syncStatus.color, fontWeight: 700, textAlign: { xs: 'center', md: 'left' } }}
-                  >
-                    {syncStatus.label} · {syncStatus.ageText}
-                  </Typography>
-
-                  <Grid container spacing={1}>
-                    {[
-                      { label: 'Total drivers', value: formatNumber(totalDrivers) },
-                      { label: 'Logged laps', value: formatNumber(totalLaps) },
-                      { label: 'Active tracks', value: formatNumber(activeTracks) },
-                      {
-                        label: 'Live server track',
-                        value: currentTrack?.track ? getTrackDisplayName(currentTrack.track) : '—',
-                      },
-                    ].map((item, tileIndex) => (
-                      <Grid key={item.label} size={{ xs: 6 }}>
-                        <Box
-                          sx={{
-                            ...GLASS_INNER_PANEL_SX,
-                            ...glassCardMotionSx(3 + tileIndex),
-                            minHeight: 78,
-                            display: 'flex',
-                            flexDirection: 'column',
-                            justifyContent: 'center',
-                            alignItems: { xs: 'center', md: 'flex-start' },
-                          }}
-                        >
-                          <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.68)' }}>
-                            {item.label}
-                          </Typography>
-                          <Typography
-                            variant="subtitle2"
-                            sx={{ fontWeight: 800, lineHeight: 1.25, mt: 0.2 }}
-                            noWrap
-                            title={typeof item.value === 'string' ? item.value : undefined}
-                          >
-                            {item.value}
-                          </Typography>
-                        </Box>
-                      </Grid>
-                    ))}
-                  </Grid>
-                </Stack>
-                </Box>
-              </Box>
-
+            <Stack spacing={2} sx={{ height: 1, alignItems: { xs: 'center', md: 'stretch' } }}>
+              <ServerJoinCard currentTrack={currentTrack} sx={{ ...glassCardMotionSx(1) }} />
             </Stack>
           </Grid>
         </Grid>
@@ -678,11 +682,19 @@ function DriverSearchSection({
   loading,
   error,
   currentTrack,
+  syncStatus,
+  totalDrivers,
+  totalLaps,
+  activeTracks,
 }: {
   drivers: DriverView[];
   loading: boolean;
   error: string | null;
   currentTrack: CurrentTrackData | null;
+  syncStatus: SyncHealth;
+  totalDrivers: number;
+  totalLaps: number;
+  activeTracks: number;
 }) {
   const [query, setQuery] = useState('');
 
@@ -716,7 +728,7 @@ function DriverSearchSection({
     >
       <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1 }}>
         <Grid container spacing={{ xs: 2, md: 4.5 }} alignItems="stretch">
-          <Grid size={{ xs: 12, md: 8 }}>
+          <Grid size={{ xs: 12, md: 7 }}>
             <Stack spacing={1} sx={{ mb: 2, textAlign: { xs: 'center', md: 'left' }, alignItems: { xs: 'center', md: 'flex-start' } }}>
               <Typography variant="overline" sx={sectionKickerSx}>
                 Driver statistics
@@ -856,9 +868,16 @@ function DriverSearchSection({
             {error && <Typography color="error" sx={{ mt: 1 }}>Failed to load driver data: {error}</Typography>}
           </Grid>
 
-          <Grid size={{ xs: 12, md: 4 }}>
+          <Grid size={{ xs: 12, md: 5 }}>
             <Stack spacing={1.25} sx={{ height: 1, alignItems: { xs: 'center', md: 'stretch' } }}>
-              <ServerJoinCard currentTrack={currentTrack} sx={{ ...glassCardMotionSx(1) }} />
+              <RaceIntelligenceCard
+                syncStatus={syncStatus}
+                totalDrivers={totalDrivers}
+                totalLaps={totalLaps}
+                activeTracks={activeTracks}
+                currentTrack={currentTrack}
+                motionSxIndex={1}
+              />
             </Stack>
           </Grid>
         </Grid>
@@ -1063,18 +1082,16 @@ export default function Page() {
       />
       <meta property="og:url" content="https://ac-elite.github.io/" />
 
-      <HeroSection
-        totalDrivers={community.totalDrivers}
-        totalLaps={community.totalLaps}
-        activeTracks={community.activeTracks}
-        syncStatus={syncStatus}
-        currentTrack={currentTrack}
-      />
+      <HeroSection currentTrack={currentTrack} />
       <DriverSearchSection
         drivers={drivers}
         loading={loading}
         error={error}
         currentTrack={currentTrack}
+        syncStatus={syncStatus}
+        totalDrivers={community.totalDrivers}
+        totalLaps={community.totalLaps}
+        activeTracks={community.activeTracks}
       />
       <CurrentTrackLeaderboardSection
         loading={loading}
