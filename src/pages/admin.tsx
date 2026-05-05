@@ -633,7 +633,8 @@ export default function Page() {
                       sx={{
                         borderCollapse: 'separate',
                         borderSpacing: 0,
-                        minWidth: 720,
+                        minWidth: 980,
+                        tableLayout: 'fixed',
                       }}
                     >
                       <TableHead>
@@ -653,11 +654,11 @@ export default function Page() {
                             },
                           }}
                         >
-                          <TableCell>Data file</TableCell>
-                          <TableCell>Source</TableCell>
-                          <TableCell>Last change</TableCell>
-                          <TableCell>Freshness</TableCell>
-                          <TableCell>Notes</TableCell>
+                          <TableCell sx={{ width: { xs: 170, sm: 180 } }}>Data file</TableCell>
+                          <TableCell sx={{ width: { xs: 120, sm: 140 } }}>Source</TableCell>
+                          <TableCell sx={{ width: { xs: 165, sm: 180 } }}>Last change</TableCell>
+                          <TableCell sx={{ width: { xs: 150, sm: 170 } }}>Freshness</TableCell>
+                          <TableCell sx={{ width: { xs: 340, sm: 420, md: 500 } }}>Notes</TableCell>
                         </TableRow>
                       </TableHead>
                       <TableBody>
@@ -678,7 +679,7 @@ export default function Page() {
                               borderLeftColor: health.color,
                             }}
                           >
-                            <TableCell sx={{ ...freshnessBodyCellSx, pl: 1.5, pr: 1 }}>
+                            <TableCell sx={{ ...freshnessBodyCellSx, pl: 1.5, pr: 1, width: { xs: 170, sm: 180 } }}>
                               <Box
                                 component="span"
                                 sx={{
@@ -697,7 +698,7 @@ export default function Page() {
                                 {df.file}
                               </Box>
                             </TableCell>
-                            <TableCell sx={{ ...freshnessBodyCellSx, color: 'text.secondary', maxWidth: 200 }}>
+                            <TableCell sx={{ ...freshnessBodyCellSx, color: 'text.secondary', width: { xs: 120, sm: 140 } }}>
                               {df.updatedBy}
                             </TableCell>
                             <TableCell
@@ -706,11 +707,12 @@ export default function Page() {
                                 color: 'text.primary',
                                 fontVariantNumeric: 'tabular-nums',
                                 whiteSpace: 'nowrap',
+                                width: { xs: 165, sm: 180 },
                               }}
                             >
                               {formatAbsolute(ts)}
                             </TableCell>
-                            <TableCell sx={{ ...freshnessBodyCellSx, minWidth: 140 }}>
+                            <TableCell sx={{ ...freshnessBodyCellSx, minWidth: 140, width: { xs: 150, sm: 170 } }}>
                               <Stack direction="row" alignItems="center" spacing={1} flexWrap="wrap" useFlexGap>
                                 <Chip
                                   size="small"
@@ -736,9 +738,10 @@ export default function Page() {
                                 color: 'text.secondary',
                                 fontSize: '0.8125rem',
                                 lineHeight: 1.45,
-                                maxWidth: { xs: 200, sm: 280, md: 360 },
+                                width: { xs: 340, sm: 420, md: 500 },
                                 whiteSpace: 'normal',
-                                overflowWrap: 'anywhere',
+                                overflowWrap: 'break-word',
+                                wordBreak: 'normal',
                               }}
                             >
                               {note || '—'}
