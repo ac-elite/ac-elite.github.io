@@ -14,6 +14,8 @@ import {
   mergeInfoStaticOverlayLive,
   mergeInfoWhenPreferringLiveSnapshot,
 } from 'src/lib/server-info';
+import { applyCurrentTrackMock } from 'src/centralized/current-track-mock';
+import { supabaseBaseUrl, supabaseHeaders, supabaseReadConfigured } from 'src/centralized/supabase-rest';
 
 /** Browser poll interval once live `server_status` reads succeed (or when forced on). */
 export const LIVE_SERVER_STATUS_POLL_MS = 90_000;
@@ -26,15 +28,11 @@ function isBrowser(): boolean {
   return typeof window !== 'undefined';
 }
 
-/** Opt-in debug: `?serverStatusDebug=1` or localStorage `acelite:server-status-debug=1`. */
+/** Opt-in debug via query param: `?serverStatusDebug=1`. */
 export function isServerStatusDebugEnabled(): boolean {
-  const env = import.meta.env.VITE_SERVER_STATUS_DEBUG?.trim().toLowerCase();
-  if (env === '1' || env === 'true' || env === 'yes') return true;
   if (!isBrowser()) return false;
   const qp = new URLSearchParams(window.location.search).get('serverStatusDebug')?.toLowerCase();
-  if (qp === '1' || qp === 'true' || qp === 'yes') return true;
-  const ls = window.localStorage.getItem('acelite:server-status-debug')?.toLowerCase();
-  return ls === '1' || ls === 'true' || ls === 'yes';
+  return qp === '1' || qp === 'true' || qp === 'yes';
 }
 
 export type CurrentTrackPayload = {
@@ -55,28 +53,18 @@ function isServerOfflineDebugRawOn(raw: string | null | undefined): boolean {
  * When enabled, server payloads behave as if the game server is offline (`online: false`)
  * so you can test join card / fallback UI without stopping the real server.
  *
- * - Env: `VITE_SERVER_OFFLINE_DEBUG`
  * - URL: `?serverOfflineDebug=1` (or `on`, `true`, …)
- * - Storage: `localStorage['acelite:server-offline-debug']`
  */
 export function isServerOfflineDebugEnabled(): boolean {
-  if (isServerOfflineDebugRawOn(import.meta.env.VITE_SERVER_OFFLINE_DEBUG)) return true;
   if (!isBrowser()) return false;
   const qp = new URLSearchParams(window.location.search).get('serverOfflineDebug');
-  if (isServerOfflineDebugRawOn(qp)) return true;
-  return isServerOfflineDebugRawOn(window.localStorage.getItem('acelite:server-offline-debug'));
+  return isServerOfflineDebugRawOn(qp);
 }
 
 /** If offline debug is on, force `online: false` on the payload (rest unchanged). */
 export function applyServerOfflineDebug(payload: CurrentTrackPayload | null): CurrentTrackPayload | null {
   if (!payload || !isServerOfflineDebugEnabled()) return payload;
   return { ...payload, online: false };
-}
-
-function supabaseReadConfigured(): boolean {
-  const url = import.meta.env.VITE_SUPABASE_URL?.trim();
-  const key = import.meta.env.VITE_SUPABASE_ANON_KEY?.trim();
-  return Boolean(url && key);
 }
 
 function explicitLiveServerDisabled(): boolean {
@@ -106,22 +94,6 @@ export function shouldPollLiveServerStatus(): boolean {
 /** @deprecated Use `shouldPollLiveServerStatus` — same behaviour. */
 export function isSupabaseLiveServerStatusEnabled(): boolean {
   return shouldPollLiveServerStatus();
-}
-
-function supabaseHeaders(): HeadersInit {
-  const key = import.meta.env.VITE_SUPABASE_ANON_KEY!.trim();
-  const headers: Record<string, string> = {
-    apikey: key,
-    'Content-Type': 'application/json',
-  };
-  if (!key.startsWith('sb_')) {
-    headers.Authorization = `Bearer ${key}`;
-  }
-  return headers;
-}
-
-function supabaseBaseUrl(): string {
-  return import.meta.env.VITE_SUPABASE_URL!.trim().replace(/\/$/, '');
 }
 
 /** Single PostgREST row, or null on error / empty response. */
@@ -248,7 +220,7 @@ export function pickNewerCurrentTrack(
     }
   }
 
-  return applyServerOfflineDebug(result);
+  return applyCurrentTrackMock(applyServerOfflineDebug(result));
 }
 
 /** Normalize admin / loose JSON into the merge payload shape. */
@@ -260,10 +232,10 @@ export function toCurrentTrackPayload(row: {
 } | null): CurrentTrackPayload | null {
   if (!row) return null;
   const info = parseAcServerInfo(row.info);
-  return {
+  return applyCurrentTrackMock({
     online: Boolean(row.online),
     track: typeof row.track === 'string' ? row.track : '',
     fetchedAt: typeof row.fetchedAt === 'string' ? row.fetchedAt : '',
     info: info ?? undefined,
-  };
+  });
 }

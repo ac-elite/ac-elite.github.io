@@ -23,8 +23,11 @@ import TableContainer from '@mui/material/TableContainer';
 import { useTheme, keyframes } from '@mui/material/styles';
 
 import { CONFIG } from 'src/config-global';
+import { APP_ROUTES } from 'src/centralized/app-routes';
+import { DATA_FILES } from 'src/centralized/data-files';
 import { fetchJson } from 'src/lib/fetch-json';
 import { getDriverProfileHref } from 'src/lib/routes';
+import { getSiteUrl } from 'src/centralized/site-urls';
 import { SITE_TEAM_ROLES } from 'src/site-manual-config';
 import { ACE_SKIN_PACK_DOWNLOAD_URL } from 'src/lib/ace-skin-pack-download';
 import { computeDeltas, type DriverDelta, fetchPrevRankData } from 'src/lib/delta';
@@ -926,11 +929,11 @@ export default function Page() {
       setError(null);
       try {
         const [rank, leaderboard, meta, prevRank, trackJson] = await Promise.all([
-          fetchJson<RankDriver[]>('/data/rank.json'),
-          fetchJson<Record<string, any>>('/data/leaderboard.json'),
-          fetchJson<SiteMetadata>('/data/metadata.json'),
+          fetchJson<RankDriver[]>(DATA_FILES.rank),
+          fetchJson<Record<string, any>>(DATA_FILES.leaderboard),
+          fetchJson<SiteMetadata>(DATA_FILES.metadata),
           fetchPrevRankData(),
-          fetchJson<CurrentTrackData>('/data/current-track.json').catch(() => null),
+          fetchJson<CurrentTrackData>(DATA_FILES.currentTrack).catch(() => null),
         ]);
 
         if (!mounted) return;
@@ -968,7 +971,7 @@ export default function Page() {
     if (!shouldPollLiveServerStatus()) return undefined;
     let mounted = true;
     const tick = () => {
-      void fetchJson<CurrentTrackData>('/data/current-track.json')
+      void fetchJson<CurrentTrackData>(DATA_FILES.currentTrack)
         .catch(() => null)
         .then((trackJson) => {
           if (!mounted) return;
@@ -1094,7 +1097,7 @@ export default function Page() {
         property="og:description"
         content="AC Elite Assetto Corsa community: KMR-powered stats, leaderboards, safety rating and licence progression. Search drivers and compare lap times."
       />
-      <meta property="og:url" content="https://ac-elite.github.io/" />
+      <meta property="og:url" content={getSiteUrl(APP_ROUTES.home)} />
 
       <HeroSection currentTrack={currentTrack} />
       <DriverSearchSection

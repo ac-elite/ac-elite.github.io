@@ -1,6 +1,7 @@
 import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
 
+import { APP_ROUTES } from 'src/centralized/app-routes';
 import { usePathname } from 'src/routes/hooks';
 import { RouterLink } from 'src/routes/components';
 
@@ -9,7 +10,7 @@ import { RouterLink } from 'src/routes/components';
  */
 export function ModTeamAdminLink() {
   const pathname = usePathname();
-  if (pathname === '/admin' || pathname.endsWith('/admin')) {
+  if (pathname === APP_ROUTES.admin || pathname.endsWith(APP_ROUTES.admin)) {
     return null;
   }
 
@@ -24,7 +25,7 @@ export function ModTeamAdminLink() {
     >
       <Link
         component={RouterLink}
-        href="/admin"
+        href={APP_ROUTES.admin}
         underline="hover"
         sx={{
           color: 'rgba(255,255,255,0.22)',

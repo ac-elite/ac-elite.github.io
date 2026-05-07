@@ -42,27 +42,29 @@ jobs:
             echo '{"online":false,"track":"","fetchedAt":"'"$(date -u +'%Y-%m-%dT%H:%M:%SZ')"'","info":{}}' > "$DEST"
           else
             echo "$HTTP_RESPONSE" | python3 -c "
-          import json, sys
-          # Keep in sync with trackNames keys in src/lib/ac-elite-data.ts that end with a lone trailing _.
-          _CANONICAL_TRAILING_UNDERSCORE = (
-              'imola_',
-              'ks_laguna_seca_',
-              'magione_',
-              'monza_',
-              'mugello_',
-              'spa_',
-              'ks_zandvoort_',
-              'canada_2021_',
-          )
+          import json, pathlib, sys
+
+          _TRACK_CATALOG_PATH = pathlib.Path('src/centralized/track-catalog.json')
+          _TRACK_ID_ALIASES = {}
+          try:
+              catalog = json.loads(_TRACK_CATALOG_PATH.read_text(encoding='utf-8'))
+              for row in catalog:
+                  canon = row.get('id')
+                  if not isinstance(canon, str) or not canon:
+                      continue
+                  aliases = row.get('aliases', [])
+                  if isinstance(aliases, list):
+                      for alias in aliases:
+                          if isinstance(alias, str) and alias:
+                              _TRACK_ID_ALIASES[alias] = canon
+          except Exception:
+              _TRACK_ID_ALIASES = {}
 
           def normalize_track_id(track):
               if not isinstance(track, str):
                   return ''
               t = track.replace('-layout', '_layout').replace('-', '_')
-              for canon in _CANONICAL_TRAILING_UNDERSCORE:
-                  if t == canon or t == canon[:-1]:
-                      return canon
-              return t
+              return _TRACK_ID_ALIASES.get(t, t)
           try:
               data = json.load(sys.stdin)
               track = normalize_track_id(data.get('track', ''))

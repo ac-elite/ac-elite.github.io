@@ -12,9 +12,12 @@ import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 
 import { CONFIG } from 'src/config-global';
+import { APP_ROUTES } from 'src/centralized/app-routes';
+import { DATA_FILES } from 'src/centralized/data-files';
 import { fetchJson } from 'src/lib/fetch-json';
 import { DATA_PAGE_SHELL_SX } from 'src/lib/page-shell';
 import { getLeaderboardHref, getDriverProfileHref } from 'src/lib/routes';
+import { getSiteUrl } from 'src/centralized/site-urls';
 import { GLASS_CARD_SX, GLASS_PANEL_SX, GLASS_CARD_INNER_SX } from 'src/lib/glass';
 import { getSyncHealth, type SiteMetadata, getEffectiveLastSync } from 'src/lib/sync-utils';
 import { subtleEnterUpSx, glassCardMotionSx, softFloatWrapperSx } from 'src/lib/subtle-motion';
@@ -46,9 +49,9 @@ export default function Page() {
       setError(null);
       try {
         const [rank, leaderboard, meta, prevRank] = await Promise.all([
-          fetchJson<RankDriver[]>('/data/rank.json'),
-          fetchJson<Record<string, any>>('/data/leaderboard.json'),
-          fetchJson<SiteMetadata>('/data/metadata.json'),
+          fetchJson<RankDriver[]>(DATA_FILES.rank),
+          fetchJson<Record<string, any>>(DATA_FILES.leaderboard),
+          fetchJson<SiteMetadata>(DATA_FILES.metadata),
           fetchPrevRankData(),
         ]);
 
@@ -169,7 +172,7 @@ export default function Page() {
       <meta name="description" content="AC Elite community stats: driver counts, lap totals, and track activity." />
       <meta property="og:title" content="Stats - AC Elite" />
       <meta property="og:description" content="AC Elite community stats: driver counts, lap totals, and track activity." />
-      <meta property="og:url" content="https://ac-elite.github.io/dashboard" />
+      <meta property="og:url" content={getSiteUrl(APP_ROUTES.dashboard)} />
 
       <Box sx={{ ...DATA_PAGE_SHELL_SX }}>
         <PageGridOverlay />

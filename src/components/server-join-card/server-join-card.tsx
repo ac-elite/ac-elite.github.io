@@ -11,9 +11,10 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 
 import { GLASS_PADDING } from 'src/lib/glass';
+import { SERVER_ENDPOINTS } from 'src/centralized/server-endpoints';
 import { formatTimeAgo } from 'src/lib/sync-utils';
 import { BRAND_ACCENT } from 'src/lib/status-accent';
-import { getTrackHeroImageSrc } from 'src/lib/track-hero';
+import { getTrackHeroImageOffsetY, getTrackHeroImageSrc } from 'src/lib/track-hero';
 import { softFloatWrapperSx } from 'src/lib/subtle-motion';
 import { getTrackDisplayName, normalizeServerTrackId } from 'src/lib/ac-elite-data';
 import {
@@ -24,8 +25,7 @@ import {
 } from 'src/lib/server-info';
 
 /** Content Manager deep link (same host/query as admin / workflows). */
-export const AC_ELITE_SERVER_JOIN_HREF =
-  'https://acstuff.ru/s/q:race/online/join?httpPort=18283&ip=157.90.3.32';
+export const AC_ELITE_SERVER_JOIN_HREF = SERVER_ENDPOINTS.join;
 
 /** Zelfde accent als `brandAccentBorderSx()` / glass panels (geen lime LFM-kleur). */
 const ACCENT = BRAND_ACCENT;
@@ -176,6 +176,7 @@ export function ServerJoinCard({ currentTrack, joinHref = AC_ELITE_SERVER_JOIN_H
   const lobbyName = rawLobbyName ? sanitizeServerLobbyDisplayName(rawLobbyName) : '';
 
   const heroSrc = rawTrack ? getTrackHeroImageSrc(rawTrack) : null;
+  const heroOffsetY = rawTrack ? getTrackHeroImageOffsetY(rawTrack) : 0;
   const cardBackground = heroSrc
     ? undefined
     : `linear-gradient(180deg, rgba(16,18,25,0.98) 0%, rgba(10,12,17,0.98) 100%), radial-gradient(circle at 88% 5%, ${ACCENT_GLOW}, transparent 45%)`;
@@ -193,8 +194,8 @@ export function ServerJoinCard({ currentTrack, joinHref = AC_ELITE_SERVER_JOIN_H
           ...sx,
         }}
       >
-        {heroSrc ? (
-          <Box sx={{ position: 'relative', lineHeight: 0 }}>
+        <Box sx={{ position: 'relative', lineHeight: 0, overflow: 'hidden' }}>
+          {heroSrc ? (
             <Box
               component="img"
               src={heroSrc}
@@ -205,22 +206,32 @@ export function ServerJoinCard({ currentTrack, joinHref = AC_ELITE_SERVER_JOIN_H
                 width: '100%',
                 height: { xs: 148, sm: 168 },
                 objectFit: 'cover',
-                objectPosition: 'center',
+                objectPosition: heroOffsetY === 0 ? 'center' : `center calc(50% + ${heroOffsetY}px)`,
                 display: 'block',
               }}
             />
+          ) : (
             <Box
               aria-hidden
               sx={{
-                pointerEvents: 'none',
-                position: 'absolute',
-                inset: 0,
+                width: '100%',
+                height: { xs: 148, sm: 168 },
                 background:
-                  'linear-gradient(180deg, rgba(10,12,17,0.05) 0%, rgba(10,12,17,0.55) 55%, rgba(10,12,17,0.96) 100%)',
+                  'radial-gradient(circle at 85% 10%, rgba(147, 197, 253, 0.12), transparent 45%), linear-gradient(180deg, rgba(16,20,32,0.92) 0%, rgba(10,14,24,0.95) 100%), repeating-linear-gradient(0deg, rgba(148,163,184,0.08) 0px, rgba(148,163,184,0.08) 1px, transparent 1px, transparent 28px), repeating-linear-gradient(90deg, rgba(148,163,184,0.08) 0px, rgba(148,163,184,0.08) 1px, transparent 1px, transparent 28px)',
               }}
             />
-          </Box>
-        ) : null}
+          )}
+          <Box
+            aria-hidden
+            sx={{
+              pointerEvents: 'none',
+              position: 'absolute',
+              inset: 0,
+              background:
+                'linear-gradient(180deg, rgba(10,12,17,0.05) 0%, rgba(10,12,17,0.55) 55%, rgba(10,12,17,0.96) 100%)',
+            }}
+          />
+        </Box>
 
         <Stack
           spacing={1.75}

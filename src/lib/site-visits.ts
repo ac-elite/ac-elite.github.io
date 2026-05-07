@@ -1,3 +1,6 @@
+import { APP_ROUTES } from 'src/centralized/app-routes';
+import { supabaseBaseUrl, supabaseHeaders } from 'src/centralized/supabase-rest';
+
 /** localStorage: epoch ms of last successful increment (same browser, any tab). */
 const LAST_COUNTED_AT_KEY = 'ace:site-visit-last-counted-at';
 
@@ -62,7 +65,7 @@ function writeLastCountedAtMs(ms: number): void {
 /** Mod-only routes: do not increment global “public” visit stats. */
 export function isPathExcludedFromSiteVisitCount(pathname: string): boolean {
   const p = pathname.replace(/\/$/, '') || '/';
-  return p === '/admin' || p.startsWith('/admin/');
+  return p === APP_ROUTES.admin || p.startsWith(`${APP_ROUTES.admin}/`);
 }
 
 /**
@@ -76,7 +79,7 @@ export function normalizePathForVisitStats(pathname: string): string {
     return `${p.slice(0, 197)}...`;
   }
   if (/^\/driver\/[^/]+$/i.test(p)) {
-    return '/driver/:id';
+    return APP_ROUTES.driverStatsPattern;
   }
   return p;
 }
@@ -87,24 +90,6 @@ export function isSiteVisitsConfigured(): boolean {
   const url = import.meta.env.VITE_SUPABASE_URL?.trim();
   const key = import.meta.env.VITE_SUPABASE_ANON_KEY?.trim();
   return Boolean(url && key);
-}
-
-function supabaseHeaders(): HeadersInit {
-  const key = import.meta.env.VITE_SUPABASE_ANON_KEY!.trim();
-  const headers: Record<string, string> = {
-    apikey: key,
-    'Content-Type': 'application/json',
-  };
-  // New platform keys (sb_publishable_ / sb_secret_) are not JWTs — do not use Bearer.
-  // Legacy anon JWT still uses Authorization for PostgREST.
-  if (!key.startsWith('sb_')) {
-    headers.Authorization = `Bearer ${key}`;
-  }
-  return headers;
-}
-
-function supabaseBaseUrl(): string {
-  return import.meta.env.VITE_SUPABASE_URL!.trim().replace(/\/$/, '');
 }
 
 /** Postgres bigint / numeric often arrives as string in JSON. */

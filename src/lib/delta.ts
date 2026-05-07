@@ -1,4 +1,5 @@
 import { fetchJson } from './fetch-json';
+import { DATA_FILES } from 'src/centralized/data-files';
 import {
   getDriverSR,
   type RankDriver,
@@ -15,7 +16,7 @@ const EPSILON = 0.001;
 
 export async function fetchPrevRankData(): Promise<RankDriver[]> {
   try {
-    return await fetchJson<RankDriver[]>('/data/rank-24h.json');
+    return await fetchJson<RankDriver[]>(DATA_FILES.rank24h);
   } catch {
     return [];
   }

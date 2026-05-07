@@ -21,8 +21,11 @@ import FormControl from '@mui/material/FormControl';
 import TableContainer from '@mui/material/TableContainer';
 
 import { CONFIG } from 'src/config-global';
+import { APP_ROUTES } from 'src/centralized/app-routes';
+import { DATA_FILES } from 'src/centralized/data-files';
 import { fetchJson } from 'src/lib/fetch-json';
 import { getDriverProfileHref } from 'src/lib/routes';
+import { getSiteUrl } from 'src/centralized/site-urls';
 import { computeDeltas, type DriverDelta, fetchPrevRankData } from 'src/lib/delta';
 import { getSyncHealth, type SiteMetadata, getEffectiveLastSync } from 'src/lib/sync-utils';
 import { subtleRowEnterSx, glassCardMotionSx, softFloatWrapperSx } from 'src/lib/subtle-motion';
@@ -93,11 +96,11 @@ export default function Page() {
       setError(null);
       try {
         const [rank, leaderboard, prevRank, trackJson, meta, liveStatus] = await Promise.all([
-          fetchJson<RankDriver[]>('/data/rank.json'),
-          fetchJson<Record<string, any>>('/data/leaderboard.json'),
+          fetchJson<RankDriver[]>(DATA_FILES.rank),
+          fetchJson<Record<string, any>>(DATA_FILES.leaderboard),
           fetchPrevRankData(),
-          fetchJson<CurrentTrackData>('/data/current-track.json').catch(() => null),
-          fetchJson<SiteMetadata>('/data/metadata.json').catch(() => ({})),
+          fetchJson<CurrentTrackData>(DATA_FILES.currentTrack).catch(() => null),
+          fetchJson<SiteMetadata>(DATA_FILES.metadata).catch(() => ({})),
           canAttemptLiveServerStatusFetch()
             ? fetchLiveServerStatusFromSupabase()
             : Promise.resolve(null),
@@ -190,7 +193,7 @@ export default function Page() {
       <meta name="description" content="AC Elite leaderboard by track. Compare lap times and find the fastest drivers." />
       <meta property="og:title" content="Leaderboard - AC Elite" />
       <meta property="og:description" content="AC Elite leaderboard by track. Compare lap times and find the fastest drivers." />
-      <meta property="og:url" content="https://ac-elite.github.io/leaderboard" />
+      <meta property="og:url" content={getSiteUrl(APP_ROUTES.leaderboard)} />
 
       <Box sx={{ ...DATA_PAGE_SHELL_SX }}>
         <PageGridOverlay />

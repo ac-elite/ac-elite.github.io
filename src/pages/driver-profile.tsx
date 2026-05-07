@@ -19,6 +19,8 @@ import TableContainer from '@mui/material/TableContainer';
 import { RouterLink } from 'src/routes/components';
 
 import { CONFIG } from 'src/config-global';
+import { APP_ROUTES } from 'src/centralized/app-routes';
+import { DATA_FILES } from 'src/centralized/data-files';
 import { fetchJson } from 'src/lib/fetch-json';
 import { SITE_TEAM_ROLES } from 'src/site-manual-config';
 import { getDiscordRolesForGuid } from 'src/lib/team-roles';
@@ -179,11 +181,11 @@ export default function Page() {
       setError(null);
       try {
         const [rank, leaderboard, prevRank, meta, liverySectionsRaw] = await Promise.all([
-          fetchJson<RankDriver[]>('/data/rank.json'),
-          fetchJson<Record<string, any>>('/data/leaderboard.json'),
+          fetchJson<RankDriver[]>(DATA_FILES.rank),
+          fetchJson<Record<string, any>>(DATA_FILES.leaderboard),
           fetchPrevRankData(),
-          fetchJson<SiteMetadata>('/data/metadata.json').catch(() => ({})),
-          fetchJson<LiveryShowcaseSectionsFile>('/data/livery-showcase-sections.json').catch(() => ({})),
+          fetchJson<SiteMetadata>(DATA_FILES.metadata).catch(() => ({})),
+          fetchJson<LiveryShowcaseSectionsFile>(DATA_FILES.liveryShowcaseSections).catch(() => ({})),
         ]);
         if (!mounted) return;
         setRankData(rank);
@@ -409,7 +411,7 @@ export default function Page() {
                     </Button>
                     <Button
                       component={RouterLink}
-                      href="/rankings"
+                      href={APP_ROUTES.rankings}
                       variant="outlined"
                       color="primary"
                       size="small"
@@ -741,7 +743,7 @@ export default function Page() {
                             hover
                             onClick={() =>
                               navigate({
-                                pathname: '/leaderboard',
+                                pathname: APP_ROUTES.leaderboard,
                                 search: getLeaderboardTrackSearch(row.trackId),
                               })
                             }

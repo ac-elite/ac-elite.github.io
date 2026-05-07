@@ -8,8 +8,10 @@ import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 
 import { CONFIG } from 'src/config-global';
+import { APP_ROUTES } from 'src/centralized/app-routes';
 import { CAR } from 'src/lib/ac-elite-data';
 import { SITE_PREVIEW } from 'src/site-manual-config';
+import { getSiteUrl } from 'src/centralized/site-urls';
 import { brandAccentBorderSx } from 'src/lib/status-accent';
 import { GLASS_PANEL_SX, GLASS_PANEL_COMPACT_SX } from 'src/lib/glass';
 import { glassCardMotionSx, softFloatWrapperSx } from 'src/lib/subtle-motion';
@@ -74,7 +76,7 @@ export default function Page() {
         property="og:description"
         content="AC Elite setup store: community Assetto Corsa car setups (preview). Browse qualy, race and wet baselines."
       />
-      <meta property="og:url" content="https://ac-elite.github.io/setup-store" />
+      <meta property="og:url" content={getSiteUrl(APP_ROUTES.setupStore)} />
 
       <Box sx={{ ...DATA_PAGE_SHELL_SX }}>
         <PageGridOverlay />

@@ -20,8 +20,11 @@ import FormControl from '@mui/material/FormControl';
 import TableContainer from '@mui/material/TableContainer';
 
 import { CONFIG } from 'src/config-global';
+import { APP_ROUTES } from 'src/centralized/app-routes';
+import { DATA_FILES } from 'src/centralized/data-files';
 import { fetchJson } from 'src/lib/fetch-json';
 import { getDriverProfileHref } from 'src/lib/routes';
+import { getSiteUrl } from 'src/centralized/site-urls';
 import { computeDeltas, type DriverDelta, fetchPrevRankData } from 'src/lib/delta';
 import { getSyncHealth, type SiteMetadata, getEffectiveLastSync } from 'src/lib/sync-utils';
 import { subtleRowEnterSx, glassCardMotionSx, softFloatWrapperSx } from 'src/lib/subtle-motion';
@@ -164,9 +167,9 @@ export default function Page() {
       setError(null);
       try {
         const [rank, prevRank, meta] = await Promise.all([
-          fetchJson<RankDriver[]>('/data/rank.json'),
+          fetchJson<RankDriver[]>(DATA_FILES.rank),
           fetchPrevRankData(),
-          fetchJson<SiteMetadata>('/data/metadata.json').catch(() => ({})),
+          fetchJson<SiteMetadata>(DATA_FILES.metadata).catch(() => ({})),
         ]);
         if (!mounted) return;
         setRankData(rank);
@@ -295,7 +298,7 @@ export default function Page() {
       <meta name="description" content="AC Elite rankings by overall, license tier, and safety tier." />
       <meta property="og:title" content="Rankings - AC Elite" />
       <meta property="og:description" content="AC Elite rankings by overall, license tier, and safety tier." />
-      <meta property="og:url" content="https://ac-elite.github.io/rankings" />
+      <meta property="og:url" content={getSiteUrl(APP_ROUTES.rankings)} />
 
       <Box sx={{ ...DATA_PAGE_SHELL_SX }}>
         <PageGridOverlay />

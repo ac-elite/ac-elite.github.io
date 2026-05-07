@@ -10,9 +10,12 @@ import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 
 import { CONFIG } from 'src/config-global';
+import { APP_ROUTES } from 'src/centralized/app-routes';
+import { DATA_FILES } from 'src/centralized/data-files';
 import { fetchJson } from 'src/lib/fetch-json';
 import { getDriverProfileHref } from 'src/lib/routes';
 import { DATA_PAGE_SHELL_SX } from 'src/lib/page-shell';
+import { getSiteUrl } from 'src/centralized/site-urls';
 import { SITE_TEAM_ROLES } from 'src/site-manual-config';
 import { GLASS_PANEL_SX, GLASS_INNER_ROW_SX } from 'src/lib/glass';
 import { getSyncHealth, type SiteMetadata, getEffectiveLastSync } from 'src/lib/sync-utils';
@@ -305,8 +308,8 @@ export default function Page() {
       setError(null);
       try {
         const [rank, meta] = await Promise.all([
-          fetchJson<RankDriver[]>('/data/rank.json'),
-          fetchJson<SiteMetadata>('/data/metadata.json').catch(() => ({})),
+          fetchJson<RankDriver[]>(DATA_FILES.rank),
+          fetchJson<SiteMetadata>(DATA_FILES.metadata).catch(() => ({})),
         ]);
         if (!mounted) return;
         setDrivers(rank);
@@ -478,7 +481,7 @@ export default function Page() {
       <meta name="description" content="AC Elite Hall of Fame with standout drivers and team members." />
       <meta property="og:title" content="Hall of Fame - AC Elite" />
       <meta property="og:description" content="AC Elite Hall of Fame with standout drivers and team members." />
-      <meta property="og:url" content="https://ac-elite.github.io/hall-of-fame" />
+      <meta property="og:url" content={getSiteUrl(APP_ROUTES.hallOfFame)} />
 
       <Box sx={{ ...DATA_PAGE_SHELL_SX }}>
         <PageGridOverlay />

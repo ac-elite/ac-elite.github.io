@@ -8,6 +8,7 @@ import Box from '@mui/material/Box';
 import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgress';
 
 import AdminPage from 'src/pages/admin';
+import { APP_ROUTES } from 'src/centralized/app-routes';
 import { DashboardLayout } from 'src/layouts/dashboard';
 
 import { LicenseSafetyGuideProvider } from 'src/components/license-safety-guide/license-safety-guide';
@@ -58,14 +59,14 @@ export const routesSection: RouteObject[] = [
     children: [
       // Home (AC Elite) is the default route
       { index: true, element: <HomePage /> },
-      { path: 'dashboard', element: <DashboardPage /> },
-      { path: 'leaderboard', element: <LeaderboardPage /> },
-      { path: 'rankings', element: <RankingsPage /> },
-      { path: 'hall-of-fame', element: <HallOfFamePage /> },
-      { path: 'driver/:driverGuid', element: <DriverProfilePage /> },
-      { path: 'setup-store', element: <SetupStorePage /> },
-      { path: 'livery-showcase', element: <LiveryShowcasePage /> },
-      { path: 'admin', element: <AdminPage /> },
+      { path: APP_ROUTES.dashboard.slice(1), element: <DashboardPage /> },
+      { path: APP_ROUTES.leaderboard.slice(1), element: <LeaderboardPage /> },
+      { path: APP_ROUTES.rankings.slice(1), element: <RankingsPage /> },
+      { path: APP_ROUTES.hallOfFame.slice(1), element: <HallOfFamePage /> },
+      { path: APP_ROUTES.driverPattern.slice(1), element: <DriverProfilePage /> },
+      { path: APP_ROUTES.setupStore.slice(1), element: <SetupStorePage /> },
+      { path: APP_ROUTES.liveryShowcase.slice(1), element: <LiveryShowcasePage /> },
+      { path: APP_ROUTES.admin.slice(1), element: <AdminPage /> },
       { path: 'home', element: <HomePage /> },
     ],
   },

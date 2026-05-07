@@ -1,5 +1,6 @@
 import Box from '@mui/material/Box';
 
+import { APP_ROUTES } from 'src/centralized/app-routes';
 import { SvgColor } from 'src/components/svg-color';
 
 // ----------------------------------------------------------------------
@@ -37,37 +38,37 @@ const comingSoonBadge = (
 export const navData = [
   {
     title: 'Home',
-    path: '/',
+    path: APP_ROUTES.home,
     icon: icon('ic-home-racing'),
   },
   {
     title: 'Stats',
-    path: '/dashboard',
+    path: APP_ROUTES.dashboard,
     icon: icon('ic-stats-racing'),
   },
   {
     title: 'Leaderboard',
-    path: '/leaderboard',
+    path: APP_ROUTES.leaderboard,
     icon: icon('ic-leaderboard-racing'),
   },
   {
     title: 'Rankings',
-    path: '/rankings',
+    path: APP_ROUTES.rankings,
     icon: icon('ic-rankings-racing'),
   },
   {
     title: 'Hall of Fame',
-    path: '/hall-of-fame',
+    path: APP_ROUTES.hallOfFame,
     icon: icon('ic-hof-racing'),
   },
   {
     title: 'Livery Showcase',
-    path: '/livery-showcase',
+    path: APP_ROUTES.liveryShowcase,
     icon: icon('ic-livery-racing'),
   },
   {
     title: 'Setup Store',
-    path: '/setup-store',
+    path: APP_ROUTES.setupStore,
     icon: icon('ic-setup-racing'),
     info: comingSoonBadge,
     disabled: true,

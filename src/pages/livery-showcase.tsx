@@ -12,8 +12,11 @@ import Typography from '@mui/material/Typography';
 import { RouterLink } from 'src/routes/components';
 
 import { CONFIG } from 'src/config-global';
+import { APP_ROUTES } from 'src/centralized/app-routes';
+import { DATA_FILES } from 'src/centralized/data-files';
 import { fetchJson } from 'src/lib/fetch-json';
 import { getDriverProfileHref } from 'src/lib/routes';
+import { getSiteUrl } from 'src/centralized/site-urls';
 import { getSyncHealth, type SiteMetadata } from 'src/lib/sync-utils';
 import { ACE_SKIN_PACK_DOWNLOAD_URL } from 'src/lib/ace-skin-pack-download';
 import { glassCardMotionSx, softFloatWrapperSx } from 'src/lib/subtle-motion';
@@ -231,7 +234,7 @@ export default function Page() {
 
   useEffect(() => {
     let mounted = true;
-    fetchJson<AceSkinPackManifest>('/data/ace-skin-pack.json')
+    fetchJson<AceSkinPackManifest>(DATA_FILES.aceSkinPack)
       .then((data) => {
         if (mounted) setAceSkinPack(Array.isArray(data.entries) ? data.entries : []);
       })
@@ -245,7 +248,7 @@ export default function Page() {
 
   useEffect(() => {
     let mounted = true;
-    fetchJson<SiteMetadata>('/data/metadata.json')
+    fetchJson<SiteMetadata>(DATA_FILES.metadata)
       .then((data) => {
         if (mounted) setMetadata(data && typeof data === 'object' ? data : {});
       })
@@ -259,7 +262,7 @@ export default function Page() {
 
   useEffect(() => {
     let mounted = true;
-    fetchJson<Partial<LiveryShowcaseSectionsConfig>>('/data/livery-showcase-sections.json')
+    fetchJson<Partial<LiveryShowcaseSectionsConfig>>(DATA_FILES.liveryShowcaseSections)
       .then((data) => {
         if (!mounted || !data) return;
         setSectionsConfig({
@@ -289,7 +292,7 @@ export default function Page() {
       <meta name="description" content={showcaseCopy.metaDescription} />
       <meta property="og:title" content="Livery Showcase - AC Elite" />
       <meta property="og:description" content={showcaseCopy.ogDescription} />
-      <meta property="og:url" content="https://ac-elite.github.io/livery-showcase" />
+      <meta property="og:url" content={getSiteUrl(APP_ROUTES.liveryShowcase)} />
 
       <Box sx={{ ...DATA_PAGE_SHELL_SX }}>
         <PageGridOverlay />

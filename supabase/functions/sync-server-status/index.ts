@@ -6,6 +6,7 @@
  * Haalt http://157.90.3.32:18283/INFO op (override via SERVER_INFO_URL) en schrijft één rij in public.server_status.
  */
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.1';
+import trackCatalog from '../../../src/centralized/track-catalog.json' with { type: 'json' };
 
 const CORS: Record<string, string> = {
   'Access-Control-Allow-Origin': '*',
@@ -13,26 +14,21 @@ const CORS: Record<string, string> = {
     'authorization, x-client-info, apikey, content-type, x-cron-secret',
 };
 
-/** Zelfde canonieke lijst als .github/workflows/current-track.yml (Python). */
-const CANONICAL_TRAILING_UNDERSCORE = [
-  'imola_',
-  'ks_laguna_seca_',
-  'magione_',
-  'monza_',
-  'mugello_',
-  'spa_',
-  'ks_zandvoort_',
-  'canada_2021_',
-] as const;
+type TrackCatalogEntry = {
+  id: string;
+  aliases?: string[];
+};
+
+const TRACK_ID_ALIASES: Record<string, string> = Object.fromEntries(
+  (trackCatalog as TrackCatalogEntry[]).flatMap((entry) =>
+    (entry.aliases ?? []).map((alias) => [alias, entry.id])
+  )
+);
 
 function normalizeTrackId(track: unknown): string {
   if (typeof track !== 'string') return '';
   let t = track.replace(/-layout/g, '_layout').replace(/-/g, '_');
-  for (const canon of CANONICAL_TRAILING_UNDERSCORE) {
-    const short = canon.slice(0, -1);
-    if (t === canon || t === short) return canon;
-  }
-  return t;
+  return TRACK_ID_ALIASES[t] ?? t;
 }
 
 function unauthorized() {

@@ -17,9 +17,12 @@ import Typography from '@mui/material/Typography';
 import TableContainer from '@mui/material/TableContainer';
 
 import { CONFIG } from 'src/config-global';
+import { DATA_FILES as DATA_FILE_PATHS } from 'src/centralized/data-files';
 import { fetchJson } from 'src/lib/fetch-json';
 import { getSyncHealth, type SyncHealthProfile } from 'src/lib/sync-utils';
+import { SERVER_ENDPOINTS } from 'src/centralized/server-endpoints';
 import { SITE_PREVIEW } from 'src/site-manual-config';
+import { SITE_REPO_URL } from 'src/centralized/site-urls';
 import { getTrackDisplayName } from 'src/lib/ac-elite-data';
 import { glassCardMotionSx, softFloatWrapperSx } from 'src/lib/subtle-motion';
 import { brandAccentBorderSx } from 'src/lib/status-accent';
@@ -54,15 +57,10 @@ import { PageGridOverlay } from 'src/components/page-background/page-grid-overla
 import { SiteVisitsShowcase } from 'src/components/site-visits-showcase/site-visits-showcase';
 import {
   fetchSiteVisitCount,
-  fetchSitePageVisitCounts,
-  isSiteVisitsConfigured,
   type SitePageVisitRow,
+  isSiteVisitsConfigured,
+  fetchSitePageVisitCounts,
 } from 'src/lib/site-visits';
-
-/** Public site + repo (same URLs as elsewhere in the project). */
-const TEAM_GITHUB_REPO = 'https://github.com/ac-elite/ac-elite.github.io';
-const TEAM_GAME_SERVER_JOIN =
-  'https://acstuff.ru/s/q:race/online/join?httpPort=18283&ip=157.90.3.32';
 
 // ---------------------------------------------------------------------------
 // Types for fetched data
@@ -160,6 +158,22 @@ const DEBUG_QUICK_TRIES = [
     turnOff: 'Delete the pasted part from the address bar, or open the site in a fresh tab without it.',
   },
   {
+    key: 'track',
+    title: 'Force a specific current track in the UI',
+    intro:
+      'Useful when you want to test track-specific cards/leaderboards without waiting for the real server to rotate tracks.',
+    paste: '?currentTrackMock=spa',
+    stepsBeforeSnippet: [
+      'Open the page you want to test (home, leaderboard, admin, etc.).',
+      'Click the address bar and place the cursor at the very end of the URL.',
+    ],
+    stepsAfterSnippet: [
+      'Copy the entire line in the grey box above, paste it at the end of the URL, then press Enter.',
+      'Use any known track id (example: spa, monza, ks_laguna_seca).',
+    ],
+    turnOff: 'Remove `currentTrackMock=...` from the URL and reload.',
+  },
+  {
     key: 'console',
     title: 'Extra detail in the browser console (optional)',
     intro:
@@ -177,20 +191,27 @@ const DEBUG_QUICK_TRIES = [
   },
 ] as const;
 
-/** Developer-only reference (env / storage keys). */
+/** Developer-only reference (query params only). */
 const DEBUG_TECH_REFERENCE = [
   {
     title: 'Pretend server offline',
-    env: 'VITE_SERVER_OFFLINE_DEBUG',
+    env: '—',
     query: 'serverOfflineDebug',
-    storageKey: 'acelite:server-offline-debug',
+    storageKey: '—',
     values: '1, true, yes, on',
   },
   {
+    title: 'Force current track in UI',
+    env: '—',
+    query: 'currentTrackMock',
+    storageKey: '—',
+    values: 'track id, e.g. spa / monza / ks_laguna_seca',
+  },
+  {
     title: 'Verbose server-status logging',
-    env: 'VITE_SERVER_STATUS_DEBUG',
+    env: '—',
     query: 'serverStatusDebug',
-    storageKey: 'acelite:server-status-debug',
+    storageKey: '—',
     values: '1, true, yes',
   },
 ] as const;
@@ -276,8 +297,6 @@ function formatRelative(iso?: string): string {
   if (h < 24) return `${h}h ago`;
   return `${Math.floor(h / 24)}d ago`;
 }
-
-const AC_SERVER_INFO_URL = 'http://157.90.3.32:18283/INFO';
 
 /** Keys we render explicitly; anything else on `info` becomes an extra row. */
 const ADMIN_SERVER_INFO_HANDLED = new Set([
@@ -501,15 +520,15 @@ export default function Page() {
   useEffect(() => {
     let mounted = true;
     Promise.allSettled([
-      fetchJson<MetadataData>('/data/metadata.json'),
-      fetchJson<CurrentTrackData>('/data/current-track.json'),
+      fetchJson<MetadataData>(DATA_FILE_PATHS.metadata),
+      fetchJson<CurrentTrackData>(DATA_FILE_PATHS.currentTrack),
     ]).then((results) => {
       if (!mounted) return;
       const staticTrack = results[1].status === 'fulfilled' ? results[1].value : null;
       staticCurrentTrackRef.current = staticTrack;
       setData({
         metadata: results[0].status === 'fulfilled' ? results[0].value : null,
-        currentTrack: staticTrack,
+        currentTrack: toCurrentTrackPayload(staticTrack),
       });
       if (canAttemptLiveServerStatusFetch()) {
         void fetchLiveServerStatusFromSupabase().then((live) => {
@@ -826,13 +845,13 @@ export default function Page() {
                       flexWrap="wrap"
                       alignItems={{ xs: 'stretch', sm: 'center' }}
                     >
-                      <Button component="a" href={AC_SERVER_INFO_URL} target="_blank" rel="noreferrer" variant="outlined" size="small" sx={{ ...ADMIN_EXTERNAL_LINK_OUTLINED_SX }}>
+                      <Button component="a" href={SERVER_ENDPOINTS.info} target="_blank" rel="noreferrer" variant="outlined" size="small" sx={{ ...ADMIN_EXTERNAL_LINK_OUTLINED_SX }}>
                         Live status page (advanced)
                       </Button>
-                      <Button component="a" href={`${TEAM_GITHUB_REPO}/actions`} target="_blank" rel="noopener noreferrer" variant="outlined" size="small" sx={{ ...ADMIN_EXTERNAL_LINK_OUTLINED_SX }}>
+                      <Button component="a" href={`${SITE_REPO_URL}/actions`} target="_blank" rel="noopener noreferrer" variant="outlined" size="small" sx={{ ...ADMIN_EXTERNAL_LINK_OUTLINED_SX }}>
                         Automation runs (GitHub)
                       </Button>
-                      <Button component="a" href={TEAM_GAME_SERVER_JOIN} target="_blank" rel="noopener noreferrer" variant="outlined" size="small" sx={{ ...ADMIN_JOIN_SERVER_OUTLINED_SX }}>
+                      <Button component="a" href={SERVER_ENDPOINTS.join} target="_blank" rel="noopener noreferrer" variant="outlined" size="small" sx={{ ...ADMIN_JOIN_SERVER_OUTLINED_SX }}>
                         Join server (Content Manager)
                       </Button>
                     </Stack>
@@ -963,12 +982,11 @@ export default function Page() {
                       '&:hover': { bgcolor: 'rgba(255,255,255,0.06)', color: 'rgba(248,250,252,0.98)' },
                     }}
                   >
-                    {debugTechOpen ? '▲ Hide' : '▼ Show'} developer-only details (env variables & storage keys)
+                    {debugTechOpen ? '▲ Hide' : '▼ Show'} developer-only details (query params)
                   </Button>
                   <Collapse in={debugTechOpen} timeout="auto" unmountOnExit>
                     <Typography variant="body2" sx={{ color: 'text.secondary', mt: 1.5, mb: 1, lineHeight: 1.55 }}>
-                      These are the same switches as above, written the way developers configure builds. If you use an <strong>address-bar</strong> trick, you can ignore this box.{' '}
-                      <strong>Env</strong> values need a site rebuild to apply on the live website.
+                      These are the same switches as above in a compact developer reference. Everything here is query-param based, so you can toggle it directly from the address bar.
                     </Typography>
                     <TableContainer
                       sx={{
