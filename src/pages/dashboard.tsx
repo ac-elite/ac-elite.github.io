@@ -436,44 +436,6 @@ export default function Page() {
                 </Paper>
               </Grid>
 
-              <Grid size={{ xs: 12 }}>
-                <Paper
-                  sx={{
-                    ...GLASS_CARD_SX,
-                    ...brandAccentBorderSx(),
-                    ...glassCardMotionSx(8),
-                    p: 2.75,
-                    textAlign: { xs: 'center', md: 'left' },
-                  }}
-                >
-                  <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.78)' }}>
-                    Session Totals
-                  </Typography>
-                  <Stack
-                    direction={{ xs: 'column', sm: 'row' }}
-                    spacing={{ xs: 1.5, sm: 3 }}
-                    sx={{ mt: 1.25, alignItems: { xs: 'center', sm: 'flex-start' } }}
-                  >
-                    <Typography variant="body2">
-                      Wins: <Box component="span" sx={{ fontWeight: 700 }}>{formatNumber(quickStats.totalWins)}</Box>
-                    </Typography>
-                    <Typography variant="body2">
-                      Podiums:{' '}
-                      <Box component="span" sx={{ fontWeight: 700 }}>{formatNumber(quickStats.totalPodiums)}</Box>
-                    </Typography>
-                    <Typography variant="body2">
-                      Poles: <Box component="span" sx={{ fontWeight: 700 }}>{formatNumber(quickStats.totalPoles)}</Box>
-                    </Typography>
-                    <Typography variant="body2">
-                      Fastest Laps:{' '}
-                      <Box component="span" sx={{ fontWeight: 700 }}>
-                        {formatNumber(quickStats.totalFastestLaps)}
-                      </Box>
-                    </Typography>
-                  </Stack>
-                </Paper>
-              </Grid>
-
               <Grid size={{ xs: 12, md: 6 }}>
                 <Paper
                   sx={{
