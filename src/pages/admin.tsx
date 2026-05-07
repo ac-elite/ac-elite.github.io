@@ -856,7 +856,7 @@ export default function Page() {
                     <Box>
                       <Typography variant="h6" sx={{ fontWeight: 800 }}>Track IDs</Typography>
                       <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.4 }}>
-                        Short list of track names and IDs for quick lookup.
+                        List of track names and IDs for quick lookup.
                       </Typography>
                     </Box>
                   </Stack>
