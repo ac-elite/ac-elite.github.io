@@ -854,47 +854,35 @@ export default function Page() {
                 <Paper sx={{ ...GLASS_PANEL_COMPACT_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(3), order: 4 }}>
                   <Stack direction={{ xs: 'column', md: 'row' }} justifyContent="space-between" spacing={1.5} sx={{ mb: 1 }}>
                     <Box>
-                      <Typography variant="h6" sx={{ fontWeight: 800 }}>Track catalog (mods)</Typography>
+                      <Typography variant="h6" sx={{ fontWeight: 800 }}>Track IDs</Typography>
                       <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.4 }}>
-                        Quick overview of centralized track IDs used for mapping, aliases, and hero image tuning.
+                        Short list of track names and IDs for quick lookup.
                       </Typography>
                     </Box>
-                  </Stack>
-
-                  <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap" sx={{ mb: 1.5 }}>
-                    <Chip size="small" label={`Tracks: ${trackCatalogStats.total}`} sx={{ fontWeight: 700 }} />
-                    <Chip size="small" label={`With image: ${trackCatalogStats.withImage}`} sx={{ fontWeight: 700 }} />
-                    <Chip size="small" label={`With aliases: ${trackCatalogStats.withAliases}`} sx={{ fontWeight: 700 }} />
-                    <Chip size="small" label={`Offset set: ${trackCatalogStats.withOffset}`} sx={{ fontWeight: 700 }} />
                   </Stack>
 
                   <TableContainer sx={{ maxHeight: 380, borderRadius: 1, border: '1px solid rgba(148,163,184,0.14)', bgcolor: 'rgba(15,23,42,0.35)' }}>
                     <Table size="small" stickyHeader>
                       <TableHead>
                         <TableRow>
-                          <TableCell sx={{ fontWeight: 800, width: '28%', bgcolor: 'rgba(15,23,42,0.88)' }}>Track ID</TableCell>
-                          <TableCell sx={{ fontWeight: 800, width: '24%', bgcolor: 'rgba(15,23,42,0.88)' }}>Display name</TableCell>
-                          <TableCell sx={{ fontWeight: 800, width: '24%', bgcolor: 'rgba(15,23,42,0.88)' }}>Aliases</TableCell>
-                          <TableCell sx={{ fontWeight: 800, width: '14%', bgcolor: 'rgba(15,23,42,0.88)' }}>Image</TableCell>
-                          <TableCell sx={{ fontWeight: 800, width: '10%', bgcolor: 'rgba(15,23,42,0.88)' }}>Offset Y</TableCell>
+                          <TableCell sx={{ fontWeight: 800, width: '38%', bgcolor: 'rgba(15,23,42,0.88)' }}>Track name</TableCell>
+                          <TableCell sx={{ fontWeight: 800, width: '42%', bgcolor: 'rgba(15,23,42,0.88)' }}>Track ID</TableCell>
+                          <TableCell sx={{ fontWeight: 800, width: '20%', bgcolor: 'rgba(15,23,42,0.88)' }}>Image</TableCell>
                         </TableRow>
                       </TableHead>
                       <TableBody>
                         {TRACK_CATALOG.map((track) => {
                           const image = track.image?.trim() ?? '';
-                          const aliases = Array.isArray(track.aliases) && track.aliases.length ? track.aliases.join(', ') : '—';
-                          const offset = track.imageOffsetY ?? 0;
                           return (
                             <TableRow key={track.id}>
+                              <TableCell sx={{ ...freshnessBodyCellSx, color: 'text.primary', fontWeight: 700 }}>{track.name || '—'}</TableCell>
                               <TableCell sx={{ ...freshnessBodyCellSx, fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace', fontSize: '0.8rem' }}>
                                 {track.id}
                               </TableCell>
-                              <TableCell sx={{ ...freshnessBodyCellSx, color: 'text.primary' }}>{track.name || '—'}</TableCell>
-                              <TableCell sx={{ ...freshnessBodyCellSx, color: 'text.secondary' }}>{aliases}</TableCell>
                               <TableCell sx={{ ...freshnessBodyCellSx }}>
                                 <Chip
                                   size="small"
-                                  label={image ? 'Configured' : 'Empty'}
+                                  label={image ? 'Yes' : 'No'}
                                   sx={{
                                     height: 22,
                                     fontWeight: 700,
@@ -903,9 +891,6 @@ export default function Page() {
                                     border: image ? '1px solid rgba(34,197,94,0.42)' : '1px solid rgba(148,163,184,0.35)',
                                   }}
                                 />
-                              </TableCell>
-                              <TableCell sx={{ ...freshnessBodyCellSx, color: 'text.primary', fontVariantNumeric: 'tabular-nums' }}>
-                                {offset}
                               </TableCell>
                             </TableRow>
                           );
@@ -917,7 +902,7 @@ export default function Page() {
 
                 <Paper sx={{ ...GLASS_PANEL_COMPACT_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(4), order: 3 }}>
                   <Stack direction={{ xs: 'column', md: 'row' }} justifyContent="space-between" spacing={1.5} sx={{ mb: 1 }}>
-                    <Typography variant="h6" sx={{ fontWeight: 800 }}>Links & raw detail</Typography>
+                    <Typography variant="h6" sx={{ fontWeight: 800 }}>Useful links & details</Typography>
                     <Stack
                       direction={{ xs: 'column', sm: 'row' }}
                       spacing={1.25}
@@ -926,7 +911,7 @@ export default function Page() {
                       alignItems={{ xs: 'stretch', sm: 'center' }}
                     >
                       <Button component="a" href={SERVER_ENDPOINTS.info} target="_blank" rel="noreferrer" variant="outlined" size="small" sx={{ ...ADMIN_EXTERNAL_LINK_OUTLINED_SX }}>
-                        Live status page (advanced)
+                        Live status page
                       </Button>
                       <Button component="a" href={`${SITE_REPO_URL}/actions`} target="_blank" rel="noopener noreferrer" variant="outlined" size="small" sx={{ ...ADMIN_EXTERNAL_LINK_OUTLINED_SX }}>
                         Automation runs (GitHub)
@@ -938,7 +923,7 @@ export default function Page() {
                   </Stack>
                   <Stack spacing={1.25}>
                     <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>
-                      Full field list (for tech helpers — most moderators can skip this)
+                      Full field list (extra details)
                     </Typography>
                     <TableContainer sx={{ maxHeight: 400, borderRadius: 1, border: '1px solid rgba(148,163,184,0.14)', bgcolor: 'rgba(15,23,42,0.35)' }}>
                       <Table size="small" stickyHeader>
@@ -1062,7 +1047,7 @@ export default function Page() {
                       '&:hover': { bgcolor: 'rgba(255,255,255,0.06)', color: 'rgba(248,250,252,0.98)' },
                     }}
                   >
-                    {debugTechOpen ? '▲ Hide' : '▼ Show'} developer-only details (query params)
+                    {debugTechOpen ? '▲ Hide' : '▼ Show'} extra details (URL options)
                   </Button>
                   <Collapse in={debugTechOpen} timeout="auto" unmountOnExit>
                     <Typography variant="body2" sx={{ color: 'text.secondary', mt: 1.5, mb: 1, lineHeight: 1.55 }}>
