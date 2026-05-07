@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const METADATA_JSON = join(__dirname, '..', 'public', 'data', 'metadata.json');
 
-const defaultMessage = 'V2 - Update';
+const defaultMessage = 'V3 - Update';
 const customMessage = process.argv.slice(2).join(' ').trim();
 const commitMessage = customMessage || defaultMessage;
 
