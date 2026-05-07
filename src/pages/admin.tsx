@@ -117,7 +117,7 @@ const SCHEDULE: readonly ScheduleEntry[] = [
     workflow: 'Live server check',
     cron: 'Your external cron schedule (e.g. every minute)',
     what:
-      'Checks the game server often so the site can show who is online, which track is running, and session info without waiting for the hourly backup.',
+      'Checks the AC Elite server often so the site can show who is online, which track is running, and session info without waiting for the hourly backup.',
   },
   {
     agendaWhen: 'After sync',
@@ -143,7 +143,7 @@ const SCHEDULE: readonly ScheduleEntry[] = [
 const DEBUG_QUICK_TRIES = [
   {
     key: 'offline',
-    title: 'Preview: site thinks the game server is offline',
+    title: 'Preview: site thinks the AC Elite serveris offline',
     intro:
       'Good for checking the homepage “server offline” layout. The real server is not touched — this only changes what your browser shows.',
     paste: '?serverOfflineDebug=on',
@@ -238,7 +238,7 @@ const DATA_FILES: readonly DataFileEntry[] = [
   },
   {
     file: 'current-track.json',
-    updatedBy: 'Game server (live check + hourly backup)',
+    updatedBy: 'AC Elite server (live check + hourly backup)',
     getTimestamp: (s) => s.currentTrack?.fetchedAt,
     getNote: (s) => {
       const state =
@@ -581,7 +581,7 @@ export default function Page() {
   return (
     <>
       <title>{`Admin Panel - ${CONFIG.appName}`}</title>
-      <meta name="description" content="AC Elite team page — data freshness, game server readout, and helpful links." />
+      <meta name="description" content="AC Elite team page — data freshness, AC Elite server status, and helpful links." />
       <meta name="robots" content="noindex, nofollow" />
 
       <Box sx={{ ...DATA_PAGE_SHELL_SX }}>
@@ -782,7 +782,7 @@ export default function Page() {
                   >
                     <Box>
                       <Typography variant="h6" sx={{ fontWeight: 800 }}>
-                        Game server (quick readout)
+                        AC Elite server status
                       </Typography>
                       <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.4 }}>
                         Is the lobby up, which track is loaded, and how many drivers are connected — same idea players see on the homepage card.
@@ -909,7 +909,7 @@ export default function Page() {
                     Optional: try things in your browser
                   </Typography>
                   <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5, mb: 2 }}>
-                    You never have to use this section. It is only for checking how the site looks in special cases. Nothing here changes the real game server.
+                    You never have to use this section. It is only for checking how the site looks in special cases. Nothing here changes the real stuff.
                   </Typography>
                   <Stack spacing={2}>
                     {DEBUG_QUICK_TRIES.map((block) => (

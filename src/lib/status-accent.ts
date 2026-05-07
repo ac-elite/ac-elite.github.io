@@ -85,7 +85,7 @@ export function statusAccentSplitRimSx(accentColor: string) {
   };
 }
 
-/** Binary presence (game server, API reachability, etc.). */
+/** Binary presence (AC Elite server, API reachability, etc.). */
 export const STATUS_ACCENT = {
   online: '#22c55e',
   offline: '#64748b',
