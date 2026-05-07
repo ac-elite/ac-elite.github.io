@@ -50,7 +50,7 @@ function isServerOfflineDebugRawOn(raw: string | null | undefined): boolean {
 }
 
 /**
- * When enabled, server payloads behave as if the game server is offline (`online: false`)
+ * When enabled, server payloads behave as if the AC Elite server is offline (`online: false`)
  * so you can test join card / fallback UI without stopping the real server.
  *
  * - URL: `?serverOfflineDebug=1` (or `on`, `true`, …)

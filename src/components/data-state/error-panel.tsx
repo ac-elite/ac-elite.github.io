@@ -35,7 +35,7 @@ export function ErrorPanel({ error, title = 'Failed to load data', onRetry }: Er
         </Typography>
         <Typography variant="body2" sx={{ ...DATA_STATE_HELP_TEXT_SX }}>
           This is usually temporary. Try again in a moment, or refresh the page. Stats are synced regularly from the
-          game server.
+          AC Elite server.
         </Typography>
         {onRetry && (
           <Button

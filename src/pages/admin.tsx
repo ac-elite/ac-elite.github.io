@@ -18,6 +18,7 @@ import TableContainer from '@mui/material/TableContainer';
 
 import { CONFIG } from 'src/config-global';
 import { DATA_FILES as DATA_FILE_PATHS } from 'src/centralized/data-files';
+import trackCatalog from 'src/centralized/track-catalog.json';
 import { fetchJson } from 'src/lib/fetch-json';
 import { getSyncHealth, type SyncHealthProfile } from 'src/lib/sync-utils';
 import { SERVER_ENDPOINTS } from 'src/centralized/server-endpoints';
@@ -68,6 +69,13 @@ import {
 
 type MetadataData = { lastSync?: string; status?: string; error?: string; rank24hSnapshotAt?: string };
 type CurrentTrackData = CurrentTrackPayload;
+type TrackCatalogEntry = {
+  id: string;
+  name: string;
+  image?: string;
+  imageOffsetY?: number;
+  aliases: string[];
+};
 
 type AdminState = {
   metadata: MetadataData | null;
@@ -143,7 +151,7 @@ const SCHEDULE: readonly ScheduleEntry[] = [
 const DEBUG_QUICK_TRIES = [
   {
     key: 'offline',
-    title: 'Preview: site thinks the AC Elite serveris offline',
+    title: 'Preview: site thinks the AC Elite server is offline',
     intro:
       'Good for checking the homepage “server offline” layout. The real server is not touched — this only changes what your browser shows.',
     paste: '?serverOfflineDebug=on',
@@ -452,6 +460,7 @@ function buildAdminServerInfoRows(ct: CurrentTrackPayload | null): { label: stri
 }
 
 const FRESHNESS_ROW_BORDER = '1px solid rgba(148,163,184,0.1)';
+const TRACK_CATALOG = trackCatalog as TrackCatalogEntry[];
 
 /** Body cell: soft row divider; vertical align top for multi-line age/note. */
 const freshnessBodyCellSx = {
@@ -566,6 +575,13 @@ export default function Page() {
   }, [data.currentTrack?.fetchedAt]);
 
   const adminServerDetailRows = useMemo(() => buildAdminServerInfoRows(data.currentTrack), [data.currentTrack]);
+  const trackCatalogStats = useMemo(() => {
+    const total = TRACK_CATALOG.length;
+    const withImage = TRACK_CATALOG.filter((track) => Boolean(track.image?.trim())).length;
+    const withAliases = TRACK_CATALOG.filter((track) => Array.isArray(track.aliases) && track.aliases.length > 0).length;
+    const withOffset = TRACK_CATALOG.filter((track) => (track.imageOffsetY ?? 0) !== 0).length;
+    return { total, withImage, withAliases, withOffset };
+  }, []);
 
   const dataStatusRows = useMemo(
     () =>
@@ -835,7 +851,71 @@ export default function Page() {
                   </Grid>
                 </Paper>
 
-                <Paper sx={{ ...GLASS_PANEL_COMPACT_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(3) }}>
+                <Paper sx={{ ...GLASS_PANEL_COMPACT_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(3), order: 4 }}>
+                  <Stack direction={{ xs: 'column', md: 'row' }} justifyContent="space-between" spacing={1.5} sx={{ mb: 1 }}>
+                    <Box>
+                      <Typography variant="h6" sx={{ fontWeight: 800 }}>Track catalog (mods)</Typography>
+                      <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.4 }}>
+                        Quick overview of centralized track IDs used for mapping, aliases, and hero image tuning.
+                      </Typography>
+                    </Box>
+                  </Stack>
+
+                  <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap" sx={{ mb: 1.5 }}>
+                    <Chip size="small" label={`Tracks: ${trackCatalogStats.total}`} sx={{ fontWeight: 700 }} />
+                    <Chip size="small" label={`With image: ${trackCatalogStats.withImage}`} sx={{ fontWeight: 700 }} />
+                    <Chip size="small" label={`With aliases: ${trackCatalogStats.withAliases}`} sx={{ fontWeight: 700 }} />
+                    <Chip size="small" label={`Offset set: ${trackCatalogStats.withOffset}`} sx={{ fontWeight: 700 }} />
+                  </Stack>
+
+                  <TableContainer sx={{ maxHeight: 380, borderRadius: 1, border: '1px solid rgba(148,163,184,0.14)', bgcolor: 'rgba(15,23,42,0.35)' }}>
+                    <Table size="small" stickyHeader>
+                      <TableHead>
+                        <TableRow>
+                          <TableCell sx={{ fontWeight: 800, width: '28%', bgcolor: 'rgba(15,23,42,0.88)' }}>Track ID</TableCell>
+                          <TableCell sx={{ fontWeight: 800, width: '24%', bgcolor: 'rgba(15,23,42,0.88)' }}>Display name</TableCell>
+                          <TableCell sx={{ fontWeight: 800, width: '24%', bgcolor: 'rgba(15,23,42,0.88)' }}>Aliases</TableCell>
+                          <TableCell sx={{ fontWeight: 800, width: '14%', bgcolor: 'rgba(15,23,42,0.88)' }}>Image</TableCell>
+                          <TableCell sx={{ fontWeight: 800, width: '10%', bgcolor: 'rgba(15,23,42,0.88)' }}>Offset Y</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {TRACK_CATALOG.map((track) => {
+                          const image = track.image?.trim() ?? '';
+                          const aliases = Array.isArray(track.aliases) && track.aliases.length ? track.aliases.join(', ') : '—';
+                          const offset = track.imageOffsetY ?? 0;
+                          return (
+                            <TableRow key={track.id}>
+                              <TableCell sx={{ ...freshnessBodyCellSx, fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace', fontSize: '0.8rem' }}>
+                                {track.id}
+                              </TableCell>
+                              <TableCell sx={{ ...freshnessBodyCellSx, color: 'text.primary' }}>{track.name || '—'}</TableCell>
+                              <TableCell sx={{ ...freshnessBodyCellSx, color: 'text.secondary' }}>{aliases}</TableCell>
+                              <TableCell sx={{ ...freshnessBodyCellSx }}>
+                                <Chip
+                                  size="small"
+                                  label={image ? 'Configured' : 'Empty'}
+                                  sx={{
+                                    height: 22,
+                                    fontWeight: 700,
+                                    color: image ? '#22c55e' : 'rgba(226,232,240,0.92)',
+                                    bgcolor: image ? 'rgba(34,197,94,0.12)' : 'rgba(148,163,184,0.15)',
+                                    border: image ? '1px solid rgba(34,197,94,0.42)' : '1px solid rgba(148,163,184,0.35)',
+                                  }}
+                                />
+                              </TableCell>
+                              <TableCell sx={{ ...freshnessBodyCellSx, color: 'text.primary', fontVariantNumeric: 'tabular-nums' }}>
+                                {offset}
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </Paper>
+
+                <Paper sx={{ ...GLASS_PANEL_COMPACT_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(4), order: 3 }}>
                   <Stack direction={{ xs: 'column', md: 'row' }} justifyContent="space-between" spacing={1.5} sx={{ mb: 1 }}>
                     <Typography variant="h6" sx={{ fontWeight: 800 }}>Links & raw detail</Typography>
                     <Stack
@@ -904,7 +984,7 @@ export default function Page() {
                   </Stack>
                 </Paper>
 
-                <Paper sx={{ ...GLASS_PANEL_COMPACT_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(4) }}>
+                <Paper sx={{ ...GLASS_PANEL_COMPACT_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(5) }}>
                   <Typography variant="h6" sx={{ fontWeight: 800 }}>
                     Optional: try things in your browser
                   </Typography>
