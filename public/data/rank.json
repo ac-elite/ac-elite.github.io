@@ -9105,8 +9105,8 @@
  {
   "guid": "76561198101602322",
   "name": "rob",
-  "points": 255.707,
-  "kilometers": 779.3,
+  "points": 256.464,
+  "kilometers": 806.7,
   "collisions": 23,
   "leaderboard": {
    "ks_nurburgring_layout_gp_a": {
@@ -9168,12 +9168,12 @@
    "ks_red_bull_ring_layout_gp": {
     "tatuusfa1": {
      "laptime": 88844,
-     "laps": 17,
-     "ts": 1778070898317
+     "laps": 19,
+     "ts": 1778239173521
     }
    }
   },
-  "last_seen": 1778070989461,
+  "last_seen": 1778239348301,
   "wins": 5,
   "podiums": 9,
   "poles": 2,
@@ -19301,6 +19301,35 @@
   "infr": 0
  },
  {
+  "guid": "76561198076169462",
+  "name": "Fernando Lobato de la Rosa",
+  "points": 110.266,
+  "kilometers": 603.4,
+  "collisions": 84,
+  "leaderboard": {
+   "ks_silverstone_gp": {
+    "tatuusfa1": {
+     "laptime": 120008,
+     "laps": 26,
+     "ts": 1777812906972
+    }
+   },
+   "ks_red_bull_ring_layout_gp": {
+    "tatuusfa1": {
+     "laptime": 90145,
+     "laps": 47,
+     "ts": 1778233941666
+    }
+   }
+  },
+  "last_seen": 1778234161938,
+  "wins": 1,
+  "podiums": 2,
+  "poles": 1,
+  "flaps": 0,
+  "infr": 2
+ },
+ {
   "guid": "76561198166239342",
   "name": "mario pellegrino",
   "points": 110.23100000000001,
@@ -19371,35 +19400,6 @@
   "poles": 0,
   "flaps": 0,
   "infr": 1
- },
- {
-  "guid": "76561198076169462",
-  "name": "Fernando Lobato de la Rosa",
-  "points": 110.15,
-  "kilometers": 581.8,
-  "collisions": 83,
-  "leaderboard": {
-   "ks_silverstone_gp": {
-    "tatuusfa1": {
-     "laptime": 120008,
-     "laps": 26,
-     "ts": 1777812906972
-    }
-   },
-   "ks_red_bull_ring_layout_gp": {
-    "tatuusfa1": {
-     "laptime": 90145,
-     "laps": 46,
-     "ts": 1778184574681
-    }
-   }
-  },
-  "last_seen": 1778184798723,
-  "wins": 1,
-  "podiums": 2,
-  "poles": 1,
-  "flaps": 0,
-  "infr": 2
  },
  {
   "guid": "76561198097713633",
@@ -48484,7 +48484,7 @@
     }
    }
   },
-  "last_seen": 1778221427901,
+  "last_seen": 1778221934485,
   "wins": 0,
   "podiums": 0,
   "poles": 0,
@@ -82760,6 +82760,28 @@
    }
   },
   "last_seen": 1763490013642,
+  "wins": 0,
+  "podiums": 0,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 0
+ },
+ {
+  "guid": "76561198828878048",
+  "name": "dane mauceri",
+  "points": 56.261,
+  "kilometers": 21.6,
+  "collisions": 3,
+  "leaderboard": {
+   "ks_red_bull_ring_layout_gp": {
+    "tatuusfa1": {
+     "laptime": 96727,
+     "laps": 2,
+     "ts": 1778233943825
+    }
+   }
+  },
+  "last_seen": 1778234161938,
   "wins": 0,
   "podiums": 0,
   "poles": 0,
