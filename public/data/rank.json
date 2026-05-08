@@ -7397,8 +7397,8 @@
  {
   "guid": "76561199479816450",
   "name": "okajima",
-  "points": 407.175,
-  "kilometers": 3812.5,
+  "points": 414.35900000000004,
+  "kilometers": 3864.3,
   "collisions": 134,
   "leaderboard": {
    "ks_zandvoort_": {
@@ -7459,9 +7459,9 @@
    },
    "ks_red_bull_ring_layout_gp": {
     "tatuusfa1": {
-     "laptime": 92615,
-     "laps": 34,
-     "ts": 1778149804155
+     "laptime": 92611,
+     "laps": 42,
+     "ts": 1778218179741
     }
    },
    "ks_vallelunga_extended_circuit": {
@@ -7479,11 +7479,11 @@
     }
    }
   },
-  "last_seen": 1778207118719,
-  "wins": 24,
-  "podiums": 45,
+  "last_seen": 1778218228146,
+  "wins": 25,
+  "podiums": 46,
   "poles": 1,
-  "flaps": 14,
+  "flaps": 15,
   "infr": 1
  },
  {
@@ -47903,28 +47903,6 @@
   "infr": 0
  },
  {
-  "guid": "76561198067568701",
-  "name": "Dino",
-  "points": 65.521,
-  "kilometers": 68.2,
-  "collisions": 10,
-  "leaderboard": {
-   "ks_red_bull_ring_layout_gp": {
-    "tatuusfa1": {
-     "laptime": 91748,
-     "laps": 9,
-     "ts": 1778190672614
-    }
-   }
-  },
-  "last_seen": 1778213675931,
-  "wins": 0,
-  "podiums": 0,
-  "poles": 0,
-  "flaps": 0,
-  "infr": 0
- },
- {
   "guid": "76561199100244190",
   "name": "Lesnare",
   "points": 65.518,
@@ -48487,6 +48465,28 @@
   "last_seen": 1764803524135,
   "wins": 0,
   "podiums": 1,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 0
+ },
+ {
+  "guid": "76561198067568701",
+  "name": "Dino",
+  "points": 65.221,
+  "kilometers": 68.2,
+  "collisions": 10,
+  "leaderboard": {
+   "ks_red_bull_ring_layout_gp": {
+    "tatuusfa1": {
+     "laptime": 91748,
+     "laps": 9,
+     "ts": 1778190672614
+    }
+   }
+  },
+  "last_seen": 1778221427901,
+  "wins": 0,
+  "podiums": 0,
   "poles": 0,
   "flaps": 0,
   "infr": 0
@@ -108881,35 +108881,6 @@
   "infr": 0
  },
  {
-  "guid": "76561198986638971",
-  "name": "TCHALLA",
-  "points": 52.687000000000005,
-  "kilometers": 152.5,
-  "collisions": 37,
-  "leaderboard": {
-   "monza_": {
-    "tatuusfa1": {
-     "laptime": 115865,
-     "laps": 13,
-     "ts": 1777251041904
-    }
-   },
-   "ks_red_bull_ring_layout_gp": {
-    "tatuusfa1": {
-     "laptime": 96784,
-     "laps": 1,
-     "ts": 1778199804761
-    }
-   }
-  },
-  "last_seen": 1778200050426,
-  "wins": 1,
-  "podiums": 2,
-  "poles": 0,
-  "flaps": 0,
-  "infr": 2
- },
- {
   "guid": "76561199427232878",
   "name": "Dutu bossu",
   "points": 52.687,
@@ -117015,6 +116986,35 @@
   "poles": 0,
   "flaps": 0,
   "infr": 0
+ },
+ {
+  "guid": "76561198986638971",
+  "name": "TCHALLA",
+  "points": 51.866,
+  "kilometers": 155.2,
+  "collisions": 39,
+  "leaderboard": {
+   "monza_": {
+    "tatuusfa1": {
+     "laptime": 115865,
+     "laps": 13,
+     "ts": 1777251041904
+    }
+   },
+   "ks_red_bull_ring_layout_gp": {
+    "tatuusfa1": {
+     "laptime": 96784,
+     "laps": 1,
+     "ts": 1778199804761
+    }
+   }
+  },
+  "last_seen": 1778218022072,
+  "wins": 1,
+  "podiums": 2,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 2
  },
  {
   "guid": "76561199100667680",
