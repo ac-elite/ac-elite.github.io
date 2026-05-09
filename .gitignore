@@ -28,6 +28,9 @@ build
 .env.test.local
 .env.production.local
 
+# Claude Code nested clones (eigen .git; niet als submodule op main committen)
+.claude/worktrees/
+
 # misc
 .DS_Store
 .vercel
