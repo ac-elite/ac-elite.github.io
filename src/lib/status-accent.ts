@@ -5,34 +5,62 @@ import { GLASS_SYNC_CYCLE_SEC } from 'src/lib/glass';
 /** Top strip width for status-colored panels (matches admin quick-stats cards). */
 export const STATUS_ACCENT_BORDER_WIDTH = 3;
 
+/**
+ * Pulse range tuned so the solid 3px strip stays visibly solid throughout
+ * (≥ 85% opacity at all times) while the soft glow gradient underneath still
+ * "breathes" perceptibly. Wider ranges (e.g. 0.4 → 0.82) made the strip itself
+ * flicker visibly, which read as cheap on the panel borders.
+ */
 const accentGlow = keyframes`
-  0%, 100% { opacity: 0.4; }
-  50%      { opacity: 0.82; }
-`;
-
-/** Opacity pulse for split rim — same cadence as {@link GLASS_SYNC_CYCLE_SEC} card rim. */
-const statusSplitRimGlowPulse = keyframes`
   0%, 100% {
-    opacity: 0.56;
+    opacity: 0.76;
+    transform: translateY(0) scaleY(1);
   }
   50% {
-    opacity: 0.92;
+    opacity: 1;
+    transform: translateY(0.8px) scaleY(1.12);
   }
 `;
 
 /**
- * Colored top border + matching shadow glow + subtle breathing effect for glass panels.
- * A `::before` pseudo-element creates a soft downward glow from the accent border that
- * gently pulses to convey "live data". Respects `prefers-reduced-motion`.
+ * Opacity pulse for split rim — same cadence as {@link GLASS_SYNC_CYCLE_SEC} card rim.
+ * Tight dynamic range (0.72 → 0.95) so the rim "breathes" without aggressively
+ * brightening — feels deliberate rather than flashing.
+ */
+const statusSplitRimGlowPulse = keyframes`
+  0%, 100% {
+    opacity: 0.66;
+  }
+  50% {
+    opacity: 1;
+  }
+`;
+
+/**
+ * Colored top accent + soft pulsing glow for glass panels.
  *
- * Use with `getSyncHealth().color`, `STATUS_ACCENT.online`, or any hex accent.
- * Merge **after** base panel styles (`GLASS_PANEL_SX`, `GLASS_PANEL_COMPACT_SX`, `GLASS_CARD_SX`, …).
+ * The visible strip uses an **inset** `box-shadow` (not `border-top` nor a
+ * clipped full-border pseudo) so it follows the panel’s `border-radius` inside
+ * the border box and blends into the corners instead of meeting the side
+ * borders with a hard cut.
+ *
+ * `::before` adds a soft downward glow; a horizontal mask tapers it near the
+ * top-left/right curves. Pulse uses {@link accentGlow}. Respects
+ * `prefers-reduced-motion`.
+ *
+ * Merge **after** base panel styles (`GLASS_PANEL_SX`, `GLASS_PANEL_COMPACT_SX`,
+ * `GLASS_CARD_SX`, …).
  */
 export function statusAccentBorderSx(accentColor: string) {
+  const strip = `${STATUS_ACCENT_BORDER_WIDTH}px`;
   return {
     position: 'relative' as const,
-    borderTop: `${STATUS_ACCENT_BORDER_WIDTH}px solid ${accentColor}`,
-    boxShadow: `0 12px 30px rgba(0,0,0,0.32), inset 0 1px 0 rgba(255,255,255,0.08), 0 -1px 0 ${alpha(accentColor, 0.22)}`,
+    boxShadow: [
+      '0 12px 30px rgba(0,0,0,0.32)',
+      'inset 0 1px 0 rgba(255,255,255,0.08)',
+      `inset 0 ${strip} 0 0 ${accentColor}`,
+      `0 -1px 0 ${alpha(accentColor, 0.22)}`,
+    ].join(', '),
     '&::before': {
       content: '""',
       position: 'absolute' as const,
@@ -41,25 +69,37 @@ export function statusAccentBorderSx(accentColor: string) {
       right: 0,
       height: 10,
       borderRadius: 'inherit',
-      background: `linear-gradient(180deg, ${alpha(accentColor, 0.22)} 0%, transparent 100%)`,
+      background: `linear-gradient(180deg, ${alpha(accentColor, 0.28)} 0%, transparent 100%)`,
+      WebkitMaskImage:
+        'linear-gradient(90deg, transparent 0%, #000 12%, #000 88%, transparent 100%)',
+      maskImage: 'linear-gradient(90deg, transparent 0%, #000 12%, #000 88%, transparent 100%)',
+      transformOrigin: 'top center',
       pointerEvents: 'none' as const,
-      animation: `${accentGlow} ${GLASS_SYNC_CYCLE_SEC}s ease-in-out infinite`,
+      animation: `${accentGlow} ${GLASS_SYNC_CYCLE_SEC * 0.92}s ease-in-out infinite`,
       '@media (prefers-reduced-motion: reduce)': {
         animation: 'none',
-        opacity: 0.6,
+        opacity: 0.95,
       },
     },
   };
 }
 
 /**
- * Replaces the default uniform blue `::after` rim from glass panels: **top** glow follows
- * `accentColor` (sync / status strip), **left, right, bottom** stay brand blue — merge **after**
- * `...GLASS_PANEL_SX` / `...GLASS_PANEL_COMPACT_SX` and **after** {@link statusAccentBorderSx}.
+ * Outer rim glow for status panels — pairs with {@link statusAccentBorderSx} so
+ * the top accent strip has a matching, deliberate halo around the whole panel
+ * rather than the diffuse bloom + clashing brand-blue sides the previous
+ * version produced.
+ *
+ * Built as a layered single-colour ring:
+ *   1) Crisp inset hairline — premium edge just inside the panel border.
+ *   2) Razor-thin outer hairline — keeps the rim defined, no fogginess.
+ *   3) Tight top glow — concentrated around the accent strip (small blur).
+ *   4) Subtle ambient halo — adds depth without spilling.
+ *
+ * Merge **after** `GLASS_PANEL_SX` / `GLASS_PANEL_COMPACT_SX` and **after**
+ * {@link statusAccentBorderSx}.
  */
 export function statusAccentSplitRimSx(accentColor: string) {
-  const blueSide = 'rgba(147, 197, 253, 0.2)';
-  const blueBottom = 'rgba(56, 189, 248, 0.15)';
   return {
     '&::after': {
       content: '""',
@@ -69,17 +109,15 @@ export function statusAccentSplitRimSx(accentColor: string) {
       zIndex: 2,
       pointerEvents: 'none' as const,
       boxShadow: [
-        `0 -7px 30px -10px ${alpha(accentColor, 0.44)}`,
-        `0 -3px 18px -6px ${alpha(accentColor, 0.28)}`,
-        `-5px 0 24px -8px ${blueSide}`,
-        `5px 0 24px -8px ${blueSide}`,
-        `0 7px 28px -8px ${blueBottom}`,
-        '0 0 0 1px rgba(191, 225, 255, 0.18)',
+        `inset 0 0 0 1px ${alpha(accentColor, 0.22)}`,
+        `0 0 0 1px ${alpha(accentColor, 0.18)}`,
+        `0 -4px 14px -3px ${alpha(accentColor, 0.42)}`,
+        `0 0 22px -8px ${alpha(accentColor, 0.22)}`,
       ].join(', '),
       animation: `${statusSplitRimGlowPulse} ${GLASS_SYNC_CYCLE_SEC}s ease-in-out infinite`,
       '@media (prefers-reduced-motion: reduce)': {
         animation: 'none',
-        opacity: 0.78,
+        opacity: 0.88,
       },
     },
   };
