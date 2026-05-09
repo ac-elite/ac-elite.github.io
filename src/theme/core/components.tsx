@@ -35,6 +35,15 @@ const buttonGlassSheenSx = {
       backgroundPosition: '48% 50%',
     },
   },
+  // Stagger the sheen so adjacent buttons in the same row don't shimmer in
+  // unison. Negative delay lets the offset button start mid-cycle immediately
+  // instead of pausing on the 0%-frame for half a cycle on first paint.
+  '&:nth-of-type(even)::before': {
+    animationDelay: `-${GLASS_SYNC_CYCLE_SEC / 2}s`,
+    '@media (prefers-reduced-motion: reduce)': {
+      animationDelay: '0s',
+    },
+  },
   '& > *': {
     position: 'relative',
     zIndex: 1,

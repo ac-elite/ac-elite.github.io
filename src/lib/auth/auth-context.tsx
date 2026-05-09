@@ -161,3 +161,23 @@ export function hasAtLeastRole(profile: AuthProfile | null, min: AppRole): boole
   if (!profile) return false;
   return ROLE_RANK[profile.role] >= ROLE_RANK[min];
 }
+
+// ----------------------------------------------------------------------
+// Role label / chip helpers — kept here so every staff-facing UI uses the
+// same wording and chip palette. The "DiscordRole" key maps to the gradient
+// styles in `src/lib/ac-elite-data.ts`.
+// ----------------------------------------------------------------------
+
+/** Mapping into the existing role-chip gradient styles. */
+export const ROLE_TO_CHIP_STYLE: Record<AppRole, 'Creator' | 'Admin' | 'Moderator'> = {
+  owner: 'Creator',
+  admin: 'Admin',
+  moderator: 'Moderator',
+};
+
+/** Capitalised label shown on the chip and in copy. */
+export const ROLE_LABEL: Record<AppRole, string> = {
+  owner: 'Owner',
+  admin: 'Admin',
+  moderator: 'Moderator',
+};

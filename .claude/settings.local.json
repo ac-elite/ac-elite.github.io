@@ -5,7 +5,15 @@
       "Bash(cp '/c/Programming/AC Elite Website/.env' .env && ls -la .env)",
       "PowerShell(npm install 2>&1)",
       "Bash(until grep *)",
-      "Bash(grep -n \"<Paper sx={{\\\\|<Box sx={glassCardMotionSx\\\\|<Box sx={{ order\\\\|^                </Paper>$\\\\|^                </Box>$\" src/pages/admin.tsx)"
+      "Bash(grep -n \"<Paper sx={{\\\\|<Box sx={glassCardMotionSx\\\\|<Box sx={{ order\\\\|^                </Paper>$\\\\|^                </Box>$\" src/pages/admin.tsx)",
+      "Bash(npx tsc *)",
+      "Bash(echo \"exit=$?\")",
+      "Bash(npx eslint *)",
+      "Bash(npm run *)",
+      "Read(//c/Users/mike-/AppData/Local/Temp/claude/C--Programming-AC-Elite-Website--claude-worktrees-brave-lichterman-777a68/f432d7de-0b3b-498f-8bb3-7258aa1aa0eb/tasks/**)",
+      "Bash(ls -la \"C:/Programming/AC Elite Website/\" | head -40)",
+      "Bash(cp \"C:/Programming/AC Elite Website/.env\" .env && ls -la .env)",
+      "Bash(git add *)"
     ]
   }
 }

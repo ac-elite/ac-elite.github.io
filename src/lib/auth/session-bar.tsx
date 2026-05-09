@@ -7,30 +7,11 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 
 import { GLASS_CARD_INNER_SX } from 'src/lib/glass';
-import { ROLE_CHIP_SX, type DiscordRole } from 'src/lib/ac-elite-data';
+import { ROLE_CHIP_SX } from 'src/lib/ac-elite-data';
 
-import { useAuth, type AppRole } from './auth-context';
+import { useAuth, ROLE_LABEL, type AppRole, ROLE_TO_CHIP_STYLE } from './auth-context';
 
 // ----------------------------------------------------------------------
-
-/**
- * Map our auth roles onto the existing Discord role chip styles so the badge
- * colours match the labels shown on driver profiles / hall of fame.
- *   owner     → Creator (red gradient)
- *   admin     → Admin   (purple gradient)
- *   moderator → Moderator (green gradient)
- */
-const ROLE_TO_CHIP_STYLE: Record<AppRole, DiscordRole> = {
-  owner: 'Creator',
-  admin: 'Admin',
-  moderator: 'Moderator',
-};
-
-const ROLE_LABEL: Record<AppRole, string> = {
-  owner: 'Owner',
-  admin: 'Admin',
-  moderator: 'Moderator',
-};
 
 /**
  * Solid accent colour per role — used for the left-edge stripe and the avatar

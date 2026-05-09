@@ -3,3 +3,6 @@
 
 [functions.sync-server-status]
 verify_jwt = false
+
+[functions.manage-blocklist]
+verify_jwt = true
