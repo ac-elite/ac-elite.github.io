@@ -89,6 +89,7 @@ export function TrackCatalogManager() {
 
   const canEdit = hasAtLeastRole(auth.profile, 'admin');
   const canDelete = hasAtLeastRole(auth.profile, 'owner');
+  const showActionsColumn = canEdit || canDelete;
 
   const [dialog, setDialog] = useState<DialogMode>({ kind: 'closed' });
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
@@ -207,9 +208,11 @@ export function TrackCatalogManager() {
               <TableCell sx={{ width: '22%' }}>Alias</TableCell>
               <TableCell sx={{ width: '10%' }}>Image</TableCell>
               <TableCell sx={{ width: '8%' }}>Offset Y</TableCell>
-              <TableCell sx={{ width: '10%' }} align="right">
-                Actions
-              </TableCell>
+              {showActionsColumn && (
+                <TableCell sx={{ width: '10%' }} align="right">
+                  Actions
+                </TableCell>
+              )}
             </TableRow>
           </TableHead>
           <TableBody>
@@ -269,35 +272,47 @@ export function TrackCatalogManager() {
                 <TableCell sx={{ ...bodyCellSx, fontVariantNumeric: 'tabular-nums' }}>
                   {row.imageOffsetY}
                 </TableCell>
-                <TableCell sx={{ ...bodyCellSx }} align="right">
-                  <Stack direction="row" spacing={0.5} justifyContent="flex-end">
-                    {canEdit && (
-                      <IconButton
-                        size="small"
-                        onClick={() => setDialog({ kind: 'edit', row })}
-                        aria-label={`Edit ${row.id}`}
-                      >
-                        <Icon icon="solar:pen-bold" width={16} />
-                      </IconButton>
-                    )}
-                    {canDelete && (
-                      <IconButton
-                        size="small"
-                        onClick={() => setConfirmDeleteId(row.id)}
-                        aria-label={`Delete ${row.id}`}
-                        sx={{ color: '#fca5a5' }}
-                      >
-                        <Icon icon="solar:trash-bin-trash-bold" width={16} />
-                      </IconButton>
-                    )}
-                  </Stack>
-                </TableCell>
+                {showActionsColumn && (
+                  <TableCell sx={{ ...bodyCellSx }} align="right">
+                    <Stack direction="row" spacing={0.5} justifyContent="flex-end">
+                      {canEdit && (
+                        <IconButton
+                          size="small"
+                          onClick={() => setDialog({ kind: 'edit', row })}
+                          aria-label={`Edit ${row.id}`}
+                        >
+                          <Icon icon="solar:pen-bold" width={16} />
+                        </IconButton>
+                      )}
+                      {canDelete && (
+                        <IconButton
+                          size="small"
+                          onClick={() => setConfirmDeleteId(row.id)}
+                          aria-label={`Delete ${row.id}`}
+                          sx={{ color: '#fca5a5' }}
+                        >
+                          <Icon icon="solar:trash-bin-trash-bold" width={16} />
+                        </IconButton>
+                      )}
+                    </Stack>
+                  </TableCell>
+                )}
               </TableRow>
             ))}
             {!loading && tracks.length === 0 && (
               <TableRow>
-                <TableCell colSpan={6} sx={{ ...bodyCellSx, color: 'text.secondary' }} align="center">
-                  No tracks yet. Click <strong>Add track</strong> to get started.
+                <TableCell
+                  colSpan={showActionsColumn ? 6 : 5}
+                  sx={{ ...bodyCellSx, color: 'text.secondary' }}
+                  align="center"
+                >
+                  {canEdit ? (
+                    <>
+                      No tracks yet. Click <strong>Add track</strong> to get started.
+                    </>
+                  ) : (
+                    <>No tracks in the database yet.</>
+                  )}
                 </TableCell>
               </TableRow>
             )}

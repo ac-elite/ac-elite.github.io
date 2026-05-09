@@ -124,8 +124,7 @@ export default function Page() {
                     Welcome back
                   </Typography>
                   <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.75, maxWidth: 320 }}>
-                    Sign in with your Owner, Admin, or Moderator account to manage tracks,
-                    images, and the leaderboard tooling.
+                    Sign in to your AC Elite team account to continue.
                   </Typography>
                 </Box>
               </Stack>
@@ -162,7 +161,7 @@ export default function Page() {
                   autoComplete="username"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  placeholder="owner / admin / moderator"
+                  placeholder="Username"
                   required
                   fullWidth
                   disabled={!auth.configured || submitting}

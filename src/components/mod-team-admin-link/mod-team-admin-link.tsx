@@ -6,7 +6,8 @@ import { usePathname } from 'src/routes/hooks';
 import { RouterLink } from 'src/routes/components';
 
 /**
- * Muted footer link to /admin for moderators — not meant to compete with main nav.
+ * Muted footer link to /admin — not meant to compete with main nav.
+ * Always visible; the admin route itself is gated by `AuthGate`.
  */
 export function ModTeamAdminLink() {
   const pathname = usePathname();
