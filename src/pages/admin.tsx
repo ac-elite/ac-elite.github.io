@@ -20,6 +20,7 @@ import { CONFIG } from 'src/config-global';
 import { AuthGate } from 'src/lib/auth/auth-gate';
 import { SessionBar } from 'src/lib/auth/session-bar';
 import { TrackCatalogManager } from 'src/components/track-catalog-manager/track-catalog-manager';
+import { DriverBansManager } from 'src/components/driver-bans-manager/driver-bans-manager';
 import { DATA_FILES as DATA_FILE_PATHS } from 'src/centralized/data-files';
 import { fetchJson } from 'src/lib/fetch-json';
 import { getSyncHealth, type SyncHealthProfile } from 'src/lib/sync-utils';
@@ -836,6 +837,10 @@ export default function Page() {
 
                 <Box sx={{ order: 2 }}>
                   <TrackCatalogManager />
+                </Box>
+
+                <Box sx={{ order: 2 }}>
+                  <DriverBansManager />
                 </Box>
 
                 {/* Quick links — external nav shortcuts. */}
