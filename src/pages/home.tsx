@@ -46,6 +46,8 @@ import {
   PAGINATION_NAV_BUTTON_SX,
   PAGINATION_PAGE_BUTTON_SX,
   MARKETING_CTA_LARGE_LAYOUT_SX,
+  MARKETING_CTA_PRIMARY_GLASS_SX,
+  MARKETING_CTA_SECONDARY_GLASS_SX,
 } from 'src/lib/page-shell';
 import {
   GLASS_CARD_SX,
@@ -88,6 +90,7 @@ import {
   type LeaderboardCarRow,
   leaderboardTrackIdLookupCandidates,
 } from 'src/lib/ac-elite-data';
+import { useTrackCatalogVersion } from 'src/centralized/track-info';
 
 import { EmptyState } from 'src/components/data-state';
 import { DeltaChip } from 'src/components/delta-chip/delta-chip';
@@ -115,16 +118,14 @@ type CurrentTrackData = CurrentTrackPayload;
 
 const HOME_CURRENT_TRACK_PER_PAGE = 20;
 
-/** Hero CTA: subtle “breathing” glass glow (matches grid energy, stays on-brand). */
+/**
+ * Hero CTA: subtle outer-glow pulse. Only changes `filter` so it composes with
+ * the layered glass styling on the buttons (inner sheens + base box-shadow stay
+ * intact). Each button gets a different delay so they breathe out of sync.
+ */
 const heroPrimaryPulse = keyframes`
-  0%, 100% {
-    box-shadow: 0 2px 10px rgba(0,0,0,0.24), inset 0 1px 0 rgba(255,255,255,0.16);
-    border-color: rgba(255,255,255,0.22);
-  }
-  50% {
-    box-shadow: 0 2px 12px rgba(0,0,0,0.26), inset 0 1px 0 rgba(255,255,255,0.24);
-    border-color: rgba(255,255,255,0.3);
-  }
+  0%, 100% { filter: brightness(1) drop-shadow(0 0 0 rgba(147,197,253,0)); }
+  50%      { filter: brightness(1.05) drop-shadow(0 0 14px rgba(147,197,253,0.35)); }
 `;
 
 /** Soft highlight on “leaderboard.” — white-forward, not loud accent color. */
@@ -147,6 +148,18 @@ const heroKeywordPulse = keyframes`
   50% {
     color: #ffffff;
     text-shadow: 0 0 24px rgba(255,255,255,0.22), 0 0 44px rgba(191,219,254,0.18);
+  }
+`;
+
+/** Soft "live" pulse for the green dot in the hero kicker. */
+const heroLiveDotPulse = keyframes`
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(34,197,94,0.55), 0 0 12px rgba(34,197,94,0.6);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(34,197,94,0), 0 0 18px rgba(34,197,94,0.85);
+    transform: scale(1.08);
   }
 `;
 
@@ -228,9 +241,32 @@ function RaceIntelligenceCard({
                     flexDirection: 'column',
                     justifyContent: 'center',
                     alignItems: { xs: 'center', md: 'flex-start' },
+                    // Layered surface: subtle top sheen + soft outer glow + crisper border.
+                    // Lifts the tile from "flat box" to "deliberate glass surface".
+                    backgroundImage:
+                      'linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 36%),' +
+                      'linear-gradient(145deg, rgba(31,44,73,0.92), rgba(23,33,59,0.92))',
+                    border: '1px solid rgba(148,163,184,0.34)',
+                    boxShadow:
+                      'inset 0 1px 0 rgba(255,255,255,0.12), inset 0 -1px 0 rgba(0,0,0,0.22),' +
+                      ' 0 6px 16px rgba(0,0,0,0.28)',
+                    transition: 'transform 200ms ease, border-color 200ms ease, box-shadow 200ms ease',
+                    '@media (hover: hover)': {
+                      '&:hover': {
+                        transform: 'translateY(-1px)',
+                        borderColor: 'rgba(191,225,255,0.5)',
+                        boxShadow:
+                          'inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -1px 0 rgba(0,0,0,0.22),' +
+                          ' 0 10px 22px rgba(0,0,0,0.36), 0 0 0 1px rgba(147,197,253,0.2)',
+                      },
+                    },
+                    '@media (prefers-reduced-motion: reduce)': {
+                      transition: 'none',
+                      '&:hover': { transform: 'none' },
+                    },
                   }}
                 >
-                  <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.68)' }}>
+                  <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.72)', fontWeight: 600, letterSpacing: 0.2 }}>
                     {item.label}
                   </Typography>
                   <Typography
@@ -283,12 +319,23 @@ function HeroSection({ currentTrack }: { currentTrack: CurrentTrackData | null }
               }}
             >
               <Stack spacing={1} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: { xs: 'center', md: 'flex-start' } }}>
-                <Typography
-                  variant="overline"
-                  sx={sectionKickerSx}
-                >
-                  AC Elite Simracing
-                </Typography>
+                <Stack direction="row" spacing={1} alignItems="center">
+                  {/* Live dot — subtle "we're alive and updating" cue. */}
+                  <Box
+                    aria-hidden
+                    sx={{
+                      width: 8,
+                      height: 8,
+                      borderRadius: '50%',
+                      bgcolor: '#22c55e',
+                      animation: `${heroLiveDotPulse} 2.4s ease-in-out infinite`,
+                      ...reducedMotionNone,
+                    }}
+                  />
+                  <Typography variant="overline" sx={sectionKickerSx}>
+                    AC Elite Simracing · Live
+                  </Typography>
+                </Stack>
 
                 <Typography
                   variant={isMdUp ? 'h2' : 'h3'}
@@ -327,8 +374,9 @@ function HeroSection({ currentTrack }: { currentTrack: CurrentTrackData | null }
                   </Box>
                 </Typography>
 
-                <Typography variant="body1" sx={{ maxWidth: 540, color: 'text.secondary' }}>
-                Live drivers, live stats, real-time progress from AC Elite.
+                <Typography variant="body1" sx={{ maxWidth: 580, color: 'text.secondary' }}>
+                  Real-time leaderboards, license rankings, and Safety Rating — every lap from
+                  the AC Elite server, updated as drivers cross the line.
                 </Typography>
               </Stack>
 
@@ -342,12 +390,12 @@ function HeroSection({ currentTrack }: { currentTrack: CurrentTrackData | null }
               >
                 <Button
                   variant="contained"
-                  color="primary"
                   size="large"
                   sx={{
                     ...MARKETING_CTA_LARGE_LAYOUT_SX,
+                    ...MARKETING_CTA_PRIMARY_GLASS_SX,
                     animation: `${heroPrimaryPulse} 4.5s ease-in-out infinite`,
-                    ...reducedMotionNone,
+                    '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
                   }}
                   href="https://discord.gg/d2EbxGYBbj"
                   target="_blank"
@@ -357,12 +405,13 @@ function HeroSection({ currentTrack }: { currentTrack: CurrentTrackData | null }
                 </Button>
                 <Button
                   variant="contained"
-                  color="secondary"
                   size="large"
                   sx={{
                     ...MARKETING_CTA_LARGE_LAYOUT_SX,
-                    animation: `${heroPrimaryPulse} 4.5s ease-in-out infinite`,
-                    ...reducedMotionNone,
+                    ...MARKETING_CTA_SECONDARY_GLASS_SX,
+                    // Same pulse, half-cycle delay so the two CTAs breathe out of sync.
+                    animation: `${heroPrimaryPulse} 4.5s ease-in-out 2.25s infinite`,
+                    '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
                   }}
                   href={ACE_SKIN_PACK_DOWNLOAD_URL}
                   target="_blank"
@@ -509,16 +558,22 @@ function CurrentTrackLeaderboardSection({
                 <TableBody>
                   {loading && (
                     <TableRow>
-                      <TableCell colSpan={8} align="center" sx={{ py: 4 }}>
-                        Loading leaderboard data...
+                      <TableCell colSpan={8} sx={{ py: 4, px: 2 }}>
+                        <EmptyState
+                          title="Loading leaderboard…"
+                          description="Pulling current-track lap times. This usually takes a second."
+                        />
                       </TableCell>
                     </TableRow>
                   )}
 
                   {!loading && error && (
                     <TableRow>
-                      <TableCell colSpan={8} align="center" sx={{ py: 4, color: 'error.main' }}>
-                        Failed to load leaderboard data: {error}
+                      <TableCell colSpan={8} sx={{ py: 4, px: 2 }}>
+                        <EmptyState
+                          title="Couldn’t load leaderboard data"
+                          description={error}
+                        />
                       </TableCell>
                     </TableRow>
                   )}
@@ -527,8 +582,8 @@ function CurrentTrackLeaderboardSection({
                     <TableRow>
                       <TableCell colSpan={8} sx={{ py: 4, px: 2 }}>
                         <EmptyState
-                          title="No leaderboard data for this track yet."
-                          description="When laps post for this layout, the table fills in on the next data sync."
+                          title="No times yet"
+                          description="No laps have been recorded on this track. Times will appear automatically after the next sync."
                         />
                       </TableCell>
                     </TableRow>
@@ -727,8 +782,11 @@ function DriverSearchSection({
         position: 'relative',
         py: 4,
         background: 'linear-gradient(180deg, rgba(31,44,73,0.98) 0%, rgba(23,33,59,0.98) 100%)',
-        borderTop: '1px solid rgba(255,255,255,0.08)',
-        borderBottom: '1px solid rgba(255,255,255,0.08)',
+        // Slightly stronger so the seam reads as crisp on both sides — the
+        // grid-pattern transition below already adds visual contrast on its own;
+        // the top boundary needs the border to do all the work.
+        borderTop: '1px solid rgba(255,255,255,0.14)',
+        borderBottom: '1px solid rgba(255,255,255,0.14)',
         overflow: 'hidden',
       }}
     >
@@ -739,7 +797,7 @@ function DriverSearchSection({
               <Typography variant="overline" sx={sectionKickerSx}>
                 Driver statistics
               </Typography>
-              <Typography variant="h4" sx={{ fontWeight: 700 }}>
+              <Typography variant="h4" sx={{ fontWeight: 800 }}>
                 Driver search
               </Typography>
               <Typography variant="body1" sx={{ maxWidth: 680, color: 'text.secondary' }}>
@@ -893,6 +951,8 @@ function DriverSearchSection({
 }
 
 export default function Page() {
+  // Subscribe so track names / images refresh when admin edits the catalog.
+  useTrackCatalogVersion();
   const { openGuide } = useLicenseSafetyGuide();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

@@ -66,6 +66,7 @@ import {
   getDriverOverallRank,
   type LeaderboardCarRow,
 } from 'src/lib/ac-elite-data';
+import { useTrackCatalogVersion } from 'src/centralized/track-info';
 
 import { DeltaChip } from 'src/components/delta-chip/delta-chip';
 import { EmptyState, ErrorPanel, LoadingPanel } from 'src/components/data-state';
@@ -162,6 +163,7 @@ type LiveryShowcaseSectionsFile = {
 };
 
 export default function Page() {
+  useTrackCatalogVersion();
   const navigate = useNavigate();
   const { openGuide } = useLicenseSafetyGuide();
   const { driverGuid = '' } = useParams();
@@ -382,19 +384,13 @@ export default function Page() {
             {!loading && error && <ErrorPanel error={error} />}
 
             {!loading && !error && !driver && (
-              <Paper
-                sx={{
-                  ...GLASS_PANEL_SX,
-                  borderTop: `3px solid ${BRAND_ACCENT}`,
-                  boxShadow:
-                    '0 12px 30px rgba(0,0,0,0.32), inset 0 1px 0 rgba(255,255,255,0.08), 0 -1px 0 rgba(147,197,253,0.2)',
-                }}
-              >
+              <Box sx={softFloatWrapperSx()}>
+                <Paper sx={{ ...GLASS_PANEL_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(0) }}>
                 <Stack spacing={1.5} sx={{ alignItems: { xs: 'center', md: 'flex-start' }, textAlign: { xs: 'center', md: 'left' } }}>
                   <Typography variant="h6" fontWeight={800}>
                     Driver not found
                   </Typography>
-                  <Typography color="text.secondary" sx={{ maxWidth: 560 }}>
+                  <Typography variant="body2" sx={{ color: 'text.secondary', maxWidth: 560 }}>
                     This driver is not in the current AC Elite data. Check the link or use the driver search on the home
                     page.
                   </Typography>
@@ -422,6 +418,7 @@ export default function Page() {
                   </Stack>
                 </Stack>
               </Paper>
+              </Box>
             )}
 
             {!loading && !error && driver && license && sr && (
@@ -779,6 +776,7 @@ export default function Page() {
                     <Paper
                       sx={{
                         ...GLASS_PANEL_SX,
+                        ...brandAccentBorderSx(),
                         ...glassCardMotionSx(2),
                         p: 2,
                         width: 1,

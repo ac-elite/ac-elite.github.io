@@ -100,3 +100,13 @@ export const BRAND_ACCENT = '#93c5fd';
 export function brandAccentBorderSx() {
   return statusAccentBorderSx(BRAND_ACCENT);
 }
+
+/**
+ * Top-rim accent in a role-specific colour (Owner red, Admin purple, Moderator
+ * green, etc.). Mechanically identical to `statusAccentBorderSx` but named so
+ * the call-site reads as "role rim, not sync rim". Pair with
+ * `statusAccentSplitRimSx(color)` to add the soft outer glow.
+ */
+export function roleAccentBorderSx(color: string) {
+  return statusAccentBorderSx(color);
+}

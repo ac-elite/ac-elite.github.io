@@ -312,7 +312,7 @@ export default function Page() {
                   <Typography variant="h4" fontWeight={800}>
                     Livery Showcase
                   </Typography>
-                  <Typography color="text.secondary">{showcaseCopy.heroSubtitle}</Typography>
+                  <Typography variant="body2" sx={{ color: 'text.secondary' }}>{showcaseCopy.heroSubtitle}</Typography>
                   <Typography variant="body2" sx={{ color: syncHealth.color, fontWeight: 700 }}>
                     {syncHealth.label} · {syncHealth.ageText}
                   </Typography>
@@ -325,13 +325,19 @@ export default function Page() {
 
             <Stack spacing={3}>
               {sectionsConfig?.officialPack && (
-                <Stack spacing={1.25} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: 'stretch' }}>
-                <Typography variant="h6" sx={{ fontWeight: 800 }}>
-                  Official pack
-                </Typography>
-                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                  Included with the standard AC Elite livery pack.
-                </Typography>
+                <Stack spacing={2} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: 'stretch' }}>
+                <Box sx={softFloatWrapperSx()}>
+                  <Box sx={{ ...GLASS_PANEL_TIGHT_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(0) }}>
+                    <Stack spacing={0.5} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: { xs: 'center', md: 'flex-start' } }}>
+                      <Typography variant="h6" sx={{ fontWeight: 800 }}>
+                        Official pack
+                      </Typography>
+                      <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                        Included with the standard AC Elite livery pack.
+                      </Typography>
+                    </Stack>
+                  </Box>
+                </Box>
                 <Grid container spacing={2} sx={{ width: 1 }}>
                   {generalLiveries.map((livery, i) => (
                     <Grid key={livery.name} size={{ xs: 12, sm: 6, md: 4 }}>
@@ -384,30 +390,37 @@ export default function Page() {
               )}
 
               {sectionsConfig?.aceSkinPack && aceSkinPack && aceSkinPack.length > 0 && (
-                <Stack spacing={1.25} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: 'stretch' }}>
-                  <Typography variant="h6" sx={{ fontWeight: 800 }}>
-                    ACE Skin Pack
-                  </Typography>
-                  <Stack spacing={0.75} useFlexGap>
-                    <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                      The full ACE Skin Pack for Assetto Corsa: install it in your game to drive these liveries.
-                      Each card shows the author (linked to their driver profile).
-                    </Typography>
-                    <Button
-                      component="a"
-                      href={ACE_SKIN_PACK_DOWNLOAD_URL}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      variant="outlined"
-                      size="small"
-                      sx={{
-                        my: 2,
-                        ...OUTLINED_GLASS_WHITE_SX,
-                      }}
-                    >
-                      Download ACE skin pack
-                    </Button>
-                  </Stack>
+                <Stack spacing={2} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: 'stretch' }}>
+                  <Box sx={softFloatWrapperSx()}>
+                    <Box sx={{ ...GLASS_PANEL_TIGHT_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(0) }}>
+                      <Stack
+                        direction={{ xs: 'column', md: 'row' }}
+                        spacing={1.5}
+                        alignItems={{ xs: 'flex-start', md: 'center' }}
+                        justifyContent="space-between"
+                      >
+                        <Stack spacing={0.5} sx={{ flex: 1, textAlign: { xs: 'center', md: 'left' }, alignItems: { xs: 'center', md: 'flex-start' } }}>
+                          <Typography variant="h6" sx={{ fontWeight: 800 }}>
+                            ACE Skin Pack
+                          </Typography>
+                          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                            The full ACE Skin Pack for Assetto Corsa: install it in your game to drive these liveries. Each card shows the author (linked to their driver profile).
+                          </Typography>
+                        </Stack>
+                        <Button
+                          component="a"
+                          href={ACE_SKIN_PACK_DOWNLOAD_URL}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          variant="outlined"
+                          size="small"
+                          sx={{ ...OUTLINED_GLASS_WHITE_SX, flexShrink: 0 }}
+                        >
+                          Download ACE skin pack
+                        </Button>
+                      </Stack>
+                    </Box>
+                  </Box>
                   <Grid container spacing={2} sx={{ width: 1 }}>
                     {aceSkinPackOrdered.map((entry, i) => {
                       const src = publicAsset(entry.previewUrl);
@@ -494,13 +507,19 @@ export default function Page() {
               )}
 
               {sectionsConfig?.teamLiveries && (
-                <Stack spacing={1.25} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: 'stretch' }}>
-                <Typography variant="h6" sx={{ fontWeight: 800 }}>
-                  AC Elite Team
-                </Typography>
-                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                  Team and collaborator liveries.
-                </Typography>
+                <Stack spacing={2} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: 'stretch' }}>
+                <Box sx={softFloatWrapperSx()}>
+                  <Box sx={{ ...GLASS_PANEL_TIGHT_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(0) }}>
+                    <Stack spacing={0.5} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: { xs: 'center', md: 'flex-start' } }}>
+                      <Typography variant="h6" sx={{ fontWeight: 800 }}>
+                        AC Elite Team
+                      </Typography>
+                      <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                        Team and collaborator liveries.
+                      </Typography>
+                    </Stack>
+                  </Box>
+                </Box>
                 <Grid container spacing={2} sx={{ width: 1 }}>
                   {TEAM_LIVERY_ENTRIES.map((livery, i) => {
                     const image = liveriesAssetUrl(livery.steamGuid);

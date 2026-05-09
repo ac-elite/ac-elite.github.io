@@ -17,10 +17,10 @@ import { getDriverProfileHref } from 'src/lib/routes';
 import { DATA_PAGE_SHELL_SX } from 'src/lib/page-shell';
 import { getSiteUrl } from 'src/centralized/site-urls';
 import { SITE_TEAM_ROLES } from 'src/site-manual-config';
-import { GLASS_PANEL_SX, GLASS_INNER_ROW_SX } from 'src/lib/glass';
+import { GLASS_PANEL_SX, GLASS_INNER_ROW_SX, GLASS_PANEL_TIGHT_SX } from 'src/lib/glass';
 import { getSyncHealth, type SiteMetadata, getEffectiveLastSync } from 'src/lib/sync-utils';
 import { subtleEnterUpSx, glassCardMotionSx, subtleEnterOnceSx, softFloatWrapperSx } from 'src/lib/subtle-motion';
-import { BRAND_ACCENT, brandAccentBorderSx, statusAccentBorderSx, statusAccentSplitRimSx } from 'src/lib/status-accent';
+import { BRAND_ACCENT, brandAccentBorderSx, roleAccentBorderSx, statusAccentBorderSx, statusAccentSplitRimSx } from 'src/lib/status-accent';
 import {
   CAR,
   type CarLap,
@@ -229,7 +229,7 @@ function TeamRoleColumn({
     <Paper
       sx={{
         ...GLASS_PANEL_SX,
-        ...statusAccentBorderSx(accent),
+        ...roleAccentBorderSx(accent),
         ...statusAccentSplitRimSx(accent),
         ...glassCardMotionSx(enterIndex),
         height: '100%',
@@ -494,7 +494,7 @@ export default function Page() {
                   <Typography variant="h4" fontWeight={800}>
                     Hall of Fame
                   </Typography>
-                  <Typography color="text.secondary">
+                  <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                     Standout drivers, iconic stats, and the AC Elite team behind the community.
                   </Typography>
                   <Typography variant="body2" sx={{ color: syncHealth.color, fontWeight: 700 }}>
@@ -533,10 +533,19 @@ export default function Page() {
                   ))}
                 </Grid>
 
-                <Box sx={{ pt: 1, textAlign: { xs: 'center', md: 'left' } }}>
-                  <Typography variant="h5" sx={{ fontWeight: 800, mb: 1.5, ...subtleEnterOnceSx(320) }}>
-                    Team Spotlight
-                  </Typography>
+                <Stack spacing={2}>
+                  <Box sx={softFloatWrapperSx()}>
+                    <Box sx={{ ...GLASS_PANEL_TIGHT_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(6) }}>
+                      <Stack spacing={0.5} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: { xs: 'center', md: 'flex-start' } }}>
+                        <Typography variant="h6" sx={{ fontWeight: 800 }}>
+                          Team Spotlight
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                          The people who keep AC Elite running — by role.
+                        </Typography>
+                      </Stack>
+                    </Box>
+                  </Box>
                   <Grid container spacing={2.5}>
                     <Grid size={{ xs: 12, md: 4 }}>
                       <TeamRoleColumn title="Creators" guids={teamRoles.creator} allDrivers={drivers} enterIndex={7} />
@@ -548,7 +557,7 @@ export default function Page() {
                       <TeamRoleColumn title="Moderators" guids={teamModerators} allDrivers={drivers} enterIndex={9} />
                     </Grid>
                   </Grid>
-                </Box>
+                </Stack>
               </>
             )}
           </Stack>

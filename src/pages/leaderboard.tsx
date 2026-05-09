@@ -3,6 +3,7 @@ import { useMemo, useState, useEffect } from 'react';
 
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
+import Container from '@mui/material/Container';
 import Link from '@mui/material/Link';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
@@ -15,7 +16,6 @@ import TableRow from '@mui/material/TableRow';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
-import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import FormControl from '@mui/material/FormControl';
 import TableContainer from '@mui/material/TableContainer';
@@ -42,6 +42,11 @@ import {
   GLASS_TABLE_PAGINATION_SX,
 } from 'src/lib/glass';
 import {
+  GLASS_SELECT_SX,
+  GLASS_SELECT_MENU_PROPS,
+  GLASS_SELECT_MENU_ITEM_SX,
+} from 'src/lib/glass-select';
+import {
   pickNewerCurrentTrack,
   toCurrentTrackPayload,
   type CurrentTrackPayload,
@@ -66,6 +71,7 @@ import {
   type LeaderboardCarRow,
   leaderboardTrackIdLookupCandidates,
 } from 'src/lib/ac-elite-data';
+import { getTrackInfo, getAllTracks, useTrackCatalogVersion } from 'src/centralized/track-info';
 
 import { DeltaChip } from 'src/components/delta-chip/delta-chip';
 import { EmptyState, ErrorPanel, LoadingPanel } from 'src/components/data-state';
@@ -77,6 +83,7 @@ const LEADERBOARD_PER_PAGE = 20;
 type CurrentTrackData = CurrentTrackPayload;
 
 export default function Page() {
+  const catalogVersion = useTrackCatalogVersion();
   const { openGuide } = useLicenseSafetyGuide();
   const [searchParams, setSearchParams] = useSearchParams();
   const [loading, setLoading] = useState(true);
@@ -130,13 +137,25 @@ export default function Page() {
     };
   }, []);
 
-  const tracks = useMemo(
-    () =>
-      Object.keys(leaderboardData || {}).sort((a, b) =>
-        getTrackDisplayName(a).localeCompare(getTrackDisplayName(b))
-      ),
-    [leaderboardData]
-  );
+  // Build the dropdown's track list as the union of:
+  //   - whatever has lap data in leaderboard.json
+  //   - whatever exists in the catalog (so admin-added tracks show up even
+  //     before any laps have been recorded on them)
+  // Deduped by the catalog's canonical id where known, so e.g. `imola` and
+  // `imola_` collapse onto one entry.
+  const tracks = useMemo(() => {
+    const idsFromData = Object.keys(leaderboardData || {});
+    const idsFromCatalog = getAllTracks().map((t) => t.id);
+    const canonical = new Set<string>();
+    for (const raw of [...idsFromData, ...idsFromCatalog]) {
+      const info = getTrackInfo(raw);
+      canonical.add(info?.id ?? raw);
+    }
+    return Array.from(canonical).sort((a, b) =>
+      getTrackDisplayName(a).localeCompare(getTrackDisplayName(b))
+    );
+    // catalogVersion bumps when admin saves; recompute so the new track shows up.
+  }, [leaderboardData, catalogVersion]);
 
   useEffect(() => {
     if (tracks.length === 0) return;
@@ -170,10 +189,22 @@ export default function Page() {
 
   const licenseMap = useMemo(() => computeLicenseMap(rankData), [rankData]);
 
+  // Try every alias variant for the current track id (e.g. `imola_` ⇄ `imola`)
+  // so admin-canonical IDs still resolve to whichever key the leaderboard JSON
+  // actually used. Returns an empty array for tracks without recorded laps, so
+  // the table renders the existing "no data yet" empty state.
   const rows = useMemo<LeaderboardCarRow[]>(() => {
-    const data = leaderboardData?.[currentTrack]?.[CAR];
-    if (!Array.isArray(data)) return [];
-    return [...data].sort((a, b) => (a.laptime || 0) - (b.laptime || 0));
+    const candidates = leaderboardTrackIdLookupCandidates(currentTrack);
+    let matched: LeaderboardCarRow[] | undefined;
+    for (const cand of candidates) {
+      const arr = leaderboardData?.[cand]?.[CAR];
+      if (Array.isArray(arr)) {
+        matched = arr;
+        break;
+      }
+    }
+    if (!matched) return [];
+    return [...matched].sort((a, b) => (a.laptime || 0) - (b.laptime || 0));
   }, [currentTrack, leaderboardData]);
 
   const syncHealth = useMemo(
@@ -206,7 +237,7 @@ export default function Page() {
                   <Typography variant="h4" fontWeight={800}>
                     Leaderboard
                   </Typography>
-                  <Typography color="text.secondary">
+                  <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                     Track-based leaderboard for {CAR}. Click a driver to open the full profile.
                   </Typography>
                   <Typography variant="body2" sx={{ color: syncHealth.color, fontWeight: 700 }}>
@@ -232,6 +263,7 @@ export default function Page() {
                 <Paper
                   sx={{
                     ...GLASS_PANEL_SX,
+                    ...brandAccentBorderSx(),
                     ...glassCardMotionSx(1),
                     textAlign: { xs: 'center', md: 'left' },
                   }}
@@ -248,55 +280,11 @@ export default function Page() {
                           setCurrentTrack(next);
                           setSearchParams({ track: next }, { replace: true });
                         }}
-                        sx={{
-                          borderRadius: 2,
-                          color: '#fff',
-                          bgcolor: 'rgba(10,22,47,0.88)',
-                          boxShadow: '0 0 0 1px rgba(255,255,255,0.08), inset 0 1px 0 rgba(255,255,255,0.08)',
-                          '& .MuiOutlinedInput-notchedOutline': {
-                            borderColor: 'rgba(191,225,255,0.4)',
-                          },
-                          '&:hover .MuiOutlinedInput-notchedOutline': {
-                            borderColor: 'rgba(191,225,255,0.65)',
-                          },
-                          '&.Mui-focused': {
-                            boxShadow: '0 0 0 3px rgba(173, 216, 255, 0.22)',
-                          },
-                          '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                            borderColor: 'rgba(191,225,255,0.95)',
-                            borderWidth: 2,
-                          },
-                          '& .MuiSelect-select': {
-                            fontWeight: 700,
-                          },
-                          '& .MuiSvgIcon-root': {
-                            color: '#dbeafe',
-                          },
-                        }}
-                        MenuProps={{
-                          PaperProps: {
-                            sx: {
-                              bgcolor: '#132447',
-                              color: '#fff',
-                              border: '1px solid rgba(191,225,255,0.3)',
-                              mt: 0.5,
-                            },
-                          },
-                        }}
+                        sx={GLASS_SELECT_SX}
+                        MenuProps={GLASS_SELECT_MENU_PROPS}
                       >
                         {tracks.map((track) => (
-                          <MenuItem
-                            key={track}
-                            value={track}
-                            sx={{
-                              '&.Mui-selected': {
-                                bgcolor: 'rgba(191,225,255,0.18)',
-                              },
-                              '&.Mui-selected:hover': {
-                                bgcolor: 'rgba(191,225,255,0.24)',
-                              },
-                            }}
-                          >
+                          <MenuItem key={track} value={track} sx={GLASS_SELECT_MENU_ITEM_SX}>
                             {getTrackDisplayName(track)}
                           </MenuItem>
                         ))}
@@ -338,8 +326,8 @@ export default function Page() {
                           <TableRow>
                             <TableCell colSpan={8} sx={{ py: 4, px: 2 }}>
                               <EmptyState
-                                title="No leaderboard data for this track yet."
-                                description="When laps are recorded on this layout, rows will appear here automatically after the next sync."
+                                title="No times yet"
+                                description="No laps have been recorded on this track. Times will appear automatically after the next sync."
                               />
                             </TableCell>
                           </TableRow>

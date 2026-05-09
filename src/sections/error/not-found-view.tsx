@@ -9,6 +9,7 @@ import { RouterLink } from 'src/routes/components';
 import { GLASS_PANEL_SX } from 'src/lib/glass';
 import { brandAccentBorderSx } from 'src/lib/status-accent';
 import { getHomeHref, getPublicAssetHref } from 'src/lib/routes';
+import { glassCardMotionSx, softFloatWrapperSx } from 'src/lib/subtle-motion';
 import { PAGE_SURFACE_SX, NOT_FOUND_SUPPORTING_TEXT_SX, LINK_PRIMARY_CONTAINED_LARGE_SX } from 'src/lib/page-shell';
 
 import { Logo } from 'src/components/logo';
@@ -43,25 +44,23 @@ export function NotFoundView() {
         }}
       >
         <Stack spacing={3} alignItems="center" sx={{ width: 1, textAlign: 'center' }}>
-          <Box
-            sx={{
-              ...GLASS_PANEL_SX,
-              ...brandAccentBorderSx(),
-              width: 1,
-              maxWidth: 560,
-            }}
-          >
-            <Stack spacing={1.25} alignItems="center">
-              <Typography variant="h4" sx={{ fontWeight: 900, letterSpacing: 0.02 }}>
-                Wrong chicane
-              </Typography>
-              <Typography variant="body1" sx={{ color: 'rgba(255,255,255,0.78)', fontWeight: 600 }}>
-                Off track — this URL is not on our circuit.
-              </Typography>
-              <Typography variant="body2" sx={{ ...NOT_FOUND_SUPPORTING_TEXT_SX }}>
-                Check the address for typos, or head back to the pits and pick a page from the nav.
-              </Typography>
-            </Stack>
+          <Box sx={{ ...softFloatWrapperSx(), width: 1, maxWidth: 560 }}>
+            <Box
+              sx={{
+                ...GLASS_PANEL_SX,
+                ...brandAccentBorderSx(),
+                ...glassCardMotionSx(0),
+              }}
+            >
+              <Stack spacing={1} alignItems="center">
+                <Typography variant="h4" sx={{ fontWeight: 800, letterSpacing: 0.02 }}>
+                  Wrong chicane
+                </Typography>
+                <Typography variant="body2" sx={{ ...NOT_FOUND_SUPPORTING_TEXT_SX }}>
+                  Off track — this URL is not on our circuit. Check the address for typos, or head back to the pits and pick a page from the nav.
+                </Typography>
+              </Stack>
+            </Box>
           </Box>
 
           <Box
