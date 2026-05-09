@@ -67,7 +67,6 @@ import {
   getLicenseBadgeSx,
   LICENSE_CHIP_WIDTH,
   getTrackDisplayName,
-  normalizeServerTrackId,
   type LeaderboardCarRow,
   leaderboardTrackIdLookupCandidates,
 } from 'src/lib/ac-elite-data';
@@ -81,6 +80,18 @@ import { useLicenseSafetyGuide } from 'src/components/license-safety-guide/licen
 const LEADERBOARD_PER_PAGE = 20;
 
 type CurrentTrackData = CurrentTrackPayload;
+
+/** Same canonical id set as the track dropdown (leaderboard keys ∪ catalog). */
+function buildCanonicalLeaderboardTrackIdSet(leaderboard: Record<string, any>): Set<string> {
+  const idsFromData = Object.keys(leaderboard || {});
+  const idsFromCatalog = getAllTracks().map((t) => t.id);
+  const canonical = new Set<string>();
+  for (const raw of [...idsFromData, ...idsFromCatalog]) {
+    const info = getTrackInfo(raw);
+    canonical.add(info?.id ?? raw);
+  }
+  return canonical;
+}
 
 export default function Page() {
   const catalogVersion = useTrackCatalogVersion();
@@ -117,12 +128,13 @@ export default function Page() {
         setLeaderboardData(leaderboard);
         setMetadata(meta);
         setDeltas(computeDeltas(rank, prevRank));
-        const trackKeys = Object.keys(leaderboard);
+        const canonicalSet = buildCanonicalLeaderboardTrackIdSet(leaderboard);
         const merged = pickNewerCurrentTrack(toCurrentTrackPayload(trackJson), liveStatus);
         const raw = merged?.track?.trim() ?? '';
         const preferred =
-          leaderboardTrackIdLookupCandidates(raw).find((id) => trackKeys.includes(id)) ??
-          normalizeServerTrackId(raw);
+          leaderboardTrackIdLookupCandidates(raw)
+            .map((id) => getTrackInfo(id)?.id ?? id)
+            .find((canon) => canonicalSet.has(canon)) ?? '';
         setPreferredTrack(preferred);
       } catch (e) {
         if (!mounted) return;
@@ -144,13 +156,7 @@ export default function Page() {
   // Deduped by the catalog's canonical id where known, so e.g. `imola` and
   // `imola_` collapse onto one entry.
   const tracks = useMemo(() => {
-    const idsFromData = Object.keys(leaderboardData || {});
-    const idsFromCatalog = getAllTracks().map((t) => t.id);
-    const canonical = new Set<string>();
-    for (const raw of [...idsFromData, ...idsFromCatalog]) {
-      const info = getTrackInfo(raw);
-      canonical.add(info?.id ?? raw);
-    }
+    const canonical = buildCanonicalLeaderboardTrackIdSet(leaderboardData);
     return Array.from(canonical).sort((a, b) =>
       getTrackDisplayName(a).localeCompare(getTrackDisplayName(b))
     );
@@ -174,7 +180,7 @@ export default function Page() {
       return;
     }
 
-    setCurrentTrack((prev) => (prev && tracks.includes(prev) ? prev : fallbackTrack));
+    setCurrentTrack(fallbackTrack);
   }, [tracks, preferredTrack, searchParams, setSearchParams]);
 
   useEffect(() => {
