@@ -8,16 +8,16 @@ import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 
 import { CONFIG } from 'src/config-global';
+import { AuthGate } from 'src/lib/auth/auth-gate';
+import { SessionBar } from 'src/lib/auth/session-bar';
 import { APP_ROUTES } from 'src/centralized/app-routes';
 import { CAR } from 'src/lib/ac-elite-data';
-import { SITE_PREVIEW } from 'src/site-manual-config';
 import { getSiteUrl } from 'src/centralized/site-urls';
 import { brandAccentBorderSx } from 'src/lib/status-accent';
 import { GLASS_PANEL_SX, GLASS_PANEL_COMPACT_SX } from 'src/lib/glass';
 import { glassCardMotionSx, softFloatWrapperSx } from 'src/lib/subtle-motion';
 import { DATA_PAGE_SHELL_SX, ACTION_PRIMARY_SMALL_SX, HERO_FOOTNOTE_CAPTION_SX } from 'src/lib/page-shell';
 
-import { PreviewLock } from 'src/components/preview-lock/preview-lock';
 import { PageGridOverlay } from 'src/components/page-background/page-grid-overlay';
 
 const mockSetups = [
@@ -89,7 +89,7 @@ export default function Page() {
                   <Typography variant="h4" fontWeight={800}>
                     Setup Store
                   </Typography>
-                  <Typography color="text.secondary">
+                  <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                     Setup hub for the team — real downloads are still on the way.
                   </Typography>
                   <Typography variant="body2" sx={{ color: 'rgba(147,197,253,0.92)', fontWeight: 700 }}>
@@ -102,12 +102,9 @@ export default function Page() {
               </Box>
             </Box>
 
-            <PreviewLock
-              storageKey={SITE_PREVIEW.setupStore.storageKey}
-              password={SITE_PREVIEW.setupStore.password}
-              title="Setup store — team access"
-              description="Enter the team password to browse the sample setup cards."
-            >
+            <AuthGate minRole="moderator">
+              <Stack spacing={2}>
+                <SessionBar />
               <Grid container spacing={2}>
                 {mockSetups.map((setup, i) => (
                   <Grid key={`${setup.name}-${setup.track}`} size={{ xs: 12, md: 4 }} sx={{ display: 'flex' }}>
@@ -154,7 +151,8 @@ export default function Page() {
                   </Grid>
                 ))}
               </Grid>
-            </PreviewLock>
+              </Stack>
+            </AuthGate>
           </Stack>
         </Container>
       </Box>

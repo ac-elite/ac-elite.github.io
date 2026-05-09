@@ -28,11 +28,14 @@ import {
   computeCommunitySnapshotDelta,
 } from 'src/lib/delta';
 import { CAR, formatNumber, formatLaptime, type RankDriver, getTrackDisplayName } from 'src/lib/ac-elite-data';
+import { useTrackCatalogVersion } from 'src/centralized/track-info';
 
+import { StatTile } from 'src/components/stat-tile/stat-tile';
 import { ErrorPanel, LoadingPanel } from 'src/components/data-state';
 import { PageGridOverlay } from 'src/components/page-background/page-grid-overlay';
 
 export default function Page() {
+  useTrackCatalogVersion();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -185,7 +188,7 @@ export default function Page() {
                 <Typography variant="h4" fontWeight={800}>
                   Stats
                 </Typography>
-                <Typography color="text.secondary">
+                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                   Community-wide totals for drivers, tracks, laps, and distance.
                 </Typography>
                 <Typography variant="body2" sx={{ color: syncHealth.color, fontWeight: 700 }}>
@@ -264,179 +267,67 @@ export default function Page() {
 
           {!loading && !error && (
             <Grid container spacing={2.5}>
-              {/* Hero metrics — coloured top accent + larger figures */}
+              {/* Hero metrics — larger figures */}
               <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                <Paper
-                  component="article"
-                  aria-label="Total drivers in synced KMR data"
-                  tabIndex={0}
-                  sx={{
-                    ...GLASS_CARD_SX,
-                    ...brandAccentBorderSx(),
-                    ...glassCardMotionSx(1),
-                    p: { xs: 2.5, md: 3 },
-                    textAlign: { xs: 'center', md: 'left' },
-                  }}
-                >
-                  <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.78)', fontWeight: 700 }}>
-                    Total Drivers
-                  </Typography>
-                  <Typography
-                    variant="h2"
-                    sx={{
-                      fontSize: { xs: 38, md: 46 },
-                      fontWeight: 900,
-                      mt: 0.75,
-                      lineHeight: 1.05,
-                      letterSpacing: -0.02,
-                    }}
-                  >
-                    {formatNumber(quickStats.totalDrivers)}
-                  </Typography>
-                </Paper>
+                <StatTile
+                  size="hero"
+                  motionIndex={1}
+                  label="Total Drivers"
+                  value={formatNumber(quickStats.totalDrivers)}
+                  ariaLabel="Total drivers in synced KMR data"
+                />
               </Grid>
 
               <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                <Paper
-                  sx={{
-                    ...GLASS_CARD_SX,
-                    ...brandAccentBorderSx(),
-                    ...glassCardMotionSx(2),
-                    p: { xs: 2.5, md: 3 },
-                    textAlign: { xs: 'center', md: 'left' },
-                  }}
-                >
-                  <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.78)', fontWeight: 700 }}>
-                    Total Laps
-                  </Typography>
-                  <Typography
-                    variant="h2"
-                    sx={{
-                      fontSize: { xs: 38, md: 46 },
-                      fontWeight: 900,
-                      mt: 0.75,
-                      lineHeight: 1.05,
-                      letterSpacing: -0.02,
-                    }}
-                  >
-                    {formatNumber(quickStats.totalLaps)}
-                  </Typography>
-                </Paper>
+                <StatTile
+                  size="hero"
+                  motionIndex={2}
+                  label="Total Laps"
+                  value={formatNumber(quickStats.totalLaps)}
+                />
               </Grid>
 
               <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                <Paper
-                  sx={{
-                    ...GLASS_CARD_SX,
-                    ...brandAccentBorderSx(),
-                    ...glassCardMotionSx(3),
-                    p: { xs: 2.5, md: 3 },
-                    textAlign: { xs: 'center', md: 'left' },
-                  }}
-                >
-                  <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.78)', fontWeight: 700 }}>
-                    Total KM
-                  </Typography>
-                  <Typography
-                    variant="h2"
-                    sx={{
-                      fontSize: { xs: 38, md: 46 },
-                      fontWeight: 900,
-                      mt: 0.75,
-                      lineHeight: 1.05,
-                      letterSpacing: -0.02,
-                    }}
-                  >
-                    {formatNumber(quickStats.totalKm)}
-                  </Typography>
-                </Paper>
+                <StatTile
+                  size="hero"
+                  motionIndex={3}
+                  label="Total KM"
+                  value={formatNumber(quickStats.totalKm)}
+                />
               </Grid>
 
               <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                <Paper
-                  sx={{
-                    ...GLASS_CARD_SX,
-                    ...brandAccentBorderSx(),
-                    ...glassCardMotionSx(4),
-                    p: { xs: 2.5, md: 3 },
-                    textAlign: { xs: 'center', md: 'left' },
-                  }}
-                >
-                  <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.78)', fontWeight: 700 }}>
-                    Incidents / 100 KM
-                  </Typography>
-                  <Typography
-                    variant="h2"
-                    sx={{
-                      fontSize: { xs: 38, md: 46 },
-                      fontWeight: 900,
-                      mt: 0.75,
-                      lineHeight: 1.05,
-                      letterSpacing: -0.02,
-                      fontVariantNumeric: 'tabular-nums',
-                    }}
-                  >
-                    {quickStats.incidentsPer100Km.toFixed(2)}
-                  </Typography>
-                </Paper>
+                <StatTile
+                  size="hero"
+                  motionIndex={4}
+                  label="Incidents / 100 KM"
+                  value={quickStats.incidentsPer100Km.toFixed(2)}
+                />
               </Grid>
 
               {/* Secondary metrics */}
               <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-                <Paper
-                  sx={{
-                    ...GLASS_CARD_SX,
-                    ...brandAccentBorderSx(),
-                    ...glassCardMotionSx(5),
-                    p: 2.75,
-                    textAlign: { xs: 'center', md: 'left' },
-                  }}
-                >
-                  <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.72)' }}>
-                    Active Drivers (100+ KM)
-                  </Typography>
-                  <Typography variant="h2" sx={{ fontSize: 40, fontWeight: 900, mt: 0.5 }}>
-                    {formatNumber(quickStats.activeDrivers)}
-                  </Typography>
-                </Paper>
+                <StatTile
+                  motionIndex={5}
+                  label="Active Drivers (100+ KM)"
+                  value={formatNumber(quickStats.activeDrivers)}
+                />
               </Grid>
 
               <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-                <Paper
-                  sx={{
-                    ...GLASS_CARD_SX,
-                    ...brandAccentBorderSx(),
-                    ...glassCardMotionSx(6),
-                    p: 2.75,
-                    textAlign: { xs: 'center', md: 'left' },
-                  }}
-                >
-                  <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.72)' }}>
-                    Total Tracks
-                  </Typography>
-                  <Typography variant="h2" sx={{ fontSize: 40, fontWeight: 900, mt: 0.5 }}>
-                    {formatNumber(quickStats.totalTracks)}
-                  </Typography>
-                </Paper>
+                <StatTile
+                  motionIndex={6}
+                  label="Total Tracks"
+                  value={formatNumber(quickStats.totalTracks)}
+                />
               </Grid>
 
               <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-                <Paper
-                  sx={{
-                    ...GLASS_CARD_SX,
-                    ...brandAccentBorderSx(),
-                    ...glassCardMotionSx(7),
-                    p: 2.75,
-                    textAlign: { xs: 'center', md: 'left' },
-                  }}
-                >
-                  <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.72)' }}>
-                    Avg KM per Driver
-                  </Typography>
-                  <Typography variant="h2" sx={{ fontSize: 40, fontWeight: 900, mt: 0.5 }}>
-                    {formatNumber(quickStats.avgKmPerDriver)}
-                  </Typography>
-                </Paper>
+                <StatTile
+                  motionIndex={7}
+                  label="Avg KM per Driver"
+                  value={formatNumber(quickStats.avgKmPerDriver)}
+                />
               </Grid>
 
               <Grid size={{ xs: 12, md: 6 }}>

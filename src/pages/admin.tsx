@@ -17,14 +17,16 @@ import Typography from '@mui/material/Typography';
 import TableContainer from '@mui/material/TableContainer';
 
 import { CONFIG } from 'src/config-global';
+import { AuthGate } from 'src/lib/auth/auth-gate';
+import { SessionBar } from 'src/lib/auth/session-bar';
+import { TrackCatalogManager } from 'src/components/track-catalog-manager/track-catalog-manager';
 import { DATA_FILES as DATA_FILE_PATHS } from 'src/centralized/data-files';
-import trackCatalog from 'src/centralized/track-catalog.json';
 import { fetchJson } from 'src/lib/fetch-json';
 import { getSyncHealth, type SyncHealthProfile } from 'src/lib/sync-utils';
 import { SERVER_ENDPOINTS } from 'src/centralized/server-endpoints';
-import { SITE_PREVIEW } from 'src/site-manual-config';
 import { SITE_REPO_URL } from 'src/centralized/site-urls';
 import { getTrackDisplayName } from 'src/lib/ac-elite-data';
+import { useTrackCatalogVersion } from 'src/centralized/track-info';
 import { glassCardMotionSx, softFloatWrapperSx } from 'src/lib/subtle-motion';
 import { brandAccentBorderSx } from 'src/lib/status-accent';
 import { GLASS_PANEL_SX, GLASS_INNER_PANEL_SX, GLASS_PANEL_COMPACT_SX } from 'src/lib/glass';
@@ -53,7 +55,6 @@ import {
   fetchLiveServerStatusFromSupabase,
 } from 'src/lib/server-status';
 
-import { PreviewLock } from 'src/components/preview-lock/preview-lock';
 import { PageGridOverlay } from 'src/components/page-background/page-grid-overlay';
 import { SiteVisitsShowcase } from 'src/components/site-visits-showcase/site-visits-showcase';
 import {
@@ -69,13 +70,6 @@ import {
 
 type MetadataData = { lastSync?: string; status?: string; error?: string; rank24hSnapshotAt?: string };
 type CurrentTrackData = CurrentTrackPayload;
-type TrackCatalogEntry = {
-  id: string;
-  name: string;
-  image?: string;
-  imageOffsetY?: number;
-  aliases: string[];
-};
 
 type AdminState = {
   metadata: MetadataData | null;
@@ -460,7 +454,6 @@ function buildAdminServerInfoRows(ct: CurrentTrackPayload | null): { label: stri
 }
 
 const FRESHNESS_ROW_BORDER = '1px solid rgba(148,163,184,0.1)';
-const TRACK_CATALOG = trackCatalog as TrackCatalogEntry[];
 
 /** Body cell: soft row divider; vertical align top for multi-line age/note. */
 const freshnessBodyCellSx = {
@@ -474,6 +467,7 @@ const freshnessBodyCellSx = {
 // ---------------------------------------------------------------------------
 
 export default function Page() {
+  useTrackCatalogVersion();
   const [data, setData] = useState<AdminState>({
     metadata: null,
     currentTrack: null,
@@ -575,13 +569,6 @@ export default function Page() {
   }, [data.currentTrack?.fetchedAt]);
 
   const adminServerDetailRows = useMemo(() => buildAdminServerInfoRows(data.currentTrack), [data.currentTrack]);
-  const trackCatalogStats = useMemo(() => {
-    const total = TRACK_CATALOG.length;
-    const withImage = TRACK_CATALOG.filter((track) => Boolean(track.image?.trim())).length;
-    const withAliases = TRACK_CATALOG.filter((track) => Array.isArray(track.aliases) && track.aliases.length > 0).length;
-    const withOffset = TRACK_CATALOG.filter((track) => (track.imageOffsetY ?? 0) !== 0).length;
-    return { total, withImage, withAliases, withOffset };
-  }, []);
 
   const dataStatusRows = useMemo(
     () =>
@@ -618,14 +605,10 @@ export default function Page() {
               </Box>
             </Box>
 
-            <PreviewLock
-              storageKey={SITE_PREVIEW.adminPanel.storageKey}
-              password={SITE_PREVIEW.adminPanel.password}
-              title="This area is locked"
-              description="Ask your team lead for the shared password, then type it below."
-            >
+            <AuthGate minRole="moderator">
               <Stack spacing={3}>
-                <Box sx={glassCardMotionSx(0)}>
+                <SessionBar />
+                <Box sx={{ order: 1, ...glassCardMotionSx(1) }}>
                   <SiteVisitsShowcase
                     phase={visitPhase}
                     count={visitCount}
@@ -634,7 +617,7 @@ export default function Page() {
                     onRefresh={refreshSiteVisits}
                   />
                 </Box>
-                <Paper sx={{ ...GLASS_PANEL_COMPACT_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(1) }}>
+                <Paper sx={{ ...GLASS_PANEL_COMPACT_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(3), order: 4 }}>
                   <Typography variant="h6" sx={{ fontWeight: 800 }}>
                     Data freshness
                   </Typography>
@@ -788,7 +771,7 @@ export default function Page() {
                   </TableContainer>
                 </Paper>
 
-                <Paper sx={{ ...GLASS_PANEL_COMPACT_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(2) }}>
+                <Paper sx={{ ...GLASS_PANEL_COMPACT_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(2), order: 3 }}>
                   <Stack
                     direction={{ xs: 'column', sm: 'row' }}
                     justifyContent="space-between"
@@ -851,58 +834,24 @@ export default function Page() {
                   </Grid>
                 </Paper>
 
-                <Paper sx={{ ...GLASS_PANEL_COMPACT_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(3), order: 4 }}>
-                  <Stack direction={{ xs: 'column', md: 'row' }} justifyContent="space-between" spacing={1.5} sx={{ mb: 1 }}>
+                <Box sx={{ order: 2 }}>
+                  <TrackCatalogManager />
+                </Box>
+
+                {/* Quick links — external nav shortcuts. */}
+                <Paper sx={{ ...GLASS_PANEL_COMPACT_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(4), order: 5 }}>
+                  <Stack
+                    direction={{ xs: 'column', md: 'row' }}
+                    justifyContent="space-between"
+                    alignItems={{ xs: 'flex-start', md: 'center' }}
+                    spacing={1.5}
+                  >
                     <Box>
-                      <Typography variant="h6" sx={{ fontWeight: 800 }}>Track IDs</Typography>
+                      <Typography variant="h6" sx={{ fontWeight: 800 }}>Quick links</Typography>
                       <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.4 }}>
-                        List of track names and IDs for quick lookup.
+                        Jump to the live server status page, recent automation runs, or join the server in Content Manager.
                       </Typography>
                     </Box>
-                  </Stack>
-
-                  <TableContainer sx={{ maxHeight: 380, borderRadius: 1, border: '1px solid rgba(148,163,184,0.14)', bgcolor: 'rgba(15,23,42,0.35)' }}>
-                    <Table size="small" stickyHeader>
-                      <TableHead>
-                        <TableRow>
-                          <TableCell sx={{ fontWeight: 800, width: '38%', bgcolor: 'rgba(15,23,42,0.88)' }}>Track name</TableCell>
-                          <TableCell sx={{ fontWeight: 800, width: '42%', bgcolor: 'rgba(15,23,42,0.88)' }}>Track ID</TableCell>
-                          <TableCell sx={{ fontWeight: 800, width: '20%', bgcolor: 'rgba(15,23,42,0.88)' }}>Image</TableCell>
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        {TRACK_CATALOG.map((track) => {
-                          const image = track.image?.trim() ?? '';
-                          return (
-                            <TableRow key={track.id}>
-                              <TableCell sx={{ ...freshnessBodyCellSx, color: 'text.primary', fontWeight: 700 }}>{track.name || '—'}</TableCell>
-                              <TableCell sx={{ ...freshnessBodyCellSx, fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace', fontSize: '0.8rem' }}>
-                                {track.id}
-                              </TableCell>
-                              <TableCell sx={{ ...freshnessBodyCellSx }}>
-                                <Chip
-                                  size="small"
-                                  label={image ? 'Yes' : 'No'}
-                                  sx={{
-                                    height: 22,
-                                    fontWeight: 700,
-                                    color: image ? '#22c55e' : 'rgba(226,232,240,0.92)',
-                                    bgcolor: image ? 'rgba(34,197,94,0.12)' : 'rgba(148,163,184,0.15)',
-                                    border: image ? '1px solid rgba(34,197,94,0.42)' : '1px solid rgba(148,163,184,0.35)',
-                                  }}
-                                />
-                              </TableCell>
-                            </TableRow>
-                          );
-                        })}
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
-                </Paper>
-
-                <Paper sx={{ ...GLASS_PANEL_COMPACT_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(4), order: 3 }}>
-                  <Stack direction={{ xs: 'column', md: 'row' }} justifyContent="space-between" spacing={1.5} sx={{ mb: 1 }}>
-                    <Typography variant="h6" sx={{ fontWeight: 800 }}>Useful links & details</Typography>
                     <Stack
                       direction={{ xs: 'column', sm: 'row' }}
                       spacing={1.25}
@@ -921,55 +870,67 @@ export default function Page() {
                       </Button>
                     </Stack>
                   </Stack>
-                  <Stack spacing={1.25}>
-                    <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>
-                      Full field list (extra details)
+                </Paper>
+
+                {/* Server lobby raw fields — the full /INFO field list. */}
+                <Paper sx={{ ...GLASS_PANEL_COMPACT_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(5), order: 6 }}>
+                  <Box sx={{ mb: 1.25 }}>
+                    <Typography variant="h6" sx={{ fontWeight: 800 }}>Server lobby (raw fields)</Typography>
+                    <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.4 }}>
+                      Every field the AC server reports. Useful when something looks off in the cards above and you want to see the raw value.
                     </Typography>
-                    <TableContainer sx={{ maxHeight: 400, borderRadius: 1, border: '1px solid rgba(148,163,184,0.14)', bgcolor: 'rgba(15,23,42,0.35)' }}>
-                      <Table size="small" stickyHeader>
-                        <TableHead>
-                          <TableRow>
-                            <TableCell sx={{ fontWeight: 800, width: '32%', bgcolor: 'rgba(15,23,42,0.88)' }}>Field</TableCell>
-                            <TableCell sx={{ fontWeight: 800, bgcolor: 'rgba(15,23,42,0.88)' }}>Value</TableCell>
+                  </Box>
+                  <TableContainer sx={{ maxHeight: 400, borderRadius: 1, border: '1px solid rgba(148,163,184,0.14)', bgcolor: 'rgba(15,23,42,0.35)' }}>
+                    <Table size="small" stickyHeader>
+                      <TableHead>
+                        <TableRow>
+                          <TableCell sx={{ fontWeight: 800, width: '32%', bgcolor: 'rgba(15,23,42,0.88)' }}>Field</TableCell>
+                          <TableCell sx={{ fontWeight: 800, bgcolor: 'rgba(15,23,42,0.88)' }}>Value</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {adminServerDetailRows.map((row, idx) => (
+                          <TableRow key={`${row.label}-${idx}`}>
+                            <TableCell sx={{ ...freshnessBodyCellSx, color: 'text.secondary', fontWeight: 700 }}>{row.label}</TableCell>
+                            <TableCell sx={{ ...freshnessBodyCellSx, fontFamily: row.value.length > 120 ? 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace' : 'inherit', fontSize: '0.8125rem', wordBreak: 'break-word' }}>
+                              {row.value}
+                            </TableCell>
                           </TableRow>
-                        </TableHead>
-                        <TableBody>
-                          {adminServerDetailRows.map((row, idx) => (
-                            <TableRow key={`${row.label}-${idx}`}>
-                              <TableCell sx={{ ...freshnessBodyCellSx, color: 'text.secondary', fontWeight: 700 }}>{row.label}</TableCell>
-                              <TableCell sx={{ ...freshnessBodyCellSx, fontFamily: row.value.length > 120 ? 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace' : 'inherit', fontSize: '0.8125rem', wordBreak: 'break-word' }}>
-                                {row.value}
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </TableContainer>
-                    <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', pt: 0.5 }}>
-                      When background tasks usually run (plain-language)
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </Paper>
+
+                {/* Background schedule — when automated jobs run. */}
+                <Paper sx={{ ...GLASS_PANEL_COMPACT_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(6), order: 7 }}>
+                  <Box sx={{ mb: 1.25 }}>
+                    <Typography variant="h6" sx={{ fontWeight: 800 }}>Background schedule</Typography>
+                    <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.4 }}>
+                      When automated jobs run, in plain language. Handy for figuring out why data on the site might still look old.
                     </Typography>
-                    <Stack spacing={1}>
-                      {SCHEDULE.map((entry) => (
-                        <Box key={entry.workflow} sx={{ ...GLASS_INNER_PANEL_SX, py: 1.2 }}>
-                          <Typography variant="subtitle2" sx={{ fontWeight: 800 }}>{entry.workflow}</Typography>
-                          <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mt: 0.25 }}>
-                            {entry.agendaWhen} · {entry.agendaSub} · {entry.cron}
+                  </Box>
+                  <Stack spacing={1}>
+                    {SCHEDULE.map((entry) => (
+                      <Box key={entry.workflow} sx={{ ...GLASS_INNER_PANEL_SX, py: 1.2 }}>
+                        <Typography variant="subtitle2" sx={{ fontWeight: 800 }}>{entry.workflow}</Typography>
+                        <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mt: 0.25 }}>
+                          {entry.agendaWhen} · {entry.agendaSub} · {entry.cron}
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.65, lineHeight: 1.5 }}>
+                          {entry.what}
+                        </Typography>
+                        {entry.chain && (
+                          <Typography variant="caption" sx={{ color: 'rgba(191,219,254,0.95)', display: 'block', mt: 0.5 }}>
+                            {entry.chain}
                           </Typography>
-                          <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.65, lineHeight: 1.5 }}>
-                            {entry.what}
-                          </Typography>
-                          {entry.chain && (
-                            <Typography variant="caption" sx={{ color: 'rgba(191,219,254,0.95)', display: 'block', mt: 0.5 }}>
-                              {entry.chain}
-                            </Typography>
-                          )}
-                        </Box>
-                      ))}
-                    </Stack>
+                        )}
+                      </Box>
+                    ))}
                   </Stack>
                 </Paper>
 
-                <Paper sx={{ ...GLASS_PANEL_COMPACT_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(5) }}>
+                <Paper sx={{ ...GLASS_PANEL_COMPACT_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(7), order: 8 }}>
                   <Typography variant="h6" sx={{ fontWeight: 800 }}>
                     Optional: try things in your browser
                   </Typography>
@@ -1120,7 +1081,7 @@ export default function Page() {
                   </Collapse>
                 </Paper>
               </Stack>
-            </PreviewLock>
+            </AuthGate>
           </Stack>
         </Container>
       </Box>

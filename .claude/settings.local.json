@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls \"C:\\\\Programming\\\\AC Elite Website\\\\\" 2>&1 | head -30)",
+      "Bash(cp '/c/Programming/AC Elite Website/.env' .env && ls -la .env)",
+      "PowerShell(npm install 2>&1)",
+      "Bash(until grep *)",
+      "Bash(grep -n \"<Paper sx={{\\\\|<Box sx={glassCardMotionSx\\\\|<Box sx={{ order\\\\|^                </Paper>$\\\\|^                </Box>$\" src/pages/admin.tsx)"
+    ]
+  }
+}

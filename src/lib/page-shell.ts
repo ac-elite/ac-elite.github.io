@@ -71,6 +71,68 @@ export const MARKETING_CTA_LARGE_LAYOUT_SX: SxProps<Theme> = {
   fontWeight: 800,
 };
 
+/**
+ * Premium glass-styled primary CTA. Layered linear gradient (no flat MUI fill),
+ * inner top sheen, outer brand-tinted glow, refined border. Pair with
+ * `MARKETING_CTA_LARGE_LAYOUT_SX` for the home hero buttons.
+ */
+export const MARKETING_CTA_PRIMARY_GLASS_SX = {
+  background: 'linear-gradient(180deg, #3B82F6 0%, #2563EB 50%, #1D4ED8 100%)',
+  border: '1px solid rgba(147,197,253,0.55)',
+  color: '#fff',
+  textShadow: '0 1px 0 rgba(15,23,42,0.35)',
+  boxShadow:
+    'inset 0 1px 0 rgba(255,255,255,0.34), inset 0 -1px 0 rgba(15,23,42,0.28),' +
+    ' 0 8px 22px rgba(37,99,235,0.36), 0 0 0 1px rgba(147,197,253,0.18)',
+  transition: 'transform 180ms ease, box-shadow 180ms ease, filter 180ms ease',
+  '&:hover': {
+    background: 'linear-gradient(180deg, #4F92F8 0%, #2D6CF1 50%, #2152DD 100%)',
+    transform: 'translateY(-1px)',
+    filter: 'brightness(1.04)',
+    boxShadow:
+      'inset 0 1px 0 rgba(255,255,255,0.42), inset 0 -1px 0 rgba(15,23,42,0.28),' +
+      ' 0 12px 28px rgba(37,99,235,0.5), 0 0 0 1px rgba(191,219,254,0.32)',
+  },
+  '&:active': {
+    transform: 'translateY(0)',
+    filter: 'brightness(0.96)',
+  },
+  '@media (prefers-reduced-motion: reduce)': {
+    transition: 'none',
+    '&:hover': { transform: 'none' },
+  },
+};
+
+/**
+ * Premium glass-styled secondary CTA — neutral dark glass that pairs with the
+ * primary above without competing for attention.
+ */
+export const MARKETING_CTA_SECONDARY_GLASS_SX = {
+  background: 'linear-gradient(180deg, rgba(36,52,83,0.96) 0%, rgba(20,29,52,0.96) 100%)',
+  border: '1px solid rgba(148,163,184,0.42)',
+  color: '#fff',
+  textShadow: '0 1px 0 rgba(15,23,42,0.4)',
+  boxShadow:
+    'inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -1px 0 rgba(0,0,0,0.32),' +
+    ' 0 8px 22px rgba(0,0,0,0.4)',
+  transition: 'transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease',
+  '&:hover': {
+    background: 'linear-gradient(180deg, rgba(46,64,99,0.98) 0%, rgba(26,38,66,0.98) 100%)',
+    borderColor: 'rgba(191,219,254,0.55)',
+    transform: 'translateY(-1px)',
+    boxShadow:
+      'inset 0 1px 0 rgba(255,255,255,0.22), inset 0 -1px 0 rgba(0,0,0,0.32),' +
+      ' 0 12px 28px rgba(0,0,0,0.5), 0 0 0 1px rgba(147,197,253,0.18)',
+  },
+  '&:active': {
+    transform: 'translateY(0)',
+  },
+  '@media (prefers-reduced-motion: reduce)': {
+    transition: 'none',
+    '&:hover': { transform: 'none' },
+  },
+};
+
 /** Primary `contained` + `size="large"` (404, marketing links). */
 export const LINK_PRIMARY_CONTAINED_LARGE_SX: SxProps<Theme> = {
   fontWeight: 800,

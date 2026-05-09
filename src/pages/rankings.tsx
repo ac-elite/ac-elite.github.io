@@ -36,6 +36,11 @@ import {
   GLASS_TABLE_PAGINATION_SX,
 } from 'src/lib/glass';
 import {
+  GLASS_SELECT_SX,
+  GLASS_SELECT_MENU_PROPS,
+  GLASS_SELECT_MENU_ITEM_SX,
+} from 'src/lib/glass-select';
+import {
   DATA_PAGE_SHELL_SX,
   PAGINATION_NAV_BUTTON_SX,
   PAGINATION_PAGE_BUTTON_SX,
@@ -311,7 +316,7 @@ export default function Page() {
                   <Typography variant="h4" fontWeight={800}>
                     Rankings
                   </Typography>
-                  <Typography color="text.secondary">
+                  <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                     Compare drivers by overall performance, or filter directly by license tier and Safety Rating tier.
                   </Typography>
                   <Typography variant="body2" sx={{ color: syncHealth.color, fontWeight: 700 }}>
@@ -337,6 +342,7 @@ export default function Page() {
                 <Paper
                   sx={{
                     ...GLASS_PANEL_SX,
+                    ...brandAccentBorderSx(),
                     ...glassCardMotionSx(1),
                     textAlign: { xs: 'center', md: 'left' },
                   }}
@@ -372,58 +378,11 @@ export default function Page() {
                             setLicenseTier(event.target.value);
                             setPageLicense(1);
                           }}
-                          sx={{
-                            borderRadius: 2,
-                            color: '#fff',
-                            bgcolor: 'rgba(10,22,47,0.88)',
-                            boxShadow: '0 0 0 1px rgba(255,255,255,0.08), inset 0 1px 0 rgba(255,255,255,0.08)',
-                            '& .MuiOutlinedInput-notchedOutline': {
-                              borderColor: 'rgba(191,225,255,0.4)',
-                            },
-                            '&:hover .MuiOutlinedInput-notchedOutline': {
-                              borderColor: 'rgba(191,225,255,0.65)',
-                            },
-                            '&.Mui-focused': {
-                              boxShadow: '0 0 0 3px rgba(173, 216, 255, 0.22)',
-                            },
-                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                              borderColor: 'rgba(191,225,255,0.95)',
-                              borderWidth: 2,
-                            },
-                            '& .MuiSelect-select': {
-                              fontWeight: 700,
-                            },
-                            '& .MuiSvgIcon-root': {
-                              color: '#dbeafe',
-                            },
-                          }}
-                          MenuProps={{
-                            PaperProps: {
-                              sx: {
-                                bgcolor: '#132447',
-                                color: '#fff',
-                                border: '1px solid rgba(191,225,255,0.3)',
-                                mt: 0.5,
-                              },
-                            },
-                          }}
+                          sx={GLASS_SELECT_SX}
+                          MenuProps={GLASS_SELECT_MENU_PROPS}
                         >
                           {licenseTiers.map((tier) => (
-                            <MenuItem
-                              key={tier}
-                              value={tier}
-                              sx={{
-                                color: '#fff',
-                                '&.Mui-selected': {
-                                  bgcolor: 'rgba(191,225,255,0.2)',
-                                  color: '#fff',
-                                  fontWeight: 700,
-                                },
-                                '&.Mui-selected:hover': {
-                                  bgcolor: 'rgba(191,225,255,0.28)',
-                                },
-                              }}
-                            >
+                            <MenuItem key={tier} value={tier} sx={GLASS_SELECT_MENU_ITEM_SX}>
                               {tier} ({licenseCounts[tier] || 0})
                             </MenuItem>
                           ))}
@@ -444,58 +403,11 @@ export default function Page() {
                             setSafetyTier(event.target.value);
                             setPageSafety(1);
                           }}
-                          sx={{
-                            borderRadius: 2,
-                            color: '#fff',
-                            bgcolor: 'rgba(10,22,47,0.88)',
-                            boxShadow: '0 0 0 1px rgba(255,255,255,0.08), inset 0 1px 0 rgba(255,255,255,0.08)',
-                            '& .MuiOutlinedInput-notchedOutline': {
-                              borderColor: 'rgba(191,225,255,0.4)',
-                            },
-                            '&:hover .MuiOutlinedInput-notchedOutline': {
-                              borderColor: 'rgba(191,225,255,0.65)',
-                            },
-                            '&.Mui-focused': {
-                              boxShadow: '0 0 0 3px rgba(173, 216, 255, 0.22)',
-                            },
-                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                              borderColor: 'rgba(191,225,255,0.95)',
-                              borderWidth: 2,
-                            },
-                            '& .MuiSelect-select': {
-                              fontWeight: 700,
-                            },
-                            '& .MuiSvgIcon-root': {
-                              color: '#dbeafe',
-                            },
-                          }}
-                          MenuProps={{
-                            PaperProps: {
-                              sx: {
-                                bgcolor: '#132447',
-                                color: '#fff',
-                                border: '1px solid rgba(191,225,255,0.3)',
-                                mt: 0.5,
-                              },
-                            },
-                          }}
+                          sx={GLASS_SELECT_SX}
+                          MenuProps={GLASS_SELECT_MENU_PROPS}
                         >
                           {safetyTiers.map((tier) => (
-                            <MenuItem
-                              key={tier}
-                              value={tier}
-                              sx={{
-                                color: '#fff',
-                                '&.Mui-selected': {
-                                  bgcolor: 'rgba(191,225,255,0.2)',
-                                  color: '#fff',
-                                  fontWeight: 700,
-                                },
-                                '&.Mui-selected:hover': {
-                                  bgcolor: 'rgba(191,225,255,0.28)',
-                                },
-                              }}
-                            >
+                            <MenuItem key={tier} value={tier} sx={GLASS_SELECT_MENU_ITEM_SX}>
                               {tier} ({safetyCounts[tier] || 0})
                             </MenuItem>
                           ))}

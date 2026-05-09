@@ -17,6 +17,7 @@ import { BRAND_ACCENT } from 'src/lib/status-accent';
 import { getTrackHeroImageOffsetY, getTrackHeroImageSrc } from 'src/lib/track-hero';
 import { softFloatWrapperSx } from 'src/lib/subtle-motion';
 import { getTrackDisplayName, normalizeServerTrackId } from 'src/lib/ac-elite-data';
+import { useTrackCatalogVersion } from 'src/centralized/track-info';
 import {
   acCurrentSessionLabel,
   formatTimeLeftSeconds,
@@ -130,6 +131,7 @@ function JoinGlyphIcon() {
 }
 
 export function ServerJoinCard({ currentTrack, joinHref = AC_ELITE_SERVER_JOIN_HREF, sx }: ServerJoinCardProps) {
+  useTrackCatalogVersion();
   const online = Boolean(currentTrack?.online);
   /** When offline, do not surface merged static fallback (last track / lobby) — card must read as down. */
   const rawTrack = online ? (currentTrack?.track?.trim() ?? '') : '';

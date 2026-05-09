@@ -7,6 +7,7 @@ export const APP_ROUTES = {
   setupStore: '/setup-store',
   liveryShowcase: '/livery-showcase',
   admin: '/admin',
+  login: '/login',
   driverPattern: '/driver/:driverGuid',
   driverStatsPattern: '/driver/:id',
 } as const;

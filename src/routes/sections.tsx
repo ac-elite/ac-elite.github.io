@@ -23,6 +23,7 @@ export const HallOfFamePage = lazy(() => import('src/pages/hall-of-fame'));
 export const DriverProfilePage = lazy(() => import('src/pages/driver-profile'));
 export const SetupStorePage = lazy(() => import('src/pages/setup-store'));
 export const LiveryShowcasePage = lazy(() => import('src/pages/livery-showcase'));
+export const LoginPage = lazy(() => import('src/pages/login'));
 export const Page404 = lazy(() => import('src/pages/page-not-found'));
 
 const renderFallback = () => (
@@ -67,6 +68,7 @@ export const routesSection: RouteObject[] = [
       { path: APP_ROUTES.setupStore.slice(1), element: <SetupStorePage /> },
       { path: APP_ROUTES.liveryShowcase.slice(1), element: <LiveryShowcasePage /> },
       { path: APP_ROUTES.admin.slice(1), element: <AdminPage /> },
+      { path: APP_ROUTES.login.slice(1), element: <LoginPage /> },
       { path: 'home', element: <HomePage /> },
     ],
   },
