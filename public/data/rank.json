@@ -543,9 +543,9 @@
  {
   "guid": "76561198999518018",
   "name": "David O.",
-  "points": 3443.396,
-  "kilometers": 22074.2,
-  "collisions": 605,
+  "points": 3444.182,
+  "kilometers": 22104.5,
+  "collisions": 606,
   "leaderboard": {
    "ks_zandvoort_": {
     "tatuusfa1": {
@@ -613,8 +613,8 @@
    "ks_red_bull_ring_layout_gp": {
     "tatuusfa1": {
      "laptime": 88889,
-     "laps": 396,
-     "ts": 1778190093354
+     "laps": 399,
+     "ts": 1778318055557
     }
    },
    "ks_silverstone_gp": {
@@ -625,7 +625,7 @@
     }
    }
   },
-  "last_seen": 1778190531040,
+  "last_seen": 1778318221128,
   "wins": 113,
   "podiums": 295,
   "poles": 50,
@@ -3585,7 +3585,7 @@
     }
    }
   },
-  "last_seen": 1778296614304,
+  "last_seen": 1778296693959,
   "wins": 39,
   "podiums": 57,
   "poles": 39,
@@ -80349,35 +80349,6 @@
   "infr": 2
  },
  {
-  "guid": "76561198795165037",
-  "name": "Mageza",
-  "points": 56.745999999999995,
-  "kilometers": 88.6,
-  "collisions": 10,
-  "leaderboard": {
-   "ks_vallelunga_classic_circuit": {
-    "tatuusfa1": {
-     "laptime": 82364,
-     "laps": 1,
-     "ts": 1767290272802
-    }
-   },
-   "monza_": {
-    "tatuusfa1": {
-     "laptime": 117393,
-     "laps": 6,
-     "ts": 1768413015617
-    }
-   }
-  },
-  "last_seen": 1771179553432,
-  "wins": 0,
-  "podiums": 1,
-  "poles": 0,
-  "flaps": 0,
-  "infr": 1
- },
- {
   "guid": "76561199250974221",
   "name": "Saul",
   "points": 56.744,
@@ -82008,6 +81979,35 @@
   "poles": 0,
   "flaps": 0,
   "infr": 0
+ },
+ {
+  "guid": "76561198795165037",
+  "name": "Mageza",
+  "points": 56.446000000000005,
+  "kilometers": 88.6,
+  "collisions": 10,
+  "leaderboard": {
+   "ks_vallelunga_classic_circuit": {
+    "tatuusfa1": {
+     "laptime": 82364,
+     "laps": 1,
+     "ts": 1767290272802
+    }
+   },
+   "monza_": {
+    "tatuusfa1": {
+     "laptime": 117393,
+     "laps": 6,
+     "ts": 1768413015617
+    }
+   }
+  },
+  "last_seen": 1778318221128,
+  "wins": 0,
+  "podiums": 1,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 1
  },
  {
   "guid": "76561199809010575",
