@@ -210,7 +210,7 @@ export function DriverBansManager() {
               color="primary"
               size="small"
               onClick={() => setAddOpen(true)}
-              startIcon={<Icon icon="mingcute:add-line" />}
+              startIcon={<Icon icon="solar:add-square-linear" />}
               sx={{ ...ACTION_CONTAINED_PRIMARY_SMALL_SX }}
             >
               Ban driver
@@ -703,7 +703,7 @@ function BanFormDialog({ open, existingGuids, directory, onCancel, onSaved }: Ba
     >
       <Box component="form" onSubmit={onSubmit}>
         <DialogTitle sx={{ fontWeight: 800, fontSize: '1.1rem', display: 'flex', alignItems: 'center', gap: 1 }}>
-          <Icon icon="mdi:hammer" width={22} />
+          <Icon icon="solar:hammer-bold-duotone" width={22} />
           Ban driver
         </DialogTitle>
         <DialogContent>
@@ -802,7 +802,7 @@ function BanFormDialog({ open, existingGuids, directory, onCancel, onSaved }: Ba
             variant="contained"
             color="error"
             disabled={!canSubmit}
-            startIcon={<Icon icon="mdi:hammer" width={18} />}
+            startIcon={<Icon icon="solar:hammer-bold-duotone" width={18} />}
           >
             {saving ? 'Saving…' : guidExists ? 'Update ban' : 'Ban driver'}
           </Button>
