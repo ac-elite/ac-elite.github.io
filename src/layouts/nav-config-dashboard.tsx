@@ -1,14 +1,16 @@
+import { Icon } from '@iconify/react';
+
 import Box from '@mui/material/Box';
 
 import { APP_ROUTES } from 'src/centralized/app-routes';
 import { ADMIN_SECTIONS } from 'src/centralized/admin-sections';
-import { SvgColor } from 'src/components/svg-color';
 
 import { hasAtLeastRole, type AuthProfile } from 'src/lib/auth/auth-context';
 
 // ----------------------------------------------------------------------
 
-const icon = (name: string) => <SvgColor src={`/assets/icons/navbar/${name}.svg`} />;
+/** Wrap an Iconify name in a 24×24 box-aware glyph used by the sidebar. */
+const navIcon = (name: string) => <Icon icon={name} width={24} height={24} />;
 
 export type NavItem = {
   title: string;
@@ -41,16 +43,16 @@ const comingSoonBadge = (
 );
 
 const baseNavData: NavItem[] = [
-  { title: 'Home', path: APP_ROUTES.home, icon: icon('ic-home-racing') },
-  { title: 'Stats', path: APP_ROUTES.dashboard, icon: icon('ic-stats-racing') },
-  { title: 'Leaderboard', path: APP_ROUTES.leaderboard, icon: icon('ic-leaderboard-racing') },
-  { title: 'Rankings', path: APP_ROUTES.rankings, icon: icon('ic-rankings-racing') },
-  { title: 'Hall of Fame', path: APP_ROUTES.hallOfFame, icon: icon('ic-hof-racing') },
-  { title: 'Livery Showcase', path: APP_ROUTES.liveryShowcase, icon: icon('ic-livery-racing') },
+  { title: 'Home', path: APP_ROUTES.home, icon: navIcon('solar:home-smile-bold-duotone') },
+  { title: 'Stats', path: APP_ROUTES.dashboard, icon: navIcon('solar:chart-2-bold-duotone') },
+  { title: 'Leaderboard', path: APP_ROUTES.leaderboard, icon: navIcon('solar:medal-ribbons-star-bold-duotone') },
+  { title: 'Rankings', path: APP_ROUTES.rankings, icon: navIcon('solar:ranking-bold-duotone') },
+  { title: 'Hall of Fame', path: APP_ROUTES.hallOfFame, icon: navIcon('solar:cup-star-bold-duotone') },
+  { title: 'Livery Showcase', path: APP_ROUTES.liveryShowcase, icon: navIcon('solar:palette-bold-duotone') },
   {
     title: 'Setup Store',
     path: APP_ROUTES.setupStore,
-    icon: icon('ic-setup-racing'),
+    icon: navIcon('solar:tuning-2-bold-duotone'),
     info: comingSoonBadge,
     disabled: true,
   },
@@ -71,7 +73,7 @@ export function getNavData(profile: AuthProfile | null): NavItem[] {
   const adminItems: NavItem[] = ADMIN_SECTIONS.map((section, index) => ({
     title: section.label,
     path: section.path,
-    icon: icon(section.navIcon),
+    icon: navIcon(section.iconifyName),
     group: index === 0 ? 'Admin' : undefined,
   }));
   return [...baseNavData, ...adminItems];
