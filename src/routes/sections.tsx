@@ -7,7 +7,6 @@ import { varAlpha } from 'minimal-shared/utils';
 import Box from '@mui/material/Box';
 import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgress';
 
-import AdminPage from 'src/pages/admin';
 import { APP_ROUTES } from 'src/centralized/app-routes';
 import { DashboardLayout } from 'src/layouts/dashboard';
 
@@ -25,6 +24,12 @@ export const SetupStorePage = lazy(() => import('src/pages/setup-store'));
 export const LiveryShowcasePage = lazy(() => import('src/pages/livery-showcase'));
 export const LoginPage = lazy(() => import('src/pages/login'));
 export const Page404 = lazy(() => import('src/pages/page-not-found'));
+
+const AdminPage = lazy(() => import('src/pages/admin'));
+const AdminServerPage = lazy(() => import('src/pages/admin-server'));
+const AdminTracksPage = lazy(() => import('src/pages/admin-tracks'));
+const AdminBansPage = lazy(() => import('src/pages/admin-bans'));
+const AdminDebugPage = lazy(() => import('src/pages/admin-debug'));
 
 const renderFallback = () => (
   <Box
@@ -68,6 +73,10 @@ export const routesSection: RouteObject[] = [
       { path: APP_ROUTES.setupStore.slice(1), element: <SetupStorePage /> },
       { path: APP_ROUTES.liveryShowcase.slice(1), element: <LiveryShowcasePage /> },
       { path: APP_ROUTES.admin.slice(1), element: <AdminPage /> },
+      { path: `${APP_ROUTES.admin.slice(1)}/server`, element: <AdminServerPage /> },
+      { path: `${APP_ROUTES.admin.slice(1)}/tracks`, element: <AdminTracksPage /> },
+      { path: `${APP_ROUTES.admin.slice(1)}/bans`, element: <AdminBansPage /> },
+      { path: `${APP_ROUTES.admin.slice(1)}/debug`, element: <AdminDebugPage /> },
       { path: APP_ROUTES.login.slice(1), element: <LoginPage /> },
       { path: 'home', element: <HomePage /> },
     ],

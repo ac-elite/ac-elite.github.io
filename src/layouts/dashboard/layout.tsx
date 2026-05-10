@@ -10,14 +10,16 @@ import { useTheme } from '@mui/material/styles';
 import { OUTLINED_MENU_TRIGGER_SMALL_SX } from 'src/lib/page-shell';
 
 import { Logo } from 'src/components/logo';
-import { UpdateBar } from 'src/components/update-bar/update-bar';
+import { SessionBar } from 'src/lib/auth/session-bar';
 import { ModTeamAdminLink } from 'src/components/mod-team-admin-link/mod-team-admin-link';
 import { LicenseSafetyGuideButton } from 'src/components/license-safety-guide/license-safety-guide';
+
+import { useAuth } from 'src/lib/auth/auth-context';
 
 import { NavMobile, NavDesktop } from './nav';
 import { layoutClasses } from '../core/classes';
 import { dashboardLayoutVars } from './css-vars';
-import { navData } from '../nav-config-dashboard';
+import { getNavData } from '../nav-config-dashboard';
 import { MainSection } from '../core/main-section';
 import { LayoutSection } from '../core/layout-section';
 
@@ -43,6 +45,8 @@ export function DashboardLayout({
   layoutQuery = 'lg',
 }: DashboardLayoutProps) {
   const theme = useTheme();
+  const auth = useAuth();
+  const navData = getNavData(auth.profile);
   const [openMobileNav, setOpenMobileNav] = useState(false);
 
   const renderFooter = () => null;
@@ -100,8 +104,8 @@ export function DashboardLayout({
             slots={{
               bottomArea: (
                 <>
+                  <SessionBar compact />
                   <ModTeamAdminLink />
-                  <UpdateBar compact sx={{ mx: 1, my: 1 }} />
                 </>
               ),
             }}
@@ -114,8 +118,8 @@ export function DashboardLayout({
             slots={{
               bottomArea: (
                 <>
+                  <SessionBar compact />
                   <ModTeamAdminLink />
-                  <UpdateBar compact sx={{ mx: 1, my: 1 }} />
                 </>
               ),
             }}

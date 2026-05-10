@@ -35,13 +35,123 @@ const ROLE_ICON: Record<AppRole, string> = {
  * nothing while the auth state is still resolving so a brief unauthenticated
  * state never flashes through.
  */
-export function SessionBar() {
+export type SessionBarProps = {
+  /**
+   * Compact layout for narrow contexts like the sidebar: shrinks the avatar,
+   * shows "Signed in as" + role chip on a single line, and trims the sign-out
+   * button to an icon. Use this when horizontal space is constrained.
+   */
+  compact?: boolean;
+};
+
+export function SessionBar({ compact = false }: SessionBarProps = {}) {
   const auth = useAuth();
 
   if (auth.loading || !auth.user) return null;
 
   const role = auth.profile?.role;
   const accent = role ? ROLE_ACCENT[role] : 'rgba(148,163,184,0.6)';
+
+  if (compact) {
+    return (
+      <Box
+        sx={{
+          position: 'relative',
+          overflow: 'hidden',
+          mx: 1,
+          my: 1,
+          px: 1.25,
+          py: 1,
+          borderRadius: 1.25,
+          bgcolor: 'rgba(15,23,42,0.55)',
+          border: '1px solid rgba(148,163,184,0.18)',
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            inset: '0 auto 0 0',
+            width: 3,
+            background: accent,
+            opacity: 0.9,
+          },
+        }}
+      >
+        <Stack direction="row" spacing={1} alignItems="center">
+          {role && (
+            <Box
+              sx={{
+                width: 30,
+                height: 30,
+                borderRadius: 1,
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                bgcolor: `${accent}26`,
+                border: `1px solid ${accent}66`,
+                color: '#fff',
+                flexShrink: 0,
+              }}
+            >
+              <Icon icon={ROLE_ICON[role]} width={16} />
+            </Box>
+          )}
+          <Stack direction="row" spacing={0.75} alignItems="center" sx={{ minWidth: 0, flex: 1 }}>
+            <Typography
+              variant="caption"
+              sx={{
+                color: 'text.secondary',
+                textTransform: 'uppercase',
+                letterSpacing: '0.08em',
+                fontWeight: 700,
+                fontSize: '0.6rem',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              Signed in as
+            </Typography>
+            {role && (
+              <Chip
+                size="small"
+                label={ROLE_LABEL[role]}
+                sx={{
+                  fontWeight: 800,
+                  fontSize: '0.62rem',
+                  height: 18,
+                  '& .MuiChip-label': { px: 0.6 },
+                  ...ROLE_CHIP_SX[ROLE_TO_CHIP_STYLE[role]],
+                }}
+              />
+            )}
+          </Stack>
+          <Box
+            component="button"
+            type="button"
+            onClick={() => void auth.signOut()}
+            aria-label="Sign out"
+            title="Sign out"
+            sx={{
+              border: '1px solid rgba(148,163,184,0.32)',
+              bgcolor: 'transparent',
+              color: 'rgba(226,232,240,0.85)',
+              cursor: 'pointer',
+              p: 0.65,
+              borderRadius: 1,
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transition: 'color 0.15s ease, border-color 0.15s ease, background-color 0.15s ease',
+              '&:hover': {
+                color: '#fca5a5',
+                borderColor: 'rgba(252,165,165,0.6)',
+                bgcolor: 'rgba(252,165,165,0.08)',
+              },
+            }}
+          >
+            <Icon icon="solar:logout-3-linear" width={15} />
+          </Box>
+        </Stack>
+      </Box>
+    );
+  }
 
   return (
     <Box

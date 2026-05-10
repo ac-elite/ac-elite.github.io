@@ -9,7 +9,6 @@ import Typography from '@mui/material/Typography';
 
 import { CONFIG } from 'src/config-global';
 import { AuthGate } from 'src/lib/auth/auth-gate';
-import { SessionBar } from 'src/lib/auth/session-bar';
 import { APP_ROUTES } from 'src/centralized/app-routes';
 import { CAR } from 'src/lib/ac-elite-data';
 import { getSiteUrl } from 'src/centralized/site-urls';
@@ -104,7 +103,6 @@ export default function Page() {
 
             <AuthGate minRole="moderator">
               <Stack spacing={2}>
-                <SessionBar />
               <Grid container spacing={2}>
                 {mockSetups.map((setup, i) => (
                   <Grid key={`${setup.name}-${setup.track}`} size={{ xs: 12, md: 4 }} sx={{ display: 'flex' }}>
