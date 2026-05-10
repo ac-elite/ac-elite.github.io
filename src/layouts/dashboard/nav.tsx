@@ -1,6 +1,6 @@
 import type { Theme, SxProps, Breakpoint } from '@mui/material/styles';
 
-import { useEffect } from 'react';
+import { Fragment, useEffect } from 'react';
 import { varAlpha } from 'minimal-shared/utils';
 
 import Box from '@mui/material/Box';
@@ -155,7 +155,26 @@ export function NavContent({ data, slots, sx }: NavContentProps) {
               const navButtonProps = { component: RouterLink, href: item.path };
 
               return (
-                <ListItem disableGutters disablePadding key={item.title}>
+                <Fragment key={item.title}>
+                {item.group && (
+                  <Box
+                    component="li"
+                    sx={{
+                      listStyle: 'none',
+                      mt: 1.25,
+                      mb: 0.25,
+                      px: 0.5,
+                      fontSize: '0.62rem',
+                      fontWeight: 800,
+                      letterSpacing: '0.14em',
+                      textTransform: 'uppercase',
+                      color: 'rgba(191,219,254,0.7)',
+                    }}
+                  >
+                    {item.group}
+                  </Box>
+                )}
+                <ListItem disableGutters disablePadding>
                   <ListItemButton
                     disableGutters
                     {...navButtonProps}
@@ -208,6 +227,7 @@ export function NavContent({ data, slots, sx }: NavContentProps) {
                     {item.info && item.info}
                   </ListItemButton>
                 </ListItem>
+                </Fragment>
               );
             })}
           </Box>

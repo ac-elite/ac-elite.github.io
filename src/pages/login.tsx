@@ -118,13 +118,13 @@ export default function Page() {
                       display: 'block',
                     }}
                   >
-                    AC Elite · Team area
+                    AC Elite · Sign in
                   </Typography>
                   <Typography variant="h4" sx={{ fontWeight: 800, mt: 0.5 }}>
                     Welcome back
                   </Typography>
                   <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.75, maxWidth: 320 }}>
-                    Sign in to your AC Elite team account to continue.
+                    Sign in to your AC Elite account to continue. Driver accounts are coming soon.
                   </Typography>
                 </Box>
               </Stack>
@@ -180,6 +180,7 @@ export default function Page() {
                   autoComplete="current-password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Password"
                   required
                   fullWidth
                   disabled={!auth.configured || submitting}
@@ -241,7 +242,7 @@ export default function Page() {
                 >
                   <Icon icon="solar:shield-check-bold" width={14} style={{ color: 'rgba(148,163,184,0.7)' }} />
                   <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                    Restricted area · session is private to this browser
+                    Your session stays private to this browser
                   </Typography>
                 </Stack>
               </Stack>
