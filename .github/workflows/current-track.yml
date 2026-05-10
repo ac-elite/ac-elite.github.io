@@ -13,9 +13,10 @@ on:
 
   workflow_dispatch:
 
+# Serialize with other workflows that commit to main (avoids push races).
 concurrency:
-  group: current-track
-  cancel-in-progress: true
+  group: bot-push-main
+  cancel-in-progress: false
 
 jobs:
   track:
@@ -95,6 +96,17 @@ jobs:
             git config user.name "github-actions[bot]"
 
             git commit -m "Daily current track update - $(date -u +'%Y-%m-%d %H:%M:%S UTC')"
-            git pull --rebase --autostash
-            git push
+            ok=false
+            for attempt in 1 2 3 4 5; do
+              if git pull --rebase --autostash origin main && git push origin main; then
+                ok=true
+                break
+              fi
+              [ "$attempt" -eq 5 ] && break
+              sleep $((attempt * 4))
+            done
+            if [ "$ok" != "true" ]; then
+              echo "Push failed after 5 attempts"
+              exit 1
+            fi
           fi

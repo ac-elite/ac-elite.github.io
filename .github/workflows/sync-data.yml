@@ -6,6 +6,11 @@ env:
 permissions:
   contents: write
 
+# Serialize with other workflows that commit to main (avoids push races).
+concurrency:
+  group: bot-push-main
+  cancel-in-progress: false
+
 on:
   # Run every hour
   schedule:
@@ -222,6 +227,17 @@ jobs:
             git config user.name "github-actions[bot]"
 
             git commit -m "🔄 Sync KMR data - $(date -u +'%Y-%m-%d %H:%M:%S UTC')"
-            git pull --rebase --autostash
-            git push
+            ok=false
+            for attempt in 1 2 3 4 5; do
+              if git pull --rebase --autostash origin main && git push origin main; then
+                ok=true
+                break
+              fi
+              [ "$attempt" -eq 5 ] && break
+              sleep $((attempt * 4))
+            done
+            if [ "$ok" != "true" ]; then
+              echo "Push failed after 5 attempts"
+              exit 1
+            fi
           fi
