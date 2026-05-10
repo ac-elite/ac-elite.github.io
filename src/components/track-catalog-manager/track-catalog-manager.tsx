@@ -164,7 +164,7 @@ export function TrackCatalogManager() {
             size="small"
             onClick={() => setDialog({ kind: 'add' })}
             sx={{ ...ACTION_CONTAINED_PRIMARY_SMALL_SX }}
-            startIcon={<Icon icon="mingcute:add-line" />}
+            startIcon={<Icon icon="solar:add-square-linear" />}
           >
             Add track
           </Button>
@@ -673,7 +673,7 @@ function TrackFormDialog({ mode, existingIds, onCancel, onSaved }: TrackFormDial
             color: '#bfdbfe',
           }}
         >
-          <Icon icon={editing ? 'solar:pen-bold' : 'mingcute:add-line'} width={18} />
+          <Icon icon={editing ? 'solar:pen-bold' : 'solar:add-square-linear'} width={18} />
         </Box>
         <Box sx={{ minWidth: 0, flex: 1 }}>
           <Box sx={{ fontWeight: 800, lineHeight: 1.2 }}>{editing ? 'Edit track' : 'Add track'}</Box>
@@ -907,7 +907,7 @@ function TrackFormDialog({ mode, existingIds, onCancel, onSaved }: TrackFormDial
             disabled={!canSubmit}
             sx={{ ...ACTION_CONTAINED_PRIMARY_SMALL_SX }}
             startIcon={
-              !saving ? <Icon icon={editing ? 'solar:diskette-bold' : 'mingcute:add-line'} /> : null
+              !saving ? <Icon icon={editing ? 'solar:diskette-bold' : 'solar:add-square-linear'} /> : null
             }
           >
             {saving ? 'Saving…' : editing ? 'Save changes' : 'Add track'}
