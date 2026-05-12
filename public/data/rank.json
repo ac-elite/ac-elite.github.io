@@ -1790,9 +1790,9 @@
  {
   "guid": "76561198845443064",
   "name": "Peter Paris",
-  "points": 1862.3600000000001,
-  "kilometers": 10324.9,
-  "collisions": 559,
+  "points": 1863.364,
+  "kilometers": 10345,
+  "collisions": 561,
   "leaderboard": {
    "ks_zandvoort_": {
     "tatuusfa1": {
@@ -1853,8 +1853,8 @@
    "ks_brands_hatch_gp": {
     "tatuusfa1": {
      "laptime": 81393,
-     "laps": 64,
-     "ts": 1778613484904
+     "laps": 67,
+     "ts": 1778613976425
     }
    },
    "ks_nurburgring_layout_gp_a": {
@@ -1914,7 +1914,7 @@
     }
    }
   },
-  "last_seen": 1778613598665,
+  "last_seen": 1778614112829,
   "wins": 44,
   "podiums": 142,
   "poles": 9,
@@ -3425,9 +3425,9 @@
  {
   "guid": "76561198066917659",
   "name": "maVVam",
-  "points": 1014.506,
-  "kilometers": 8767.9,
-  "collisions": 269,
+  "points": 1021.471,
+  "kilometers": 8903,
+  "collisions": 271,
   "leaderboard": {
    "monza_": {
     "tatuusfa1": {
@@ -3494,13 +3494,13 @@
    },
    "ks_brands_hatch_gp": {
     "tatuusfa1": {
-     "laptime": 79467,
-     "laps": 19,
-     "ts": 1778540311116
+     "laptime": 79287,
+     "laps": 27,
+     "ts": 1778623593185
     }
    }
   },
-  "last_seen": 1778540478450,
+  "last_seen": 1778623820830,
   "wins": 47,
   "podiums": 69,
   "poles": 49,
@@ -23105,6 +23105,70 @@
   "infr": 3
  },
  {
+  "guid": "76561198087588746",
+  "name": "RR Quickies",
+  "points": 96.486,
+  "kilometers": 327.3,
+  "collisions": 16,
+  "leaderboard": {
+   "ks_zandvoort_": {
+    "tatuusfa1": {
+     "laptime": 97458,
+     "laps": 11,
+     "ts": 1756556063582
+    }
+   },
+   "ks_nurburgring_layout_gp_b": {
+    "tatuusfa1": {
+     "laptime": 117323,
+     "laps": 3,
+     "ts": 1759489637274
+    }
+   },
+   "ks_silverstone_gp": {
+    "tatuusfa1": {
+     "laptime": 123186,
+     "laps": 5,
+     "ts": 1777491818587
+    }
+   },
+   "ks_vallelunga_classic_circuit": {
+    "tatuusfa1": {
+     "laptime": 71639,
+     "laps": 4,
+     "ts": 1767185067019
+    }
+   },
+   "ks_red_bull_ring_layout_gp": {
+    "tatuusfa1": {
+     "laptime": 91630,
+     "laps": 3,
+     "ts": 1771017282763
+    }
+   },
+   "ks_vallelunga_extended_circuit": {
+    "tatuusfa1": {
+     "laptime": 93992,
+     "laps": 10,
+     "ts": 1774640017037
+    }
+   },
+   "ks_brands_hatch_gp": {
+    "tatuusfa1": {
+     "laptime": 84272,
+     "laps": 2,
+     "ts": 1778613802787
+    }
+   }
+  },
+  "last_seen": 1778613907395,
+  "wins": 0,
+  "podiums": 1,
+  "poles": 1,
+  "flaps": 0,
+  "infr": 0
+ },
+ {
   "guid": "76561199232135236",
   "name": "Barrez",
   "points": 96.33999999999999,
@@ -23329,70 +23393,6 @@
   "last_seen": 1778433455312,
   "wins": 0,
   "podiums": 2,
-  "poles": 1,
-  "flaps": 0,
-  "infr": 0
- },
- {
-  "guid": "76561198087588746",
-  "name": "RR Quickies",
-  "points": 96.066,
-  "kilometers": 319.5,
-  "collisions": 16,
-  "leaderboard": {
-   "ks_zandvoort_": {
-    "tatuusfa1": {
-     "laptime": 97458,
-     "laps": 11,
-     "ts": 1756556063582
-    }
-   },
-   "ks_nurburgring_layout_gp_b": {
-    "tatuusfa1": {
-     "laptime": 117323,
-     "laps": 3,
-     "ts": 1759489637274
-    }
-   },
-   "ks_silverstone_gp": {
-    "tatuusfa1": {
-     "laptime": 123186,
-     "laps": 5,
-     "ts": 1777491818587
-    }
-   },
-   "ks_vallelunga_classic_circuit": {
-    "tatuusfa1": {
-     "laptime": 71639,
-     "laps": 4,
-     "ts": 1767185067019
-    }
-   },
-   "ks_red_bull_ring_layout_gp": {
-    "tatuusfa1": {
-     "laptime": 91630,
-     "laps": 3,
-     "ts": 1771017282763
-    }
-   },
-   "ks_vallelunga_extended_circuit": {
-    "tatuusfa1": {
-     "laptime": 93992,
-     "laps": 10,
-     "ts": 1774640017037
-    }
-   },
-   "ks_brands_hatch_gp": {
-    "tatuusfa1": {
-     "laptime": 84421,
-     "laps": 1,
-     "ts": 1778613446563
-    }
-   }
-  },
-  "last_seen": 1778613598665,
-  "wins": 0,
-  "podiums": 1,
   "poles": 1,
   "flaps": 0,
   "infr": 0
