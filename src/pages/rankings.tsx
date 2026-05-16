@@ -25,7 +25,8 @@ import { DATA_FILES } from 'src/centralized/data-files';
 import { fetchJson } from 'src/lib/fetch-json';
 import { getDriverProfileHref } from 'src/lib/routes';
 import { getSiteUrl } from 'src/centralized/site-urls';
-import { computeDeltas, type DriverDelta, fetchPrevRankData } from 'src/lib/delta';
+import { fetchPrevRankData } from 'src/lib/delta';
+import { useWindowedDriverDeltas } from 'src/lib/trend-window/trend-window-context';
 import { getSyncHealth, type SiteMetadata, getEffectiveLastSync } from 'src/lib/sync-utils';
 import { subtleRowEnterSx, glassCardMotionSx, softFloatWrapperSx } from 'src/lib/subtle-motion';
 import { brandAccentBorderSx, statusAccentBorderSx, statusAccentSplitRimSx } from 'src/lib/status-accent';
@@ -64,6 +65,7 @@ import {
 
 import { DeltaChip } from 'src/components/delta-chip/delta-chip';
 import { EmptyState, ErrorPanel, LoadingPanel } from 'src/components/data-state';
+import { TrendWindowStats } from 'src/components/trend-window/trend-window-stats';
 import { PageGridOverlay } from 'src/components/page-background/page-grid-overlay';
 import { useLicenseSafetyGuide } from 'src/components/license-safety-guide/license-safety-guide';
 
@@ -155,8 +157,10 @@ export default function Page() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [rankData, setRankData] = useState<RankDriver[]>([]);
+  const [prevRankData, setPrevRankData] = useState<RankDriver[]>([]);
   const [metadata, setMetadata] = useState<SiteMetadata>({});
-  const [deltas, setDeltas] = useState<Map<string, DriverDelta>>(new Map());
+  // Per-row SR/pace deltas follow the shared trend-window filter.
+  const deltas = useWindowedDriverDeltas(rankData, prevRankData);
 
   const [tab, setTab] = useState<RankingsTab>('overall');
   const [licenseTier, setLicenseTier] = useState<string>('All');
@@ -178,8 +182,8 @@ export default function Page() {
         ]);
         if (!mounted) return;
         setRankData(rank);
+        setPrevRankData(prevRank);
         setMetadata(meta);
-        setDeltas(computeDeltas(rank, prevRank));
       } catch (e) {
         if (!mounted) return;
         setError(e instanceof Error ? e.message : 'Unknown error');
@@ -322,6 +326,11 @@ export default function Page() {
                   <Typography variant="body2" sx={{ color: syncHealth.color, fontWeight: 700 }}>
                     {syncHealth.label} · {syncHealth.ageText}
                   </Typography>
+                  {rankData.length > 0 && (
+                    <Box sx={{ pt: 0.5 }}>
+                      <TrendWindowStats variant="community" rankData={rankData} />
+                    </Box>
+                  )}
                 </Stack>
               </Box>
             </Box>

@@ -29,6 +29,7 @@ import {
 } from 'src/lib/page-shell';
 
 import { AdminPageShell } from 'src/components/admin/admin-page-shell';
+import { AdminSyncStatusPanel } from 'src/components/admin/admin-sync-status-panel';
 import { SiteVisitsShowcase } from 'src/components/site-visits-showcase/site-visits-showcase';
 import {
   fetchSiteVisitCount,
@@ -56,12 +57,14 @@ const DATA_FILES: readonly DataFileEntry[] = [
     file: 'metadata.json',
     updatedBy: 'Ranking sync (KMR)',
     getTimestamp: (s) => s.metadata?.lastSync,
+    syncHealthProfile: 'liveFeed',
     getNote: (s) => (s.metadata?.status === 'success' ? 'Last run reported success' : s.metadata?.status ?? ''),
   },
   {
     file: 'current-track.json',
     updatedBy: 'AC Elite server (live check + hourly backup)',
     getTimestamp: (s) => s.currentTrack?.fetchedAt,
+    syncHealthProfile: 'liveFeed',
     getNote: (s) => {
       const state =
         s.currentTrack?.online
@@ -74,6 +77,7 @@ const DATA_FILES: readonly DataFileEntry[] = [
     file: 'rank.json',
     updatedBy: 'Ranking sync (KMR)',
     getTimestamp: (s) => s.metadata?.lastSync,
+    syncHealthProfile: 'liveFeed',
   },
   {
     file: 'rank-24h.json',
@@ -89,6 +93,7 @@ const DATA_FILES: readonly DataFileEntry[] = [
     file: 'leaderboard.json',
     updatedBy: 'Ranking sync (KMR)',
     getTimestamp: (s) => s.metadata?.lastSync,
+    syncHealthProfile: 'liveFeed',
   },
 ];
 
@@ -188,7 +193,9 @@ export default function Page() {
         />
       </Box>
 
-      <Paper sx={{ ...GLASS_PANEL_COMPACT_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(2) }}>
+      <AdminSyncStatusPanel motionIndex={2} />
+
+      <Paper sx={{ ...GLASS_PANEL_COMPACT_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(3) }}>
         <Typography variant="h6" sx={{ fontWeight: 800 }}>
           Data freshness
         </Typography>
@@ -332,7 +339,7 @@ export default function Page() {
         </TableContainer>
       </Paper>
 
-      <Paper sx={{ ...GLASS_PANEL_COMPACT_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(3) }}>
+      <Paper sx={{ ...GLASS_PANEL_COMPACT_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(4) }}>
         <Stack
           direction={{ xs: 'column', md: 'row' }}
           justifyContent="space-between"

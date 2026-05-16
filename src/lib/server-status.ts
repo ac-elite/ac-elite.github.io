@@ -16,6 +16,7 @@ import {
 } from 'src/lib/server-info';
 import { applyCurrentTrackMock } from 'src/centralized/current-track-mock';
 import { supabaseBaseUrl, supabaseHeaders, supabaseReadConfigured } from 'src/centralized/supabase-rest';
+import { getSupabaseClient } from 'src/lib/supabase-client';
 
 /** Browser poll interval once live `server_status` reads succeed (or when forced on). */
 export const LIVE_SERVER_STATUS_POLL_MS = 90_000;
@@ -221,6 +222,34 @@ export function pickNewerCurrentTrack(
   }
 
   return applyCurrentTrackMock(applyServerOfflineDebug(result));
+}
+
+/**
+ * Realtime push: calls `onChange` whenever the `server_status` row changes,
+ * so the UI reflects a new track within ~1s instead of waiting for the next poll.
+ * Returns an unsubscribe function; no-op when live reads are unavailable.
+ * The periodic poll stays in place as a backup if the realtime socket drops.
+ */
+export function subscribeLiveServerStatus(onChange: () => void): () => void {
+  if (!canAttemptLiveServerStatusFetch()) return () => {};
+  const client = getSupabaseClient();
+  if (!client) return () => {};
+  const channel = client
+    .channel('server-status-live')
+    .on(
+      'postgres_changes',
+      { event: '*', schema: 'public', table: 'server_status' },
+      () => {
+        if (isServerStatusDebugEnabled()) {
+          console.info('[server-status] realtime change received');
+        }
+        onChange();
+      }
+    )
+    .subscribe();
+  return () => {
+    void client.removeChannel(channel);
+  };
 }
 
 /** Normalize admin / loose JSON into the merge payload shape. */

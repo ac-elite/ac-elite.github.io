@@ -18,8 +18,14 @@ export type SyncHealth = {
   ageText: string;
 };
 
-/** How strictly to interpret age for badges (hourly-ish feeds vs at-most-daily snapshot). */
-export type SyncHealthProfile = 'default' | 'dailySnapshot';
+/**
+ * How strictly to interpret age for badges:
+ * - `default`      hourly-ish feeds (Live < 2h)
+ * - `liveFeed`     realtime Supabase feeds synced every ~15 min or faster
+ *                  (Live < 30 min, so a couple of missed cycles flag Delayed)
+ * - `dailySnapshot` jobs that run at most once per day
+ */
+export type SyncHealthProfile = 'default' | 'liveFeed' | 'dailySnapshot';
 
 /**
  * Data freshness for UI badges (same thresholds as former home/dashboard helpers).
@@ -51,6 +57,17 @@ export function getSyncHealth(lastSync?: string, profile: SyncHealthProfile = 'd
       return { label: 'Live', color: '#22c55e', ageText: ago };
     }
     if (diffMs <= delayedWindow) {
+      return { label: 'Delayed', color: '#f59e0b', ageText: ago };
+    }
+    return { label: 'Stale', color: '#ef4444', ageText: ago };
+  }
+
+  if (profile === 'liveFeed') {
+    const minute = 60 * 1000;
+    if (diffMs <= 30 * minute) {
+      return { label: 'Live', color: '#22c55e', ageText: ago };
+    }
+    if (diffMs <= 3 * hour) {
       return { label: 'Delayed', color: '#f59e0b', ageText: ago };
     }
     return { label: 'Stale', color: '#ef4444', ageText: ago };

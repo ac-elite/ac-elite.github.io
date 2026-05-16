@@ -27,7 +27,8 @@ import { getDiscordRolesForGuid } from 'src/lib/team-roles';
 import { getHomeHref, getLeaderboardTrackSearch } from 'src/lib/routes';
 import { BRAND_ACCENT, brandAccentBorderSx } from 'src/lib/status-accent';
 import { liveriesAssetUrl, getTeamLiveryMeta } from 'src/lib/driver-liveries';
-import { computeDeltas, type DriverDelta, fetchPrevRankData } from 'src/lib/delta';
+import { fetchPrevRankData } from 'src/lib/delta';
+import { useWindowedDriverDeltas } from 'src/lib/trend-window/trend-window-context';
 import { getSyncHealth, type SiteMetadata, getEffectiveLastSync } from 'src/lib/sync-utils';
 import { GLASS_PANEL_SX, GLASS_INNER_PANEL_SX, GLASS_TABLE_WRAPPER_SX } from 'src/lib/glass';
 import {
@@ -71,6 +72,7 @@ import { useTrackCatalogVersion } from 'src/centralized/track-info';
 import { DeltaChip } from 'src/components/delta-chip/delta-chip';
 import { EmptyState, ErrorPanel, LoadingPanel } from 'src/components/data-state';
 import { LiveryEnlargeDialog } from 'src/components/livery/livery-enlarge-dialog';
+import { TrendWindowStats } from 'src/components/trend-window/trend-window-stats';
 import { PageGridOverlay } from 'src/components/page-background/page-grid-overlay';
 import { useLicenseSafetyGuide } from 'src/components/license-safety-guide/license-safety-guide';
 
@@ -170,11 +172,15 @@ export default function Page() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [rankData, setRankData] = useState<RankDriver[]>([]);
+  const [prevRankData, setPrevRankData] = useState<RankDriver[]>([]);
   const [leaderboardData, setLeaderboardData] = useState<Record<string, any>>({});
   const teamRoles = SITE_TEAM_ROLES;
   const [metadata, setMetadata] = useState<SiteMetadata>({});
-  const [delta, setDelta] = useState<DriverDelta | null>(null);
   const [liveryShowcaseSections, setLiveryShowcaseSections] = useState<LiveryShowcaseSectionsFile | null>(null);
+
+  // SR/pace delta for this driver, following the shared trend-window filter.
+  const deltas = useWindowedDriverDeltas(rankData, prevRankData);
+  const delta = deltas.get(driverGuid) ?? null;
 
   useEffect(() => {
     let mounted = true;
@@ -191,11 +197,10 @@ export default function Page() {
         ]);
         if (!mounted) return;
         setRankData(rank);
+        setPrevRankData(prevRank);
         setLeaderboardData(leaderboard);
         setMetadata(meta);
         setLiveryShowcaseSections(liverySectionsRaw && typeof liverySectionsRaw === 'object' ? liverySectionsRaw : {});
-        const allDeltas = computeDeltas(rank, prevRank);
-        setDelta(allDeltas.get(driverGuid) || null);
       } catch (e) {
         if (!mounted) return;
         setError(e instanceof Error ? e.message : 'Unknown error');
@@ -496,6 +501,10 @@ export default function Page() {
                           Figures below are from the latest synced AC Elite laps and results for this driver.
                         </Typography>
                       </Stack>
+                    </Box>
+
+                    <Box sx={{ pb: 0.5 }}>
+                      <TrendWindowStats variant="driver" driver={driver} />
                     </Box>
 
                     <Box sx={DRIVER_STAT_GRID_SX}>
