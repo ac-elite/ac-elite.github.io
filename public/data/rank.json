@@ -543,7 +543,7 @@
  {
   "guid": "76561198999518018",
   "name": "David O.",
-  "points": 3910.6899999999996,
+  "points": 3910.39,
   "kilometers": 24482.4,
   "collisions": 721,
   "leaderboard": {
@@ -625,7 +625,7 @@
     }
    }
   },
-  "last_seen": 1778937771080,
+  "last_seen": 1778939944433,
   "wins": 133,
   "podiums": 347,
   "poles": 53,
@@ -2580,8 +2580,8 @@
  {
   "guid": "76561198253261997",
   "name": "Zheng Ting Lim",
-  "points": 1366.5620000000001,
-  "kilometers": 19707,
+  "points": 1366.4900000000002,
+  "kilometers": 19702.1,
   "collisions": 881,
   "leaderboard": {
    "ks_nurburgring_layout_gp_b": {
@@ -2711,7 +2711,7 @@
     }
    }
   },
-  "last_seen": 1778924521007,
+  "last_seen": 1778939978344,
   "wins": 68,
   "podiums": 123,
   "poles": 53,
@@ -4578,6 +4578,91 @@
   "infr": 5
  },
  {
+  "guid": "76561197961145304",
+  "name": "AndyVG",
+  "points": 817.508,
+  "kilometers": 3729.7,
+  "collisions": 165,
+  "leaderboard": {
+   "ks_brands_hatch_gp": {
+    "tatuusfa1": {
+     "laptime": 81579,
+     "laps": 52,
+     "ts": 1778941307121
+    }
+   },
+   "ks_nurburgring_layout_gp_b": {
+    "tatuusfa1": {
+     "laptime": 113470,
+     "laps": 35,
+     "ts": 1774979441046
+    }
+   },
+   "ks_zandvoort_": {
+    "tatuusfa1": {
+     "laptime": 95213,
+     "laps": 83,
+     "ts": 1775844199296
+    }
+   },
+   "ks_barcelona_layout_moto": {
+    "tatuusfa1": {
+     "laptime": 100302,
+     "laps": 32,
+     "ts": 1773086695577
+    }
+   },
+   "mugello_": {
+    "tatuusfa1": {
+     "laptime": 105172,
+     "laps": 79,
+     "ts": 1776274717864
+    }
+   },
+   "spa_": {
+    "tatuusfa1": {
+     "laptime": 144343,
+     "laps": 4,
+     "ts": 1768134759251
+    }
+   },
+   "ks_silverstone_gp": {
+    "tatuusfa1": {
+     "laptime": 119975,
+     "laps": 15,
+     "ts": 1771797864661
+    }
+   },
+   "ks_vallelunga_extended_circuit": {
+    "tatuusfa1": {
+     "laptime": 91621,
+     "laps": 136,
+     "ts": 1774632261733
+    }
+   },
+   "monza_": {
+    "tatuusfa1": {
+     "laptime": 112018,
+     "laps": 43,
+     "ts": 1777223692084
+    }
+   },
+   "ks_red_bull_ring_layout_gp": {
+    "tatuusfa1": {
+     "laptime": 89660,
+     "laps": 36,
+     "ts": 1777925868802
+    }
+   }
+  },
+  "last_seen": 1778941338137,
+  "wins": 15,
+  "podiums": 45,
+  "poles": 6,
+  "flaps": 9,
+  "infr": 1
+ },
+ {
   "guid": "76561198965135660",
   "name": "samino",
   "points": 817.353,
@@ -4710,91 +4795,6 @@
   "poles": 29,
   "flaps": 42,
   "infr": 32
- },
- {
-  "guid": "76561197961145304",
-  "name": "AndyVG",
-  "points": 815.433,
-  "kilometers": 3657.7,
-  "collisions": 160,
-  "leaderboard": {
-   "ks_brands_hatch_gp": {
-    "tatuusfa1": {
-     "laptime": 81579,
-     "laps": 44,
-     "ts": 1778939138063
-    }
-   },
-   "ks_nurburgring_layout_gp_b": {
-    "tatuusfa1": {
-     "laptime": 113470,
-     "laps": 35,
-     "ts": 1774979441046
-    }
-   },
-   "ks_zandvoort_": {
-    "tatuusfa1": {
-     "laptime": 95213,
-     "laps": 83,
-     "ts": 1775844199296
-    }
-   },
-   "ks_barcelona_layout_moto": {
-    "tatuusfa1": {
-     "laptime": 100302,
-     "laps": 32,
-     "ts": 1773086695577
-    }
-   },
-   "mugello_": {
-    "tatuusfa1": {
-     "laptime": 105172,
-     "laps": 79,
-     "ts": 1776274717864
-    }
-   },
-   "spa_": {
-    "tatuusfa1": {
-     "laptime": 144343,
-     "laps": 4,
-     "ts": 1768134759251
-    }
-   },
-   "ks_silverstone_gp": {
-    "tatuusfa1": {
-     "laptime": 119975,
-     "laps": 15,
-     "ts": 1771797864661
-    }
-   },
-   "ks_vallelunga_extended_circuit": {
-    "tatuusfa1": {
-     "laptime": 91621,
-     "laps": 136,
-     "ts": 1774632261733
-    }
-   },
-   "monza_": {
-    "tatuusfa1": {
-     "laptime": 112018,
-     "laps": 43,
-     "ts": 1777223692084
-    }
-   },
-   "ks_red_bull_ring_layout_gp": {
-    "tatuusfa1": {
-     "laptime": 89660,
-     "laps": 36,
-     "ts": 1777925868802
-    }
-   }
-  },
-  "last_seen": 1778939170105,
-  "wins": 15,
-  "podiums": 45,
-  "poles": 6,
-  "flaps": 9,
-  "infr": 1
  },
  {
   "guid": "76561199044398303",
