@@ -543,9 +543,9 @@
  {
   "guid": "76561198999518018",
   "name": "David O.",
-  "points": 3902.359,
-  "kilometers": 24406.6,
-  "collisions": 718,
+  "points": 3910.6899999999996,
+  "kilometers": 24482.4,
+  "collisions": 721,
   "leaderboard": {
    "ks_zandvoort_": {
     "tatuusfa1": {
@@ -571,8 +571,8 @@
    "ks_brands_hatch_gp": {
     "tatuusfa1": {
      "laptime": 79851,
-     "laps": 683,
-     "ts": 1778879664094
+     "laps": 697,
+     "ts": 1778937591791
     }
    },
    "ks_nurburgring_layout_gp_b": {
@@ -625,11 +625,11 @@
     }
    }
   },
-  "last_seen": 1778880086735,
-  "wins": 132,
-  "podiums": 346,
+  "last_seen": 1778937771080,
+  "wins": 133,
+  "podiums": 347,
   "poles": 53,
-  "flaps": 135,
+  "flaps": 136,
   "infr": 4
  },
  {
@@ -1925,9 +1925,9 @@
  {
   "guid": "76561198319370833",
   "name": "Bennett Racz Szabo",
-  "points": 1854.314,
-  "kilometers": 12607.6,
-  "collisions": 380,
+  "points": 1859.9750000000001,
+  "kilometers": 12631.1,
+  "collisions": 381,
   "leaderboard": {
    "ks_zandvoort_": {
     "tatuusfa1": {
@@ -1960,8 +1960,8 @@
    "ks_brands_hatch_gp": {
     "tatuusfa1": {
      "laptime": 79425,
-     "laps": 107,
-     "ts": 1778925067268
+     "laps": 112,
+     "ts": 1778926341116
     }
    },
    "ks_silverstone_gp": {
@@ -2035,11 +2035,11 @@
     }
    }
   },
-  "last_seen": 1778925813285,
-  "wins": 105,
-  "podiums": 152,
+  "last_seen": 1778926382055,
+  "wins": 106,
+  "podiums": 153,
   "poles": 64,
-  "flaps": 102,
+  "flaps": 103,
   "infr": 11
  },
  {
@@ -3925,8 +3925,8 @@
  {
   "guid": "76561197995833363",
   "name": "MK-Ultra Racer",
-  "points": 925.6020000000001,
-  "kilometers": 4828.7,
+  "points": 925.534,
+  "kilometers": 4831.4,
   "collisions": 147,
   "leaderboard": {
    "ks_zandvoort_": {
@@ -4000,7 +4000,7 @@
     }
    }
   },
-  "last_seen": 1778925813285,
+  "last_seen": 1778926391221,
   "wins": 44,
   "podiums": 77,
   "poles": 25,
@@ -4714,15 +4714,15 @@
  {
   "guid": "76561197961145304",
   "name": "AndyVG",
-  "points": 809.627,
-  "kilometers": 3633.9,
-  "collisions": 159,
+  "points": 815.433,
+  "kilometers": 3657.7,
+  "collisions": 160,
   "leaderboard": {
    "ks_brands_hatch_gp": {
     "tatuusfa1": {
      "laptime": 81579,
-     "laps": 39,
-     "ts": 1771779844603
+     "laps": 44,
+     "ts": 1778939138063
     }
    },
    "ks_nurburgring_layout_gp_b": {
@@ -4789,11 +4789,11 @@
     }
    }
   },
-  "last_seen": 1777925985733,
-  "wins": 14,
-  "podiums": 44,
+  "last_seen": 1778939170105,
+  "wins": 15,
+  "podiums": 45,
   "poles": 6,
-  "flaps": 8,
+  "flaps": 9,
   "infr": 1
  },
  {
@@ -5361,7 +5361,7 @@
   "guid": "76561198170513269",
   "name": "Gabor Csanyi",
   "points": 659.6370000000001,
-  "kilometers": 4002.1,
+  "kilometers": 4007,
   "collisions": 92,
   "leaderboard": {
    "ks_zandvoort_": {
@@ -5456,7 +5456,7 @@
     }
    }
   },
-  "last_seen": 1778925813285,
+  "last_seen": 1778925965352,
   "wins": 30,
   "podiums": 60,
   "poles": 7,
@@ -5690,9 +5690,9 @@
  {
   "guid": "76561199690147849",
   "name": "crash champ",
-  "points": 627.333,
-  "kilometers": 7909.7,
-  "collisions": 600,
+  "points": 626.896,
+  "kilometers": 7939.7,
+  "collisions": 607,
   "leaderboard": {
    "ks_silverstone_gp": {
     "tatuusfa1": {
@@ -5753,14 +5753,14 @@
    "ks_brands_hatch_gp": {
     "tatuusfa1": {
      "laptime": 82301,
-     "laps": 90,
-     "ts": 1778866584457
+     "laps": 94,
+     "ts": 1778937994293
     }
    }
   },
-  "last_seen": 1778866623720,
+  "last_seen": 1778938071894,
   "wins": 4,
-  "podiums": 33,
+  "podiums": 34,
   "poles": 1,
   "flaps": 0,
   "infr": 25
@@ -13103,6 +13103,42 @@
   "infr": 1
  },
  {
+  "guid": "76561198076169462",
+  "name": "Fernando Lobato de la Rosa",
+  "points": 176.019,
+  "kilometers": 1058.3,
+  "collisions": 168,
+  "leaderboard": {
+   "ks_silverstone_gp": {
+    "tatuusfa1": {
+     "laptime": 120008,
+     "laps": 26,
+     "ts": 1777812906972
+    }
+   },
+   "ks_red_bull_ring_layout_gp": {
+    "tatuusfa1": {
+     "laptime": 89595,
+     "laps": 83,
+     "ts": 1778448634515
+    }
+   },
+   "ks_brands_hatch_gp": {
+    "tatuusfa1": {
+     "laptime": 81297,
+     "laps": 52,
+     "ts": 1778937604558
+    }
+   }
+  },
+  "last_seen": 1778937983392,
+  "wins": 2,
+  "podiums": 9,
+  "poles": 1,
+  "flaps": 0,
+  "infr": 3
+ },
+ {
   "guid": "76561198298524107",
   "name": "JPC4",
   "points": 175.961,
@@ -13351,42 +13387,6 @@
   "poles": 0,
   "flaps": 0,
   "infr": 8
- },
- {
-  "guid": "76561198076169462",
-  "name": "Fernando Lobato de la Rosa",
-  "points": 171.005,
-  "kilometers": 1016.8,
-  "collisions": 162,
-  "leaderboard": {
-   "ks_silverstone_gp": {
-    "tatuusfa1": {
-     "laptime": 120008,
-     "laps": 26,
-     "ts": 1777812906972
-    }
-   },
-   "ks_red_bull_ring_layout_gp": {
-    "tatuusfa1": {
-     "laptime": 89595,
-     "laps": 83,
-     "ts": 1778448634515
-    }
-   },
-   "ks_brands_hatch_gp": {
-    "tatuusfa1": {
-     "laptime": 82185,
-     "laps": 45,
-     "ts": 1778881540330
-    }
-   }
-  },
-  "last_seen": 1778881774987,
-  "wins": 2,
-  "podiums": 8,
-  "poles": 1,
-  "flaps": 0,
-  "infr": 3
  },
  {
   "guid": "76561198112213055",
@@ -231346,7 +231346,7 @@
     }
    }
   },
-  "last_seen": 1778875073891,
+  "last_seen": 1778937710340,
   "wins": 0,
   "podiums": 0,
   "poles": 0,
