@@ -30,7 +30,9 @@ import { getDriverProfileHref } from 'src/lib/routes';
 import { getSiteUrl } from 'src/centralized/site-urls';
 import { SITE_TEAM_ROLES } from 'src/site-manual-config';
 import { ACE_SKIN_PACK_DOWNLOAD_URL } from 'src/lib/ace-skin-pack-download';
-import { computeDeltas, type DriverDelta, fetchPrevRankData } from 'src/lib/delta';
+import { type DriverDelta, fetchPrevRankData } from 'src/lib/delta';
+import { subscribeKmrSync } from 'src/lib/kmr-sync';
+import { useWindowedDriverDeltas } from 'src/lib/trend-window/trend-window-context';
 import { getTeamRole, type TeamRole, teamRoleToDiscordRole } from 'src/lib/team-roles';
 import { brandAccentBorderSx, statusAccentBorderSx, statusAccentSplitRimSx } from 'src/lib/status-accent';
 import { getSyncHealth, type SyncHealth, type SiteMetadata, getEffectiveLastSync } from 'src/lib/sync-utils';
@@ -63,6 +65,7 @@ import {
   toCurrentTrackPayload,
   applyServerOfflineDebug,
   type CurrentTrackPayload,
+  subscribeLiveServerStatus,
   LIVE_SERVER_STATUS_POLL_MS,
   shouldPollLiveServerStatus,
   isServerStatusDebugEnabled,
@@ -95,6 +98,7 @@ import { useTrackCatalogVersion } from 'src/centralized/track-info';
 import { EmptyState } from 'src/components/data-state';
 import { DeltaChip } from 'src/components/delta-chip/delta-chip';
 import { ServerJoinCard } from 'src/components/server-join-card';
+import { TrendWindowStats } from 'src/components/trend-window/trend-window-stats';
 import { PageGridOverlay } from 'src/components/page-background/page-grid-overlay';
 import { useLicenseSafetyGuide } from 'src/components/license-safety-guide/license-safety-guide';
 
@@ -740,6 +744,7 @@ function CurrentTrackLeaderboardSection({
 
 function DriverSearchSection({
   drivers,
+  rankData,
   loading,
   error,
   currentTrack,
@@ -749,6 +754,8 @@ function DriverSearchSection({
   activeTracks,
 }: {
   drivers: DriverView[];
+  /** Raw rank rows (with wins/points/km) — DriverView drops those fields. */
+  rankData: RankDriver[];
   loading: boolean;
   error: string | null;
   currentTrack: CurrentTrackData | null;
@@ -803,6 +810,11 @@ function DriverSearchSection({
               <Typography variant="body1" sx={{ maxWidth: 680, color: 'text.secondary' }}>
                 Search drivers and open their profile with live Safety Rating and License data.
               </Typography>
+              {rankData.length > 0 && (
+                <Box sx={{ pt: 0.5 }}>
+                  <TrendWindowStats variant="community" rankData={rankData} />
+                </Box>
+              )}
             </Stack>
             <Paper
               elevation={0}
@@ -957,8 +969,10 @@ export default function Page() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [rankData, setRankData] = useState<RankDriver[]>([]);
+  const [prevRankData, setPrevRankData] = useState<RankDriver[]>([]);
   const [leaderboardData, setLeaderboardData] = useState<Record<string, any>>({});
-  const [deltas, setDeltas] = useState<Map<string, DriverDelta>>(new Map());
+  // Per-row SR/pace deltas follow the shared trend-window filter.
+  const deltas = useWindowedDriverDeltas(rankData, prevRankData);
   const teamRoles = SITE_TEAM_ROLES;
   const [metadata, setMetadata] = useState<SiteMetadata>({});
   const [currentTrack, setCurrentTrack] = useState<CurrentTrackData | null>(null);
@@ -999,8 +1013,8 @@ export default function Page() {
         if (!mounted) return;
         staticCurrentTrackRef.current = trackJson;
         setRankData(rank);
+        setPrevRankData(prevRank);
         setLeaderboardData(leaderboard);
-        setDeltas(computeDeltas(rank, prevRank));
         setMetadata(meta);
 
         const staticPayload = toCurrentTrackPayload(trackJson);
@@ -1042,12 +1056,44 @@ export default function Page() {
           });
         });
     };
+    // Realtime push updates the card within ~1s of the Edge Function writing a
+    // new row; the interval below stays as a backup if the socket drops.
+    const unsubscribe = subscribeLiveServerStatus(tick);
     const id = window.setInterval(tick, LIVE_SERVER_STATUS_POLL_MS);
     return () => {
       mounted = false;
       window.clearInterval(id);
+      unsubscribe();
     };
   }, [currentTrack?.fetchedAt]);
+
+  // Realtime: when the sync-kmr-data Edge Function publishes fresh data, quietly
+  // refetch rank/leaderboard without flipping the page back into its loading state.
+  useEffect(() => {
+    let mounted = true;
+    const unsubscribe = subscribeKmrSync(() => {
+      void Promise.all([
+        fetchJson<RankDriver[]>(DATA_FILES.rank),
+        fetchJson<Record<string, any>>(DATA_FILES.leaderboard),
+        fetchJson<SiteMetadata>(DATA_FILES.metadata),
+        fetchPrevRankData(),
+      ])
+        .then(([rank, leaderboard, meta, prevRank]) => {
+          if (!mounted) return;
+          setRankData(rank);
+          setPrevRankData(prevRank);
+          setLeaderboardData(leaderboard);
+          setMetadata(meta);
+        })
+        .catch(() => {
+          // Transient fetch failure — the next sync event will retry.
+        });
+    });
+    return () => {
+      mounted = false;
+      unsubscribe();
+    };
+  }, []);
 
   useEffect(() => {
     setCurrentTrackPage(1);
@@ -1162,6 +1208,7 @@ export default function Page() {
       <HeroSection currentTrack={currentTrack} />
       <DriverSearchSection
         drivers={drivers}
+        rankData={rankData}
         loading={loading}
         error={error}
         currentTrack={currentTrack}

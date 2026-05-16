@@ -36,6 +36,7 @@ import {
 } from 'src/lib/ac-elite-data';
 
 import { EmptyState, ErrorPanel, LoadingPanel } from 'src/components/data-state';
+import { TrendWindowStats } from 'src/components/trend-window/trend-window-stats';
 import { PageGridOverlay } from 'src/components/page-background/page-grid-overlay';
 import { useLicenseSafetyGuide } from 'src/components/license-safety-guide/license-safety-guide';
 
@@ -500,6 +501,11 @@ export default function Page() {
                   <Typography variant="body2" sx={{ color: syncHealth.color, fontWeight: 700 }}>
                     {syncHealth.label} · {syncHealth.ageText}
                   </Typography>
+                  {drivers.length > 0 && (
+                    <Box sx={{ pt: 0.5 }}>
+                      <TrendWindowStats variant="community" rankData={drivers} />
+                    </Box>
+                  )}
                 </Stack>
               </Box>
             </Box>

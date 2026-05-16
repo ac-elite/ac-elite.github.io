@@ -63,6 +63,24 @@ end
 $policy$;
 
 -- Schrijven alleen via service role (Edge Function), niet via anon.
+
+-- === Realtime: push i.p.v. pollen ===
+-- Zet de tabel in de `supabase_realtime` publication zodat de site via een
+-- WebSocket meteen een melding krijgt als de Edge Function een nieuwe rij schrijft
+-- (track-wissel zichtbaar binnen ~1s i.p.v. de 90s-poll). De poll blijft als backup.
+do $realtime$
+begin
+  if not exists (
+    select 1
+    from pg_publication_tables
+    where pubname = 'supabase_realtime'
+      and schemaname = 'public'
+      and tablename = 'server_status'
+  ) then
+    execute 'alter publication supabase_realtime add table public.server_status';
+  end if;
+end
+$realtime$;
 --
 --
 -- === Supabase CLI (Windows) — veelvoorkomende fixes ===

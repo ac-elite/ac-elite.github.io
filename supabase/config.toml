@@ -4,5 +4,8 @@
 [functions.sync-server-status]
 verify_jwt = false
 
+[functions.sync-kmr-data]
+verify_jwt = false
+
 [functions.manage-blocklist]
 verify_jwt = true

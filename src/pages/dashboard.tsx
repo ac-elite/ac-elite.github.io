@@ -22,16 +22,12 @@ import { GLASS_CARD_SX, GLASS_PANEL_SX, GLASS_CARD_INNER_SX } from 'src/lib/glas
 import { getSyncHealth, type SiteMetadata, getEffectiveLastSync } from 'src/lib/sync-utils';
 import { subtleEnterUpSx, glassCardMotionSx, softFloatWrapperSx } from 'src/lib/subtle-motion';
 import { brandAccentBorderSx, statusAccentBorderSx, statusAccentSplitRimSx } from 'src/lib/status-accent';
-import {
-  formatSignedKm,
-  fetchPrevRankData,
-  computeCommunitySnapshotDelta,
-} from 'src/lib/delta';
 import { CAR, formatNumber, formatLaptime, type RankDriver, getTrackDisplayName } from 'src/lib/ac-elite-data';
 import { useTrackCatalogVersion } from 'src/centralized/track-info';
 
 import { StatTile } from 'src/components/stat-tile/stat-tile';
 import { ErrorPanel, LoadingPanel } from 'src/components/data-state';
+import { TrendWindowStats } from 'src/components/trend-window/trend-window-stats';
 import { PageGridOverlay } from 'src/components/page-background/page-grid-overlay';
 
 export default function Page() {
@@ -40,7 +36,6 @@ export default function Page() {
   const [error, setError] = useState<string | null>(null);
 
   const [rankData, setRankData] = useState<RankDriver[]>([]);
-  const [prevRankData, setPrevRankData] = useState<RankDriver[]>([]);
   const [leaderboardData, setLeaderboardData] = useState<Record<string, any>>({});
   const [metadata, setMetadata] = useState<SiteMetadata>({});
 
@@ -51,16 +46,14 @@ export default function Page() {
       setLoading(true);
       setError(null);
       try {
-        const [rank, leaderboard, meta, prevRank] = await Promise.all([
+        const [rank, leaderboard, meta] = await Promise.all([
           fetchJson<RankDriver[]>(DATA_FILES.rank),
           fetchJson<Record<string, any>>(DATA_FILES.leaderboard),
           fetchJson<SiteMetadata>(DATA_FILES.metadata),
-          fetchPrevRankData(),
         ]);
 
         if (!mounted) return;
         setRankData(rank);
-        setPrevRankData(prevRank);
         setLeaderboardData(leaderboard);
         setMetadata(meta);
       } catch (e) {
@@ -164,11 +157,6 @@ export default function Page() {
   const effectiveLastSync = getEffectiveLastSync(metadata?.lastSync, rankData);
   const syncHealth = getSyncHealth(effectiveLastSync);
 
-  const communityDelta = useMemo(
-    () => computeCommunitySnapshotDelta(rankData, prevRankData),
-    [rankData, prevRankData]
-  );
-
   return (
     <>
       <title>{`Stats - ${CONFIG.appName}`}</title>
@@ -194,25 +182,9 @@ export default function Page() {
                 <Typography variant="body2" sx={{ color: syncHealth.color, fontWeight: 700 }}>
                   {syncHealth.label} · {syncHealth.ageText}
                 </Typography>
-                {communityDelta.hasBaseline ? (
-                  <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 720 }}>
-                    vs daily snapshot:{' '}
-                    <Box component="span" sx={{ fontWeight: 700, color: 'rgba(255,255,255,0.92)' }}>
-                      {formatSignedKm(communityDelta.deltaKm)} km
-                    </Box>{' '}
-                    community-wide
-                    {communityDelta.newDrivers > 0 ? (
-                      <>
-                        {' '}
-                        ·{' '}
-                        <Box component="span" sx={{ fontWeight: 700, color: 'rgba(255,255,255,0.92)' }}>
-                          +{communityDelta.newDrivers}
-                        </Box>{' '}
-                        new driver{communityDelta.newDrivers === 1 ? '' : 's'}
-                      </>
-                    ) : null}
-                  </Typography>
-                ) : null}
+                <Box sx={{ pt: 0.5 }}>
+                  <TrendWindowStats variant="community" rankData={rankData} />
+                </Box>
               </Stack>
             </Box>
           </Box>

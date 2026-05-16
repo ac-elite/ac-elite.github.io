@@ -7,6 +7,7 @@ import { usePathname } from 'src/routes/hooks';
 import { ThemeProvider } from 'src/theme/theme-provider';
 import { AuthProvider } from 'src/lib/auth/auth-context';
 import { refreshTrackCatalogFromDb } from 'src/lib/auth/tracks-bridge';
+import { TrendWindowProvider } from 'src/lib/trend-window/trend-window-context';
 import {
   recordSiteVisitIfDue,
   recordSitePageStat,
@@ -31,8 +32,10 @@ export default function App({ children }: AppProps) {
     <ThemeProvider>
       <AuthProvider>
         <ToastProvider>
-          <SyncCanonicalMeta />
-          {children}
+          <TrendWindowProvider>
+            <SyncCanonicalMeta />
+            {children}
+          </TrendWindowProvider>
         </ToastProvider>
       </AuthProvider>
     </ThemeProvider>

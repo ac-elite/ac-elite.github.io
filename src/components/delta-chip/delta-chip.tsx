@@ -1,6 +1,9 @@
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 
+import { HISTORY_WINDOWS } from 'src/lib/rank-history';
+import { useTrendWindow } from 'src/lib/trend-window/trend-window-context';
+
 type DeltaKind = 'pace' | 'sr';
 
 type DeltaChipProps = {
@@ -15,20 +18,24 @@ type DeltaChipProps = {
 
 const EPSILON = 0.001;
 
-const TOOLTIP_PACE =
-  'Change in pace score over the last 24h. ' +
+const tooltipPace = (window: string) =>
+  `Change in pace score over the last ${window}. ` +
   'This can shift even without driving — when other drivers improve their times, your relative position changes.';
 
-const TOOLTIP_SR =
-  'Change in Safety Rating over the last 24h. ' +
+const tooltipSr = (window: string) =>
+  `Change in Safety Rating over the last ${window}. ` +
   'SR only changes when you drive — it is based on your own collisions and infractions per km.';
 
 export function DeltaChip({ value, decimals = 0, kind = 'pace', label }: DeltaChipProps) {
+  const { activeWindow } = useTrendWindow();
+
   if (Math.abs(value) < EPSILON) return null;
 
+  const windowLabel = HISTORY_WINDOWS.find((w) => w.key === activeWindow)?.label ?? activeWindow;
   const isPositive = value > 0;
   const formatted = `${isPositive ? '+' : ''}${value.toFixed(decimals)}`;
-  const tooltip = label || `${formatted} · ${kind === 'sr' ? TOOLTIP_SR : TOOLTIP_PACE}`;
+  const tooltip =
+    label || `${formatted} · ${kind === 'sr' ? tooltipSr(windowLabel) : tooltipPace(windowLabel)}`;
 
   return (
     <Tooltip title={tooltip} arrow placement="top">
