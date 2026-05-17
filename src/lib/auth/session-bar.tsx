@@ -58,6 +58,9 @@ export function SessionBar({ compact = false }: SessionBarProps = {}) {
         sx={{
           position: 'relative',
           overflow: 'hidden',
+          // Sits in the sidebar's flex column — never let it shrink when the
+          // viewport is short, or the content squishes out of centre.
+          flexShrink: 0,
           mx: 1,
           my: 1,
           px: 1.25,
@@ -96,13 +99,18 @@ export function SessionBar({ compact = false }: SessionBarProps = {}) {
           )}
           <Stack direction="row" spacing={0.75} alignItems="center" sx={{ minWidth: 0, flex: 1 }}>
             <Typography
+              component="span"
               variant="caption"
               sx={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                height: 18,
                 color: 'text.secondary',
                 textTransform: 'uppercase',
                 letterSpacing: '0.08em',
                 fontWeight: 700,
                 fontSize: '0.6rem',
+                lineHeight: 1,
                 whiteSpace: 'nowrap',
               }}
             >
@@ -159,6 +167,7 @@ export function SessionBar({ compact = false }: SessionBarProps = {}) {
         ...GLASS_CARD_INNER_SX,
         position: 'relative',
         overflow: 'hidden',
+        flexShrink: 0,
         py: 1.5,
         pl: 2.5,
         pr: 2,
@@ -202,12 +211,17 @@ export function SessionBar({ compact = false }: SessionBarProps = {}) {
 
           <Stack direction="row" spacing={1} alignItems="center">
             <Typography
+              component="span"
               variant="caption"
               sx={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                height: 24,
                 color: 'text.secondary',
                 textTransform: 'uppercase',
                 letterSpacing: '0.08em',
                 fontWeight: 700,
+                lineHeight: 1,
                 whiteSpace: 'nowrap',
               }}
             >
