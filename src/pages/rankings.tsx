@@ -28,8 +28,8 @@ import { getSiteUrl } from 'src/centralized/site-urls';
 import { fetchPrevRankData } from 'src/lib/delta';
 import { useWindowedDriverDeltas } from 'src/lib/trend-window/trend-window-context';
 import { getSyncHealth, type SiteMetadata, getEffectiveLastSync } from 'src/lib/sync-utils';
-import { subtleRowEnterSx, glassCardMotionSx, softFloatWrapperSx } from 'src/lib/subtle-motion';
-import { brandAccentBorderSx, statusAccentBorderSx, statusAccentSplitRimSx } from 'src/lib/status-accent';
+import { subtleRowEnterSx, glassCardMotionSx } from 'src/lib/subtle-motion';
+import { brandAccentBorderSx } from 'src/lib/status-accent';
 import {
   GLASS_PANEL_SX,
   getPodiumRowSx,
@@ -65,6 +65,7 @@ import {
 
 import { DeltaChip } from 'src/components/delta-chip/delta-chip';
 import { EmptyState, ErrorPanel, LoadingPanel } from 'src/components/data-state';
+import { DataPageHeader } from 'src/components/data-page-header/data-page-header';
 import { TrendWindowStats } from 'src/components/trend-window/trend-window-stats';
 import { PageGridOverlay } from 'src/components/page-background/page-grid-overlay';
 import { useLicenseSafetyGuide } from 'src/components/license-safety-guide/license-safety-guide';
@@ -314,26 +315,17 @@ export default function Page() {
 
         <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1 }}>
           <Stack spacing={3}>
-            <Box sx={softFloatWrapperSx()}>
-              <Box sx={{ ...GLASS_PANEL_SX, ...statusAccentBorderSx(syncHealth.color), ...statusAccentSplitRimSx(syncHealth.color), ...glassCardMotionSx(0) }}>
-                <Stack spacing={0.75} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: { xs: 'center', md: 'flex-start' } }}>
-                  <Typography variant="h4" fontWeight={800}>
-                    Rankings
-                  </Typography>
-                  <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                    Compare drivers by overall performance, or filter directly by license tier and Safety Rating tier.
-                  </Typography>
-                  <Typography variant="body2" sx={{ color: syncHealth.color, fontWeight: 700 }}>
-                    {syncHealth.label} · {syncHealth.ageText}
-                  </Typography>
-                  {rankData.length > 0 && (
-                    <Box sx={{ pt: 0.5 }}>
-                      <TrendWindowStats variant="community" rankData={rankData} />
-                    </Box>
-                  )}
-                </Stack>
-              </Box>
-            </Box>
+            <DataPageHeader
+              title="Rankings"
+              description="Compare drivers by overall performance, or filter directly by license tier and Safety Rating tier."
+              syncHealth={syncHealth}
+            >
+              {rankData.length > 0 && (
+                <Box sx={{ pt: 0.5 }}>
+                  <TrendWindowStats variant="community" rankData={rankData} />
+                </Box>
+              )}
+            </DataPageHeader>
 
             {loading && (
               <LoadingPanel title="Loading rankings…" message="Fetching drivers, licenses, and safety tiers.">

@@ -19,8 +19,8 @@ import { getSiteUrl } from 'src/centralized/site-urls';
 import { SITE_TEAM_ROLES } from 'src/site-manual-config';
 import { GLASS_PANEL_SX, GLASS_INNER_ROW_SX, GLASS_PANEL_TIGHT_SX } from 'src/lib/glass';
 import { getSyncHealth, type SiteMetadata, getEffectiveLastSync } from 'src/lib/sync-utils';
-import { subtleEnterUpSx, glassCardMotionSx, subtleEnterOnceSx, softFloatWrapperSx } from 'src/lib/subtle-motion';
-import { BRAND_ACCENT, brandAccentBorderSx, roleAccentBorderSx, statusAccentBorderSx, statusAccentSplitRimSx } from 'src/lib/status-accent';
+import { subtleEnterUpSx, glassCardMotionSx, softFloatWrapperSx } from 'src/lib/subtle-motion';
+import { BRAND_ACCENT, roleAccentBorderSx, brandAccentBorderSx, statusAccentSplitRimSx } from 'src/lib/status-accent';
 import {
   CAR,
   type CarLap,
@@ -36,6 +36,7 @@ import {
 } from 'src/lib/ac-elite-data';
 
 import { EmptyState, ErrorPanel, LoadingPanel } from 'src/components/data-state';
+import { DataPageHeader } from 'src/components/data-page-header/data-page-header';
 import { TrendWindowStats } from 'src/components/trend-window/trend-window-stats';
 import { PageGridOverlay } from 'src/components/page-background/page-grid-overlay';
 import { useLicenseSafetyGuide } from 'src/components/license-safety-guide/license-safety-guide';
@@ -489,26 +490,17 @@ export default function Page() {
 
         <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1 }}>
           <Stack spacing={3}>
-            <Box sx={softFloatWrapperSx()}>
-              <Box sx={{ ...GLASS_PANEL_SX, ...statusAccentBorderSx(syncHealth.color), ...statusAccentSplitRimSx(syncHealth.color), ...glassCardMotionSx(0) }}>
-                <Stack spacing={0.75} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: { xs: 'center', md: 'flex-start' } }}>
-                  <Typography variant="h4" fontWeight={800}>
-                    Hall of Fame
-                  </Typography>
-                  <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                    Standout drivers, iconic stats, and the AC Elite team behind the community.
-                  </Typography>
-                  <Typography variant="body2" sx={{ color: syncHealth.color, fontWeight: 700 }}>
-                    {syncHealth.label} · {syncHealth.ageText}
-                  </Typography>
-                  {drivers.length > 0 && (
-                    <Box sx={{ pt: 0.5 }}>
-                      <TrendWindowStats variant="community" rankData={drivers} />
-                    </Box>
-                  )}
-                </Stack>
-              </Box>
-            </Box>
+            <DataPageHeader
+              title="Hall of Fame"
+              description="Standout drivers, iconic stats, and the AC Elite team behind the community."
+              syncHealth={syncHealth}
+            >
+              {drivers.length > 0 && (
+                <Box sx={{ pt: 0.5 }}>
+                  <TrendWindowStats variant="community" rankData={drivers} />
+                </Box>
+              )}
+            </DataPageHeader>
 
             {loading && (
               <LoadingPanel title="Loading Hall of Fame…" message="Loading drivers, spotlight stats, and team roster matches.">

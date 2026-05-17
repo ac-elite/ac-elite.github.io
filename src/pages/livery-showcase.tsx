@@ -20,9 +20,9 @@ import { getSiteUrl } from 'src/centralized/site-urls';
 import { getSyncHealth, type SiteMetadata } from 'src/lib/sync-utils';
 import { ACE_SKIN_PACK_DOWNLOAD_URL } from 'src/lib/ace-skin-pack-download';
 import { glassCardMotionSx, softFloatWrapperSx } from 'src/lib/subtle-motion';
-import { GLASS_PANEL_SX, GLASS_PANEL_TIGHT_SX, GLASS_INNER_PANEL_SX } from 'src/lib/glass';
+import { GLASS_PANEL_TIGHT_SX, GLASS_INNER_PANEL_SX } from 'src/lib/glass';
 import { liveriesAssetUrl, promoLiveryAssetUrl, TEAM_LIVERY_ENTRIES } from 'src/lib/driver-liveries';
-import { brandAccentBorderSx, statusAccentBorderSx, statusAccentSplitRimSx } from 'src/lib/status-accent';
+import { brandAccentBorderSx } from 'src/lib/status-accent';
 import { DATA_PAGE_SHELL_SX, OUTLINED_GLASS_WHITE_SX, HERO_FOOTNOTE_CAPTION_SX } from 'src/lib/page-shell';
 import {
   getAceSkinPackAuthorForEntryId,
@@ -30,6 +30,7 @@ import {
 } from 'src/lib/ace-skin-pack-teams';
 
 import { LiveryEnlargeDialog } from 'src/components/livery/livery-enlarge-dialog';
+import { DataPageHeader } from 'src/components/data-page-header/data-page-header';
 import { PageGridOverlay } from 'src/components/page-background/page-grid-overlay';
 
 function publicAsset(path: string) {
@@ -299,29 +300,15 @@ export default function Page() {
 
         <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1 }}>
           <Stack spacing={3}>
-            <Box sx={softFloatWrapperSx()}>
-              <Box
-                sx={{
-                  ...GLASS_PANEL_SX,
-                  ...statusAccentBorderSx(syncHealth.color),
-                  ...statusAccentSplitRimSx(syncHealth.color),
-                  ...glassCardMotionSx(0),
-                }}
-              >
-                <Stack spacing={0.75} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: { xs: 'center', md: 'flex-start' } }}>
-                  <Typography variant="h4" fontWeight={800}>
-                    Livery Showcase
-                  </Typography>
-                  <Typography variant="body2" sx={{ color: 'text.secondary' }}>{showcaseCopy.heroSubtitle}</Typography>
-                  <Typography variant="body2" sx={{ color: syncHealth.color, fontWeight: 700 }}>
-                    {syncHealth.label} · {syncHealth.ageText}
-                  </Typography>
-                  <Typography variant="caption" sx={{ ...HERO_FOOTNOTE_CAPTION_SX }}>
-                    Click any image for a full-size view.
-                  </Typography>
-                </Stack>
-              </Box>
-            </Box>
+            <DataPageHeader
+              title="Livery Showcase"
+              description={showcaseCopy.heroSubtitle}
+              syncHealth={syncHealth}
+            >
+              <Typography variant="caption" sx={{ ...HERO_FOOTNOTE_CAPTION_SX }}>
+                Click any image for a full-size view.
+              </Typography>
+            </DataPageHeader>
 
             <Stack spacing={3}>
               {sectionsConfig?.officialPack && (
