@@ -58,8 +58,8 @@ export function InfoNotesPanel({ notes, sx }: InfoNotesPanelProps) {
               borderTopRightRadius: index === 0 ? '24px' : 0,
               borderBottomLeftRadius: index === notes.length - 1 ? '24px' : 0,
               borderBottomRightRadius: index === notes.length - 1 ? '24px' : 0,
-              // Soft colour glow bleeding inward from the accent border.
-              boxShadow: `inset 16px 0 22px -16px ${alpha(note.accent, 0.85)}`,
+              // Subtle colour glow bleeding inward from the accent border.
+              boxShadow: `inset 11px 0 14px -14px ${alpha(note.accent, 0.5)}`,
             }}
           >
             <Box
