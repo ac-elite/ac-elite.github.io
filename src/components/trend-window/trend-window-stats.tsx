@@ -7,6 +7,8 @@
  * - variant="community" — community-wide change (km / wins / new drivers)
  * - variant="driver"    — one driver's change (km / points / wins)
  */
+import { Icon } from '@iconify/react';
+
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
@@ -38,7 +40,6 @@ export function TrendWindowStats(props: TrendWindowStatsProps) {
   const { activeWindow, setActiveWindow, availableWindows, snapshot } = useTrendWindow();
 
   const windowLabel = HISTORY_WINDOWS.find((w) => w.key === activeWindow)?.label ?? activeWindow;
-  const someLocked = availableWindows.size < HISTORY_WINDOWS.length;
 
   let line: React.ReactNode;
   if (variant === 'community') {
@@ -122,16 +123,26 @@ export function TrendWindowStats(props: TrendWindowStatsProps) {
           </ToggleButton>
         ))}
       </ToggleButtonGroup>
-      <Stack spacing={0.25}>
-        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+      <Box
+        sx={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 0.85,
+          px: 1.15,
+          py: 0.55,
+          borderRadius: 1.25,
+          bgcolor: 'rgba(15,23,42,0.55)',
+          border: '1px solid rgba(148,163,184,0.2)',
+          boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.05)',
+        }}
+      >
+        <Box component="span" sx={{ color: '#7dd3fc', display: 'inline-flex', flexShrink: 0 }}>
+          <Icon icon="solar:history-bold" width={15} />
+        </Box>
+        <Typography variant="body2" sx={{ color: 'rgba(226,232,240,0.82)', lineHeight: 1.4 }}>
           {line}
         </Typography>
-        {someLocked && (
-          <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-            Longer ranges unlock as history builds up.
-          </Typography>
-        )}
-      </Stack>
+      </Box>
     </Stack>
   );
 }

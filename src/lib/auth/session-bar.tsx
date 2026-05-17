@@ -96,13 +96,18 @@ export function SessionBar({ compact = false }: SessionBarProps = {}) {
           )}
           <Stack direction="row" spacing={0.75} alignItems="center" sx={{ minWidth: 0, flex: 1 }}>
             <Typography
+              component="span"
               variant="caption"
               sx={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                height: 18,
                 color: 'text.secondary',
                 textTransform: 'uppercase',
                 letterSpacing: '0.08em',
                 fontWeight: 700,
                 fontSize: '0.6rem',
+                lineHeight: 1,
                 whiteSpace: 'nowrap',
               }}
             >
@@ -202,12 +207,17 @@ export function SessionBar({ compact = false }: SessionBarProps = {}) {
 
           <Stack direction="row" spacing={1} alignItems="center">
             <Typography
+              component="span"
               variant="caption"
               sx={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                height: 24,
                 color: 'text.secondary',
                 textTransform: 'uppercase',
                 letterSpacing: '0.08em',
                 fontWeight: 700,
+                lineHeight: 1,
                 whiteSpace: 'nowrap',
               }}
             >

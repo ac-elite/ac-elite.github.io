@@ -57,7 +57,6 @@ import {
   getPodiumRowSx,
   GLASS_INNER_PANEL_SX,
   GLASS_TABLE_WRAPPER_SX,
-  GLASS_NOTE_AMBER_RIM_SX,
   GLASS_TABLE_PAGINATION_SX,
 } from 'src/lib/glass';
 import {
@@ -97,6 +96,7 @@ import { useTrackCatalogVersion } from 'src/centralized/track-info';
 
 import { EmptyState } from 'src/components/data-state';
 import { DeltaChip } from 'src/components/delta-chip/delta-chip';
+import { InfoNotesPanel } from 'src/components/info-notes/info-notes-panel';
 import { ServerJoinCard } from 'src/components/server-join-card';
 import { TrendWindowStats } from 'src/components/trend-window/trend-window-stats';
 import { PageGridOverlay } from 'src/components/page-background/page-grid-overlay';
@@ -435,37 +435,23 @@ function HeroSection({ currentTrack }: { currentTrack: CurrentTrackData | null }
           </Grid>
         </Grid>
 
-        <Box
-          sx={{
-            mt: { xs: 4, md: 4 },
-            mb: 0,
-            borderRadius: 2.5,
-            px: { xs: 2, md: 2.5 },
-            py: { xs: 1.5, md: 1.75 },
-            border: '1px solid rgba(245,196,53,0.45)',
-            background:
-              'linear-gradient(135deg, rgba(245,196,53,0.2) 0%, rgba(245,196,53,0.08) 42%, rgba(31,44,73,0.34) 100%), rgba(15,23,42,0.48)',
-            backdropFilter: 'blur(12px)',
-            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.14)',
-            ...GLASS_NOTE_AMBER_RIM_SX,
-          }}
-        >
-          <Typography
-            variant="body2"
-            sx={{
-              position: 'relative',
-              zIndex: 3,
-              color: 'rgba(255,255,255,0.95)',
-              textAlign: { xs: 'center', md: 'left' },
-            }}
-          >
-            <Box component="span" sx={{ fontWeight: 800, color: '#f6d365' }}>
-              Note:
-            </Box>{' '}
-            License and Safety Rating calculations are currently work in progress. Values and thresholds may change
-            while we continue tuning.
-          </Typography>
-        </Box>
+        <InfoNotesPanel
+          sx={{ mt: { xs: 4, md: 4 }, mb: 0 }}
+          notes={[
+            {
+              icon: 'solar:danger-triangle-bold',
+              accent: '#f5c43b',
+              lead: 'License & Safety Rating — work in progress',
+              body: 'These calculations are still being tuned, so values and thresholds may change as we refine them.',
+            },
+            {
+              icon: 'solar:info-circle-bold',
+              accent: '#7dd3fc',
+              lead: 'New — trend filter on every stats page',
+              body: 'Use the 1h / 24h / 7d / 30d switch to see how Safety Rating, license pace, distance and more have changed over the window you pick.',
+            },
+          ]}
+        />
       </Container>
     </Box>
   );
