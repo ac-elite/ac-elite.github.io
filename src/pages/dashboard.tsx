@@ -18,15 +18,16 @@ import { fetchJson } from 'src/lib/fetch-json';
 import { DATA_PAGE_SHELL_SX } from 'src/lib/page-shell';
 import { getLeaderboardHref, getDriverProfileHref } from 'src/lib/routes';
 import { getSiteUrl } from 'src/centralized/site-urls';
-import { GLASS_CARD_SX, GLASS_PANEL_SX, GLASS_CARD_INNER_SX } from 'src/lib/glass';
+import { GLASS_CARD_SX, GLASS_CARD_INNER_SX } from 'src/lib/glass';
 import { getSyncHealth, type SiteMetadata, getEffectiveLastSync } from 'src/lib/sync-utils';
-import { subtleEnterUpSx, glassCardMotionSx, softFloatWrapperSx } from 'src/lib/subtle-motion';
-import { brandAccentBorderSx, statusAccentBorderSx, statusAccentSplitRimSx } from 'src/lib/status-accent';
+import { subtleEnterUpSx, glassCardMotionSx } from 'src/lib/subtle-motion';
+import { brandAccentBorderSx } from 'src/lib/status-accent';
 import { CAR, formatNumber, formatLaptime, type RankDriver, getTrackDisplayName } from 'src/lib/ac-elite-data';
 import { useTrackCatalogVersion } from 'src/centralized/track-info';
 
 import { StatTile } from 'src/components/stat-tile/stat-tile';
 import { ErrorPanel, LoadingPanel } from 'src/components/data-state';
+import { DataPageHeader } from 'src/components/data-page-header/data-page-header';
 import { TrendWindowStats } from 'src/components/trend-window/trend-window-stats';
 import { PageGridOverlay } from 'src/components/page-background/page-grid-overlay';
 
@@ -170,24 +171,15 @@ export default function Page() {
 
       <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1 }}>
         <Stack spacing={3}>
-          <Box sx={softFloatWrapperSx()}>
-            <Box sx={{ ...GLASS_PANEL_SX, ...statusAccentBorderSx(syncHealth.color), ...statusAccentSplitRimSx(syncHealth.color), ...glassCardMotionSx(0) }}>
-              <Stack spacing={0.75} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: { xs: 'center', md: 'flex-start' } }}>
-                <Typography variant="h4" fontWeight={800}>
-                  Stats
-                </Typography>
-                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                  Community-wide totals for drivers, tracks, laps, and distance.
-                </Typography>
-                <Typography variant="body2" sx={{ color: syncHealth.color, fontWeight: 700 }}>
-                  {syncHealth.label} · {syncHealth.ageText}
-                </Typography>
-                <Box sx={{ pt: 0.5 }}>
-                  <TrendWindowStats variant="community" rankData={rankData} />
-                </Box>
-              </Stack>
+          <DataPageHeader
+            title="Stats"
+            description="Community-wide totals for drivers, tracks, laps, and distance."
+            syncHealth={syncHealth}
+          >
+            <Box sx={{ pt: 0.5 }}>
+              <TrendWindowStats variant="community" rankData={rankData} />
             </Box>
-          </Box>
+          </DataPageHeader>
 
           {loading && (
             <LoadingPanel title="Loading dashboard…" message="Aggregating community totals and track coverage from the latest sync.">
