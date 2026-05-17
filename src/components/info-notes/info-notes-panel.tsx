@@ -40,28 +40,26 @@ export function InfoNotesPanel({ notes, sx }: InfoNotesPanelProps) {
       }}
     >
       <Stack divider={<Box sx={{ borderTop: '1px solid rgba(148,163,184,0.14)' }} />}>
-        {notes.map((note) => (
+        {notes.map((note, index) => (
           <Box
             key={note.lead}
             sx={{
-              position: 'relative',
               display: 'flex',
               alignItems: 'center',
               gap: 1.5,
               px: { xs: 2, md: 2.5 },
               py: { xs: 1.5, md: 1.75 },
               bgcolor: `${note.accent}14`,
-              // Accent stripe on the left edge with a soft colour glow — same
-              // idea as the glass cards' top accent. The panel's overflow:hidden
-              // + borderRadius clips it so it follows the rounded corners.
-              '&::before': {
-                content: '""',
-                position: 'absolute',
-                inset: '0 auto 0 0',
-                width: 3,
-                bgcolor: note.accent,
-                boxShadow: `0 0 14px 1px ${alpha(note.accent, 0.6)}, 0 0 5px 0 ${alpha(note.accent, 0.9)}`,
-              },
+              // A real left border follows border-radius, so the accent curves
+              // around the panel's rounded corners (a clipped bar is cut square).
+              // The matching corner radii are applied to the first/last note.
+              borderLeft: `3px solid ${note.accent}`,
+              borderTopLeftRadius: index === 0 ? '24px' : 0,
+              borderTopRightRadius: index === 0 ? '24px' : 0,
+              borderBottomLeftRadius: index === notes.length - 1 ? '24px' : 0,
+              borderBottomRightRadius: index === notes.length - 1 ? '24px' : 0,
+              // Soft colour glow bleeding inward from the accent border.
+              boxShadow: `inset 16px 0 22px -16px ${alpha(note.accent, 0.85)}`,
             }}
           >
             <Box
