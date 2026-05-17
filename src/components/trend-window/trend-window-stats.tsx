@@ -100,7 +100,7 @@ export function TrendWindowStats(props: TrendWindowStatsProps) {
     <Stack
       direction={{ xs: 'column', sm: 'row' }}
       spacing={1}
-      sx={{ alignItems: { xs: 'flex-start', sm: 'center' }, flexWrap: 'wrap' }}
+      sx={{ alignItems: 'center', flexWrap: 'wrap' }}
       useFlexGap
     >
       <ToggleButtonGroup

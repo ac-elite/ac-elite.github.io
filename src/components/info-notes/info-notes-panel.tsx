@@ -1,4 +1,4 @@
-import type { Theme, SxProps } from '@mui/material/styles';
+import { alpha, type Theme, type SxProps } from '@mui/material/styles';
 
 import { Icon } from '@iconify/react';
 
@@ -51,14 +51,16 @@ export function InfoNotesPanel({ notes, sx }: InfoNotesPanelProps) {
               px: { xs: 2, md: 2.5 },
               py: { xs: 1.5, md: 1.75 },
               bgcolor: `${note.accent}14`,
-              // Accent stripe on the left edge so the note type reads at a glance.
+              // Accent stripe on the left edge with a soft colour glow — same
+              // idea as the glass cards' top accent. The panel's overflow:hidden
+              // + borderRadius clips it so it follows the rounded corners.
               '&::before': {
                 content: '""',
                 position: 'absolute',
                 inset: '0 auto 0 0',
                 width: 3,
                 bgcolor: note.accent,
-                opacity: 0.9,
+                boxShadow: `0 0 14px 1px ${alpha(note.accent, 0.6)}, 0 0 5px 0 ${alpha(note.accent, 0.9)}`,
               },
             }}
           >
