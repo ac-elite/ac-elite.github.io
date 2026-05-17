@@ -58,6 +58,9 @@ export function SessionBar({ compact = false }: SessionBarProps = {}) {
         sx={{
           position: 'relative',
           overflow: 'hidden',
+          // Sits in the sidebar's flex column — never let it shrink when the
+          // viewport is short, or the content squishes out of centre.
+          flexShrink: 0,
           mx: 1,
           my: 1,
           px: 1.25,
@@ -164,6 +167,7 @@ export function SessionBar({ compact = false }: SessionBarProps = {}) {
         ...GLASS_CARD_INNER_SX,
         position: 'relative',
         overflow: 'hidden',
+        flexShrink: 0,
         py: 1.5,
         pl: 2.5,
         pr: 2,
