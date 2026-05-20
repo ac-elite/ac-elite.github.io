@@ -409,9 +409,9 @@
  {
   "guid": "76561199084335436",
   "name": "Marcos Mariño",
-  "points": 5075.184,
-  "kilometers": 29762.2,
-  "collisions": 1429,
+  "points": 5075.69,
+  "kilometers": 29789.9,
+  "collisions": 1431,
   "leaderboard": {
    "ks_zandvoort_": {
     "tatuusfa1": {
@@ -472,8 +472,8 @@
    "imola_": {
     "tatuusfa1": {
      "laptime": 102876,
-     "laps": 159,
-     "ts": 1779300711009
+     "laps": 162,
+     "ts": 1779302320139
     }
    },
    "spa_": {
@@ -533,7 +533,7 @@
     }
    }
   },
-  "last_seen": 1779300876980,
+  "last_seen": 1779302436068,
   "wins": 140,
   "podiums": 396,
   "poles": 206,
@@ -543,8 +543,8 @@
  {
   "guid": "76561198999518018",
   "name": "David O.",
-  "points": 3993.158,
-  "kilometers": 25426.8,
+  "points": 3994.5,
+  "kilometers": 25489.1,
   "collisions": 745,
   "leaderboard": {
    "ks_zandvoort_": {
@@ -626,13 +626,13 @@
    },
    "imola_": {
     "tatuusfa1": {
-     "laptime": 103642,
-     "laps": 86,
-     "ts": 1779300528580
+     "laptime": 103460,
+     "laps": 90,
+     "ts": 1779302304948
     }
    }
   },
-  "last_seen": 1779300876980,
+  "last_seen": 1779303142741,
   "wins": 138,
   "podiums": 353,
   "poles": 54,
@@ -1780,7 +1780,7 @@
     }
    }
   },
-  "last_seen": 1779221625705,
+  "last_seen": 1779306394262,
   "wins": 46,
   "podiums": 148,
   "poles": 9,
@@ -8658,9 +8658,9 @@
  {
   "guid": "76561199067031859",
   "name": "Saba",
-  "points": 308.895,
-  "kilometers": 26214.7,
-  "collisions": 2344,
+  "points": 308.026,
+  "kilometers": 26213.6,
+  "collisions": 2347,
   "leaderboard": {
    "ks_zandvoort_": {
     "tatuusfa1": {
@@ -8787,7 +8787,7 @@
     }
    }
   },
-  "last_seen": 1779103403261,
+  "last_seen": 1779307422520,
   "wins": 69,
   "podiums": 160,
   "poles": 87,
@@ -43951,49 +43951,6 @@
   "infr": 0
  },
  {
-  "guid": "76561198136929519",
-  "name": "George Russel _63_",
-  "points": 68.66799999999999,
-  "kilometers": 415.5,
-  "collisions": 65,
-  "leaderboard": {
-   "ks_vallelunga_extended_circuit": {
-    "tatuusfa1": {
-     "laptime": 96649,
-     "laps": 35,
-     "ts": 1774658424100
-    }
-   },
-   "monza_": {
-    "tatuusfa1": {
-     "laptime": 118435,
-     "laps": 4,
-     "ts": 1776939096573
-    }
-   },
-   "ks_silverstone_gp": {
-    "tatuusfa1": {
-     "laptime": 132102,
-     "laps": 2,
-     "ts": 1777410849001
-    }
-   },
-   "imola_": {
-    "tatuusfa1": {
-     "laptime": 110115,
-     "laps": 5,
-     "ts": 1779131994435
-    }
-   }
-  },
-  "last_seen": 1779132388849,
-  "wins": 0,
-  "podiums": 1,
-  "poles": 0,
-  "flaps": 0,
-  "infr": 1
- },
- {
   "guid": "76561199113578222",
   "name": "Nicolas Grosman",
   "points": 68.655,
@@ -44725,6 +44682,49 @@
    }
   },
   "last_seen": 1775256190647,
+  "wins": 0,
+  "podiums": 1,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 1
+ },
+ {
+  "guid": "76561198136929519",
+  "name": "George Russel _63_",
+  "points": 68.36800000000001,
+  "kilometers": 420.4,
+  "collisions": 65,
+  "leaderboard": {
+   "ks_vallelunga_extended_circuit": {
+    "tatuusfa1": {
+     "laptime": 96649,
+     "laps": 35,
+     "ts": 1774658424100
+    }
+   },
+   "monza_": {
+    "tatuusfa1": {
+     "laptime": 118435,
+     "laps": 4,
+     "ts": 1776939096573
+    }
+   },
+   "ks_silverstone_gp": {
+    "tatuusfa1": {
+     "laptime": 132102,
+     "laps": 2,
+     "ts": 1777410849001
+    }
+   },
+   "imola_": {
+    "tatuusfa1": {
+     "laptime": 110115,
+     "laps": 5,
+     "ts": 1779131994435
+    }
+   }
+  },
+  "last_seen": 1779307422520,
   "wins": 0,
   "podiums": 1,
   "poles": 0,
