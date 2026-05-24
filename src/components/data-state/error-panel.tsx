@@ -1,9 +1,11 @@
+import type { Theme, SxProps } from '@mui/material/styles';
+
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 
-import { GLASS_PANEL_COMPACT_SX } from 'src/lib/glass';
+import { getTintedGlassPanelSx, GLASS_PANEL_COMPACT_SX } from 'src/lib/glass';
 import { DATA_STATE_HELP_TEXT_SX, ERROR_RETRY_OUTLINED_SX } from 'src/lib/page-shell';
 
 // ----------------------------------------------------------------------
@@ -19,12 +21,13 @@ type ErrorPanelProps = {
 export function ErrorPanel({ error, title = 'Failed to load data', onRetry }: ErrorPanelProps) {
   return (
     <Paper
-      sx={{
-        ...GLASS_PANEL_COMPACT_SX,
-        borderTop: `3px solid ${ERROR_ACCENT}`,
-        boxShadow:
-          '0 12px 30px rgba(0,0,0,0.32), inset 0 1px 0 rgba(255,255,255,0.08), 0 -1px 0 rgba(251,113,133,0.28)',
-      }}
+      sx={
+        [
+          GLASS_PANEL_COMPACT_SX,
+          getTintedGlassPanelSx(ERROR_ACCENT),
+          { borderTop: `2px solid ${ERROR_ACCENT}` },
+        ] as SxProps<Theme>
+      }
     >
       <Stack spacing={1.35} alignItems="flex-start">
         <Typography sx={{ color: ERROR_ACCENT, fontWeight: 800, fontSize: '0.95rem', letterSpacing: 0.04 }}>

@@ -21,7 +21,6 @@ import { SITE_TEAM_ROLES } from 'src/site-manual-config';
 import {
   GLASS_PANEL_SX,
   GLASS_INNER_ROW_SX,
-  GLASS_PANEL_TIGHT_SX,
   getTintedGlassPanelSx,
   getTintedGlassInnerRowSx,
 } from 'src/lib/glass';
@@ -547,7 +546,7 @@ export default function Page() {
 
                 <Stack spacing={2}>
                   <Box sx={softFloatWrapperSx()}>
-                    <Box sx={{ ...GLASS_PANEL_TIGHT_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(6) }}>
+                    <Box sx={{ ...GLASS_PANEL_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(6) }}>
                       <Stack spacing={0.5} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: { xs: 'center', md: 'flex-start' } }}>
                         <Typography variant="h6" sx={{ fontWeight: 800 }}>
                           Team Spotlight

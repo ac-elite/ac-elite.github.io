@@ -20,7 +20,7 @@ import { getSiteUrl } from 'src/centralized/site-urls';
 import { getSyncHealth, type SiteMetadata } from 'src/lib/sync-utils';
 import { ACE_SKIN_PACK_DOWNLOAD_URL } from 'src/lib/ace-skin-pack-download';
 import { glassCardMotionSx, softFloatWrapperSx } from 'src/lib/subtle-motion';
-import { GLASS_PANEL_TIGHT_SX, GLASS_INNER_PANEL_SX } from 'src/lib/glass';
+import { GLASS_PANEL_SX, GLASS_INNER_PANEL_SX } from 'src/lib/glass';
 import { liveriesAssetUrl, promoLiveryAssetUrl, TEAM_LIVERY_ENTRIES } from 'src/lib/driver-liveries';
 import { brandAccentBorderSx } from 'src/lib/status-accent';
 import { DATA_PAGE_SHELL_SX, OUTLINED_GLASS_WHITE_SX, HERO_FOOTNOTE_CAPTION_SX } from 'src/lib/page-shell';
@@ -314,7 +314,7 @@ export default function Page() {
               {sectionsConfig?.officialPack && (
                 <Stack spacing={2} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: 'stretch' }}>
                 <Box sx={softFloatWrapperSx()}>
-                  <Box sx={{ ...GLASS_PANEL_TIGHT_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(0) }}>
+                  <Box sx={{ ...GLASS_PANEL_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(0) }}>
                     <Stack spacing={0.5} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: { xs: 'center', md: 'flex-start' } }}>
                       <Typography variant="h6" sx={{ fontWeight: 800 }}>
                         Official pack
@@ -330,7 +330,7 @@ export default function Page() {
                     <Grid key={livery.name} size={{ xs: 12, sm: 6, md: 4 }}>
                       <Paper
                         sx={{
-                          ...GLASS_PANEL_TIGHT_SX,
+                          ...GLASS_PANEL_SX,
                           ...brandAccentBorderSx(),
                           ...glassCardMotionSx(1 + i),
                           width: 1,
@@ -379,7 +379,7 @@ export default function Page() {
               {sectionsConfig?.aceSkinPack && aceSkinPack && aceSkinPack.length > 0 && (
                 <Stack spacing={2} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: 'stretch' }}>
                   <Box sx={softFloatWrapperSx()}>
-                    <Box sx={{ ...GLASS_PANEL_TIGHT_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(0) }}>
+                    <Box sx={{ ...GLASS_PANEL_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(0) }}>
                       <Stack
                         direction={{ xs: 'column', md: 'row' }}
                         spacing={1.5}
@@ -417,7 +417,7 @@ export default function Page() {
                         <Grid key={entry.id} size={{ xs: 12, sm: 6, md: 4 }}>
                           <Paper
                             sx={{
-                              ...GLASS_PANEL_TIGHT_SX,
+                              ...GLASS_PANEL_SX,
                               ...brandAccentBorderSx(),
                               ...glassCardMotionSx(4 + i),
                               width: 1,
@@ -496,7 +496,7 @@ export default function Page() {
               {sectionsConfig?.teamLiveries && (
                 <Stack spacing={2} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: 'stretch' }}>
                 <Box sx={softFloatWrapperSx()}>
-                  <Box sx={{ ...GLASS_PANEL_TIGHT_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(0) }}>
+                  <Box sx={{ ...GLASS_PANEL_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(0) }}>
                     <Stack spacing={0.5} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: { xs: 'center', md: 'flex-start' } }}>
                       <Typography variant="h6" sx={{ fontWeight: 800 }}>
                         AC Elite Team
@@ -514,7 +514,7 @@ export default function Page() {
                       <Grid key={livery.steamGuid} size={{ xs: 12, sm: 6, md: 4 }}>
                         <Paper
                           sx={{
-                            ...GLASS_PANEL_TIGHT_SX,
+                            ...GLASS_PANEL_SX,
                             ...brandAccentBorderSx(),
                             ...glassCardMotionSx(6 + aceSkinPackOrdered.length + i),
                             width: 1,
