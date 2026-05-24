@@ -73,6 +73,7 @@ import {
 } from 'src/lib/ac-elite-data';
 import { getTrackInfo, getAllTracks, useTrackCatalogVersion } from 'src/centralized/track-info';
 
+import { Reveal } from 'src/components/reveal';
 import { DeltaChip } from 'src/components/delta-chip/delta-chip';
 import { DataPageHeader } from 'src/components/data-page-header/data-page-header';
 import { TrendWindowStats } from 'src/components/trend-window/trend-window-stats';
@@ -300,6 +301,7 @@ export default function Page() {
                   </Stack>
                 </Paper>
 
+                <Reveal>
                 <Paper
                   sx={{
                     ...GLASS_TABLE_WRAPPER_SX,
@@ -442,6 +444,7 @@ export default function Page() {
                     </Table>
                   </TableContainer>
                 </Paper>
+                </Reveal>
 
                 {totalPages > 1 && (
                   <Paper sx={{ ...GLASS_TABLE_PAGINATION_SX, ...glassCardMotionSx(3) }}>

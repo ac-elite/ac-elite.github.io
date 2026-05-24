@@ -35,6 +35,7 @@ import {
   LICENSE_CHIP_WIDTH,
 } from 'src/lib/ac-elite-data';
 
+import { Reveal } from 'src/components/reveal';
 import { EmptyState, ErrorPanel, LoadingPanel } from 'src/components/data-state';
 import { DataPageHeader } from 'src/components/data-page-header/data-page-header';
 import { TrendWindowStats } from 'src/components/trend-window/trend-window-stats';
@@ -521,12 +522,14 @@ export default function Page() {
                 <Grid container spacing={2.5}>
                   {categories.map((category, categoryIndex) => (
                     <Grid key={category.title} size={{ xs: 12, md: 6 }}>
-                      <CategoryCard
-                        title={category.title}
-                        description={category.description}
-                        entries={category.entries}
-                        enterIndex={1 + categoryIndex}
-                      />
+                      <Reveal index={categoryIndex % 2} sx={{ height: 1 }}>
+                        <CategoryCard
+                          title={category.title}
+                          description={category.description}
+                          entries={category.entries}
+                          enterIndex={1 + categoryIndex}
+                        />
+                      </Reveal>
                     </Grid>
                   ))}
                 </Grid>

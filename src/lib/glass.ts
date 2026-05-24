@@ -80,7 +80,7 @@ export const buttonGlassReflectPulse = keyframes`
  * (~49.4–50.6%) so it stays a glint, with enough alpha that the pulse reads clearly on soft-light.
  */
 export const GLASS_SPECULAR_SWEEP_GRADIENT =
-  'linear-gradient(115deg, transparent 41%, rgba(255,255,255,0.042) 47%, rgba(255,255,255,0.14) 49.4%, rgba(191,225,255,0.2) 50%, rgba(255,255,255,0.12) 50.6%, rgba(255,255,255,0.042) 52.5%, transparent 58%)';
+  'linear-gradient(115deg, transparent 42%, rgba(255,255,255,0.028) 47%, rgba(255,255,255,0.08) 49.4%, rgba(191,225,255,0.12) 50%, rgba(255,255,255,0.07) 50.6%, rgba(255,255,255,0.028) 52.5%, transparent 58%)';
 
 /**
  * Animated specular highlight (same timing as theme buttons).
@@ -119,11 +119,12 @@ export const GLASS_CHIP_SHEEN_SX: SxProps<Theme> = {
   },
 };
 
+// Multipliers against theme.shape.borderRadius (10px): panel ≈ 22px, inner ≈ 16px.
 export const GLASS_RADIUS = {
-  panel: 3,
-  innerPanel: 2,
-  innerRow: 2,
-  pagination: 2.25,
+  panel: 2.2,
+  innerPanel: 1.6,
+  innerRow: 1.4,
+  pagination: 1.8,
 } as const;
 
 export const GLASS_PADDING = {
@@ -197,21 +198,46 @@ export const GLASS_NOTE_AMBER_RIM_SX: SxProps<Theme> = {
   },
 };
 
+/**
+ * Apple "material": heavy blur + saturation so colour behind the glass blooms
+ * through (the vibrancy trick). `saturate(180%)` is the key to the premium feel.
+ */
+export const GLASS_MATERIAL_BACKDROP = 'blur(30px) saturate(190%)';
+
+/**
+ * Base glass surface — a floating macOS/visionOS-style window. More translucent
+ * so the blurred backdrop blooms through (real vibrancy), with a glassy top-left
+ * specular sheen, a crisp light top edge + fine rim, and a big soft float shadow.
+ * Calm by default; live elements opt into {@link GLASS_CARD_LIVE_SX}.
+ */
 export const GLASS_CARD_SX: SxProps<Theme> = {
+  position: 'relative',
   borderRadius: GLASS_RADIUS.panel,
-  border: '1px solid rgba(255,255,255,0.22)',
-  background: 'linear-gradient(145deg, rgba(31,44,73,0.94), rgba(23,33,59,0.94))',
-  backdropFilter: 'blur(14px)',
-  boxShadow: '0 12px 30px rgba(0,0,0,0.32), inset 0 1px 0 rgba(255,255,255,0.08)',
+  border: '1px solid rgba(255,255,255,0.14)',
+  // Layered: glassy top-left specular highlight over a frosted-navy base.
+  backgroundImage:
+    'radial-gradient(130% 90% at 18% -12%, rgba(255,255,255,0.13) 0%, rgba(255,255,255,0.035) 26%, rgba(255,255,255,0) 54%),' +
+    'linear-gradient(180deg, rgba(38,52,86,0.72) 0%, rgba(18,27,49,0.80) 100%)',
+  backdropFilter: GLASS_MATERIAL_BACKDROP,
+  WebkitBackdropFilter: GLASS_MATERIAL_BACKDROP,
+  boxShadow:
+    // bright glass top edge + fine inner contour + tight contact + wide float
+    'inset 0 1px 0 rgba(255,255,255,0.30), inset 0 0 0 1px rgba(255,255,255,0.045),' +
+    ' 0 2px 6px rgba(0,0,0,0.34), 0 30px 64px -22px rgba(0,0,0,0.72)',
+};
+
+/** Opt-in: base card + the soft live rim-glow pulse. Reserve for live data. */
+export const GLASS_CARD_LIVE_SX: SxProps<Theme> = {
+  ...GLASS_CARD_SX,
   ...GLASS_LIVE_RIM_SX,
 };
 
 export const GLASS_CARD_INNER_SX: SxProps<Theme> = {
+  position: 'relative',
   borderRadius: GLASS_RADIUS.innerPanel,
-  border: '1px solid rgba(148,163,184,0.28)',
-  background: 'linear-gradient(145deg, rgba(31,44,73,0.86), rgba(23,33,59,0.86))',
-  boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)',
-  ...GLASS_INNER_LIVE_RIM_SX,
+  border: '1px solid rgba(255,255,255,0.07)',
+  background: 'linear-gradient(180deg, rgba(40,55,87,0.58), rgba(26,38,66,0.6))',
+  boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.05)',
 };
 
 export const GLASS_CARD_INNER_HOVER_SX: SxProps<Theme> = {

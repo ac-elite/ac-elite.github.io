@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
+import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import Table from '@mui/material/Table';
@@ -69,6 +70,8 @@ import {
 } from 'src/lib/ac-elite-data';
 import { useTrackCatalogVersion } from 'src/centralized/track-info';
 
+import { Chart, CHART_COLORS } from 'src/components/chart';
+import { Reveal } from 'src/components/reveal';
 import { DeltaChip } from 'src/components/delta-chip/delta-chip';
 import { EmptyState, ErrorPanel, LoadingPanel } from 'src/components/data-state';
 import { LiveryEnlargeDialog } from 'src/components/livery/livery-enlarge-dialog';
@@ -341,6 +344,23 @@ export default function Page() {
     return {
       bestPosition: Math.min(...positions),
       topThreeTracks: trackRows.filter((r) => r.position <= 3).length,
+    };
+  }, [trackRows]);
+
+  const performanceCharts = useMemo(() => {
+    if (trackRows.length < 2) return null;
+    const byLaps = [...trackRows].sort((a, b) => b.laps - a.laps).slice(0, 8);
+    // "Grid percentile" — 100% = pole/P1, 0% = last. Reads as relative pace.
+    const radarData = byLaps.map((r) =>
+      r.totalDrivers > 1 ? Math.round((1 - (r.position - 1) / (r.totalDrivers - 1)) * 100) : 100
+    );
+    const avgPercentile = radarData.length
+      ? Math.round(radarData.reduce((s, v) => s + v, 0) / radarData.length)
+      : 0;
+    return {
+      laps: { categories: byLaps.map((r) => r.trackName), data: byLaps.map((r) => r.laps) },
+      radar: { categories: byLaps.map((r) => r.trackName), data: radarData },
+      avgPercentile,
     };
   }, [trackRows]);
 
@@ -713,6 +733,132 @@ export default function Page() {
                 </Paper>
                 </Box>
 
+                {performanceCharts && (
+                  <Grid container spacing={2.5}>
+                    <Grid size={{ xs: 12, md: 4 }}>
+                      <Reveal index={0} sx={{ height: 1 }}>
+                        <Paper sx={{ ...GLASS_PANEL_SX, ...brandAccentBorderSx(), height: 1 }}>
+                          <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.78)' }}>
+                            Overall pace
+                          </Typography>
+                          <Typography variant="h6" sx={{ fontWeight: 800, mt: 0.3 }}>
+                            Faster than the field
+                          </Typography>
+                          <Typography variant="caption" sx={{ display: 'block', color: 'text.secondary', mb: 0.5 }}>
+                            Avg across your most-driven tracks · 100% = pole
+                          </Typography>
+                          <Chart
+                            type="radialBar"
+                            height={300}
+                            series={[performanceCharts.avgPercentile]}
+                            options={{
+                              colors: [BRAND_ACCENT],
+                              fill: { type: 'solid' },
+                              labels: ['of drivers'],
+                              stroke: { lineCap: 'round' },
+                              plotOptions: {
+                                radialBar: {
+                                  hollow: { size: '62%' },
+                                  track: { background: 'rgba(255,255,255,0.06)', strokeWidth: '100%' },
+                                  dataLabels: {
+                                    name: { color: 'rgba(255,255,255,0.6)', fontSize: '13px', offsetY: 22 },
+                                    value: {
+                                      color: '#fff',
+                                      fontSize: '38px',
+                                      fontWeight: 800,
+                                      offsetY: -12,
+                                      formatter: (v: number) => `${Math.round(Number(v))}%`,
+                                    },
+                                  },
+                                },
+                              },
+                            }}
+                          />
+                        </Paper>
+                      </Reveal>
+                    </Grid>
+                    <Grid size={{ xs: 12, md: 8 }}>
+                      <Reveal index={1} sx={{ height: 1 }}>
+                        <Paper sx={{ ...GLASS_PANEL_SX, ...brandAccentBorderSx(), height: 1 }}>
+                          <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.78)' }}>
+                            Track pace
+                          </Typography>
+                          <Typography variant="h6" sx={{ fontWeight: 800, mt: 0.3 }}>
+                            Pace by track
+                          </Typography>
+                          <Typography variant="caption" sx={{ display: 'block', color: 'text.secondary', mb: 1 }}>
+                            Share of the grid you beat on each track · outer ring = fastest
+                          </Typography>
+                          <Chart
+                            type="radar"
+                            height={340}
+                            series={[{ name: 'Beats', data: performanceCharts.radar.data }]}
+                            options={{
+                              labels: performanceCharts.radar.categories,
+                              colors: [BRAND_ACCENT],
+                              stroke: { width: 2.5 },
+                              fill: { type: 'solid', opacity: 0.32 },
+                              markers: { size: 4, strokeWidth: 0 },
+                              yaxis: { show: false, min: 0, max: 100 },
+                              tooltip: { y: { formatter: (v: number) => `Faster than ${v}% of the grid` } },
+                              plotOptions: {
+                                radar: {
+                                  polygons: {
+                                    strokeColors: 'rgba(255,255,255,0.08)',
+                                    connectorColors: 'rgba(255,255,255,0.08)',
+                                  },
+                                },
+                              },
+                            }}
+                          />
+                        </Paper>
+                      </Reveal>
+                    </Grid>
+                    <Grid size={{ xs: 12 }}>
+                      <Reveal index={2}>
+                        <Paper sx={{ ...GLASS_PANEL_SX, ...brandAccentBorderSx() }}>
+                          <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.78)' }}>
+                            Activity
+                          </Typography>
+                          <Typography variant="h6" sx={{ fontWeight: 800, mt: 0.3, mb: 1 }}>
+                            Laps by track
+                          </Typography>
+                          <Chart
+                            type="bar"
+                            height={Math.max(280, performanceCharts.laps.categories.length * 40)}
+                            series={[{ name: 'Laps', data: performanceCharts.laps.data }]}
+                            options={{
+                              colors: CHART_COLORS,
+                              fill: { type: 'solid' },
+                              legend: { show: false },
+                              plotOptions: {
+                                bar: {
+                                  horizontal: true,
+                                  distributed: true,
+                                  borderRadius: 6,
+                                  borderRadiusApplication: 'end',
+                                  barHeight: '62%',
+                                },
+                              },
+                              dataLabels: {
+                                enabled: true,
+                                textAnchor: 'start',
+                                offsetX: 4,
+                                formatter: (v: number) => formatNumber(Number(v)),
+                                style: { colors: ['rgba(255,255,255,0.92)'], fontWeight: 700, fontSize: '12px' },
+                              },
+                              xaxis: { categories: performanceCharts.laps.categories, labels: { show: false } },
+                              grid: { xaxis: { lines: { show: true } }, yaxis: { lines: { show: false } } },
+                              tooltip: { y: { formatter: (v: number) => `${formatNumber(v)} laps` } },
+                            }}
+                          />
+                        </Paper>
+                      </Reveal>
+                    </Grid>
+                  </Grid>
+                )}
+
+                <Reveal>
                 <Paper
                   sx={{
                     ...GLASS_TABLE_WRAPPER_SX,
@@ -779,6 +925,7 @@ export default function Page() {
                     </Table>
                   </TableContainer>
                 </Paper>
+                </Reveal>
 
                 {teamLiveryMeta && showTeamLiveryBlock ? (
                   <>

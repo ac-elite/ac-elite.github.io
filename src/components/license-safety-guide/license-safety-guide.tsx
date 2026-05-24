@@ -130,10 +130,15 @@ function LicenseSafetyGuideDialog({ open, onClose, initialTab = 'license' }: Lic
             width: { xs: 'calc(100% - 20px)', sm: 760 },
             maxWidth: 'calc(100% - 20px)',
             borderRadius: 3,
-            border: '1px solid rgba(148,163,184,0.36)',
-            background: 'linear-gradient(150deg, rgba(19,36,71,0.96), rgba(15,27,52,0.96))',
-            backdropFilter: 'blur(16px)',
-            boxShadow: '0 30px 80px rgba(0,0,0,0.5)',
+            border: '1px solid rgba(255,255,255,0.12)',
+            // Apple vibrancy glass: top sheen + frosted navy + saturated blur.
+            backgroundImage:
+              'radial-gradient(120% 80% at 18% -10%, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.02) 30%, rgba(255,255,255,0) 56%),' +
+              'linear-gradient(180deg, rgba(34,48,80,0.94) 0%, rgba(17,26,48,0.96) 100%)',
+            backdropFilter: 'blur(30px) saturate(180%)',
+            WebkitBackdropFilter: 'blur(30px) saturate(180%)',
+            boxShadow:
+              'inset 0 1px 0 rgba(255,255,255,0.22), 0 2px 8px rgba(0,0,0,0.4), 0 40px 90px -20px rgba(0,0,0,0.72)',
             color: '#fff',
           },
         }}
@@ -143,9 +148,8 @@ function LicenseSafetyGuideDialog({ open, onClose, initialTab = 'license' }: Lic
             variant="h6"
             sx={{
               fontWeight: 800,
-              color: 'warning.main',
-              letterSpacing: { xs: 0.2, sm: 0.4 },
-              textTransform: { xs: 'none', sm: 'uppercase' },
+              color: '#fff',
+              letterSpacing: '-0.012em',
               lineHeight: 1.25,
               pr: 1,
             }}
@@ -178,43 +182,38 @@ function LicenseSafetyGuideDialog({ open, onClose, initialTab = 'license' }: Lic
             onChange={(_, value: GuideTab) => setActiveTab(value)}
             variant="fullWidth"
             sx={{
-              minHeight: 48,
-              borderRadius: 2,
-              bgcolor: 'rgba(23,33,59,0.5)',
-              border: '1px solid rgba(148,163,184,0.22)',
+              minHeight: 46,
+              p: 0.5,
+              borderRadius: 2.5,
+              bgcolor: 'rgba(11,19,38,0.6)',
+              border: '1px solid rgba(255,255,255,0.08)',
               '& .MuiTabs-indicator': { display: 'none' },
+              '& .MuiTabs-flexContainer': { gap: 0.5 },
             }}
           >
-            <Tab
-              value="license"
-              label="License"
-              sx={{
-                minHeight: 48,
-                borderRadius: 1.5,
-                color: 'text.secondary',
-                fontWeight: 800,
-                '&.Mui-selected': {
-                  color: '#22e98a',
-                  bgcolor: 'rgba(18,96,90,0.42)',
-                  border: '1px solid rgba(34,233,138,0.22)',
-                },
-              }}
-            />
-            <Tab
-              value="safety"
-              label="Safety Rating"
-              sx={{
-                minHeight: 48,
-                borderRadius: 1.5,
-                color: 'text.secondary',
-                fontWeight: 800,
-                '&.Mui-selected': {
-                  color: '#22e98a',
-                  bgcolor: 'rgba(18,96,90,0.42)',
-                  border: '1px solid rgba(34,233,138,0.22)',
-                },
-              }}
-            />
+            {(['license', 'safety'] as const).map((value) => (
+              <Tab
+                key={value}
+                value={value}
+                label={value === 'license' ? 'License' : 'Safety Rating'}
+                disableRipple
+                sx={{
+                  minHeight: 38,
+                  borderRadius: 1.8,
+                  textTransform: 'none',
+                  color: 'rgba(255,255,255,0.6)',
+                  fontWeight: 700,
+                  transition: 'color 240ms cubic-bezier(0.32,0.72,0,1), background 240ms cubic-bezier(0.32,0.72,0,1)',
+                  // Apple segmented-control: selected = brand-blue glass pill.
+                  '&.Mui-selected': {
+                    color: '#fff',
+                    background: 'linear-gradient(180deg, rgba(91,141,239,0.34) 0%, rgba(59,130,246,0.2) 100%)',
+                    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.2), 0 1px 2px rgba(0,0,0,0.3)',
+                  },
+                  '&:hover': { color: '#fff' },
+                }}
+              />
+            ))}
           </Tabs>
         </Box>
 
@@ -239,7 +238,7 @@ function LicenseSafetyGuideDialog({ open, onClose, initialTab = 'license' }: Lic
               <Box
                 sx={{
                   borderRadius: 2,
-                  border: '1px solid rgba(148,163,184,0.24)',
+                  border: '1px solid rgba(255,255,255,0.1)',
                   overflow: 'hidden',
                   maxWidth: '100%',
                   overflowX: 'auto',
@@ -253,7 +252,7 @@ function LicenseSafetyGuideDialog({ open, onClose, initialTab = 'license' }: Lic
                     px: 2,
                     py: 1.1,
                     minWidth: { xs: 320, sm: 0 },
-                    bgcolor: 'rgba(148,163,184,0.12)',
+                    bgcolor: 'rgba(255,255,255,0.06)',
                   }}
                 >
                   <Typography
@@ -367,7 +366,7 @@ function LicenseSafetyGuideDialog({ open, onClose, initialTab = 'license' }: Lic
                 To unlock a tier you need both the minimum SR value and minimum total km for that tier.
               </Typography>
 
-              <Box sx={{ borderRadius: 2, border: '1px solid rgba(148,163,184,0.24)', overflow: 'hidden' }}>
+              <Box sx={{ borderRadius: 2, border: '1px solid rgba(255,255,255,0.1)', overflow: 'hidden' }}>
                 <Box
                   sx={{
                     display: 'grid',
@@ -375,7 +374,7 @@ function LicenseSafetyGuideDialog({ open, onClose, initialTab = 'license' }: Lic
                     gap: 1,
                     px: 2,
                     py: 1.1,
-                    bgcolor: 'rgba(148,163,184,0.12)',
+                    bgcolor: 'rgba(255,255,255,0.06)',
                   }}
                 >
                   <Typography

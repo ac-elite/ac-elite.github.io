@@ -4,59 +4,27 @@ import { varAlpha } from 'minimal-shared/utils';
 
 import SvgIcon from '@mui/material/SvgIcon';
 
-import {
-  buttonGlassReflectPulse,
-  GLASS_SYNC_CYCLE_SEC,
-  GLASS_SPECULAR_SWEEP_GRADIENT,
-} from 'src/lib/glass';
-
 // ----------------------------------------------------------------------
 
-/** Glass specular layer — same cadence as {@link GLASS_SYNC_CYCLE_SEC} rim glow on cards. */
-const buttonGlassSheenSx = {
-  position: 'relative',
-  overflow: 'hidden',
-  isolation: 'isolate',
-  '&::before': {
-    content: '""',
-    position: 'absolute',
-    inset: 0,
-    borderRadius: 'inherit',
-    zIndex: 0,
-    pointerEvents: 'none',
-    backgroundImage: GLASS_SPECULAR_SWEEP_GRADIENT,
-    backgroundSize: '260% 260%',
-    backgroundRepeat: 'no-repeat',
-    mixBlendMode: 'soft-light',
-    animation: `${buttonGlassReflectPulse} ${GLASS_SYNC_CYCLE_SEC}s ease-in-out infinite`,
-    '@media (prefers-reduced-motion: reduce)': {
-      animation: 'none',
-      opacity: 0.46,
-      backgroundPosition: '48% 50%',
-    },
-  },
-  // Stagger the sheen so adjacent buttons in the same row don't shimmer in
-  // unison. Negative delay lets the offset button start mid-cycle immediately
-  // instead of pausing on the 0%-frame for half a cycle on first paint.
-  '&:nth-of-type(even)::before': {
-    animationDelay: `-${GLASS_SYNC_CYCLE_SEC / 2}s`,
-    '@media (prefers-reduced-motion: reduce)': {
-      animationDelay: '0s',
-    },
-  },
-  '& > *': {
-    position: 'relative',
-    zIndex: 1,
-  },
-} as const;
+/** Apple easing — smooth ease-out for fills/shadows, gentle spring for press. */
+const EASE_OUT = 'cubic-bezier(0.32, 0.72, 0, 1)';
+const SPRING = 'cubic-bezier(0.34, 1.4, 0.5, 1)';
+
+/** Subtle inset top-highlight shared by filled glass buttons. */
+const buttonInsetHighlight = 'inset 0 1px 0 rgba(255,255,255,0.16)';
 
 const MuiBackdrop: Components<Theme>['MuiBackdrop'] = {
   styleOverrides: {
     root: ({ theme }) => ({
-      backgroundColor: varAlpha(theme.vars.palette.grey['900Channel'], 0.8),
+      // Apple blurs whatever sits behind a sheet/dialog.
+      backgroundColor: varAlpha(theme.vars.palette.grey['900Channel'], 0.66),
+      backdropFilter: 'blur(6px)',
+      WebkitBackdropFilter: 'blur(6px)',
     }),
     invisible: {
       background: 'transparent',
+      backdropFilter: 'none',
+      WebkitBackdropFilter: 'none',
     },
   },
 };
@@ -64,114 +32,100 @@ const MuiBackdrop: Components<Theme>['MuiBackdrop'] = {
 const MuiButton: Components<Theme>['MuiButton'] = {
   defaultProps: {
     disableElevation: true,
+    disableRipple: true,
   },
   styleOverrides: {
     root: {
       textTransform: 'none' as const,
-      fontWeight: 700,
-      transition:
-        'box-shadow 220ms ease, border-color 220ms ease, background 220ms ease, transform 200ms ease, filter 200ms ease',
-      '&.Mui-disabled::before': {
-        animation: 'none',
-        opacity: 0.28,
+      fontWeight: 600,
+      borderRadius: 12,
+      // Spring on transform (the press/lift), smooth ease on everything else.
+      transition: `transform 320ms ${SPRING}, box-shadow 320ms ${EASE_OUT}, border-color 320ms ${EASE_OUT}, background 320ms ${EASE_OUT}, filter 320ms ${EASE_OUT}`,
+      // Apple press: the control compresses slightly when tapped.
+      '&:active': {
+        transform: 'scale(0.97)',
+      },
+      '@media (prefers-reduced-motion: reduce)': {
+        transition: 'none',
+        '&:active': { transform: 'none' },
       },
     },
-    /** Main CTA — glassy but opaque enough for clear contrast. */
+    /** Main CTA — clean navy fill with a soft top highlight. */
     containedPrimary: ({ theme }) => ({
-      ...buttonGlassSheenSx,
       color: theme.palette.primary.contrastText,
-      background: `linear-gradient(135deg, #2a3c63 0%, #21355b 52%, ${theme.palette.primary.dark} 100%)`,
-      border: '1px solid rgba(255,255,255,0.24)',
-      boxShadow: '0 2px 10px rgba(0,0,0,0.24), inset 0 1px 0 rgba(255,255,255,0.16)',
+      background: `linear-gradient(180deg, #2c3e66 0%, ${theme.palette.primary.dark} 100%)`,
+      border: '1px solid rgba(255,255,255,0.12)',
+      boxShadow: `${buttonInsetHighlight}, 0 1px 2px rgba(0,0,0,0.28), 0 8px 20px -10px rgba(0,0,0,0.5)`,
       '&:hover': {
-        background: `linear-gradient(135deg, #304775 0%, #26406f 52%, #1a2c4f 100%)`,
-        borderColor: 'rgba(255,255,255,0.36)',
-        boxShadow:
-          '0 4px 16px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.24), 0 0 22px rgba(147,197,253,0.32)',
-        filter: 'brightness(1.05)',
+        background: `linear-gradient(180deg, #34487a 0%, #1b2c4f 100%)`,
+        borderColor: 'rgba(255,255,255,0.2)',
+        boxShadow: `${buttonInsetHighlight}, 0 2px 4px rgba(0,0,0,0.3), 0 14px 28px -10px rgba(0,0,0,0.6)`,
         transform: 'translateY(-1px)',
-        '&::before': {
-          mixBlendMode: 'screen',
-        },
       },
+      '&:active': { transform: 'translateY(0) scale(0.97)' },
       '&:disabled': {
-        color: varAlpha(theme.vars.palette.common.whiteChannel, 0.45),
+        color: varAlpha(theme.vars.palette.common.whiteChannel, 0.4),
         background: varAlpha(theme.vars.palette.grey['800Channel'], 0.55),
-        borderColor: varAlpha(theme.vars.palette.common.whiteChannel, 0.1),
+        borderColor: varAlpha(theme.vars.palette.common.whiteChannel, 0.08),
+        boxShadow: 'none',
         transform: 'none',
-        filter: 'none',
       },
     }),
-    /** Secondary filled — graphite, distinct from primary gradient. */
+    /** Secondary filled — graphite, distinct from the navy primary. */
     containedSecondary: ({ theme }) => ({
-      ...buttonGlassSheenSx,
       color: theme.palette.secondary.contrastText,
-      background: `linear-gradient(135deg, #3a3437 0%, ${theme.palette.secondary.light} 55%, ${theme.palette.secondary.main} 100%)`,
-      border: '1px solid rgba(255,255,255,0.2)',
-      boxShadow: '0 2px 10px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.1)',
+      background: `linear-gradient(180deg, #3a3437 0%, ${theme.palette.secondary.main} 100%)`,
+      border: '1px solid rgba(255,255,255,0.1)',
+      boxShadow: `inset 0 1px 0 rgba(255,255,255,0.1), 0 1px 2px rgba(0,0,0,0.26), 0 8px 20px -10px rgba(0,0,0,0.5)`,
       '&:hover': {
-        background: `linear-gradient(135deg, #453d41 0%, #3a3437 55%, ${theme.palette.secondary.dark} 100%)`,
-        borderColor: 'rgba(255,255,255,0.34)',
-        boxShadow:
-          '0 4px 16px rgba(0,0,0,0.26), inset 0 1px 0 rgba(255,255,255,0.16), 0 0 18px rgba(255,255,255,0.08)',
-        filter: 'brightness(1.04)',
+        background: `linear-gradient(180deg, #463f42 0%, ${theme.palette.secondary.dark} 100%)`,
+        borderColor: 'rgba(255,255,255,0.18)',
+        boxShadow: `inset 0 1px 0 rgba(255,255,255,0.14), 0 2px 4px rgba(0,0,0,0.28), 0 14px 28px -10px rgba(0,0,0,0.6)`,
         transform: 'translateY(-1px)',
-        '&::before': {
-          mixBlendMode: 'overlay',
-        },
       },
+      '&:active': { transform: 'translateY(0) scale(0.97)' },
       '&:disabled': {
-        color: varAlpha(theme.vars.palette.common.whiteChannel, 0.45),
+        color: varAlpha(theme.vars.palette.common.whiteChannel, 0.4),
         background: varAlpha(theme.vars.palette.grey['800Channel'], 0.5),
-        borderColor: varAlpha(theme.vars.palette.common.whiteChannel, 0.1),
+        borderColor: varAlpha(theme.vars.palette.common.whiteChannel, 0.08),
+        boxShadow: 'none',
         transform: 'none',
-        filter: 'none',
       },
     }),
     outlinedPrimary: ({ theme }) => ({
-      ...buttonGlassSheenSx,
       color: 'rgba(255,255,255,0.94)',
-      borderColor: 'rgba(255,255,255,0.34)',
-      backgroundColor: '#283756',
-      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.08)',
+      borderColor: 'rgba(255,255,255,0.18)',
+      backgroundColor: 'rgba(40,55,86,0.55)',
+      backdropFilter: 'blur(8px)',
+      WebkitBackdropFilter: 'blur(8px)',
       '&:hover': {
-        borderColor: 'rgba(191,225,255,0.55)',
-        backgroundColor: '#304166',
-        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.14), 0 0 20px rgba(147,197,253,0.22)',
-        filter: 'brightness(1.06)',
+        borderColor: 'rgba(191,225,255,0.42)',
+        backgroundColor: 'rgba(48,65,102,0.7)',
         transform: 'translateY(-1px)',
-        '&::before': {
-          mixBlendMode: 'screen',
-        },
       },
+      '&:active': { transform: 'translateY(0) scale(0.97)' },
       '&:disabled': {
-        color: varAlpha(theme.vars.palette.common.whiteChannel, 0.35),
-        borderColor: varAlpha(theme.vars.palette.common.whiteChannel, 0.12),
+        color: varAlpha(theme.vars.palette.common.whiteChannel, 0.32),
+        borderColor: varAlpha(theme.vars.palette.common.whiteChannel, 0.1),
         transform: 'none',
-        filter: 'none',
       },
     }),
     outlinedSecondary: ({ theme }) => ({
-      ...buttonGlassSheenSx,
       color: 'rgba(255,255,255,0.88)',
-      borderColor: 'rgba(255,255,255,0.26)',
-      backgroundColor: '#2a303f',
-      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)',
+      borderColor: 'rgba(255,255,255,0.14)',
+      backgroundColor: 'rgba(42,48,63,0.55)',
+      backdropFilter: 'blur(8px)',
+      WebkitBackdropFilter: 'blur(8px)',
       '&:hover': {
-        borderColor: 'rgba(255,255,255,0.46)',
-        backgroundColor: '#323a4b',
-        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.12), 0 0 16px rgba(255,255,255,0.06)',
-        filter: 'brightness(1.05)',
+        borderColor: 'rgba(255,255,255,0.3)',
+        backgroundColor: 'rgba(50,58,75,0.7)',
         transform: 'translateY(-1px)',
-        '&::before': {
-          mixBlendMode: 'overlay',
-        },
       },
+      '&:active': { transform: 'translateY(0) scale(0.97)' },
       '&:disabled': {
-        color: varAlpha(theme.vars.palette.common.whiteChannel, 0.35),
-        borderColor: varAlpha(theme.vars.palette.common.whiteChannel, 0.12),
+        color: varAlpha(theme.vars.palette.common.whiteChannel, 0.32),
+        borderColor: varAlpha(theme.vars.palette.common.whiteChannel, 0.1),
         transform: 'none',
-        filter: 'none',
       },
     }),
     containedInherit: ({ theme }) => ({
@@ -195,6 +149,7 @@ const MuiCard: Components<Theme>['MuiCard'] = {
       position: 'relative',
       boxShadow: theme.vars.customShadows.card,
       borderRadius: theme.shape.borderRadius * 2,
+      border: '1px solid rgba(255,255,255,0.08)',
     }),
   },
 };
@@ -214,14 +169,19 @@ const MuiCardHeader: Components<Theme>['MuiCardHeader'] = {
 const MuiOutlinedInput: Components<Theme>['MuiOutlinedInput'] = {
   styleOverrides: {
     root: ({ theme }) => ({
+      borderRadius: 12,
+      backgroundColor: varAlpha(theme.vars.palette.common.whiteChannel, 0.03),
+      transition: `box-shadow 260ms ${EASE_OUT}, background-color 260ms ${EASE_OUT}`,
       '& .MuiOutlinedInput-notchedOutline': {
-        borderColor: varAlpha(theme.vars.palette.common.whiteChannel, 0.32),
+        borderColor: varAlpha(theme.vars.palette.common.whiteChannel, 0.28),
+        transition: `border-color 260ms ${EASE_OUT}`,
       },
       '&:hover .MuiOutlinedInput-notchedOutline': {
-        borderColor: varAlpha(theme.vars.palette.common.whiteChannel, 0.52),
+        borderColor: varAlpha(theme.vars.palette.common.whiteChannel, 0.46),
       },
       '&.Mui-focused': {
-        boxShadow: '0 0 0 3px rgba(147, 197, 253, 0.28)',
+        boxShadow: '0 0 0 4px rgba(147, 197, 253, 0.22)',
+        backgroundColor: varAlpha(theme.vars.palette.common.whiteChannel, 0.05),
       },
       '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
         borderColor: '#93c5fd',
@@ -308,6 +268,9 @@ const MuiMenuItem: Components<Theme>['MuiMenuItem'] = {
   styleOverrides: {
     root: ({ theme }) => ({
       ...theme.typography.body2,
+      borderRadius: 9,
+      margin: theme.spacing(0, 0.75),
+      transition: `background-color 200ms ${EASE_OUT}`,
     }),
   },
 };
@@ -369,14 +332,92 @@ const MuiRadio: Components<Theme>['MuiRadio'] = {
   },
 };
 
+const MuiChip: Components<Theme>['MuiChip'] = {
+  styleOverrides: {
+    root: {
+      borderRadius: 9,
+      fontWeight: 600,
+      transition: `transform 240ms ${SPRING}, background-color 240ms ${EASE_OUT}`,
+    },
+    label: {
+      letterSpacing: '-0.006em',
+    },
+  },
+};
+
+/** Apple-style dark glass tooltip — blurred, rounded, soft shadow. */
+const MuiTooltip: Components<Theme>['MuiTooltip'] = {
+  styleOverrides: {
+    tooltip: ({ theme }) => ({
+      ...theme.typography.caption,
+      fontWeight: 600,
+      borderRadius: 10,
+      padding: theme.spacing(0.75, 1.25),
+      backgroundColor: 'rgba(16,24,44,0.86)',
+      backdropFilter: 'blur(12px) saturate(160%)',
+      WebkitBackdropFilter: 'blur(12px) saturate(160%)',
+      border: '1px solid rgba(255,255,255,0.12)',
+      boxShadow: '0 8px 26px -8px rgba(0,0,0,0.6)',
+    }),
+    arrow: {
+      color: 'rgba(16,24,44,0.86)',
+    },
+  },
+};
+
+/** Menu / select dropdown surface — vibrancy glass, rounded, layered shadow. */
+const MuiMenu: Components<Theme>['MuiMenu'] = {
+  styleOverrides: {
+    paper: ({ theme }) => ({
+      borderRadius: 14,
+      border: '1px solid rgba(255,255,255,0.1)',
+      backgroundColor: 'rgba(24,35,61,0.82)',
+      backgroundImage: 'none',
+      backdropFilter: 'blur(20px) saturate(180%)',
+      WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+      boxShadow: theme.vars.customShadows.dropdown,
+    }),
+  },
+};
+
+const MuiPopover: Components<Theme>['MuiPopover'] = {
+  styleOverrides: {
+    paper: ({ theme }) => ({
+      borderRadius: 14,
+      border: '1px solid rgba(255,255,255,0.1)',
+      backgroundColor: 'rgba(24,35,61,0.82)',
+      backgroundImage: 'none',
+      backdropFilter: 'blur(20px) saturate(180%)',
+      WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+      boxShadow: theme.vars.customShadows.dropdown,
+    }),
+  },
+};
+
+const MuiDialog: Components<Theme>['MuiDialog'] = {
+  styleOverrides: {
+    paper: ({ theme }) => ({
+      borderRadius: 20,
+      border: '1px solid rgba(255,255,255,0.1)',
+      backgroundImage: 'none',
+      boxShadow: theme.vars.customShadows.dialog,
+    }),
+  },
+};
+
 // ----------------------------------------------------------------------
 
 export const components = {
   MuiCard,
+  MuiChip,
   MuiLink,
+  MuiMenu,
   MuiPaper,
   MuiRadio,
   MuiButton,
+  MuiDialog,
+  MuiTooltip,
+  MuiPopover,
   MuiBackdrop,
   MuiMenuItem,
   MuiCheckbox,

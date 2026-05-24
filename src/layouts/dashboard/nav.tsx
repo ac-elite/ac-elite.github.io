@@ -40,8 +40,8 @@ export function NavDesktop({
   return (
     <Box
       sx={{
-        pt: 2.5,
-        px: 2.5,
+        pt: 3,
+        px: 2,
         bgcolor: '#17213B',
         top: 0,
         left: 0,
@@ -51,7 +51,7 @@ export function NavDesktop({
         flexDirection: 'column',
         zIndex: 'var(--layout-nav-zIndex)',
         width: 'var(--layout-nav-vertical-width)',
-        borderRight: `1px solid ${varAlpha(theme.vars.palette.common.whiteChannel, 0.16)}`,
+        borderRight: `1px solid ${varAlpha(theme.vars.palette.common.whiteChannel, 0.08)}`,
         [theme.breakpoints.up(layoutQuery)]: {
           display: 'flex',
         },
@@ -110,17 +110,13 @@ export function NavContent({ data, slots, sx }: NavContentProps) {
       <Box
         sx={{
           mt: 0.5,
-          mb: 3.5,
-          px: 0.25,
-          py: 0.25,
+          mb: 3,
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
-          borderRadius: 1.5,
-          bgcolor: '#17213B',
         }}
       >
-        <Logo sx={{ width: 100, height: 100 }} />
+        <Logo sx={{ width: 96, height: 96 }} />
       </Box>
 
       <Box sx={{ mb: 2.75 }}>
@@ -180,37 +176,54 @@ export function NavContent({ data, slots, sx }: NavContentProps) {
                     {...navButtonProps}
                     sx={[
                       (theme) => ({
-                        pl: 2,
+                        pl: 1.75,
                         py: 1.1,
-                        gap: 2,
+                        gap: 1.75,
                         pr: 1.5,
-                        borderRadius: 1,
+                        borderRadius: 1.4,
                         typography: 'body2',
                         fontWeight: 'fontWeightMedium',
-                        minHeight: 48,
-                        color: varAlpha(theme.vars.palette.common.whiteChannel, 0.72),
-                        transition: theme.transitions.create(['background-color', 'color', 'box-shadow'], {
-                          duration: theme.transitions.duration.shorter,
-                        }),
-                        '&:hover': {
-                          bgcolor: varAlpha(theme.vars.palette.common.whiteChannel, 0.08),
-                          color: theme.vars.palette.common.white,
-                        },
-                        ...(isDisabled && {
-                          opacity: 0.62,
-                          cursor: 'pointer',
+                        minHeight: 46,
+                        color: varAlpha(theme.vars.palette.common.whiteChannel, 0.68),
+                        transition:
+                          'background-color 240ms cubic-bezier(0.32,0.72,0,1), color 240ms cubic-bezier(0.32,0.72,0,1), transform 320ms cubic-bezier(0.34,1.4,0.5,1), box-shadow 240ms cubic-bezier(0.32,0.72,0,1)',
+                        '@media (hover: hover)': {
                           '&:hover': {
                             bgcolor: varAlpha(theme.vars.palette.common.whiteChannel, 0.06),
-                            color: varAlpha(theme.vars.palette.common.whiteChannel, 0.82),
+                            color: theme.vars.palette.common.white,
+                            transform: 'translateX(2px)',
+                          },
+                        },
+                        '&:active': { transform: 'scale(0.98)' },
+                        '@media (prefers-reduced-motion: reduce)': {
+                          transition: 'none',
+                          '&:hover': { transform: 'none' },
+                          '&:active': { transform: 'none' },
+                        },
+                        ...(isDisabled && {
+                          opacity: 0.6,
+                          cursor: 'pointer',
+                          '@media (hover: hover)': {
+                            '&:hover': {
+                              bgcolor: varAlpha(theme.vars.palette.common.whiteChannel, 0.04),
+                              color: varAlpha(theme.vars.palette.common.whiteChannel, 0.78),
+                              transform: 'none',
+                            },
                           },
                         }),
                         ...(isActived && {
                           fontWeight: 'fontWeightSemiBold',
                           color: theme.vars.palette.common.white,
-                          bgcolor: varAlpha(theme.vars.palette.common.whiteChannel, 0.16),
-                          boxShadow: `inset 0 0 0 1px ${varAlpha(theme.vars.palette.common.whiteChannel, 0.28)}`,
-                          '&:hover': {
-                            bgcolor: varAlpha(theme.vars.palette.common.whiteChannel, 0.22),
+                          // Brand-tinted Apple "selected" pill.
+                          background:
+                            'linear-gradient(180deg, rgba(91,141,239,0.26) 0%, rgba(59,130,246,0.16) 100%)',
+                          boxShadow: `inset 0 1px 0 rgba(255,255,255,0.12), inset 0 0 0 1px ${varAlpha(theme.vars.palette.common.whiteChannel, 0.14)}`,
+                          '@media (hover: hover)': {
+                            '&:hover': {
+                              background:
+                                'linear-gradient(180deg, rgba(99,148,242,0.32) 0%, rgba(63,134,250,0.2) 100%)',
+                              transform: 'none',
+                            },
                           },
                         }),
                       }),

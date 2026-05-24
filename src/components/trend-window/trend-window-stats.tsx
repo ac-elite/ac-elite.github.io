@@ -20,6 +20,7 @@ import { type RankDriver } from 'src/lib/ac-elite-data';
 import { useTrendWindow } from 'src/lib/trend-window/trend-window-context';
 import {
   HISTORY_WINDOWS,
+  snapshotHasSrPace,
   type HistoryWindowKey,
   computeDriverWindowDelta,
   computeCommunityWindowDelta,
@@ -40,6 +41,9 @@ export function TrendWindowStats(props: TrendWindowStatsProps) {
   const { activeWindow, setActiveWindow, availableWindows, snapshot } = useTrendWindow();
 
   const windowLabel = HISTORY_WINDOWS.find((w) => w.key === activeWindow)?.label ?? activeWindow;
+  // 24h has the rank-24h.json fallback (always SR/pace-capable); other windows
+  // depend on the snapshot carrying sr/pace, which older 7d/30d ones don't yet.
+  const srPaceReady = activeWindow === '24h' || snapshotHasSrPace(snapshot);
 
   let line: React.ReactNode;
   if (variant === 'community') {
@@ -97,6 +101,7 @@ export function TrendWindowStats(props: TrendWindowStatsProps) {
   }
 
   return (
+   <Box>
     <Stack
       direction={{ xs: 'column', sm: 'row' }}
       spacing={1}
@@ -144,5 +149,15 @@ export function TrendWindowStats(props: TrendWindowStatsProps) {
         </Typography>
       </Box>
     </Stack>
+    {!srPaceReady && (
+      <Typography
+        variant="caption"
+        sx={{ display: 'block', mt: 0.85, color: 'rgba(255,255,255,0.5)', lineHeight: 1.45 }}
+      >
+        Safety Rating &amp; license changes for {windowLabel} are still building — km, wins &amp; new-driver
+        totals above already update.
+      </Typography>
+    )}
+   </Box>
   );
 }

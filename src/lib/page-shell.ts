@@ -84,7 +84,8 @@ export const MARKETING_CTA_PRIMARY_GLASS_SX = {
   boxShadow:
     'inset 0 1px 0 rgba(255,255,255,0.34), inset 0 -1px 0 rgba(15,23,42,0.28),' +
     ' 0 8px 22px rgba(37,99,235,0.36), 0 0 0 1px rgba(147,197,253,0.18)',
-  transition: 'transform 180ms ease, box-shadow 180ms ease, filter 180ms ease',
+  transition:
+    'transform 320ms cubic-bezier(0.34, 1.4, 0.5, 1), box-shadow 320ms cubic-bezier(0.32, 0.72, 0, 1), filter 320ms cubic-bezier(0.32, 0.72, 0, 1)',
   '&:hover': {
     background: 'linear-gradient(180deg, #4F92F8 0%, #2D6CF1 50%, #2152DD 100%)',
     transform: 'translateY(-1px)',
@@ -94,7 +95,7 @@ export const MARKETING_CTA_PRIMARY_GLASS_SX = {
       ' 0 12px 28px rgba(37,99,235,0.5), 0 0 0 1px rgba(191,219,254,0.32)',
   },
   '&:active': {
-    transform: 'translateY(0)',
+    transform: 'translateY(0) scale(0.97)',
     filter: 'brightness(0.96)',
   },
   '@media (prefers-reduced-motion: reduce)': {
@@ -115,7 +116,8 @@ export const MARKETING_CTA_SECONDARY_GLASS_SX = {
   boxShadow:
     'inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -1px 0 rgba(0,0,0,0.32),' +
     ' 0 8px 22px rgba(0,0,0,0.4)',
-  transition: 'transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease',
+  transition:
+    'transform 320ms cubic-bezier(0.34, 1.4, 0.5, 1), box-shadow 320ms cubic-bezier(0.32, 0.72, 0, 1), border-color 320ms cubic-bezier(0.32, 0.72, 0, 1)',
   '&:hover': {
     background: 'linear-gradient(180deg, rgba(46,64,99,0.98) 0%, rgba(26,38,66,0.98) 100%)',
     borderColor: 'rgba(191,219,254,0.55)',
@@ -125,7 +127,7 @@ export const MARKETING_CTA_SECONDARY_GLASS_SX = {
       ' 0 12px 28px rgba(0,0,0,0.5), 0 0 0 1px rgba(147,197,253,0.18)',
   },
   '&:active': {
-    transform: 'translateY(0)',
+    transform: 'translateY(0) scale(0.97)',
   },
   '@media (prefers-reduced-motion: reduce)': {
     transition: 'none',

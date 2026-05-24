@@ -65,7 +65,7 @@ export function DashboardLayout({
         px: 2,
         py: 1.25,
         bgcolor: '#17213B',
-        borderBottom: '1px solid rgba(255,255,255,0.12)',
+        borderBottom: '1px solid rgba(255,255,255,0.08)',
         [theme.breakpoints.up(layoutQuery)]: { display: 'none' },
       }}
     >

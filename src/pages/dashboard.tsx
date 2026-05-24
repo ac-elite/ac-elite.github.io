@@ -25,7 +25,9 @@ import { brandAccentBorderSx } from 'src/lib/status-accent';
 import { CAR, formatNumber, formatLaptime, type RankDriver, getTrackDisplayName } from 'src/lib/ac-elite-data';
 import { useTrackCatalogVersion } from 'src/centralized/track-info';
 
+import { Reveal } from 'src/components/reveal';
 import { StatTile } from 'src/components/stat-tile/stat-tile';
+import { Chart, CHART_COLORS } from 'src/components/chart';
 import { ErrorPanel, LoadingPanel } from 'src/components/data-state';
 import { DataPageHeader } from 'src/components/data-page-header/data-page-header';
 import { TrendWindowStats } from 'src/components/trend-window/trend-window-stats';
@@ -154,6 +156,20 @@ export default function Page() {
       .slice(0, 5),
     [leaderboardData]
   );
+
+  const trackActivityChart = useMemo(() => {
+    const rows = Object.entries(leaderboardData || {})
+      .map(([trackId, trackData]) => ({
+        name: getTrackDisplayName(trackId),
+        entries: Array.isArray((trackData as Record<string, any>)?.[CAR])
+          ? ((trackData as Record<string, any>)[CAR] as any[]).length
+          : 0,
+      }))
+      .filter((r) => r.entries > 0)
+      .sort((a, b) => b.entries - a.entries)
+      .slice(0, 10);
+    return { categories: rows.map((r) => r.name), data: rows.map((r) => r.entries) };
+  }, [leaderboardData]);
 
   const effectiveLastSync = getEffectiveLastSync(metadata?.lastSync, rankData);
   const syncHealth = getSyncHealth(effectiveLastSync);
@@ -293,6 +309,50 @@ export default function Page() {
                   value={formatNumber(quickStats.avgKmPerDriver)}
                 />
               </Grid>
+
+              {trackActivityChart.categories.length > 0 && (
+                <Grid size={{ xs: 12 }}>
+                 <Reveal>
+                  <Paper sx={{ ...GLASS_CARD_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(8), p: 2.75 }}>
+                    <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.78)' }}>
+                      Track activity
+                    </Typography>
+                    <Typography variant="h6" sx={{ fontWeight: 800, mt: 0.3, mb: 1 }}>
+                      Laps logged by track
+                    </Typography>
+                    <Chart
+                      type="bar"
+                      height={Math.max(300, trackActivityChart.categories.length * 40)}
+                      series={[{ name: 'Entries', data: trackActivityChart.data }]}
+                      options={{
+                        colors: CHART_COLORS,
+                        fill: { type: 'solid' },
+                        legend: { show: false },
+                        plotOptions: {
+                          bar: {
+                            horizontal: true,
+                            distributed: true,
+                            borderRadius: 7,
+                            borderRadiusApplication: 'end',
+                            barHeight: '64%',
+                          },
+                        },
+                        dataLabels: {
+                          enabled: true,
+                          textAnchor: 'start',
+                          offsetX: 4,
+                          formatter: (v: number) => formatNumber(Number(v)),
+                          style: { colors: ['rgba(255,255,255,0.92)'], fontWeight: 700, fontSize: '12px' },
+                        },
+                        xaxis: { categories: trackActivityChart.categories, labels: { show: false } },
+                        grid: { xaxis: { lines: { show: true } }, yaxis: { lines: { show: false } } },
+                        tooltip: { y: { formatter: (v: number) => `${formatNumber(v)} entries` } },
+                      }}
+                    />
+                  </Paper>
+                 </Reveal>
+                </Grid>
+              )}
 
               <Grid size={{ xs: 12, md: 6 }}>
                 <Paper

@@ -156,9 +156,13 @@ export function getLicenseBadgeSx(license: string): SxProps<Theme> {
   const textColor = '#111827';
   const glass = (start: string, end: string, border: string, color = textColor): SxProps<Theme> => ({
     color,
-    background: `linear-gradient(135deg, ${start} 0%, ${end} 100%)`,
+    // Domed enamel-pin look: bright top sheen + dark lower inset + a drop
+    // shadow so the badge sits proud — reads like an earned medal, not a flat tag.
+    background: `linear-gradient(180deg, ${start} 0%, ${end} 100%)`,
     border: `1px solid ${border}`,
-    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.3)',
+    boxShadow:
+      'inset 0 1px 0 rgba(255,255,255,0.62), inset 0 -2px 3px rgba(0,0,0,0.22),' +
+      ' 0 1px 1px rgba(0,0,0,0.35), 0 3px 7px -1px rgba(0,0,0,0.32)',
   });
 
   const styles: Record<string, SxProps<Theme>> = {
@@ -187,9 +191,13 @@ export function getSRBadgeSx(tier: string): SxProps<Theme> {
   const textColor = '#111827';
   const glass = (start: string, end: string, border: string, color = textColor): SxProps<Theme> => ({
     color,
-    background: `linear-gradient(135deg, ${start} 0%, ${end} 100%)`,
+    // Domed enamel-pin look: bright top sheen + dark lower inset + a drop
+    // shadow so the badge sits proud — reads like an earned medal, not a flat tag.
+    background: `linear-gradient(180deg, ${start} 0%, ${end} 100%)`,
     border: `1px solid ${border}`,
-    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.3)',
+    boxShadow:
+      'inset 0 1px 0 rgba(255,255,255,0.62), inset 0 -2px 3px rgba(0,0,0,0.22),' +
+      ' 0 1px 1px rgba(0,0,0,0.35), 0 3px 7px -1px rgba(0,0,0,0.32)',
   });
 
   const first = tier.charAt(0);
@@ -209,17 +217,18 @@ export function getSRBadgeSx(tier: string): SxProps<Theme> {
 function medalPanelShinySx(rgb: string, opacity: number, borderOpacity: number): SxProps<Theme> {
   const o = opacity;
   const base = `linear-gradient(135deg, rgba(${rgb},${o}) 0%, rgba(${rgb},${o * 0.55}) 55%, rgba(${rgb},${o * 0.28}) 100%)`;
-  const topSheen = `linear-gradient(180deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.04) 24%, rgba(255,255,255,0) 46%)`;
-  const bottomDepth = `linear-gradient(180deg, rgba(0,0,0,0) 50%, rgba(0,0,0,0.16) 100%)`;
+  const topSheen = `linear-gradient(180deg, rgba(255,255,255,0.24) 0%, rgba(255,255,255,0.07) 22%, rgba(255,255,255,0) 46%)`;
+  const bottomDepth = `linear-gradient(180deg, rgba(0,0,0,0) 48%, rgba(0,0,0,0.2) 100%)`;
   return {
     background: `${topSheen}, ${bottomDepth}, ${base}`,
     border: `1.5px solid rgba(${rgb},${borderOpacity * 0.7})`,
     borderLeft: `3.5px solid rgba(${rgb},${borderOpacity})`,
     boxShadow: [
-      'inset 0 1px 0 rgba(255,255,255,0.28)',
-      'inset 0 -1px 0 rgba(0,0,0,0.14)',
-      `0 0 18px rgba(${rgb},${o * 0.6})`,
-      `0 0 4px rgba(${rgb},${o * 0.35})`,
+      'inset 0 1px 0 rgba(255,255,255,0.4)',
+      'inset 0 -1px 0 rgba(0,0,0,0.18)',
+      `0 0 22px rgba(${rgb},${o * 0.7})`,
+      `0 0 5px rgba(${rgb},${o * 0.4})`,
+      '0 6px 16px -6px rgba(0,0,0,0.5)',
     ].join(', '),
     ...GLASS_SPECULAR_SWEEP_SX,
     '& > *': {

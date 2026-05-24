@@ -50,16 +50,17 @@ export function InfoNotesPanel({ notes, sx }: InfoNotesPanelProps) {
               px: { xs: 2, md: 2.5 },
               py: { xs: 1.5, md: 1.75 },
               bgcolor: `${note.accent}14`,
-              // A real left border follows border-radius, so the accent curves
-              // around the panel's rounded corners (a clipped bar is cut square).
-              // The matching corner radii are applied to the first/last note.
-              borderLeft: `3px solid ${note.accent}`,
+              // Match the container's rounded corners on the first/last note so
+              // the inset accent line curves with them.
               borderTopLeftRadius: index === 0 ? '24px' : 0,
               borderTopRightRadius: index === 0 ? '24px' : 0,
               borderBottomLeftRadius: index === notes.length - 1 ? '24px' : 0,
               borderBottomRightRadius: index === notes.length - 1 ? '24px' : 0,
-              // Subtle colour glow bleeding inward from the accent border.
-              boxShadow: `inset 11px 0 14px -14px ${alpha(note.accent, 0.5)}`,
+              // The accent is an INSET box-shadow, not a left border: inset
+              // shadows are clipped to the rounded border-box, so the 3px line
+              // wraps around the rounded corners (a one-sided border is cut square).
+              // Second layer is a soft colour glow bleeding inward.
+              boxShadow: `inset 3px 0 0 0 ${note.accent}, inset 16px 0 20px -16px ${alpha(note.accent, 0.55)}`,
             }}
           >
             <Box

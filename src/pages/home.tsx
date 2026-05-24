@@ -40,7 +40,6 @@ import {
   subtleEnterUpSx,
   subtleRowEnterSx,
   glassCardMotionSx,
-  subtleEnterOnceSx,
   softFloatWrapperSx,
 } from 'src/lib/subtle-motion';
 import {
@@ -88,12 +87,15 @@ import {
   computeLicenseMap,
   getLicenseBadgeSx,
   LICENSE_CHIP_WIDTH,
+  LICENSE_TIER_ORDER,
   getTrackDisplayName,
   type LeaderboardCarRow,
   leaderboardTrackIdLookupCandidates,
 } from 'src/lib/ac-elite-data';
 import { useTrackCatalogVersion } from 'src/centralized/track-info';
 
+import { Chart } from 'src/components/chart';
+import { Reveal } from 'src/components/reveal';
 import { EmptyState } from 'src/components/data-state';
 import { DeltaChip } from 'src/components/delta-chip/delta-chip';
 import { InfoNotesPanel } from 'src/components/info-notes/info-notes-panel';
@@ -123,37 +125,19 @@ type CurrentTrackData = CurrentTrackPayload;
 const HOME_CURRENT_TRACK_PER_PAGE = 20;
 
 /**
- * Hero CTA: subtle outer-glow pulse. Only changes `filter` so it composes with
- * the layered glass styling on the buttons (inner sheens + base box-shadow stay
- * intact). Each button gets a different delay so they breathe out of sync.
+ * Static Apple-style gradient keyword (white → soft ice-blue, clipped to text).
+ * Replaces the former infinite colour/shimmer pulses — premium through restraint.
  */
-const heroPrimaryPulse = keyframes`
-  0%, 100% { filter: brightness(1) drop-shadow(0 0 0 rgba(147,197,253,0)); }
-  50%      { filter: brightness(1.05) drop-shadow(0 0 14px rgba(147,197,253,0.35)); }
-`;
-
-/** Soft highlight on “leaderboard.” — white-forward, not loud accent color. */
-const heroWordShimmer = keyframes`
-  0%, 100% {
-    text-shadow: 0 0 18px rgba(255,255,255,0.12), 0 0 36px rgba(23,33,59,0.45);
-    opacity: 0.96;
-  }
-  50% {
-    text-shadow: 0 0 26px rgba(255,255,255,0.2), 0 0 48px rgba(255,255,255,0.05);
-    opacity: 1;
-  }
-`;
-
-const heroKeywordPulse = keyframes`
-  0%, 100% {
-    color: rgba(255,255,255,0.97);
-    text-shadow: 0 0 18px rgba(255,255,255,0.14), 0 0 34px rgba(147,197,253,0.12);
-  }
-  50% {
-    color: #ffffff;
-    text-shadow: 0 0 24px rgba(255,255,255,0.22), 0 0 44px rgba(191,219,254,0.18);
-  }
-`;
+const heroKeywordSx = {
+  // On-brand electric-blue accent gradient (matches the CTA / accent blue).
+  backgroundImage: 'linear-gradient(180deg, #9FCBFF 0%, #5B93F4 52%, #2E6BE6 100%)',
+  WebkitBackgroundClip: 'text',
+  backgroundClip: 'text',
+  color: 'transparent',
+  fontWeight: 800,
+  // Soft brand glow so the keyword reads as luminous on the navy hero.
+  filter: 'drop-shadow(0 1px 10px rgba(59,130,246,0.35))',
+} as const;
 
 /** Soft "live" pulse for the green dot in the hero kicker. */
 const heroLiveDotPulse = keyframes`
@@ -350,30 +334,13 @@ function HeroSection({ currentTrack }: { currentTrack: CurrentTrackData | null }
                   }}
                 >
                   Track your{' '}
-                  <Box
-                    component="span"
-                    sx={{
-                      color: 'rgba(255,255,255,0.97)',
-                      fontWeight: 900,
-                      animation: `${heroKeywordPulse} 5.2s ease-in-out infinite`,
-                      ...reducedMotionNone,
-                    }}
-                  >
+                  <Box component="span" sx={heroKeywordSx}>
                     stats
                   </Box>
                   .
                   <br />
                   Dominate the{' '}
-                  <Box
-                    component="span"
-                    sx={{
-                      color: 'rgba(255,255,255,0.98)',
-                      fontWeight: 900,
-                      animation: `${heroKeywordPulse} 5.2s ease-in-out 1.2s infinite, ${heroWordShimmer} 5.5s ease-in-out 1.2s infinite`,
-                      textShadow: '0 0 28px rgba(255,255,255,0.16)',
-                      ...reducedMotionNone,
-                    }}
-                  >
+                  <Box component="span" sx={heroKeywordSx}>
                     leaderboard.
                   </Box>
                 </Typography>
@@ -388,8 +355,8 @@ function HeroSection({ currentTrack }: { currentTrack: CurrentTrackData | null }
                 direction={{ xs: 'column', sm: 'row' }}
                 spacing={1.25}
                 flexWrap="wrap"
-                alignItems={{ xs: 'center', sm: 'flex-start' }}
-                justifyContent={{ xs: 'center', sm: 'flex-start' }}
+                alignItems={{ xs: 'center', md: 'flex-start' }}
+                justifyContent={{ xs: 'center', md: 'flex-start' }}
                 sx={{ width: '100%' }}
               >
                 <Button
@@ -398,8 +365,6 @@ function HeroSection({ currentTrack }: { currentTrack: CurrentTrackData | null }
                   sx={{
                     ...MARKETING_CTA_LARGE_LAYOUT_SX,
                     ...MARKETING_CTA_PRIMARY_GLASS_SX,
-                    animation: `${heroPrimaryPulse} 4.5s ease-in-out infinite`,
-                    '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
                   }}
                   href="https://discord.gg/d2EbxGYBbj"
                   target="_blank"
@@ -413,9 +378,6 @@ function HeroSection({ currentTrack }: { currentTrack: CurrentTrackData | null }
                   sx={{
                     ...MARKETING_CTA_LARGE_LAYOUT_SX,
                     ...MARKETING_CTA_SECONDARY_GLASS_SX,
-                    // Same pulse, half-cycle delay so the two CTAs breathe out of sync.
-                    animation: `${heroPrimaryPulse} 4.5s ease-in-out 2.25s infinite`,
-                    '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
                   }}
                   href={ACE_SKIN_PACK_DOWNLOAD_URL}
                   target="_blank"
@@ -498,12 +460,12 @@ function CurrentTrackLeaderboardSection({
 
       <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1 }}>
         <Stack spacing={3}>
+          <Reveal>
           <Stack
             spacing={0.7}
             sx={{
               textAlign: { xs: 'center', md: 'left' },
               alignItems: { xs: 'center', md: 'flex-start' },
-              ...subtleEnterOnceSx(340),
             }}
           >
             <Typography variant="overline" sx={sectionKickerSx}>
@@ -516,7 +478,9 @@ function CurrentTrackLeaderboardSection({
               Full leaderboard for {CAR} on the currently active server track.
             </Typography>
           </Stack>
+          </Reveal>
 
+          <Reveal index={1}>
           <Paper
             sx={{
               ...GLASS_TABLE_WRAPPER_SX,
@@ -677,6 +641,7 @@ function CurrentTrackLeaderboardSection({
               </Table>
             </TableContainer>
           </Paper>
+          </Reveal>
 
           {!loading && !error && totalPages > 1 && (
             <Paper sx={{ ...GLASS_TABLE_PAGINATION_SX, ...glassCardMotionSx(0, { baseDelayMs: 460 }) }}>
@@ -948,6 +913,200 @@ function DriverSearchSection({
   );
 }
 
+/** Tier-matched donut colours (mirrors the license badge palette). */
+const LICENSE_TIER_COLORS: Record<string, string> = {
+  'Diamond+': '#22D3EE',
+  Diamond: '#22D3EE',
+  'Platinum+': '#E2E8F0',
+  Platinum: '#CBD5E1',
+  'Gold+': '#FDE047',
+  Gold: '#FACC15',
+  'Silver+': '#C9D5E1',
+  Silver: '#AEBED0',
+  'Bronze+': '#FB923C',
+  Bronze: '#F97316',
+  Rookie: '#94A3B8',
+};
+
+function CommunityInsightsSection({ drivers }: { drivers: DriverView[] }) {
+  const dist = useMemo(() => {
+    const counts = new Map<string, number>();
+    drivers.forEach((d) => {
+      // Skip the starting tier — everyone begins as Rookie, so it dwarfs the
+      // earned tiers and flattens the distribution.
+      if (d.license === 'Rookie') return;
+      counts.set(d.license, (counts.get(d.license) ?? 0) + 1);
+    });
+    const order = LICENSE_TIER_ORDER as readonly string[];
+    const entries = [...counts.entries()].sort((a, b) => {
+      const ai = order.indexOf(a[0]);
+      const bi = order.indexOf(b[0]);
+      if (ai !== -1 && bi !== -1) return ai - bi;
+      if (ai !== -1) return -1;
+      if (bi !== -1) return 1;
+      return b[1] - a[1];
+    });
+    return {
+      labels: entries.map((e) => e[0]),
+      series: entries.map((e) => e[1]),
+      colors: entries.map((e) => LICENSE_TIER_COLORS[e[0]] ?? '#5B8DEF'),
+      total: entries.reduce((sum, e) => sum + e[1], 0),
+    };
+  }, [drivers]);
+
+  const grades = useMemo(() => {
+    const order = ['S', 'A', 'B', 'C', 'D', 'E', 'F'];
+    const gradeColor: Record<string, string> = {
+      S: '#22C55E',
+      A: '#5B8DEF',
+      B: '#38BDF8',
+      C: '#F59E0B',
+      D: '#F87171',
+      E: '#EF4444',
+      F: '#B91C1C',
+    };
+    const counts = new Map<string, number>();
+    drivers.forEach((d) => {
+      const g = (d.safetyTier?.[0] || '?').toUpperCase();
+      // Skip F — the starting SR grade everyone holds before earning a rating.
+      if (g === 'F') return;
+      counts.set(g, (counts.get(g) ?? 0) + 1);
+    });
+    const entries = [...counts.entries()].sort((a, b) => {
+      const ai = order.indexOf(a[0]);
+      const bi = order.indexOf(b[0]);
+      if (ai !== -1 && bi !== -1) return ai - bi;
+      if (ai !== -1) return -1;
+      if (bi !== -1) return 1;
+      return a[0].localeCompare(b[0]);
+    });
+    return {
+      categories: entries.map((e) => e[0]),
+      data: entries.map((e) => e[1]),
+      colors: entries.map((e) => gradeColor[e[0]] ?? '#94A3B8'),
+    };
+  }, [drivers]);
+
+  if (!drivers.length) return null;
+
+  return (
+    <Box component="section" sx={{ ...DATA_PAGE_SHELL_SX }}>
+      <PageGridOverlay opacity={0.22} />
+      <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1 }}>
+        <Reveal>
+          <Stack
+            spacing={0.7}
+            sx={{
+              textAlign: { xs: 'center', md: 'left' },
+              alignItems: { xs: 'center', md: 'flex-start' },
+              mb: 3,
+            }}
+          >
+            <Typography variant="overline" sx={sectionKickerSx}>
+              Community insights
+            </Typography>
+            <Typography variant="h4" fontWeight={800}>
+              The grid at a glance
+            </Typography>
+            <Typography color="text.secondary">
+              How the field breaks down across earned license tiers and Safety Rating — {formatNumber(dist.total)} ranked
+              drivers (starting Rookie &amp; F tiers excluded).
+            </Typography>
+          </Stack>
+        </Reveal>
+
+        <Grid container spacing={2.5} alignItems="stretch">
+          <Grid size={{ xs: 12, md: 6 }}>
+            <Reveal index={1} sx={{ height: 1 }}>
+              <Box sx={{ ...GLASS_PANEL_SX, ...brandAccentBorderSx(), height: 1 }}>
+                <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.78)' }}>
+                  License tiers
+                </Typography>
+                <Chart
+                  type="donut"
+                  height={360}
+                  series={dist.series}
+                  options={{
+                    labels: dist.labels,
+                    colors: dist.colors,
+                    stroke: { width: 0 },
+                    fill: { type: 'solid' },
+                    legend: { position: 'bottom', horizontalAlign: 'center' },
+                    dataLabels: { enabled: false },
+                    tooltip: { y: { formatter: (v: number) => `${formatNumber(v)} drivers` } },
+                    plotOptions: {
+                      pie: {
+                        donut: {
+                          size: '72%',
+                          labels: {
+                            show: true,
+                            name: { color: 'rgba(255,255,255,0.6)' },
+                            value: {
+                              color: '#fff',
+                              fontSize: '30px',
+                              fontWeight: 800,
+                              formatter: (v: string) => formatNumber(Number(v)),
+                            },
+                            total: {
+                              show: true,
+                              label: 'Drivers',
+                              color: 'rgba(255,255,255,0.6)',
+                              formatter: () => formatNumber(dist.total),
+                            },
+                          },
+                        },
+                      },
+                    },
+                  }}
+                />
+              </Box>
+            </Reveal>
+          </Grid>
+
+          <Grid size={{ xs: 12, md: 6 }}>
+            <Reveal index={2} sx={{ height: 1 }}>
+              <Box sx={{ ...GLASS_PANEL_SX, ...brandAccentBorderSx(), height: 1 }}>
+                <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.78)' }}>
+                  Safety Rating grades
+                </Typography>
+                <Chart
+                  type="bar"
+                  height={360}
+                  series={[{ name: 'Drivers', data: grades.data }]}
+                  options={{
+                    colors: grades.colors,
+                    fill: { type: 'solid' },
+                    legend: { show: false },
+                    plotOptions: {
+                      bar: {
+                        distributed: true,
+                        borderRadius: 8,
+                        borderRadiusApplication: 'end',
+                        columnWidth: '52%',
+                        dataLabels: { position: 'top' },
+                      },
+                    },
+                    dataLabels: {
+                      enabled: true,
+                      offsetY: -20,
+                      formatter: (v: number) => formatNumber(Number(v)),
+                      style: { colors: ['rgba(255,255,255,0.92)'], fontWeight: 700, fontSize: '12px' },
+                    },
+                    xaxis: { categories: grades.categories },
+                    yaxis: { labels: { formatter: (v: number) => formatNumber(Math.round(v)) } },
+                    grid: { xaxis: { lines: { show: false } }, yaxis: { lines: { show: true } } },
+                    tooltip: { y: { formatter: (v: number) => `${formatNumber(v)} drivers` } },
+                  }}
+                />
+              </Box>
+            </Reveal>
+          </Grid>
+        </Grid>
+      </Container>
+    </Box>
+  );
+}
+
 export default function Page() {
   // Subscribe so track names / images refresh when admin edits the catalog.
   useTrackCatalogVersion();
@@ -1203,6 +1362,7 @@ export default function Page() {
         totalLaps={community.totalLaps}
         activeTracks={community.activeTracks}
       />
+      <CommunityInsightsSection drivers={drivers} />
       <CurrentTrackLeaderboardSection
         loading={loading}
         error={error}
