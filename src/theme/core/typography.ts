@@ -1,8 +1,6 @@
-import type { CSSObject, Breakpoint, TypographyVariantsOptions } from '@mui/material/styles';
+import type { CSSObject, TypographyVariantsOptions } from '@mui/material/styles';
 
 import { pxToRem } from 'minimal-shared/utils';
-
-import { createTheme as getTheme } from '@mui/material/styles';
 
 // ----------------------------------------------------------------------
 
@@ -14,29 +12,6 @@ export type FontStyleExtend = {
   fontWeightSemiBold: CSSObject['fontWeight'];
   fontSecondaryFamily: CSSObject['fontFamily'];
 };
-
-export type ResponsiveFontSizesInput = Partial<Record<Breakpoint, number>>;
-export type ResponsiveFontSizesResult = Record<string, { fontSize: string }>;
-
-const defaultMuiTheme = getTheme();
-
-function responsiveFontSizes(obj: ResponsiveFontSizesInput): ResponsiveFontSizesResult {
-  const breakpoints: Breakpoint[] = defaultMuiTheme.breakpoints.keys;
-
-  return breakpoints.reduce((acc, breakpoint) => {
-    const value = obj[breakpoint];
-
-    if (value !== undefined && value >= 0) {
-      acc[defaultMuiTheme.breakpoints.up(breakpoint)] = {
-        fontSize: pxToRem(value),
-      };
-    }
-
-    return acc;
-  }, {} as ResponsiveFontSizesResult);
-}
-
-// ----------------------------------------------------------------------
 
 /**
  * San Francisco first. Apple devices render genuine SF Pro via -apple-system /
@@ -78,59 +53,57 @@ export const typography: TypographyVariantsOptions = {
     fontFamily: secondaryFont,
     fontWeight: 700,
     lineHeight: 1.06,
-    fontSize: 'clamp(2.25rem, 1.30rem + 3.6vw, 4rem)',
-    letterSpacing: '-0.026em',
+    fontSize: pxToRem(56),
+    letterSpacing: 0,
   },
   h2: {
     fontFamily: secondaryFont,
     fontWeight: 700,
     lineHeight: 1.12,
-    fontSize: 'clamp(1.85rem, 1.25rem + 2.6vw, 3rem)',
-    letterSpacing: '-0.023em',
+    fontSize: pxToRem(44),
+    letterSpacing: 0,
   },
   h3: {
     fontFamily: secondaryFont,
     fontWeight: 700,
     lineHeight: 1.2,
-    fontSize: 'clamp(1.4rem, 1.05rem + 1.5vw, 2rem)',
-    letterSpacing: '-0.019em',
+    fontSize: pxToRem(32),
+    letterSpacing: 0,
   },
   h4: {
     fontWeight: 700,
     lineHeight: 1.3,
-    fontSize: 'clamp(1.2rem, 1.04rem + 0.7vw, 1.5rem)',
-    letterSpacing: '-0.015em',
+    fontSize: pxToRem(24),
+    letterSpacing: 0,
   },
   h5: {
     fontWeight: 600,
     lineHeight: 1.4,
     fontSize: pxToRem(18),
-    letterSpacing: '-0.012em',
-    ...responsiveFontSizes({ sm: 19 }),
+    letterSpacing: 0,
   },
   h6: {
     fontWeight: 600,
     lineHeight: 1.5,
     fontSize: pxToRem(17),
-    letterSpacing: '-0.01em',
-    ...responsiveFontSizes({ sm: 18 }),
+    letterSpacing: 0,
   },
   subtitle1: {
     fontWeight: 600,
     lineHeight: 1.5,
     fontSize: pxToRem(16),
-    letterSpacing: '-0.008em',
+    letterSpacing: 0,
   },
   subtitle2: {
     fontWeight: 600,
     lineHeight: 22 / 14,
     fontSize: pxToRem(14),
-    letterSpacing: '-0.006em',
+    letterSpacing: 0,
   },
   body1: {
     lineHeight: 1.55,
     fontSize: pxToRem(16),
-    letterSpacing: '-0.003em',
+    letterSpacing: 0,
   },
   body2: {
     lineHeight: 1.57,
@@ -153,7 +126,7 @@ export const typography: TypographyVariantsOptions = {
     fontWeight: 600,
     lineHeight: 24 / 14,
     fontSize: pxToRem(14),
-    letterSpacing: '-0.006em',
+    letterSpacing: 0,
     textTransform: 'unset',
   },
 };

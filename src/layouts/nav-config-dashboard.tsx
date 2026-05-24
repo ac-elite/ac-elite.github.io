@@ -6,11 +6,23 @@ import { APP_ROUTES } from 'src/centralized/app-routes';
 import { ADMIN_SECTIONS } from 'src/centralized/admin-sections';
 
 import { hasAtLeastRole, type AuthProfile } from 'src/lib/auth/auth-context';
+import { dashboardIcons } from 'src/components/icons/ac-dashboard-icons';
 
 // ----------------------------------------------------------------------
 
-/** Wrap an Iconify name in a 24×24 box-aware glyph used by the sidebar. */
-const navIcon = (name: string) => <Icon icon={name} width={24} height={24} />;
+const navIcon = (name: string) => (
+  <Box
+    component="span"
+    className="nav-glyph"
+    sx={
+      {
+        '--nav-icon-size': '25.5px',
+      } as React.CSSProperties
+    }
+  >
+    <Icon icon={name} width={25.5} height={25.5} />
+  </Box>
+);
 
 export type NavItem = {
   title: string;
@@ -43,16 +55,16 @@ const comingSoonBadge = (
 );
 
 const baseNavData: NavItem[] = [
-  { title: 'Home', path: APP_ROUTES.home, icon: navIcon('solar:home-smile-bold-duotone') },
-  { title: 'Stats', path: APP_ROUTES.dashboard, icon: navIcon('solar:chart-2-bold-duotone') },
-  { title: 'Leaderboard', path: APP_ROUTES.leaderboard, icon: navIcon('solar:medal-ribbons-star-bold-duotone') },
-  { title: 'Rankings', path: APP_ROUTES.rankings, icon: navIcon('solar:ranking-bold-duotone') },
-  { title: 'Hall of Fame', path: APP_ROUTES.hallOfFame, icon: navIcon('solar:cup-star-bold-duotone') },
-  { title: 'Livery Showcase', path: APP_ROUTES.liveryShowcase, icon: navIcon('solar:palette-bold-duotone') },
+  { title: 'Home', path: APP_ROUTES.home, icon: dashboardIcons.home },
+  { title: 'Stats', path: APP_ROUTES.dashboard, icon: dashboardIcons.stats },
+  { title: 'Leaderboard', path: APP_ROUTES.leaderboard, icon: dashboardIcons.leaderboard },
+  { title: 'Rankings', path: APP_ROUTES.rankings, icon: dashboardIcons.rankings },
+  { title: 'Hall of Fame', path: APP_ROUTES.hallOfFame, icon: dashboardIcons.trophy },
+  { title: 'Livery Showcase', path: APP_ROUTES.liveryShowcase, icon: dashboardIcons.livery },
   {
     title: 'Setup Store',
     path: APP_ROUTES.setupStore,
-    icon: navIcon('solar:tuning-2-bold-duotone'),
+    icon: dashboardIcons.setup,
     info: comingSoonBadge,
     disabled: true,
   },

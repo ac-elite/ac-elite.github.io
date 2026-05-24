@@ -122,7 +122,7 @@ const DRIVER_STAT_HERO_SX = {
 } as const;
 
 /**
- * Chip-like “glass” hover: specular inset line + lift — only used on License / SR hero cards.
+ * Quiet glass hover for License / SR hero cards.
  * (Other stat tiles use {@link glassCardEnterOnlySx} without hover.)
  */
 const DRIVER_STAT_HERO_GLASS_HOVER_SX = {
@@ -131,13 +131,12 @@ const DRIVER_STAT_HERO_GLASS_HOVER_SX = {
     'transform 220ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 220ms cubic-bezier(0.22, 1, 0.36, 1), filter 220ms cubic-bezier(0.22, 1, 0.36, 1)',
   '@media (hover: hover)': {
     '&:hover': {
-      transform: 'translateY(-3px)',
-      filter: 'brightness(1.08)',
+      transform: 'translateY(-1px)',
+      filter: 'brightness(1.014)',
       boxShadow: [
-        'inset 0 1px 0 rgba(255,255,255,0.38)',
-        'inset 0 -1px 0 rgba(0,0,0,0.14)',
-        '0 18px 46px rgba(0,0,0,0.48)',
-        '0 0 36px rgba(255,255,255,0.14)',
+        'inset 0 1px 0 rgba(255,255,255,0.16)',
+        'inset 0 -1px 0 rgba(0,0,0,0.16)',
+        '0 10px 26px -24px rgba(0,0,0,0.7)',
       ].join(', '),
     },
   },
@@ -230,36 +229,37 @@ export default function Page() {
 
   const driverSeasonHeaderBandSx = useMemo(() => {
     const base = {
+      ...GLASS_INNER_PANEL_SX,
       borderRadius: 2,
       px: { xs: 2, md: 2.25 },
       py: { xs: 1.5, md: 1.75 },
       mb: 0,
-      border: '1px solid rgba(255,255,255,0.12)',
-      background: 'linear-gradient(120deg, rgba(31,44,73,0.5) 0%, rgba(23,33,59,0.28) 100%)',
-      borderLeft: '3px solid rgba(147,197,253,0.48)',
     };
     if (overallRank === 1) {
       return {
         ...base,
-        borderLeft: '3px solid rgba(245,158,11,0.78)',
-        background:
-          'linear-gradient(120deg, rgba(245,158,11,0.14) 0%, rgba(23,33,59,0.42) 48%, rgba(23,33,59,0.24) 100%)',
+        borderColor: 'rgba(245,158,11,0.42)',
+        backgroundImage:
+          'linear-gradient(180deg, rgba(255,255,255,0.018) 0%, rgba(255,255,255,0) 58%),' +
+          'radial-gradient(340px 160px at 80px -60px, rgba(245,158,11,0.18), rgba(245,158,11,0.04) 48%, transparent 78%)',
       };
     }
     if (overallRank === 2) {
       return {
         ...base,
-        borderLeft: '3px solid rgba(148,163,184,0.78)',
-        background:
-          'linear-gradient(120deg, rgba(148,163,184,0.12) 0%, rgba(23,33,59,0.42) 48%, rgba(23,33,59,0.24) 100%)',
+        borderColor: 'rgba(203,213,225,0.34)',
+        backgroundImage:
+          'linear-gradient(180deg, rgba(255,255,255,0.018) 0%, rgba(255,255,255,0) 58%),' +
+          'radial-gradient(340px 160px at 80px -60px, rgba(203,213,225,0.14), rgba(203,213,225,0.035) 48%, transparent 78%)',
       };
     }
     if (overallRank === 3) {
       return {
         ...base,
-        borderLeft: '3px solid rgba(194,101,31,0.78)',
-        background:
-          'linear-gradient(120deg, rgba(194,101,31,0.13) 0%, rgba(23,33,59,0.42) 48%, rgba(23,33,59,0.24) 100%)',
+        borderColor: 'rgba(194,101,31,0.38)',
+        backgroundImage:
+          'linear-gradient(180deg, rgba(255,255,255,0.018) 0%, rgba(255,255,255,0) 58%),' +
+          'radial-gradient(340px 160px at 80px -60px, rgba(194,101,31,0.16), rgba(194,101,31,0.04) 48%, transparent 78%)',
       };
     }
     return base;
@@ -350,19 +350,55 @@ export default function Page() {
   const performanceCharts = useMemo(() => {
     if (trackRows.length < 2) return null;
     const byLaps = [...trackRows].sort((a, b) => b.laps - a.laps).slice(0, 8);
+    if (!driver) return null;
+
+    const driverByGuid = new Map(rankData.map((item) => [item.guid, item]));
+    const qualifiedPaceRows = byLaps
+      .map((row) => {
+        const rawRows = Array.isArray((leaderboardData as Record<string, any>)?.[row.trackId]?.[CAR])
+          ? ([...(leaderboardData as Record<string, any>)[row.trackId][CAR]] as LeaderboardCarRow[])
+          : [];
+
+        const qualifiedRows = rawRows
+          .filter((entry) => {
+            if (typeof entry?.laptime !== 'number') return false;
+            if (entry.guid === driver.guid) return true;
+            const rankedDriver = driverByGuid.get(entry.guid);
+            return Boolean(rankedDriver && (rankedDriver.kilometers || 0) >= 100);
+          })
+          .sort((a, b) => (a.laptime || 0) - (b.laptime || 0));
+
+        const qualifiedIndex = qualifiedRows.findIndex((entry) => entry.guid === driver.guid);
+        if (qualifiedIndex < 0 || qualifiedRows.length < 8 || row.laps < 2) return null;
+
+        return {
+          trackName: row.trackName,
+          percentile:
+            qualifiedRows.length > 1
+              ? Math.round((1 - qualifiedIndex / (qualifiedRows.length - 1)) * 100)
+              : 100,
+        };
+      })
+      .filter((row): row is { trackName: string; percentile: number } => Boolean(row));
+
+    if (qualifiedPaceRows.length < 2) {
+      return {
+        laps: { categories: byLaps.map((r) => r.trackName), data: byLaps.map((r) => r.laps) },
+        radar: null,
+        avgPercentile: null,
+      };
+    }
     // "Grid percentile" — 100% = pole/P1, 0% = last. Reads as relative pace.
-    const radarData = byLaps.map((r) =>
-      r.totalDrivers > 1 ? Math.round((1 - (r.position - 1) / (r.totalDrivers - 1)) * 100) : 100
-    );
+    const radarData = qualifiedPaceRows.map((r) => r.percentile);
     const avgPercentile = radarData.length
       ? Math.round(radarData.reduce((s, v) => s + v, 0) / radarData.length)
       : 0;
     return {
       laps: { categories: byLaps.map((r) => r.trackName), data: byLaps.map((r) => r.laps) },
-      radar: { categories: byLaps.map((r) => r.trackName), data: radarData },
+      radar: { categories: qualifiedPaceRows.map((r) => r.trackName), data: radarData },
       avgPercentile,
     };
-  }, [trackRows]);
+  }, [driver, leaderboardData, rankData, trackRows]);
 
   const driverRoles = useMemo<DiscordRole[]>(
     () => (driverGuid ? getDiscordRolesForGuid(driverGuid, teamRoles) : []),
@@ -496,7 +532,7 @@ export default function Page() {
                           useFlexGap
                           sx={{ width: 1 }}
                         >
-                          <Typography variant="h4" sx={{ fontWeight: 800, letterSpacing: '-0.02em' }}>
+                          <Typography component="h1" variant="h4" sx={{ fontWeight: 800, letterSpacing: 0 }}>
                             {driver.name || 'Unknown Driver'}
                           </Typography>
                           {driverRoles.map((role) => (
@@ -745,8 +781,9 @@ export default function Page() {
                             Faster than the field
                           </Typography>
                           <Typography variant="caption" sx={{ display: 'block', color: 'text.secondary', mb: 0.5 }}>
-                            Avg across your most-driven tracks · 100% = pole
+                            Qualified tracks only · 100% = pole
                           </Typography>
+                          {performanceCharts.avgPercentile != null ? (
                           <Chart
                             type="radialBar"
                             height={300}
@@ -774,6 +811,12 @@ export default function Page() {
                               },
                             }}
                           />
+                          ) : (
+                            <EmptyState
+                              title="Not enough qualified pace data yet."
+                              description="Pace graphs need multiple tracks with enough established drivers to avoid noisy comparisons."
+                            />
+                          )}
                         </Paper>
                       </Reveal>
                     </Grid>
@@ -787,8 +830,9 @@ export default function Page() {
                             Pace by track
                           </Typography>
                           <Typography variant="caption" sx={{ display: 'block', color: 'text.secondary', mb: 1 }}>
-                            Share of the grid you beat on each track · outer ring = fastest
+                            Qualified field you beat on each track · outer ring = fastest
                           </Typography>
+                          {performanceCharts.radar ? (
                           <Chart
                             type="radar"
                             height={340}
@@ -811,6 +855,12 @@ export default function Page() {
                               },
                             }}
                           />
+                          ) : (
+                            <EmptyState
+                              title="Track pace is still building."
+                              description="This view ignores tiny grids and mostly-new fields so the shape stays meaningful."
+                            />
+                          )}
                         </Paper>
                       </Reveal>
                     </Grid>

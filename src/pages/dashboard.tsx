@@ -1,5 +1,3 @@
-import type { Theme } from '@mui/material/styles';
-
 import { useMemo, useState, useEffect } from 'react';
 
 import Box from '@mui/material/Box';
@@ -18,11 +16,27 @@ import { fetchJson } from 'src/lib/fetch-json';
 import { DATA_PAGE_SHELL_SX } from 'src/lib/page-shell';
 import { getLeaderboardHref, getDriverProfileHref } from 'src/lib/routes';
 import { getSiteUrl } from 'src/centralized/site-urls';
-import { GLASS_CARD_SX, GLASS_CARD_INNER_SX } from 'src/lib/glass';
+import {
+  GLASS_PANEL_SX,
+  GLASS_INNER_ROW_SX,
+  GLASS_CARD_INNER_SX,
+  GLASS_PANEL_SPACIOUS_SX,
+} from 'src/lib/glass';
 import { getSyncHealth, type SiteMetadata, getEffectiveLastSync } from 'src/lib/sync-utils';
 import { subtleEnterUpSx, glassCardMotionSx } from 'src/lib/subtle-motion';
 import { brandAccentBorderSx } from 'src/lib/status-accent';
-import { CAR, formatNumber, formatLaptime, type RankDriver, getTrackDisplayName } from 'src/lib/ac-elite-data';
+import {
+  CAR,
+  getSRTier,
+  formatNumber,
+  safetyRating,
+  formatLaptime,
+  type RankDriver,
+  getDriverLicense,
+  computeLicenseMap,
+  LICENSE_TIER_ORDER,
+  getTrackDisplayName,
+} from 'src/lib/ac-elite-data';
 import { useTrackCatalogVersion } from 'src/centralized/track-info';
 
 import { Reveal } from 'src/components/reveal';
@@ -32,6 +46,197 @@ import { ErrorPanel, LoadingPanel } from 'src/components/data-state';
 import { DataPageHeader } from 'src/components/data-page-header/data-page-header';
 import { TrendWindowStats } from 'src/components/trend-window/trend-window-stats';
 import { PageGridOverlay } from 'src/components/page-background/page-grid-overlay';
+
+const LICENSE_TIER_COLORS: Record<string, string> = {
+  'Diamond+': '#22D3EE',
+  Diamond: '#22D3EE',
+  'Platinum+': '#E2E8F0',
+  Platinum: '#CBD5E1',
+  'Gold+': '#FDE047',
+  Gold: '#FACC15',
+  'Silver+': '#C9D5E1',
+  Silver: '#AEBED0',
+  'Bronze+': '#FB923C',
+  Bronze: '#F97316',
+  Rookie: '#94A3B8',
+};
+
+function GridCompositionSection({ rankData }: { rankData: RankDriver[] }) {
+  const licenseMap = useMemo(() => computeLicenseMap(rankData), [rankData]);
+
+  const dist = useMemo(() => {
+    const counts = new Map<string, number>();
+    rankData.forEach((driver) => {
+      const license = getDriverLicense(driver, licenseMap).license;
+      if (license === 'Rookie') return;
+      counts.set(license, (counts.get(license) ?? 0) + 1);
+    });
+
+    const order = LICENSE_TIER_ORDER as readonly string[];
+    const entries = [...counts.entries()].sort((a, b) => {
+      const ai = order.indexOf(a[0]);
+      const bi = order.indexOf(b[0]);
+      if (ai !== -1 && bi !== -1) return ai - bi;
+      if (ai !== -1) return -1;
+      if (bi !== -1) return 1;
+      return b[1] - a[1];
+    });
+
+    return {
+      labels: entries.map((e) => e[0]),
+      series: entries.map((e) => e[1]),
+      colors: entries.map((e) => LICENSE_TIER_COLORS[e[0]] ?? '#5B8DEF'),
+      total: entries.reduce((sum, e) => sum + e[1], 0),
+    };
+  }, [licenseMap, rankData]);
+
+  const grades = useMemo(() => {
+    const order = ['S', 'A', 'B', 'C', 'D', 'E', 'F'];
+    const gradeColor: Record<string, string> = {
+      S: '#22C55E',
+      A: '#5B8DEF',
+      B: '#38BDF8',
+      C: '#F59E0B',
+      D: '#F87171',
+      E: '#EF4444',
+      F: '#B91C1C',
+    };
+    const counts = new Map<string, number>();
+
+    rankData.forEach((driver) => {
+      const safety = safetyRating(driver);
+      const grade = getSRTier(safety, driver.kilometers || 0)[0]?.toUpperCase() || '?';
+      if (grade === 'F') return;
+      counts.set(grade, (counts.get(grade) ?? 0) + 1);
+    });
+
+    const entries = [...counts.entries()].sort((a, b) => {
+      const ai = order.indexOf(a[0]);
+      const bi = order.indexOf(b[0]);
+      if (ai !== -1 && bi !== -1) return ai - bi;
+      if (ai !== -1) return -1;
+      if (bi !== -1) return 1;
+      return a[0].localeCompare(b[0]);
+    });
+
+    return {
+      categories: entries.map((e) => e[0]),
+      data: entries.map((e) => e[1]),
+      colors: entries.map((e) => gradeColor[e[0]] ?? '#94A3B8'),
+    };
+  }, [rankData]);
+
+  if (!rankData.length || !dist.total) return null;
+
+  return (
+    <Grid size={{ xs: 12 }}>
+      <Reveal>
+        <Box sx={{ ...GLASS_PANEL_SX, ...brandAccentBorderSx() }}>
+        <Stack spacing={0.7} sx={{ mb: 2 }}>
+          <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.78)' }}>
+            Grid composition
+          </Typography>
+          <Typography component="h2" variant="h5" sx={{ fontWeight: 800 }}>
+            The field at a glance
+          </Typography>
+          <Typography color="text.secondary">
+            How the field breaks down across earned license tiers and Safety Rating — {formatNumber(dist.total)} ranked
+            drivers (starting Rookie &amp; F tiers excluded).
+          </Typography>
+        </Stack>
+
+      <Grid container spacing={2.5} alignItems="stretch">
+        <Grid size={{ xs: 12, md: 6 }}>
+          <Reveal index={1} sx={{ height: 1 }}>
+            <Box sx={{ ...GLASS_CARD_INNER_SX, height: 1, p: 2 }}>
+              <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.78)' }}>
+                License tiers
+              </Typography>
+              <Chart
+                type="donut"
+                height={360}
+                series={dist.series}
+                options={{
+                  labels: dist.labels,
+                  colors: dist.colors,
+                  stroke: { width: 0 },
+                  fill: { type: 'solid' },
+                  legend: { position: 'bottom', horizontalAlign: 'center' },
+                  dataLabels: { enabled: false },
+                  tooltip: { y: { formatter: (v: number) => `${formatNumber(v)} drivers` } },
+                  plotOptions: {
+                    pie: {
+                      donut: {
+                        size: '72%',
+                        labels: {
+                          show: true,
+                          name: { color: 'rgba(255,255,255,0.6)' },
+                          value: {
+                            color: '#fff',
+                            fontSize: '30px',
+                            fontWeight: 800,
+                            formatter: (v: string) => formatNumber(Number(v)),
+                          },
+                          total: {
+                            show: true,
+                            label: 'Drivers',
+                            color: 'rgba(255,255,255,0.6)',
+                            formatter: () => formatNumber(dist.total),
+                          },
+                        },
+                      },
+                    },
+                  },
+                }}
+              />
+            </Box>
+          </Reveal>
+        </Grid>
+
+        <Grid size={{ xs: 12, md: 6 }}>
+          <Reveal index={2} sx={{ height: 1 }}>
+            <Box sx={{ ...GLASS_CARD_INNER_SX, height: 1, p: 2 }}>
+              <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.78)' }}>
+                Safety Rating grades
+              </Typography>
+              <Chart
+                type="bar"
+                height={360}
+                series={[{ name: 'Drivers', data: grades.data }]}
+                options={{
+                  colors: grades.colors,
+                  fill: { type: 'solid' },
+                  legend: { show: false },
+                  plotOptions: {
+                    bar: {
+                      distributed: true,
+                      borderRadius: 8,
+                      borderRadiusApplication: 'end',
+                      columnWidth: '52%',
+                      dataLabels: { position: 'top' },
+                    },
+                  },
+                  dataLabels: {
+                    enabled: true,
+                    offsetY: -20,
+                    formatter: (v: number) => formatNumber(Number(v)),
+                    style: { colors: ['rgba(255,255,255,0.92)'], fontWeight: 700, fontSize: '12px' },
+                  },
+                  xaxis: { categories: grades.categories },
+                  yaxis: { labels: { formatter: (v: number) => formatNumber(Math.round(v)) } },
+                  grid: { xaxis: { lines: { show: false } }, yaxis: { lines: { show: true } } },
+                  tooltip: { y: { formatter: (v: number) => `${formatNumber(v)} drivers` } },
+                }}
+              />
+            </Box>
+          </Reveal>
+        </Grid>
+      </Grid>
+        </Box>
+      </Reveal>
+    </Grid>
+  );
+}
 
 export default function Page() {
   useTrackCatalogVersion();
@@ -310,10 +515,12 @@ export default function Page() {
                 />
               </Grid>
 
+              <GridCompositionSection rankData={rankData} />
+
               {trackActivityChart.categories.length > 0 && (
                 <Grid size={{ xs: 12 }}>
                  <Reveal>
-                  <Paper sx={{ ...GLASS_CARD_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(8), p: 2.75 }}>
+                  <Paper sx={{ ...GLASS_PANEL_SPACIOUS_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(8) }}>
                     <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.78)' }}>
                       Track activity
                     </Typography>
@@ -357,10 +564,9 @@ export default function Page() {
               <Grid size={{ xs: 12, md: 6 }}>
                 <Paper
                   sx={{
-                    ...GLASS_CARD_SX,
+                    ...GLASS_PANEL_SPACIOUS_SX,
                     ...brandAccentBorderSx(),
                     ...glassCardMotionSx(9),
-                    p: 2.75,
                   }}
                 >
                   <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.78)' }}>
@@ -377,18 +583,8 @@ export default function Page() {
                           window.location.href = getDriverProfileHref(driver.guid);
                         }}
                         sx={{
-                          ...GLASS_CARD_INNER_SX,
+                          ...GLASS_INNER_ROW_SX,
                           ...subtleEnterUpSx(idx, { baseDelayMs: 520 }),
-                          p: 1.1,
-                          borderRadius: 1.5,
-                          cursor: 'pointer',
-                          transition: (t: Theme) => t.transitions.create(['background-color', 'border-color'], { duration: 200 }),
-                          '@media (hover: hover)': {
-                            '&:hover': {
-                              bgcolor: 'rgba(255,255,255,0.06)',
-                              borderColor: 'rgba(191,219,254,0.22)',
-                            },
-                          },
                         }}
                       >
                         <Typography variant="body2" sx={{ fontWeight: 600 }}>
@@ -404,7 +600,7 @@ export default function Page() {
               </Grid>
 
               <Grid size={{ xs: 12, md: 6 }}>
-                <Paper sx={{ ...GLASS_CARD_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(10), p: 2.75 }}>
+                <Paper sx={{ ...GLASS_PANEL_SPACIOUS_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(10) }}>
                   <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.78)' }}>
                     Most Active Tracks
                   </Typography>
@@ -419,18 +615,8 @@ export default function Page() {
                           window.location.href = getLeaderboardHref(track.trackId);
                         }}
                         sx={{
-                          ...GLASS_CARD_INNER_SX,
+                          ...GLASS_INNER_ROW_SX,
                           ...subtleEnterUpSx(idx, { baseDelayMs: 520 }),
-                          p: 1.1,
-                          borderRadius: 1.5,
-                          cursor: 'pointer',
-                          transition: (t: Theme) => t.transitions.create(['background-color', 'border-color'], { duration: 200 }),
-                          '@media (hover: hover)': {
-                            '&:hover': {
-                              bgcolor: 'rgba(255,255,255,0.06)',
-                              borderColor: 'rgba(191,219,254,0.22)',
-                            },
-                          },
                         }}
                       >
                         <Box>

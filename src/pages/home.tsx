@@ -44,6 +44,7 @@ import {
 } from 'src/lib/subtle-motion';
 import {
   DATA_PAGE_SHELL_SX,
+  PAGE_BACKGROUND_GRADIENT,
   PAGINATION_NAV_BUTTON_SX,
   PAGINATION_PAGE_BUTTON_SX,
   MARKETING_CTA_LARGE_LAYOUT_SX,
@@ -87,14 +88,12 @@ import {
   computeLicenseMap,
   getLicenseBadgeSx,
   LICENSE_CHIP_WIDTH,
-  LICENSE_TIER_ORDER,
   getTrackDisplayName,
   type LeaderboardCarRow,
   leaderboardTrackIdLookupCandidates,
 } from 'src/lib/ac-elite-data';
 import { useTrackCatalogVersion } from 'src/centralized/track-info';
 
-import { Chart } from 'src/components/chart';
 import { Reveal } from 'src/components/reveal';
 import { EmptyState } from 'src/components/data-state';
 import { DeltaChip } from 'src/components/delta-chip/delta-chip';
@@ -128,26 +127,61 @@ const HOME_CURRENT_TRACK_PER_PAGE = 20;
  * Static Apple-style gradient keyword (white → soft ice-blue, clipped to text).
  * Replaces the former infinite colour/shimmer pulses — premium through restraint.
  */
+const heroKeywordFloat = keyframes`
+  0%, 100% {
+    transform: translate3d(0, 0, 0) rotate(-1deg);
+  }
+  50% {
+    transform: translate3d(0, -5px, 0) rotate(-1deg);
+  }
+`;
+
 const heroKeywordSx = {
+  display: 'inline-block',
+  position: 'relative',
+  zIndex: 1,
+  mx: { xs: 0.35, md: 0.55 },
+  lineHeight: 0.9,
+  letterSpacing: 0,
   // On-brand electric-blue accent gradient (matches the CTA / accent blue).
-  backgroundImage: 'linear-gradient(180deg, #9FCBFF 0%, #5B93F4 52%, #2E6BE6 100%)',
+  backgroundImage:
+    'linear-gradient(180deg, #F5FBFF 0%, #A9D8FF 26%, #4F8DF6 62%, #173EA8 100%)',
   WebkitBackgroundClip: 'text',
   backgroundClip: 'text',
   color: 'transparent',
   fontWeight: 800,
-  // Soft brand glow so the keyword reads as luminous on the navy hero.
-  filter: 'drop-shadow(0 1px 10px rgba(59,130,246,0.35))',
+  // Soft depth shadow; avoid neon-style glow.
+  textShadow: '0 2px 10px rgba(15,23,42,0.56)',
+  animation: `${heroKeywordFloat} 5.8s ease-in-out infinite`,
+  transformOrigin: '50% 65%',
+  '@media (prefers-reduced-motion: reduce)': {
+    animation: 'none',
+  },
+} as const;
+
+const heroStatsKeywordSx = {
+  ...heroKeywordSx,
+  fontSize: { xs: '1.18em', sm: '1.24em', md: '1.3em' },
+  top: { xs: 2, md: 4 },
+} as const;
+
+const heroLeaderboardKeywordSx = {
+  ...heroKeywordSx,
+  display: { xs: 'inline-block', md: 'block' },
+  width: 'fit-content',
+  ml: { xs: 0.35, md: 5.5 },
+  mt: { xs: 0, md: -0.4 },
+  fontSize: { xs: '1.12em', sm: '1.2em', md: '1.26em' },
+  animationDelay: '-1.8s',
 } as const;
 
 /** Soft "live" pulse for the green dot in the hero kicker. */
 const heroLiveDotPulse = keyframes`
   0%, 100% {
-    box-shadow: 0 0 0 0 rgba(34,197,94,0.55), 0 0 12px rgba(34,197,94,0.6);
     transform: scale(1);
   }
   50% {
-    box-shadow: 0 0 0 6px rgba(34,197,94,0), 0 0 18px rgba(34,197,94,0.85);
-    transform: scale(1.08);
+    transform: scale(1.04);
   }
 `;
 
@@ -229,29 +263,6 @@ function RaceIntelligenceCard({
                     flexDirection: 'column',
                     justifyContent: 'center',
                     alignItems: { xs: 'center', md: 'flex-start' },
-                    // Layered surface: subtle top sheen + soft outer glow + crisper border.
-                    // Lifts the tile from "flat box" to "deliberate glass surface".
-                    backgroundImage:
-                      'linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 36%),' +
-                      'linear-gradient(145deg, rgba(31,44,73,0.92), rgba(23,33,59,0.92))',
-                    border: '1px solid rgba(148,163,184,0.34)',
-                    boxShadow:
-                      'inset 0 1px 0 rgba(255,255,255,0.12), inset 0 -1px 0 rgba(0,0,0,0.22),' +
-                      ' 0 6px 16px rgba(0,0,0,0.28)',
-                    transition: 'transform 200ms ease, border-color 200ms ease, box-shadow 200ms ease',
-                    '@media (hover: hover)': {
-                      '&:hover': {
-                        transform: 'translateY(-1px)',
-                        borderColor: 'rgba(191,225,255,0.5)',
-                        boxShadow:
-                          'inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -1px 0 rgba(0,0,0,0.22),' +
-                          ' 0 10px 22px rgba(0,0,0,0.36), 0 0 0 1px rgba(147,197,253,0.2)',
-                      },
-                    },
-                    '@media (prefers-reduced-motion: reduce)': {
-                      transition: 'none',
-                      '&:hover': { transform: 'none' },
-                    },
                   }}
                 >
                   <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.72)', fontWeight: 600, letterSpacing: 0.2 }}>
@@ -286,15 +297,12 @@ function HeroSection({ currentTrack }: { currentTrack: CurrentTrackData | null }
         position: 'relative',
         pt: { xs: 8, md: 12 },
         pb: { xs: 6, md: 6 },
-        background:
-          'radial-gradient(circle at 0% 0%, rgba(23,33,59,0.28) 0, transparent 55%),' +
-          'radial-gradient(circle at 100% 100%, rgba(35,31,32,0.2) 0, transparent 55%),' +
-          'linear-gradient(180deg, #17213B 0%, #1f2c49 55%, #17213B 100%)',
+        background: PAGE_BACKGROUND_GRADIENT,
         color: '#fff',
         overflow: 'hidden',
       }}
     >
-      <PageGridOverlay opacity={0.42} />
+      <PageGridOverlay opacity={0.34} />
 
       <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1 }}>
         <Grid container spacing={{ xs: 4, md: 6 }} alignItems="center">
@@ -326,26 +334,41 @@ function HeroSection({ currentTrack }: { currentTrack: CurrentTrackData | null }
                 </Stack>
 
                 <Typography
+                  component="h1"
                   variant={isMdUp ? 'h2' : 'h3'}
                   sx={{
                     fontWeight: 800,
-                    letterSpacing: 0.5,
-                    textShadow: '0 0 16px rgba(0,0,0,0.72), 0 0 36px rgba(15,23,42,0.92)',
+                    letterSpacing: 0,
+                    lineHeight: { xs: 1.02, md: 0.96 },
+                    maxWidth: 840,
+                    textShadow: '0 2px 12px rgba(15,23,42,0.72)',
+                    '&::selection': {
+                      backgroundColor: 'rgba(147,197,253,0.32)',
+                    },
                   }}
                 >
                   Track your{' '}
-                  <Box component="span" sx={heroKeywordSx}>
+                  <Box component="span" sx={heroStatsKeywordSx}>
                     stats
                   </Box>
                   .
                   <br />
                   Dominate the{' '}
-                  <Box component="span" sx={heroKeywordSx}>
+                  <Box component="span" sx={heroLeaderboardKeywordSx}>
                     leaderboard.
                   </Box>
                 </Typography>
 
-                <Typography variant="body1" sx={{ maxWidth: 580, color: 'text.secondary' }}>
+                <Typography
+                  variant="body1"
+                  sx={{
+                    maxWidth: 610,
+                    color: 'rgba(226,232,240,0.9)',
+                    fontSize: { xs: '1rem', md: '1.075rem' },
+                    lineHeight: 1.6,
+                    textShadow: '0 1px 8px rgba(15,23,42,0.62)',
+                  }}
+                >
                   Real-time leaderboards, license rankings, and Safety Rating — every lap from
                   the AC Elite server, updated as drivers cross the line.
                 </Typography>
@@ -456,7 +479,7 @@ function CurrentTrackLeaderboardSection({
 
   return (
     <Box component="section" sx={{ ...DATA_PAGE_SHELL_SX }}>
-      <PageGridOverlay opacity={0.28} />
+      <PageGridOverlay />
 
       <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1 }}>
         <Stack spacing={3}>
@@ -471,7 +494,7 @@ function CurrentTrackLeaderboardSection({
             <Typography variant="overline" sx={sectionKickerSx}>
               Live track leaderboard
             </Typography>
-            <Typography variant="h4" fontWeight={800}>
+            <Typography component="h2" variant="h4" fontWeight={800}>
               Current track: {getTrackDisplayName(currentTrack.track)}
             </Typography>
             <Typography color="text.secondary">
@@ -739,12 +762,12 @@ function DriverSearchSection({
       sx={{
         position: 'relative',
         py: 4,
-        background: 'linear-gradient(180deg, rgba(31,44,73,0.98) 0%, rgba(23,33,59,0.98) 100%)',
+        background: 'transparent',
         // Slightly stronger so the seam reads as crisp on both sides — the
         // grid-pattern transition below already adds visual contrast on its own;
         // the top boundary needs the border to do all the work.
-        borderTop: '1px solid rgba(255,255,255,0.14)',
-        borderBottom: '1px solid rgba(255,255,255,0.14)',
+        borderTop: '1px solid rgba(226,242,255,0.08)',
+        borderBottom: '1px solid rgba(226,242,255,0.08)',
         overflow: 'hidden',
       }}
     >
@@ -755,7 +778,7 @@ function DriverSearchSection({
               <Typography variant="overline" sx={sectionKickerSx}>
                 Driver statistics
               </Typography>
-              <Typography variant="h4" sx={{ fontWeight: 800 }}>
+              <Typography component="h2" variant="h4" sx={{ fontWeight: 800 }}>
                 Driver search
               </Typography>
               <Typography variant="body1" sx={{ maxWidth: 680, color: 'text.secondary' }}>
@@ -795,22 +818,7 @@ function DriverSearchSection({
                   sx={{
                     '& .MuiOutlinedInput-root': {
                       borderRadius: 2,
-                      bgcolor: 'rgba(13,27,56,0.72)',
                       color: '#fff',
-                      backdropFilter: 'blur(10px)',
-                      '& fieldset': {
-                        borderColor: 'rgba(255,255,255,0.26)',
-                      },
-                      '&:hover fieldset': {
-                        borderColor: 'rgba(255,255,255,0.42)',
-                      },
-                      '&.Mui-focused': {
-                        boxShadow: '0 0 0 3px rgba(147, 197, 253, 0.28)',
-                      },
-                      '&.Mui-focused fieldset': {
-                        borderColor: 'rgba(191,225,255,0.92)',
-                        borderWidth: 2,
-                      },
                     },
                     '& .MuiInputBase-input::placeholder': {
                       color: 'rgba(255,255,255,0.65)',
@@ -825,10 +833,8 @@ function DriverSearchSection({
                       ...GLASS_CARD_SX,
                       width: '100%',
                       mt: 1,
-                      borderRadius: 2,
                       maxHeight: 280,
                       overflowY: 'auto',
-                      boxShadow: '0 8px 26px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.08)',
                     }}
                   >
                     <List dense disablePadding sx={{ width: '100%' }}>
@@ -906,200 +912,6 @@ function DriverSearchSection({
                 motionSxIndex={1}
               />
             </Stack>
-          </Grid>
-        </Grid>
-      </Container>
-    </Box>
-  );
-}
-
-/** Tier-matched donut colours (mirrors the license badge palette). */
-const LICENSE_TIER_COLORS: Record<string, string> = {
-  'Diamond+': '#22D3EE',
-  Diamond: '#22D3EE',
-  'Platinum+': '#E2E8F0',
-  Platinum: '#CBD5E1',
-  'Gold+': '#FDE047',
-  Gold: '#FACC15',
-  'Silver+': '#C9D5E1',
-  Silver: '#AEBED0',
-  'Bronze+': '#FB923C',
-  Bronze: '#F97316',
-  Rookie: '#94A3B8',
-};
-
-function CommunityInsightsSection({ drivers }: { drivers: DriverView[] }) {
-  const dist = useMemo(() => {
-    const counts = new Map<string, number>();
-    drivers.forEach((d) => {
-      // Skip the starting tier — everyone begins as Rookie, so it dwarfs the
-      // earned tiers and flattens the distribution.
-      if (d.license === 'Rookie') return;
-      counts.set(d.license, (counts.get(d.license) ?? 0) + 1);
-    });
-    const order = LICENSE_TIER_ORDER as readonly string[];
-    const entries = [...counts.entries()].sort((a, b) => {
-      const ai = order.indexOf(a[0]);
-      const bi = order.indexOf(b[0]);
-      if (ai !== -1 && bi !== -1) return ai - bi;
-      if (ai !== -1) return -1;
-      if (bi !== -1) return 1;
-      return b[1] - a[1];
-    });
-    return {
-      labels: entries.map((e) => e[0]),
-      series: entries.map((e) => e[1]),
-      colors: entries.map((e) => LICENSE_TIER_COLORS[e[0]] ?? '#5B8DEF'),
-      total: entries.reduce((sum, e) => sum + e[1], 0),
-    };
-  }, [drivers]);
-
-  const grades = useMemo(() => {
-    const order = ['S', 'A', 'B', 'C', 'D', 'E', 'F'];
-    const gradeColor: Record<string, string> = {
-      S: '#22C55E',
-      A: '#5B8DEF',
-      B: '#38BDF8',
-      C: '#F59E0B',
-      D: '#F87171',
-      E: '#EF4444',
-      F: '#B91C1C',
-    };
-    const counts = new Map<string, number>();
-    drivers.forEach((d) => {
-      const g = (d.safetyTier?.[0] || '?').toUpperCase();
-      // Skip F — the starting SR grade everyone holds before earning a rating.
-      if (g === 'F') return;
-      counts.set(g, (counts.get(g) ?? 0) + 1);
-    });
-    const entries = [...counts.entries()].sort((a, b) => {
-      const ai = order.indexOf(a[0]);
-      const bi = order.indexOf(b[0]);
-      if (ai !== -1 && bi !== -1) return ai - bi;
-      if (ai !== -1) return -1;
-      if (bi !== -1) return 1;
-      return a[0].localeCompare(b[0]);
-    });
-    return {
-      categories: entries.map((e) => e[0]),
-      data: entries.map((e) => e[1]),
-      colors: entries.map((e) => gradeColor[e[0]] ?? '#94A3B8'),
-    };
-  }, [drivers]);
-
-  if (!drivers.length) return null;
-
-  return (
-    <Box component="section" sx={{ ...DATA_PAGE_SHELL_SX }}>
-      <PageGridOverlay opacity={0.22} />
-      <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1 }}>
-        <Reveal>
-          <Stack
-            spacing={0.7}
-            sx={{
-              textAlign: { xs: 'center', md: 'left' },
-              alignItems: { xs: 'center', md: 'flex-start' },
-              mb: 3,
-            }}
-          >
-            <Typography variant="overline" sx={sectionKickerSx}>
-              Community insights
-            </Typography>
-            <Typography variant="h4" fontWeight={800}>
-              The grid at a glance
-            </Typography>
-            <Typography color="text.secondary">
-              How the field breaks down across earned license tiers and Safety Rating — {formatNumber(dist.total)} ranked
-              drivers (starting Rookie &amp; F tiers excluded).
-            </Typography>
-          </Stack>
-        </Reveal>
-
-        <Grid container spacing={2.5} alignItems="stretch">
-          <Grid size={{ xs: 12, md: 6 }}>
-            <Reveal index={1} sx={{ height: 1 }}>
-              <Box sx={{ ...GLASS_PANEL_SX, ...brandAccentBorderSx(), height: 1 }}>
-                <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.78)' }}>
-                  License tiers
-                </Typography>
-                <Chart
-                  type="donut"
-                  height={360}
-                  series={dist.series}
-                  options={{
-                    labels: dist.labels,
-                    colors: dist.colors,
-                    stroke: { width: 0 },
-                    fill: { type: 'solid' },
-                    legend: { position: 'bottom', horizontalAlign: 'center' },
-                    dataLabels: { enabled: false },
-                    tooltip: { y: { formatter: (v: number) => `${formatNumber(v)} drivers` } },
-                    plotOptions: {
-                      pie: {
-                        donut: {
-                          size: '72%',
-                          labels: {
-                            show: true,
-                            name: { color: 'rgba(255,255,255,0.6)' },
-                            value: {
-                              color: '#fff',
-                              fontSize: '30px',
-                              fontWeight: 800,
-                              formatter: (v: string) => formatNumber(Number(v)),
-                            },
-                            total: {
-                              show: true,
-                              label: 'Drivers',
-                              color: 'rgba(255,255,255,0.6)',
-                              formatter: () => formatNumber(dist.total),
-                            },
-                          },
-                        },
-                      },
-                    },
-                  }}
-                />
-              </Box>
-            </Reveal>
-          </Grid>
-
-          <Grid size={{ xs: 12, md: 6 }}>
-            <Reveal index={2} sx={{ height: 1 }}>
-              <Box sx={{ ...GLASS_PANEL_SX, ...brandAccentBorderSx(), height: 1 }}>
-                <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.78)' }}>
-                  Safety Rating grades
-                </Typography>
-                <Chart
-                  type="bar"
-                  height={360}
-                  series={[{ name: 'Drivers', data: grades.data }]}
-                  options={{
-                    colors: grades.colors,
-                    fill: { type: 'solid' },
-                    legend: { show: false },
-                    plotOptions: {
-                      bar: {
-                        distributed: true,
-                        borderRadius: 8,
-                        borderRadiusApplication: 'end',
-                        columnWidth: '52%',
-                        dataLabels: { position: 'top' },
-                      },
-                    },
-                    dataLabels: {
-                      enabled: true,
-                      offsetY: -20,
-                      formatter: (v: number) => formatNumber(Number(v)),
-                      style: { colors: ['rgba(255,255,255,0.92)'], fontWeight: 700, fontSize: '12px' },
-                    },
-                    xaxis: { categories: grades.categories },
-                    yaxis: { labels: { formatter: (v: number) => formatNumber(Math.round(v)) } },
-                    grid: { xaxis: { lines: { show: false } }, yaxis: { lines: { show: true } } },
-                    tooltip: { y: { formatter: (v: number) => `${formatNumber(v)} drivers` } },
-                  }}
-                />
-              </Box>
-            </Reveal>
           </Grid>
         </Grid>
       </Container>
@@ -1362,7 +1174,6 @@ export default function Page() {
         totalLaps={community.totalLaps}
         activeTracks={community.activeTracks}
       />
-      <CommunityInsightsSection drivers={drivers} />
       <CurrentTrackLeaderboardSection
         loading={loading}
         error={error}

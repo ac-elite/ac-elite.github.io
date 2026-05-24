@@ -227,7 +227,7 @@ export function SiteVisitsShowcase({ phase, count, configured, pageRows, onRefre
                   variant="h3"
                   sx={{
                     fontWeight: 900,
-                    letterSpacing: '-0.04em',
+                    letterSpacing: 0,
                     lineHeight: 1.05,
                     fontFeatureSettings: '"tnum"',
                     background: `linear-gradient(115deg, ${VISIT_ACCENT} 0%, #e9d5ff 38%, ${VISIT_ACCENT_2} 88%)`,

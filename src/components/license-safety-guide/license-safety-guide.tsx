@@ -149,7 +149,7 @@ function LicenseSafetyGuideDialog({ open, onClose, initialTab = 'license' }: Lic
             sx={{
               fontWeight: 800,
               color: '#fff',
-              letterSpacing: '-0.012em',
+              letterSpacing: 0,
               lineHeight: 1.25,
               pr: 1,
             }}
@@ -164,11 +164,20 @@ function LicenseSafetyGuideDialog({ open, onClose, initialTab = 'license' }: Lic
               borderRadius: '50%',
               color: 'rgba(255,255,255,0.72)',
               border: '1px solid rgba(255,255,255,0.18)',
-              '&:hover': { color: '#fff', bgcolor: 'rgba(255,255,255,0.08)' },
+              background:
+                'radial-gradient(120% 120% at 24% 0%, rgba(255,255,255,0.11), rgba(255,255,255,0.02) 46%, transparent 70%), rgba(255,255,255,0.035)',
+              backdropFilter: 'blur(16px) saturate(165%)',
+              WebkitBackdropFilter: 'blur(16px) saturate(165%)',
+              boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.12)',
+              '&:hover': {
+                color: '#fff',
+                borderColor: 'rgba(226,242,255,0.38)',
+                bgcolor: 'rgba(255,255,255,0.075)',
+              },
             }}
           >
-            <Box component="span" sx={{ fontSize: 22, lineHeight: 1 }}>
-              ×
+            <Box component="span" sx={{ fontSize: 18, lineHeight: 1, fontWeight: 800 }}>
+              x
             </Box>
           </IconButton>
         </Stack>
@@ -185,8 +194,12 @@ function LicenseSafetyGuideDialog({ open, onClose, initialTab = 'license' }: Lic
               minHeight: 46,
               p: 0.5,
               borderRadius: 2.5,
-              bgcolor: 'rgba(11,19,38,0.6)',
-              border: '1px solid rgba(255,255,255,0.08)',
+              background:
+                'radial-gradient(120% 120% at 16% -30%, rgba(255,255,255,0.12), rgba(255,255,255,0.025) 42%, transparent 66%), rgba(11,19,38,0.48)',
+              border: '1px solid rgba(255,255,255,0.1)',
+              backdropFilter: 'blur(18px) saturate(165%)',
+              WebkitBackdropFilter: 'blur(18px) saturate(165%)',
+              boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.11)',
               '& .MuiTabs-indicator': { display: 'none' },
               '& .MuiTabs-flexContainer': { gap: 0.5 },
             }}
@@ -203,14 +216,24 @@ function LicenseSafetyGuideDialog({ open, onClose, initialTab = 'license' }: Lic
                   textTransform: 'none',
                   color: 'rgba(255,255,255,0.6)',
                   fontWeight: 700,
-                  transition: 'color 240ms cubic-bezier(0.32,0.72,0,1), background 240ms cubic-bezier(0.32,0.72,0,1)',
-                  // Apple segmented-control: selected = brand-blue glass pill.
+                  transition:
+                    'color 240ms cubic-bezier(0.32,0.72,0,1), background 240ms cubic-bezier(0.32,0.72,0,1), transform 240ms cubic-bezier(0.32,0.72,0,1), box-shadow 240ms cubic-bezier(0.32,0.72,0,1)',
                   '&.Mui-selected': {
                     color: '#fff',
-                    background: 'linear-gradient(180deg, rgba(91,141,239,0.34) 0%, rgba(59,130,246,0.2) 100%)',
-                    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.2), 0 1px 2px rgba(0,0,0,0.3)',
+                    background:
+                      'radial-gradient(120% 120% at 18% -20%, rgba(255,255,255,0.18), rgba(255,255,255,0.045) 42%, transparent 68%),' +
+                      'linear-gradient(180deg, rgba(96,165,250,0.24) 0%, rgba(59,130,246,0.12) 100%)',
+                    boxShadow:
+                      'inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -1px 0 rgba(15,23,42,0.2), 0 10px 24px -20px rgba(59,130,246,0.3)',
                   },
-                  '&:hover': { color: '#fff' },
+                  '&:hover': {
+                    color: '#fff',
+                    transform: 'translateY(-1px)',
+                  },
+                  '@media (prefers-reduced-motion: reduce)': {
+                    transition: 'none',
+                    '&:hover': { transform: 'none' },
+                  },
                 }}
               />
             ))}

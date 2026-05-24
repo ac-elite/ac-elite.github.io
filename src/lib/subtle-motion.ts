@@ -131,8 +131,23 @@ export type SoftFloatWrapperOptions = {
   alternatePhase?: boolean;
 };
 
+const softAmbientFloat = keyframes`
+  0%, 100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -1.5px, 0);
+  }
+`;
+
 export function softFloatWrapperSx(_options?: SoftFloatWrapperOptions): SxProps<Theme> {
-  return { width: '100%' };
+  return {
+    width: '100%',
+    animation: `${softAmbientFloat} 9s ease-in-out ${_options?.alternatePhase ? '-3.8s' : '0s'} infinite`,
+    '@media (prefers-reduced-motion: reduce)': {
+      animation: 'none',
+    },
+  };
 }
 
 /** @deprecated Use {@link softFloatWrapperSx} — kept for older imports. */
@@ -166,21 +181,20 @@ export function subtleRowEnterSx(index: number, options: SubtleEnterOptions = {}
 
 /**
  * Hover polish for glass cards: a deliberate, weighty lift (no jittery scale) —
- * the window rises, its top edge and rim brighten, the float shadow deepens and
- * a soft brand-blue glow blooms underneath. Smooth ease-out, not a bouncy spring.
+ * the window rises, its top edge and rim brighten, and the float shadow deepens.
+ * Smooth ease-out, not a bouncy spring.
  */
 export const glassCardHoverSx = {
-  transition: `transform 300ms ${APPLE_EASE_OUT}, box-shadow 300ms ${APPLE_EASE_OUT}, border-color 300ms ${APPLE_EASE_OUT}, filter 300ms ${APPLE_EASE_OUT}`,
+  transition: `transform 260ms ${APPLE_EASE_OUT}, box-shadow 260ms ${APPLE_EASE_OUT}, border-color 260ms ${APPLE_EASE_OUT}, filter 260ms ${APPLE_EASE_OUT}, background 260ms ${APPLE_EASE_OUT}`,
   willChange: 'transform',
   '@media (hover: hover)': {
     '&:hover': {
-      transform: 'translate3d(0,-7px,0) scale(1.014)',
-      borderColor: 'rgba(191,219,254,0.5)',
-      filter: 'brightness(1.05)',
+      transform: 'translate3d(0,-2px,0)',
+      borderColor: 'rgba(226,242,255,0.22)',
+      filter: 'brightness(1.018)',
       boxShadow:
-        'inset 0 1px 0 rgba(255,255,255,0.5), inset 0 0 0 1px rgba(255,255,255,0.08),' +
-        ' 0 8px 18px rgba(0,0,0,0.36), 0 54px 96px -30px rgba(0,0,0,0.82),' +
-        ' 0 0 0 1px rgba(147,197,253,0.28), 0 26px 64px -20px rgba(59,130,246,0.42)',
+        'inset 0 1px 0 rgba(255,255,255,0.26), inset 0 -1px 0 rgba(0,0,0,0.15), inset 0 0 0 1px rgba(255,255,255,0.035),' +
+        ' 0 2px 6px rgba(0,0,0,0.24), 0 26px 54px -32px rgba(0,0,0,0.78)',
     },
   },
   '&:focus-visible': {

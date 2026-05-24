@@ -6,6 +6,8 @@ import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 
+import { GLASS_PANEL_SX, GLASS_CARD_INNER_SX } from 'src/lib/glass';
+
 /**
  * A small glass "notes" panel — same dark-glass look as the License/SR modal.
  * Holds one or more colour-accented notes (heads-up messages for visitors).
@@ -29,38 +31,34 @@ type InfoNotesPanelProps = {
 export function InfoNotesPanel({ notes, sx }: InfoNotesPanelProps) {
   return (
     <Box
-      sx={{
-        borderRadius: 3,
-        border: '1px solid rgba(148,163,184,0.3)',
-        background: 'linear-gradient(150deg, rgba(19,36,71,0.96), rgba(15,27,52,0.96))',
-        backdropFilter: 'blur(16px)',
-        boxShadow: '0 20px 56px rgba(0,0,0,0.4)',
-        overflow: 'hidden',
-        ...sx,
-      }}
+      sx={[GLASS_PANEL_SX, { p: 0, overflow: 'hidden' }, sx] as SxProps<Theme>}
     >
-      <Stack divider={<Box sx={{ borderTop: '1px solid rgba(148,163,184,0.14)' }} />}>
+      <Stack divider={<Box sx={{ borderTop: '1px solid rgba(226,242,255,0.08)' }} />}>
         {notes.map((note, index) => (
           <Box
             key={note.lead}
             sx={{
+              ...GLASS_CARD_INNER_SX,
               display: 'flex',
               alignItems: 'center',
               gap: 1.5,
               px: { xs: 2, md: 2.5 },
               py: { xs: 1.5, md: 1.75 },
-              bgcolor: `${note.accent}14`,
+              border: 0,
+              borderRadius: 0,
+              backgroundColor: alpha(note.accent, 0.105),
+              backgroundImage:
+                `radial-gradient(420px 150px at 42px -44px, ${alpha(note.accent, 0.24)} 0%, ${alpha(note.accent, 0.09)} 42%, rgba(255,255,255,0) 78%),` +
+                `linear-gradient(90deg, ${alpha(note.accent, 0.12)} 0%, ${alpha(note.accent, 0.045)} 24%, rgba(19,30,54,0.12) 62%, rgba(19,30,54,0) 100%),` +
+                'linear-gradient(180deg, rgba(255,255,255,0.018) 0%, rgba(255,255,255,0) 58%)',
               // Match the container's rounded corners on the first/last note so
               // the inset accent line curves with them.
-              borderTopLeftRadius: index === 0 ? '24px' : 0,
-              borderTopRightRadius: index === 0 ? '24px' : 0,
-              borderBottomLeftRadius: index === notes.length - 1 ? '24px' : 0,
-              borderBottomRightRadius: index === notes.length - 1 ? '24px' : 0,
-              // The accent is an INSET box-shadow, not a left border: inset
-              // shadows are clipped to the rounded border-box, so the 3px line
-              // wraps around the rounded corners (a one-sided border is cut square).
-              // Second layer is a soft colour glow bleeding inward.
-              boxShadow: `inset 3px 0 0 0 ${note.accent}, inset 16px 0 20px -16px ${alpha(note.accent, 0.55)}`,
+              borderTopLeftRadius: index === 0 ? '22px' : 0,
+              borderTopRightRadius: index === 0 ? '22px' : 0,
+              borderBottomLeftRadius: index === notes.length - 1 ? '22px' : 0,
+              borderBottomRightRadius: index === notes.length - 1 ? '22px' : 0,
+              boxShadow:
+                `inset 0 1px 0 rgba(255,255,255,0.08), inset 3px 0 0 ${alpha(note.accent, 0.86)}`,
             }}
           >
             <Box
@@ -73,8 +71,12 @@ export function InfoNotesPanel({ notes, sx }: InfoNotesPanelProps) {
                 alignItems: 'center',
                 justifyContent: 'center',
                 color: note.accent,
-                bgcolor: `${note.accent}2e`,
+                background:
+                  `radial-gradient(120% 120% at 24% 0%, rgba(255,255,255,0.22), rgba(255,255,255,0.04) 46%, transparent 72%), ${alpha(note.accent, 0.16)}`,
                 border: `1px solid ${note.accent}66`,
+                backdropFilter: 'blur(14px) saturate(165%)',
+                WebkitBackdropFilter: 'blur(14px) saturate(165%)',
+                boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.18)',
               }}
             >
               <Icon icon={note.icon} width={19} />

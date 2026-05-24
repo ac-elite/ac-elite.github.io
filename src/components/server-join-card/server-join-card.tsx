@@ -10,7 +10,7 @@ import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 
-import { GLASS_PADDING } from 'src/lib/glass';
+import { GLASS_PADDING, GLASS_PANEL_SX, GLASS_CARD_INNER_SX } from 'src/lib/glass';
 import { SERVER_ENDPOINTS } from 'src/centralized/server-endpoints';
 import { formatTimeAgo } from 'src/lib/sync-utils';
 import { BRAND_ACCENT } from 'src/lib/status-accent';
@@ -33,8 +33,6 @@ const ACCENT = BRAND_ACCENT;
 const ACCENT_SOFT = 'rgba(147, 197, 253, 0.14)';
 const ACCENT_BORDER = 'rgba(147, 197, 253, 0.42)';
 const ACCENT_BORDER_STRONG = 'rgba(147, 197, 253, 0.58)';
-const ACCENT_INNER = 'rgba(147, 197, 253, 0.09)';
-const ACCENT_GLOW = 'rgba(147, 197, 253, 0.11)';
 
 const badgeSx = {
   height: 20,
@@ -45,12 +43,12 @@ const badgeSx = {
 } as const;
 
 const infoBlockSx = {
+  ...GLASS_CARD_INNER_SX,
   borderRadius: 1.1,
   px: { xs: 1, md: 0.75 },
   /** Equal top/bottom padding; inner Stack uses fixed gap + lineHeight so content looks balanced. */
   py: { xs: 1.5, md: 1.15 },
-  bgcolor: 'rgba(255,255,255,0.04)',
-  border: '1px solid rgba(255,255,255,0.08)',
+  backgroundColor: 'rgba(19,30,54,0.42)',
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'center',
@@ -179,22 +177,10 @@ export function ServerJoinCard({ currentTrack, joinHref = AC_ELITE_SERVER_JOIN_H
 
   const heroSrc = rawTrack ? getTrackHeroImageSrc(rawTrack) : null;
   const heroOffsetY = rawTrack ? getTrackHeroImageOffsetY(rawTrack) : 0;
-  const cardBackground = heroSrc
-    ? undefined
-    : `linear-gradient(180deg, rgba(16,18,25,0.98) 0%, rgba(10,12,17,0.98) 100%), radial-gradient(circle at 88% 5%, ${ACCENT_GLOW}, transparent 45%)`;
-
   return (
     <Box sx={softFloatWrapperSx()}>
       <Box
-        sx={{
-          width: '100%',
-          borderRadius: 2,
-          border: `1px solid ${online ? ACCENT_BORDER : 'rgba(148,163,184,0.38)'}`,
-          background: cardBackground,
-          boxShadow: `0 14px 30px rgba(0,0,0,0.4), inset 0 0 0 1px ${online ? ACCENT_INNER : 'rgba(148,163,184,0.08)'}`,
-          overflow: 'hidden',
-          ...sx,
-        }}
+        sx={[GLASS_PANEL_SX, { width: '100%', p: 0, overflow: 'hidden' }, sx] as SxProps<Theme>}
       >
         <Box sx={{ position: 'relative', lineHeight: 0, overflow: 'hidden' }}>
           {heroSrc ? (
@@ -230,7 +216,8 @@ export function ServerJoinCard({ currentTrack, joinHref = AC_ELITE_SERVER_JOIN_H
               position: 'absolute',
               inset: 0,
               background:
-                'linear-gradient(180deg, rgba(10,12,17,0.05) 0%, rgba(10,12,17,0.55) 55%, rgba(10,12,17,0.96) 100%)',
+                'linear-gradient(180deg, rgba(6,10,20,0.06) 0%, rgba(7,12,24,0.56) 54%, rgba(9,15,29,0.94) 100%)',
+              boxShadow: 'inset 0 -1px 0 rgba(226,242,255,0.12)',
             }}
           />
         </Box>
@@ -240,7 +227,9 @@ export function ServerJoinCard({ currentTrack, joinHref = AC_ELITE_SERVER_JOIN_H
           sx={{
             /** Same gutter as {@link GLASS_PANEL_SX} / Race Intelligence — one token for all glass cards. */
             p: GLASS_PADDING.panel,
-            bgcolor: heroSrc ? 'rgba(12,14,20,0.98)' : 'transparent',
+            backgroundColor: heroSrc ? 'rgba(8,14,28,0.82)' : 'rgba(8,14,28,0.34)',
+            backdropFilter: heroSrc ? 'blur(20px) saturate(170%)' : undefined,
+            WebkitBackdropFilter: heroSrc ? 'blur(20px) saturate(170%)' : undefined,
           }}
         >
         <Stack direction="row" justifyContent="space-between" alignItems="center">
@@ -330,21 +319,33 @@ export function ServerJoinCard({ currentTrack, joinHref = AC_ELITE_SERVER_JOIN_H
           href={joinHref}
           target="_blank"
           rel="noreferrer"
+          variant="outlined"
+          color="primary"
           fullWidth
           size="small"
           aria-label="Join official server in Content Manager"
           startIcon={<JoinGlyphIcon />}
           sx={{
             minHeight: 40,
-            borderRadius: 1.2,
+            borderRadius: 1.35,
             border: `1px solid ${ACCENT_BORDER_STRONG}`,
-            bgcolor: ACCENT_SOFT,
+            background:
+              'radial-gradient(120% 120% at 18% -30%, rgba(255,255,255,0.15), rgba(255,255,255,0.03) 40%, transparent 64%),' +
+              `linear-gradient(180deg, ${ACCENT_SOFT} 0%, rgba(59,130,246,0.07) 100%)`,
             color: ACCENT,
             fontWeight: 800,
+            backdropFilter: 'blur(18px) saturate(170%)',
+            WebkitBackdropFilter: 'blur(18px) saturate(170%)',
+            boxShadow:
+              'inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -1px 0 rgba(255,255,255,0.032)',
             '& .MuiButton-startIcon': { mr: 0.75 },
             '&:hover': {
-              bgcolor: 'rgba(147, 197, 253, 0.22)',
-              borderColor: 'rgba(147, 197, 253, 0.72)',
+              borderColor: 'rgba(191, 225, 255, 0.74)',
+              background:
+                'radial-gradient(120% 120% at 18% -30%, rgba(255,255,255,0.22), rgba(255,255,255,0.045) 40%, transparent 64%),' +
+                'linear-gradient(180deg, rgba(147,197,253,0.22) 0%, rgba(59,130,246,0.1) 100%)',
+              boxShadow:
+                'inset 0 1px 0 rgba(255,255,255,0.22), inset 0 -1px 0 rgba(255,255,255,0.04)',
             },
           }}
         >

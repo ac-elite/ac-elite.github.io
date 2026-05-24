@@ -2,8 +2,7 @@ import type { Theme, SxProps } from '@mui/material/styles';
 
 /** Background paint shared by data pages, setup store, admin shell, 404, and home sections that sit on the grid. */
 export const PAGE_BACKGROUND_GRADIENT =
-  'radial-gradient(circle at 20% 0%, rgba(23,33,59,0.24) 0, transparent 50%),' +
-  'linear-gradient(180deg, #17213B 0%, #1f2c49 100%)';
+  'linear-gradient(180deg, #17213B 0%, #192540 48%, #17213B 100%)';
 
 /** Base surface under {@link PageGridOverlay}: positioning + canvas + clip (no vertical padding — override `py` as needed). */
 export const PAGE_SURFACE_SX: SxProps<Theme> = {
@@ -73,26 +72,28 @@ export const MARKETING_CTA_LARGE_LAYOUT_SX: SxProps<Theme> = {
 
 /**
  * Premium glass-styled primary CTA. Layered linear gradient (no flat MUI fill),
- * inner top sheen, outer brand-tinted glow, refined border. Pair with
+ * inner top sheen, quiet depth shadow, refined border. Pair with
  * `MARKETING_CTA_LARGE_LAYOUT_SX` for the home hero buttons.
  */
 export const MARKETING_CTA_PRIMARY_GLASS_SX = {
-  background: 'linear-gradient(180deg, #3B82F6 0%, #2563EB 50%, #1D4ED8 100%)',
-  border: '1px solid rgba(147,197,253,0.55)',
+  background:
+    'linear-gradient(180deg, rgba(72,132,222,0.7) 0%, rgba(45,101,204,0.66) 100%)',
+  backdropFilter: 'blur(22px) saturate(185%)',
+  WebkitBackdropFilter: 'blur(22px) saturate(185%)',
+  border: '1px solid rgba(219,234,254,0.2)',
   color: '#fff',
   textShadow: '0 1px 0 rgba(15,23,42,0.35)',
   boxShadow:
-    'inset 0 1px 0 rgba(255,255,255,0.34), inset 0 -1px 0 rgba(15,23,42,0.28),' +
-    ' 0 8px 22px rgba(37,99,235,0.36), 0 0 0 1px rgba(147,197,253,0.18)',
+    'inset 0 1px 0 rgba(255,255,255,0.17), inset 0 -1px 0 rgba(255,255,255,0.03),' +
+    ' 0 1px 2px rgba(0,0,0,0.2)',
   transition:
     'transform 320ms cubic-bezier(0.34, 1.4, 0.5, 1), box-shadow 320ms cubic-bezier(0.32, 0.72, 0, 1), filter 320ms cubic-bezier(0.32, 0.72, 0, 1)',
   '&:hover': {
-    background: 'linear-gradient(180deg, #4F92F8 0%, #2D6CF1 50%, #2152DD 100%)',
     transform: 'translateY(-1px)',
-    filter: 'brightness(1.04)',
+    filter: 'brightness(1.018) saturate(1.035)',
     boxShadow:
-      'inset 0 1px 0 rgba(255,255,255,0.42), inset 0 -1px 0 rgba(15,23,42,0.28),' +
-      ' 0 12px 28px rgba(37,99,235,0.5), 0 0 0 1px rgba(191,219,254,0.32)',
+      'inset 0 1px 0 rgba(255,255,255,0.21), inset 0 -1px 0 rgba(255,255,255,0.035),' +
+      ' 0 2px 4px rgba(0,0,0,0.22)',
   },
   '&:active': {
     transform: 'translateY(0) scale(0.97)',
@@ -109,22 +110,24 @@ export const MARKETING_CTA_PRIMARY_GLASS_SX = {
  * primary above without competing for attention.
  */
 export const MARKETING_CTA_SECONDARY_GLASS_SX = {
-  background: 'linear-gradient(180deg, rgba(36,52,83,0.96) 0%, rgba(20,29,52,0.96) 100%)',
-  border: '1px solid rgba(148,163,184,0.42)',
+  background:
+    'linear-gradient(180deg, rgba(43,59,92,0.48) 0%, rgba(20,30,54,0.58) 100%)',
+  backdropFilter: 'blur(24px) saturate(180%)',
+  WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+  border: '1px solid rgba(226,232,240,0.18)',
   color: '#fff',
   textShadow: '0 1px 0 rgba(15,23,42,0.4)',
   boxShadow:
-    'inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -1px 0 rgba(0,0,0,0.32),' +
-    ' 0 8px 22px rgba(0,0,0,0.4)',
+    'inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -1px 0 rgba(255,255,255,0.028),' +
+    ' 0 1px 2px rgba(0,0,0,0.2)',
   transition:
     'transform 320ms cubic-bezier(0.34, 1.4, 0.5, 1), box-shadow 320ms cubic-bezier(0.32, 0.72, 0, 1), border-color 320ms cubic-bezier(0.32, 0.72, 0, 1)',
   '&:hover': {
-    background: 'linear-gradient(180deg, rgba(46,64,99,0.98) 0%, rgba(26,38,66,0.98) 100%)',
-    borderColor: 'rgba(191,219,254,0.55)',
+    borderColor: 'rgba(226,242,255,0.3)',
     transform: 'translateY(-1px)',
     boxShadow:
-      'inset 0 1px 0 rgba(255,255,255,0.22), inset 0 -1px 0 rgba(0,0,0,0.32),' +
-      ' 0 12px 28px rgba(0,0,0,0.5), 0 0 0 1px rgba(147,197,253,0.18)',
+      'inset 0 1px 0 rgba(255,255,255,0.2), inset 0 -1px 0 rgba(255,255,255,0.035),' +
+      ' 0 2px 4px rgba(0,0,0,0.22)',
   },
   '&:active': {
     transform: 'translateY(0) scale(0.97)',
@@ -161,17 +164,20 @@ export const ACTION_PRIMARY_SMALL_SX: SxProps<Theme> = {
 /** License / SR guide launcher (contained; size set on Button). */
 export const GUIDE_LAUNCH_BUTTON_SX: SxProps<Theme> = {
   fontWeight: 800,
-  borderRadius: 2,
+  borderRadius: 999,
+  boxShadow:
+    'inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -1px 0 rgba(255,255,255,0.035)',
 };
 
 /** Small outlined / toggle controls — default font weight for labels. */
 export const ACTION_OUTLINED_SMALL_DENSE_SX: SxProps<Theme> = {
   fontWeight: 700,
+  borderColor: 'rgba(226,242,255,0.22)',
 };
 
 /** Admin external link row (slate border). */
 export const ADMIN_EXTERNAL_LINK_OUTLINED_SX: SxProps<Theme> = {
-  borderColor: 'rgba(148,163,184,0.4)',
+  borderColor: 'rgba(226,232,240,0.24)',
   fontWeight: 700,
 };
 
@@ -180,17 +186,23 @@ export const ADMIN_JOIN_SERVER_OUTLINED_SX: SxProps<Theme> = {
   borderColor: 'rgba(34,197,94,0.45)',
   color: '#86efac',
   fontWeight: 700,
+  '&:hover': {
+    borderColor: 'rgba(134,239,172,0.62)',
+    bgcolor: 'rgba(34,197,94,0.12)',
+    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.16)',
+  },
 };
 
 /** Outlined control on dark glass (white hairline). */
 export const OUTLINED_GLASS_WHITE_SX: SxProps<Theme> = {
   textTransform: 'none' as const,
   fontWeight: 700,
-  borderColor: 'rgba(255, 255, 255, 0.45)',
+  borderColor: 'rgba(255, 255, 255, 0.28)',
   color: 'common.white',
   '&:hover': {
-    borderColor: 'common.white',
-    bgcolor: 'rgba(255, 255, 255, 0.08)',
+    borderColor: 'rgba(255,255,255,0.48)',
+    bgcolor: 'rgba(255, 255, 255, 0.075)',
+    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.18)',
   },
 };
 
@@ -201,12 +213,12 @@ export const OUTLINED_INFO_STRIP_SX: SxProps<Theme> = {
   px: 1.25,
   fontWeight: 700,
   textTransform: 'none' as const,
-  borderColor: 'rgba(147,197,253,0.55)',
+  borderColor: 'rgba(147,197,253,0.42)',
   color: 'rgba(219,234,254,0.98)',
-  bgcolor: 'rgba(59,130,246,0.08)',
+  bgcolor: 'rgba(59,130,246,0.06)',
   '&:hover': {
-    borderColor: 'rgba(147,197,253,0.8)',
-    bgcolor: 'rgba(59,130,246,0.16)',
+    borderColor: 'rgba(191,219,254,0.62)',
+    bgcolor: 'rgba(59,130,246,0.12)',
   },
 };
 
@@ -217,6 +229,7 @@ export const OUTLINED_MENU_TRIGGER_SMALL_SX: SxProps<Theme> = {
   px: 1.5,
   py: 0.75,
   borderRadius: 1.25,
+  borderColor: 'rgba(226,242,255,0.24)',
 };
 
 /** ErrorPanel Retry (rose accent, outlined). */
@@ -228,6 +241,7 @@ export const ERROR_RETRY_OUTLINED_SX: SxProps<Theme> = {
   '&:hover': {
     borderColor: 'rgba(251,113,133,0.85)',
     bgcolor: 'rgba(251,113,133,0.1)',
+    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.14)',
   },
 };
 

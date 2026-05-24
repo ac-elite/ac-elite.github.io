@@ -1,38 +1,29 @@
-import { keyframes, type Theme, type SxProps } from '@mui/material/styles';
+import { alpha, keyframes, type Theme, type SxProps } from '@mui/material/styles';
+import type { SystemStyleObject } from '@mui/system';
 
 /**
  * Rim pulse on `::after` above content (`z-index: 2`, `pointer-events: none`) so the glow is
  * actually visible — a full-bleed layer under opaque children was nearly invisible on home/hero.
  */
-const glassRimGlowPulse = keyframes`
+const glassRimPulse = keyframes`
   0%, 100% {
     opacity: 0.54;
-    box-shadow:
-      0 0 0 1px rgba(191, 225, 255, 0.28),
-      0 0 18px rgba(147, 197, 253, 0.15),
-      0 0 40px rgba(56, 189, 248, 0.09);
+    box-shadow: inset 0 0 0 1px rgba(191, 225, 255, 0.24);
   }
   50% {
     opacity: 0.86;
-    box-shadow:
-      0 0 0 1px rgba(224, 242, 254, 0.44),
-      0 0 26px rgba(147, 197, 253, 0.26),
-      0 0 48px rgba(56, 189, 248, 0.14);
+    box-shadow: inset 0 0 0 1px rgba(224, 242, 254, 0.38);
   }
 `;
 
 const glassInnerRimPulse = keyframes`
   0%, 100% {
     opacity: 0.48;
-    box-shadow:
-      0 0 0 1px rgba(148, 163, 184, 0.24),
-      0 0 14px rgba(147, 197, 253, 0.08);
+    box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.22);
   }
   50% {
     opacity: 0.78;
-    box-shadow:
-      0 0 0 1px rgba(191, 225, 255, 0.34),
-      0 0 20px rgba(147, 197, 253, 0.14);
+    box-shadow: inset 0 0 0 1px rgba(191, 225, 255, 0.3);
   }
 `;
 
@@ -40,17 +31,11 @@ const glassInnerRimPulse = keyframes`
 const glassAmberNoteRimPulse = keyframes`
   0%, 100% {
     opacity: 0.5;
-    box-shadow:
-      0 0 0 1px rgba(245, 196, 53, 0.3),
-      0 0 16px rgba(245, 196, 53, 0.12),
-      0 0 34px rgba(245, 158, 11, 0.08);
+    box-shadow: inset 0 0 0 1px rgba(245, 196, 53, 0.28);
   }
   50% {
     opacity: 0.82;
-    box-shadow:
-      0 0 0 1px rgba(250, 220, 130, 0.48),
-      0 0 22px rgba(245, 196, 53, 0.19),
-      0 0 42px rgba(245, 158, 11, 0.12);
+    box-shadow: inset 0 0 0 1px rgba(250, 220, 130, 0.42);
   }
 `;
 
@@ -61,8 +46,8 @@ export const GLASS_SYNC_CYCLE_SEC = 6.4;
 export const GLASS_INNER_SYNC_CYCLE_SEC = 7.5;
 
 /**
- * Specular sweep + opacity in step with rim glow (`GLASS_SYNC_CYCLE_SEC`, ease-in-out).
- * Use on `MuiButton` via `::before` (soft-light blend).
+ * Legacy pulse kept for any opt-in motion, but the shared material highlight below is static by
+ * default. Permanent moving glare started to feel cheap on badges and tier panels.
  */
 export const buttonGlassReflectPulse = keyframes`
   0%, 100% {
@@ -75,15 +60,12 @@ export const buttonGlassReflectPulse = keyframes`
   }
 `;
 
-/**
- * Narrow specular band for the animated glass sweep (buttons, chips, medal panels): tight core
- * (~49.4–50.6%) so it stays a glint, with enough alpha that the pulse reads clearly on soft-light.
- */
+/** Soft diamond-facet highlight for chips and tinted panels. */
 export const GLASS_SPECULAR_SWEEP_GRADIENT =
-  'linear-gradient(115deg, transparent 42%, rgba(255,255,255,0.028) 47%, rgba(255,255,255,0.08) 49.4%, rgba(191,225,255,0.12) 50%, rgba(255,255,255,0.07) 50.6%, rgba(255,255,255,0.028) 52.5%, transparent 58%)';
+  'linear-gradient(135deg, rgba(255,255,255,0.09) 0%, rgba(255,255,255,0.034) 48.5%, rgba(255,255,255,0.012) 49.5%, rgba(8,18,34,0.03) 50.5%, rgba(8,18,34,0.075) 100%), radial-gradient(150% 92% at 16% -26%, rgba(255,255,255,0.09) 0%, rgba(255,255,255,0.026) 34%, rgba(255,255,255,0) 68%), linear-gradient(180deg, rgba(255,255,255,0.026) 0%, rgba(255,255,255,0.004) 42%, rgba(255,255,255,0) 72%)';
 
 /**
- * Animated specular highlight (same timing as theme buttons).
+ * Static specular highlight.
  * Merge onto panels that use `::before`; chips also set overflow/label z-index via {@link GLASS_CHIP_SHEEN_SX}.
  */
 export const GLASS_SPECULAR_SWEEP_SX: SxProps<Theme> = {
@@ -95,19 +77,13 @@ export const GLASS_SPECULAR_SWEEP_SX: SxProps<Theme> = {
     zIndex: 0,
     pointerEvents: 'none',
     backgroundImage: GLASS_SPECULAR_SWEEP_GRADIENT,
-    backgroundSize: '260% 260%',
     backgroundRepeat: 'no-repeat',
-    mixBlendMode: 'soft-light',
-    animation: `${buttonGlassReflectPulse} ${GLASS_SYNC_CYCLE_SEC}s ease-in-out infinite`,
-    '@media (prefers-reduced-motion: reduce)': {
-      animation: 'none',
-      opacity: 0.46,
-      backgroundPosition: '48% 50%',
-    },
+    opacity: 0.48,
+    mixBlendMode: 'screen',
   },
 };
 
-/** License / SR chips — same sheen + period as theme buttons ({@link GLASS_SYNC_CYCLE_SEC}). */
+/** License / SR chips — static material highlight with label content above it. */
 export const GLASS_CHIP_SHEEN_SX: SxProps<Theme> = {
   position: 'relative',
   overflow: 'hidden',
@@ -129,6 +105,7 @@ export const GLASS_RADIUS = {
 
 export const GLASS_PADDING = {
   panel: 2.5,
+  panelSpacious: 2.75,
   panelCompact: 2,
   panelTight: 1.5,
   innerPanel: 1.5,
@@ -147,12 +124,11 @@ export const GLASS_LIVE_RIM_SX: SxProps<Theme> = {
     borderRadius: 'inherit',
     zIndex: 2,
     pointerEvents: 'none',
-    animation: `${glassRimGlowPulse} ${GLASS_SYNC_CYCLE_SEC}s ease-in-out infinite`,
+    animation: `${glassRimPulse} ${GLASS_SYNC_CYCLE_SEC}s ease-in-out infinite`,
     '@media (prefers-reduced-motion: reduce)': {
       animation: 'none',
       opacity: 0.76,
-      boxShadow:
-        '0 0 0 1px rgba(191, 225, 255, 0.34), 0 0 20px rgba(147, 197, 253, 0.18), 0 0 38px rgba(56, 189, 248, 0.1)',
+      boxShadow: 'inset 0 0 0 1px rgba(191, 225, 255, 0.34)',
     },
   },
 };
@@ -172,7 +148,7 @@ export const GLASS_INNER_LIVE_RIM_SX: SxProps<Theme> = {
     '@media (prefers-reduced-motion: reduce)': {
       animation: 'none',
       opacity: 0.68,
-      boxShadow: '0 0 0 1px rgba(191, 225, 255, 0.28), 0 0 16px rgba(147, 197, 253, 0.12)',
+      boxShadow: 'inset 0 0 0 1px rgba(191, 225, 255, 0.28)',
     },
   },
 };
@@ -192,8 +168,7 @@ export const GLASS_NOTE_AMBER_RIM_SX: SxProps<Theme> = {
     '@media (prefers-reduced-motion: reduce)': {
       animation: 'none',
       opacity: 0.68,
-      boxShadow:
-        '0 0 0 1px rgba(245, 196, 53, 0.38), 0 0 18px rgba(245, 196, 53, 0.14), 0 0 32px rgba(245, 158, 11, 0.09)',
+      boxShadow: 'inset 0 0 0 1px rgba(245, 196, 53, 0.38)',
     },
   },
 };
@@ -213,20 +188,20 @@ export const GLASS_MATERIAL_BACKDROP = 'blur(30px) saturate(190%)';
 export const GLASS_CARD_SX: SxProps<Theme> = {
   position: 'relative',
   borderRadius: GLASS_RADIUS.panel,
-  border: '1px solid rgba(255,255,255,0.14)',
-  // Layered: glassy top-left specular highlight over a frosted-navy base.
+  border: '1px solid rgba(226,242,255,0.14)',
+  backgroundColor: 'rgba(19,30,54,0.66)',
   backgroundImage:
-    'radial-gradient(130% 90% at 18% -12%, rgba(255,255,255,0.13) 0%, rgba(255,255,255,0.035) 26%, rgba(255,255,255,0) 54%),' +
-    'linear-gradient(180deg, rgba(38,52,86,0.72) 0%, rgba(18,27,49,0.80) 100%)',
+    'linear-gradient(180deg, rgba(255,255,255,0.02) 0%, rgba(255,255,255,0.004) 42%, rgba(255,255,255,0) 100%),' +
+    'radial-gradient(430px 210px at 110px -88px, rgba(255,255,255,0.038) 0%, rgba(255,255,255,0.012) 42%, rgba(255,255,255,0) 72%),' +
+    'linear-gradient(180deg, rgba(35,49,78,0.34) 0%, rgba(17,28,51,0.54) 100%)',
   backdropFilter: GLASS_MATERIAL_BACKDROP,
   WebkitBackdropFilter: GLASS_MATERIAL_BACKDROP,
   boxShadow:
-    // bright glass top edge + fine inner contour + tight contact + wide float
-    'inset 0 1px 0 rgba(255,255,255,0.30), inset 0 0 0 1px rgba(255,255,255,0.045),' +
-    ' 0 2px 6px rgba(0,0,0,0.34), 0 30px 64px -22px rgba(0,0,0,0.72)',
+    'inset 0 1px 0 rgba(255,255,255,0.22), inset 0 -1px 0 rgba(0,0,0,0.16), inset 0 0 0 1px rgba(255,255,255,0.028),' +
+    ' 0 1px 2px rgba(0,0,0,0.22), 0 22px 50px -30px rgba(0,0,0,0.72)',
 };
 
-/** Opt-in: base card + the soft live rim-glow pulse. Reserve for live data. */
+/** Opt-in: base card + the soft live rim pulse. Reserve for live data. */
 export const GLASS_CARD_LIVE_SX: SxProps<Theme> = {
   ...GLASS_CARD_SX,
   ...GLASS_LIVE_RIM_SX,
@@ -235,9 +210,15 @@ export const GLASS_CARD_LIVE_SX: SxProps<Theme> = {
 export const GLASS_CARD_INNER_SX: SxProps<Theme> = {
   position: 'relative',
   borderRadius: GLASS_RADIUS.innerPanel,
-  border: '1px solid rgba(255,255,255,0.07)',
-  background: 'linear-gradient(180deg, rgba(40,55,87,0.58), rgba(26,38,66,0.6))',
-  boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.05)',
+  border: '1px solid rgba(226,242,255,0.1)',
+  backgroundColor: 'rgba(19,30,54,0.6)',
+  backgroundImage:
+    'linear-gradient(180deg, rgba(255,255,255,0.014) 0%, rgba(255,255,255,0.003) 44%, rgba(255,255,255,0) 100%),' +
+    'radial-gradient(340px 170px at 86px -72px, rgba(255,255,255,0.028) 0%, rgba(255,255,255,0.008) 44%, rgba(255,255,255,0) 74%),' +
+    'linear-gradient(180deg, rgba(35,49,78,0.24), rgba(17,28,51,0.42))',
+  backdropFilter: 'blur(18px) saturate(160%)',
+  WebkitBackdropFilter: 'blur(18px) saturate(160%)',
+  boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.1), 0 10px 26px -24px rgba(0,0,0,0.7)',
 };
 
 export const GLASS_CARD_INNER_HOVER_SX: SxProps<Theme> = {
@@ -245,14 +226,18 @@ export const GLASS_CARD_INNER_HOVER_SX: SxProps<Theme> = {
   cursor: 'pointer',
   transition: 'border-color 160ms ease, background 160ms ease',
   '&:hover': {
-    borderColor: 'rgba(191,225,255,0.38)',
-    background: 'linear-gradient(145deg, rgba(36,52,83,0.9), rgba(26,39,66,0.9))',
+    borderColor: 'rgba(226,242,255,0.24)',
+    backgroundColor: 'rgba(21,32,56,0.64)',
+    backgroundImage:
+      'linear-gradient(180deg, rgba(255,255,255,0.018) 0%, rgba(255,255,255,0.004) 44%, rgba(255,255,255,0) 100%),' +
+      'radial-gradient(340px 170px at 86px -72px, rgba(255,255,255,0.036) 0%, rgba(255,255,255,0.01) 44%, rgba(255,255,255,0) 74%),' +
+      'linear-gradient(180deg, rgba(35,49,78,0.28), rgba(17,28,51,0.46))',
   },
 };
 
 export const GLASS_TABLE_WRAPPER_SX: SxProps<Theme> = {
   ...GLASS_CARD_SX,
-  /** Let the live rim `::after` outer glow show; clip the table inside `TableContainer` instead. */
+  /** Clip the table inside `TableContainer` while preserving the outer card geometry. */
   overflow: 'visible',
   '& > .MuiTableContainer-root': {
     borderRadius: 'inherit',
@@ -269,6 +254,11 @@ export const GLASS_TABLE_PAGINATION_SX: SxProps<Theme> = {
 export const GLASS_PANEL_SX: SxProps<Theme> = {
   ...GLASS_CARD_SX,
   p: GLASS_PADDING.panel,
+};
+
+export const GLASS_PANEL_SPACIOUS_SX: SxProps<Theme> = {
+  ...GLASS_CARD_SX,
+  p: GLASS_PADDING.panelSpacious,
 };
 
 export const GLASS_PANEL_COMPACT_SX: SxProps<Theme> = {
@@ -291,6 +281,34 @@ export const GLASS_INNER_ROW_SX: SxProps<Theme> = {
   px: GLASS_PADDING.innerRowX,
   py: GLASS_PADDING.innerRowY,
 };
+
+/** Role/semantic tinted outer glass: same base card, with a quiet colour bloom. */
+export function getTintedGlassPanelSx(accent: string): SystemStyleObject<Theme> {
+  return {
+    borderColor: alpha(accent, 0.24),
+    backgroundImage:
+      `radial-gradient(520px 240px at 84px -88px, ${alpha(accent, 0.16)} 0%, ${alpha(accent, 0.052)} 43%, rgba(255,255,255,0) 76%),` +
+      `linear-gradient(135deg, ${alpha(accent, 0.08)} 0%, ${alpha(accent, 0.032)} 48%, rgba(17,28,51,0.03) 51%, rgba(17,28,51,0) 100%),` +
+      'linear-gradient(180deg, rgba(255,255,255,0.018) 0%, rgba(255,255,255,0.004) 42%, rgba(255,255,255,0) 100%),' +
+      'linear-gradient(180deg, rgba(35,49,78,0.34) 0%, rgba(17,28,51,0.54) 100%)',
+    boxShadow:
+      `inset 0 1px 0 rgba(255,255,255,0.18), inset 0 0 0 1px ${alpha(accent, 0.035)},` +
+      ' 0 1px 2px rgba(0,0,0,0.22)',
+  };
+}
+
+/** Role/semantic tinted inner row: use on rows inside a tinted glass card. */
+export function getTintedGlassInnerRowSx(accent: string): SystemStyleObject<Theme> {
+  return {
+    borderColor: alpha(accent, 0.18),
+    backgroundImage:
+      `radial-gradient(360px 150px at 52px -64px, ${alpha(accent, 0.09)} 0%, ${alpha(accent, 0.03)} 46%, transparent 78%),` +
+      'linear-gradient(180deg, rgba(255,255,255,0.014) 0%, rgba(255,255,255,0.003) 44%, rgba(255,255,255,0) 100%),' +
+      'linear-gradient(180deg, rgba(35,49,78,0.22), rgba(17,28,51,0.42))',
+    boxShadow:
+      `inset 0 1px 0 rgba(255,255,255,0.1), inset 3px 0 0 ${alpha(accent, 0.62)}, 0 10px 26px -24px rgba(0,0,0,0.7)`,
+  };
+}
 
 /** Podium table row highlight (1 = gold, 2 = silver, 3 = bronze). */
 export function getPodiumRowSx(place: 1 | 2 | 3): SxProps<Theme> {

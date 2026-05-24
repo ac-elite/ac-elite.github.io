@@ -56,7 +56,7 @@ export function AdminPageShell({ title, description, documentTitle, children }: 
                   <Typography variant="overline" sx={{ color: 'rgba(191,219,254,0.85)', fontWeight: 800, letterSpacing: '0.16em' }}>
                     Admin Panel
                   </Typography>
-                  <Typography variant="h4" fontWeight={800}>
+                  <Typography component="h1" variant="h4" fontWeight={800}>
                     {title}
                   </Typography>
                   {description && (

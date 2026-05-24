@@ -1,4 +1,5 @@
 import { useMemo, useState, useEffect } from 'react';
+import type { Theme, SxProps } from '@mui/material/styles';
 
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
@@ -17,7 +18,13 @@ import { getDriverProfileHref } from 'src/lib/routes';
 import { DATA_PAGE_SHELL_SX } from 'src/lib/page-shell';
 import { getSiteUrl } from 'src/centralized/site-urls';
 import { SITE_TEAM_ROLES } from 'src/site-manual-config';
-import { GLASS_PANEL_SX, GLASS_INNER_ROW_SX, GLASS_PANEL_TIGHT_SX } from 'src/lib/glass';
+import {
+  GLASS_PANEL_SX,
+  GLASS_INNER_ROW_SX,
+  GLASS_PANEL_TIGHT_SX,
+  getTintedGlassPanelSx,
+  getTintedGlassInnerRowSx,
+} from 'src/lib/glass';
 import { getSyncHealth, type SiteMetadata, getEffectiveLastSync } from 'src/lib/sync-utils';
 import { subtleEnterUpSx, glassCardMotionSx, softFloatWrapperSx } from 'src/lib/subtle-motion';
 import { BRAND_ACCENT, roleAccentBorderSx, brandAccentBorderSx, statusAccentSplitRimSx } from 'src/lib/status-accent';
@@ -230,14 +237,17 @@ function TeamRoleColumn({
 
   return (
     <Paper
-      sx={{
-        ...GLASS_PANEL_SX,
-        ...roleAccentBorderSx(accent),
-        ...statusAccentSplitRimSx(accent),
-        ...glassCardMotionSx(enterIndex),
-        height: '100%',
-        textAlign: { xs: 'center', md: 'left' },
-      }}
+      sx={[
+        GLASS_PANEL_SX,
+        roleAccentBorderSx(accent),
+        statusAccentSplitRimSx(accent),
+        getTintedGlassPanelSx(accent),
+        glassCardMotionSx(enterIndex),
+        {
+          height: '100%',
+          textAlign: { xs: 'center', md: 'left' },
+        },
+      ] as SxProps<Theme>}
     >
       <Typography variant="h6" sx={{ fontWeight: 800, mb: 1.25 }}>
         {title}
@@ -255,11 +265,12 @@ function TeamRoleColumn({
             onClick={() => {
               window.location.href = getDriverProfileHref(member.guid);
             }}
-            sx={{
-              ...GLASS_INNER_ROW_SX,
-              ...subtleEnterUpSx(mi, { baseDelayMs: 380 }),
-              cursor: 'pointer',
-            }}
+            sx={[
+              GLASS_INNER_ROW_SX,
+              getTintedGlassInnerRowSx(accent),
+              subtleEnterUpSx(mi, { baseDelayMs: 380 }),
+              { cursor: 'pointer' },
+            ] as SxProps<Theme>}
           >
             <Typography variant="subtitle2" sx={{ fontWeight: 700, textAlign: { xs: 'center', md: 'left' } }}>
               {member.name}

@@ -88,10 +88,14 @@ export function SessionBar({ compact = false }: SessionBarProps = {}) {
                 display: 'inline-flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                bgcolor: `${accent}26`,
+                background:
+                  `radial-gradient(120% 120% at 24% 0%, rgba(255,255,255,0.2), rgba(255,255,255,0.04) 46%, transparent 72%), ${accent}24`,
                 border: `1px solid ${accent}66`,
                 color: '#fff',
                 flexShrink: 0,
+                backdropFilter: 'blur(14px) saturate(165%)',
+                WebkitBackdropFilter: 'blur(14px) saturate(165%)',
+                boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.16)',
               }}
             >
               <Icon icon={ROLE_ICON[role]} width={16} />
@@ -199,10 +203,14 @@ export function SessionBar({ compact = false }: SessionBarProps = {}) {
                 display: 'inline-flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                bgcolor: `${accent}26`,
+                background:
+                  `radial-gradient(120% 120% at 24% 0%, rgba(255,255,255,0.2), rgba(255,255,255,0.04) 46%, transparent 72%), ${accent}24`,
                 border: `1px solid ${accent}66`,
                 color: '#fff',
                 flexShrink: 0,
+                backdropFilter: 'blur(14px) saturate(165%)',
+                WebkitBackdropFilter: 'blur(14px) saturate(165%)',
+                boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.16)',
               }}
             >
               <Icon icon={ROLE_ICON[role]} width={20} />

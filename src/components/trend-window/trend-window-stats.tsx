@@ -141,7 +141,23 @@ export function TrendWindowStats(props: TrendWindowStatsProps) {
           boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.05)',
         }}
       >
-        <Box component="span" sx={{ color: '#7dd3fc', display: 'inline-flex', flexShrink: 0 }}>
+        <Box
+          component="span"
+          sx={{
+            width: 22,
+            height: 22,
+            borderRadius: '50%',
+            color: '#93c5fd',
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexShrink: 0,
+            background:
+              'radial-gradient(120% 120% at 28% 0%, rgba(255,255,255,0.14), rgba(255,255,255,0.028) 46%, transparent 70%), rgba(59,130,246,0.08)',
+            border: '1px solid rgba(147,197,253,0.26)',
+            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.12)',
+          }}
+        >
           <Icon icon="solar:history-bold" width={15} />
         </Box>
         <Typography variant="body2" sx={{ color: 'rgba(226,232,240,0.82)', lineHeight: 1.4 }}>

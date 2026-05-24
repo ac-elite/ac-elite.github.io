@@ -1,6 +1,6 @@
 import type { Theme, SxProps } from '@mui/material/styles';
 
-import { GLASS_CHIP_SHEEN_SX, GLASS_SPECULAR_SWEEP_SX } from 'src/lib/glass';
+import { GLASS_CHIP_SHEEN_SX, GLASS_CARD_INNER_SX, GLASS_SPECULAR_SWEEP_SX } from 'src/lib/glass';
 import {
   getTrackDisplayName,
   normalizeServerTrackId,
@@ -127,7 +127,7 @@ export function calculateGap(fastestLap: number, currentLap: number) {
   return `+${((currentLap - fastestLap) / 1000).toFixed(3)}`;
 }
 
-/** Animated glass sheen + hover lift for license / SR chips (same timing as theme buttons). */
+/** Static glass highlight + hover lift for license / SR chips. */
 function withBadgeGlassHover(base: SxProps<Theme>): SxProps<Theme> {
   return {
     ...GLASS_CHIP_SHEEN_SX,
@@ -137,9 +137,9 @@ function withBadgeGlassHover(base: SxProps<Theme>): SxProps<Theme> {
     '@media (hover: hover)': {
       '&:hover': {
         transform: 'translateY(-1px)',
-        filter: 'brightness(1.08)',
+        filter: 'brightness(1.04)',
         boxShadow:
-          'inset 0 1px 0 rgba(255,255,255,0.48), 0 0 0 1px rgba(255,255,255,0.2), 0 10px 28px rgba(0,0,0,0.38), 0 0 20px rgba(255,255,255,0.14)',
+          'inset 0 1px 0 rgba(255,255,255,0.34), 0 0 0 1px rgba(255,255,255,0.12), 0 10px 24px -18px rgba(0,0,0,0.44)',
       },
     },
     '@media (prefers-reduced-motion: reduce)': {
@@ -156,13 +156,11 @@ export function getLicenseBadgeSx(license: string): SxProps<Theme> {
   const textColor = '#111827';
   const glass = (start: string, end: string, border: string, color = textColor): SxProps<Theme> => ({
     color,
-    // Domed enamel-pin look: bright top sheen + dark lower inset + a drop
-    // shadow so the badge sits proud — reads like an earned medal, not a flat tag.
     background: `linear-gradient(180deg, ${start} 0%, ${end} 100%)`,
     border: `1px solid ${border}`,
     boxShadow:
-      'inset 0 1px 0 rgba(255,255,255,0.62), inset 0 -2px 3px rgba(0,0,0,0.22),' +
-      ' 0 1px 1px rgba(0,0,0,0.35), 0 3px 7px -1px rgba(0,0,0,0.32)',
+      'inset 0 1px 0 rgba(255,255,255,0.34), inset 0 -1px 1px rgba(0,0,0,0.14),' +
+      ' 0 1px 1px rgba(0,0,0,0.22), 0 4px 10px -7px rgba(0,0,0,0.4)',
   });
 
   const styles: Record<string, SxProps<Theme>> = {
@@ -171,7 +169,7 @@ export function getLicenseBadgeSx(license: string): SxProps<Theme> {
       color: '#0b1f3a',
       background: 'linear-gradient(135deg, #93C5FD 0%, #60A5FA 52%, #A5F3FC 100%)',
       border: '1px solid rgba(191,219,254,0.92)',
-      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.42), 0 0 0 1px rgba(147,197,253,0.22)',
+      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.38), 0 0 0 1px rgba(147,197,253,0.14)',
     },
     Diamond: glass('#67E8F9', '#22D3EE', 'rgba(103,232,249,0.8)'),
     'Platinum+': glass('#F8FAFC', '#E2E8F0', 'rgba(226,232,240,0.95)'),
@@ -191,13 +189,11 @@ export function getSRBadgeSx(tier: string): SxProps<Theme> {
   const textColor = '#111827';
   const glass = (start: string, end: string, border: string, color = textColor): SxProps<Theme> => ({
     color,
-    // Domed enamel-pin look: bright top sheen + dark lower inset + a drop
-    // shadow so the badge sits proud — reads like an earned medal, not a flat tag.
     background: `linear-gradient(180deg, ${start} 0%, ${end} 100%)`,
     border: `1px solid ${border}`,
     boxShadow:
-      'inset 0 1px 0 rgba(255,255,255,0.62), inset 0 -2px 3px rgba(0,0,0,0.22),' +
-      ' 0 1px 1px rgba(0,0,0,0.35), 0 3px 7px -1px rgba(0,0,0,0.32)',
+      'inset 0 1px 0 rgba(255,255,255,0.34), inset 0 -1px 1px rgba(0,0,0,0.14),' +
+      ' 0 1px 1px rgba(0,0,0,0.22), 0 4px 10px -7px rgba(0,0,0,0.4)',
   });
 
   const first = tier.charAt(0);
@@ -211,31 +207,32 @@ export function getSRBadgeSx(tier: string): SxProps<Theme> {
 }
 
 /**
- * Tier-tinted medal panel + static gloss layers + animated specular sweep ({@link GLASS_SPECULAR_SWEEP_SX}, same
- * rhythm as license/SR chips).
+ * Tier-tinted glass panel with a quiet static highlight.
  */
 function medalPanelShinySx(rgb: string, opacity: number, borderOpacity: number): SxProps<Theme> {
   const o = opacity;
-  const base = `linear-gradient(135deg, rgba(${rgb},${o}) 0%, rgba(${rgb},${o * 0.55}) 55%, rgba(${rgb},${o * 0.28}) 100%)`;
-  const topSheen = `linear-gradient(180deg, rgba(255,255,255,0.24) 0%, rgba(255,255,255,0.07) 22%, rgba(255,255,255,0) 46%)`;
-  const bottomDepth = `linear-gradient(180deg, rgba(0,0,0,0) 48%, rgba(0,0,0,0.2) 100%)`;
   return {
-    background: `${topSheen}, ${bottomDepth}, ${base}`,
-    border: `1.5px solid rgba(${rgb},${borderOpacity * 0.7})`,
-    borderLeft: `3.5px solid rgba(${rgb},${borderOpacity})`,
+    ...(GLASS_CARD_INNER_SX as Record<string, unknown>),
+    backgroundColor: 'rgba(19,30,54,0.62)',
+    backgroundImage:
+      'linear-gradient(180deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.006) 44%, rgba(255,255,255,0) 100%),' +
+      `radial-gradient(380px 190px at 96px -70px, rgba(${rgb},${o * 0.6}) 0%, rgba(${rgb},${o * 0.2}) 42%, rgba(${rgb},0) 76%),` +
+      `linear-gradient(135deg, rgba(${rgb},${o * 0.22}) 0%, rgba(${rgb},${o * 0.105}) 48.5%, rgba(${rgb},${o * 0.045}) 50.5%, rgba(${rgb},${o * 0.025}) 100%),` +
+      'linear-gradient(180deg, rgba(35,49,78,0.22), rgba(17,28,51,0.46))',
+    border: `1px solid rgba(${rgb},${borderOpacity * 0.56})`,
     boxShadow: [
-      'inset 0 1px 0 rgba(255,255,255,0.4)',
+      'inset 0 1px 0 rgba(255,255,255,0.18)',
       'inset 0 -1px 0 rgba(0,0,0,0.18)',
-      `0 0 22px rgba(${rgb},${o * 0.7})`,
-      `0 0 5px rgba(${rgb},${o * 0.4})`,
-      '0 6px 16px -6px rgba(0,0,0,0.5)',
+      `inset 0 0 0 1px rgba(${rgb},${o * 0.18})`,
+      `0 16px 34px -28px rgba(${rgb},${o * 0.28})`,
+      '0 10px 26px -24px rgba(0,0,0,0.7)',
     ].join(', '),
-    ...GLASS_SPECULAR_SWEEP_SX,
+    ...(GLASS_SPECULAR_SWEEP_SX as Record<string, unknown>),
     '& > *': {
       position: 'relative',
       zIndex: 1,
     },
-  };
+  } as SxProps<Theme>;
 }
 
 /** Medal-style tinted panel for license tier — used on driver profile stat cards. */

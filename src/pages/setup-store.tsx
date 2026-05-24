@@ -85,7 +85,7 @@ export default function Page() {
             <Box sx={softFloatWrapperSx()}>
               <Box sx={{ ...GLASS_PANEL_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(0) }}>
                 <Stack spacing={0.75} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: { xs: 'center', md: 'flex-start' } }}>
-                  <Typography variant="h4" fontWeight={800}>
+                  <Typography component="h1" variant="h4" fontWeight={800}>
                     Setup Store
                   </Typography>
                   <Typography variant="body2" sx={{ color: 'text.secondary' }}>

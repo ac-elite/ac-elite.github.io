@@ -64,8 +64,14 @@ export function DashboardLayout({
         justifyContent: 'center',
         px: 2,
         py: 1.25,
-        bgcolor: '#17213B',
-        borderBottom: '1px solid rgba(255,255,255,0.08)',
+        bgcolor: 'rgba(18,28,50,0.72)',
+        backgroundImage:
+          'linear-gradient(180deg, rgba(255,255,255,0.075) 0%, rgba(255,255,255,0) 100%),' +
+          'linear-gradient(180deg, rgba(25,37,64,0.76) 0%, rgba(18,28,50,0.82) 100%)',
+        backdropFilter: 'blur(26px) saturate(180%)',
+        WebkitBackdropFilter: 'blur(26px) saturate(180%)',
+        borderBottom: '1px solid rgba(255,255,255,0.12)',
+        boxShadow: '0 16px 34px -28px rgba(0,0,0,0.82)',
         [theme.breakpoints.up(layoutQuery)]: { display: 'none' },
       }}
     >
@@ -114,7 +120,6 @@ export function DashboardLayout({
             data={navData}
             open={openMobileNav}
             onClose={() => setOpenMobileNav(false)}
-            sx={{ bgcolor: '#17213B' }}
             slots={{
               bottomArea: (
                 <>

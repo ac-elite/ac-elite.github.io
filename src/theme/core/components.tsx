@@ -11,7 +11,8 @@ const EASE_OUT = 'cubic-bezier(0.32, 0.72, 0, 1)';
 const SPRING = 'cubic-bezier(0.34, 1.4, 0.5, 1)';
 
 /** Subtle inset top-highlight shared by filled glass buttons. */
-const buttonInsetHighlight = 'inset 0 1px 0 rgba(255,255,255,0.16)';
+const buttonInsetHighlight =
+  'inset 0 1px 0 rgba(255,255,255,0.17), inset 0 -1px 0 rgba(255,255,255,0.03)';
 
 const MuiBackdrop: Components<Theme>['MuiBackdrop'] = {
   styleOverrides: {
@@ -37,10 +38,21 @@ const MuiButton: Components<Theme>['MuiButton'] = {
   styleOverrides: {
     root: {
       textTransform: 'none' as const,
-      fontWeight: 600,
-      borderRadius: 12,
+      fontWeight: 700,
+      borderRadius: 999,
       // Spring on transform (the press/lift), smooth ease on everything else.
-      transition: `transform 320ms ${SPRING}, box-shadow 320ms ${EASE_OUT}, border-color 320ms ${EASE_OUT}, background 320ms ${EASE_OUT}, filter 320ms ${EASE_OUT}`,
+      transition: `transform 260ms ${EASE_OUT}, box-shadow 260ms ${EASE_OUT}, border-color 260ms ${EASE_OUT}, background 260ms ${EASE_OUT}, background-color 260ms ${EASE_OUT}, filter 260ms ${EASE_OUT}`,
+      '& .MuiButton-startIcon, & .MuiButton-endIcon': {
+        color: 'currentColor',
+        transition: `transform 240ms ${EASE_OUT}, filter 240ms ${EASE_OUT}, opacity 240ms ${EASE_OUT}`,
+      },
+      '&:hover .MuiButton-startIcon, &:hover .MuiButton-endIcon': {
+        transform: 'translateY(-1px)',
+      },
+      '&:focus-visible': {
+        outline: '2px solid rgba(191,225,255,0.34)',
+        outlineOffset: 3,
+      },
       // Apple press: the control compresses slightly when tapped.
       '&:active': {
         transform: 'scale(0.97)',
@@ -53,13 +65,15 @@ const MuiButton: Components<Theme>['MuiButton'] = {
     /** Main CTA — clean navy fill with a soft top highlight. */
     containedPrimary: ({ theme }) => ({
       color: theme.palette.primary.contrastText,
-      background: `linear-gradient(180deg, #2c3e66 0%, ${theme.palette.primary.dark} 100%)`,
-      border: '1px solid rgba(255,255,255,0.12)',
-      boxShadow: `${buttonInsetHighlight}, 0 1px 2px rgba(0,0,0,0.28), 0 8px 20px -10px rgba(0,0,0,0.5)`,
+      background:
+        'linear-gradient(180deg, rgba(72,132,222,0.7) 0%, rgba(45,101,204,0.66) 100%)',
+      backdropFilter: 'blur(18px) saturate(175%)',
+      WebkitBackdropFilter: 'blur(18px) saturate(175%)',
+      border: '1px solid rgba(219,234,254,0.2)',
+      boxShadow: `${buttonInsetHighlight}, 0 1px 2px rgba(0,0,0,0.18)`,
       '&:hover': {
-        background: `linear-gradient(180deg, #34487a 0%, #1b2c4f 100%)`,
-        borderColor: 'rgba(255,255,255,0.2)',
-        boxShadow: `${buttonInsetHighlight}, 0 2px 4px rgba(0,0,0,0.3), 0 14px 28px -10px rgba(0,0,0,0.6)`,
+        borderColor: 'rgba(226,242,255,0.38)',
+        boxShadow: `${buttonInsetHighlight}, 0 2px 4px rgba(0,0,0,0.2)`,
         transform: 'translateY(-1px)',
       },
       '&:active': { transform: 'translateY(0) scale(0.97)' },
@@ -74,13 +88,15 @@ const MuiButton: Components<Theme>['MuiButton'] = {
     /** Secondary filled — graphite, distinct from the navy primary. */
     containedSecondary: ({ theme }) => ({
       color: theme.palette.secondary.contrastText,
-      background: `linear-gradient(180deg, #3a3437 0%, ${theme.palette.secondary.main} 100%)`,
-      border: '1px solid rgba(255,255,255,0.1)',
-      boxShadow: `inset 0 1px 0 rgba(255,255,255,0.1), 0 1px 2px rgba(0,0,0,0.26), 0 8px 20px -10px rgba(0,0,0,0.5)`,
+      background: 'linear-gradient(180deg, rgba(54,62,80,0.56), rgba(43,50,66,0.48))',
+      border: '1px solid rgba(255,255,255,0.14)',
+      backdropFilter: 'blur(18px) saturate(165%)',
+      WebkitBackdropFilter: 'blur(18px) saturate(165%)',
+      boxShadow: `inset 0 1px 0 rgba(255,255,255,0.14), 0 1px 2px rgba(0,0,0,0.2)`,
       '&:hover': {
-        background: `linear-gradient(180deg, #463f42 0%, ${theme.palette.secondary.dark} 100%)`,
-        borderColor: 'rgba(255,255,255,0.18)',
-        boxShadow: `inset 0 1px 0 rgba(255,255,255,0.14), 0 2px 4px rgba(0,0,0,0.28), 0 14px 28px -10px rgba(0,0,0,0.6)`,
+        backgroundColor: 'rgba(50,58,75,0.54)',
+        borderColor: 'rgba(255,255,255,0.24)',
+        boxShadow: `inset 0 1px 0 rgba(255,255,255,0.18), 0 2px 4px rgba(0,0,0,0.22)`,
         transform: 'translateY(-1px)',
       },
       '&:active': { transform: 'translateY(0) scale(0.97)' },
@@ -94,14 +110,16 @@ const MuiButton: Components<Theme>['MuiButton'] = {
     }),
     outlinedPrimary: ({ theme }) => ({
       color: 'rgba(255,255,255,0.94)',
-      borderColor: 'rgba(255,255,255,0.18)',
-      backgroundColor: 'rgba(40,55,86,0.55)',
-      backdropFilter: 'blur(8px)',
-      WebkitBackdropFilter: 'blur(8px)',
+      borderColor: 'rgba(226,242,255,0.18)',
+      background: 'linear-gradient(180deg, rgba(42,60,96,0.42), rgba(33,47,76,0.36))',
+      backdropFilter: 'blur(18px) saturate(165%)',
+      WebkitBackdropFilter: 'blur(18px) saturate(165%)',
+      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.12)',
       '&:hover': {
-        borderColor: 'rgba(191,225,255,0.42)',
-        backgroundColor: 'rgba(48,65,102,0.7)',
+        borderColor: 'rgba(226,242,255,0.32)',
+        backgroundColor: 'rgba(42,60,96,0.46)',
         transform: 'translateY(-1px)',
+        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.16)',
       },
       '&:active': { transform: 'translateY(0) scale(0.97)' },
       '&:disabled': {
@@ -112,14 +130,16 @@ const MuiButton: Components<Theme>['MuiButton'] = {
     }),
     outlinedSecondary: ({ theme }) => ({
       color: 'rgba(255,255,255,0.88)',
-      borderColor: 'rgba(255,255,255,0.14)',
-      backgroundColor: 'rgba(42,48,63,0.55)',
-      backdropFilter: 'blur(8px)',
-      WebkitBackdropFilter: 'blur(8px)',
+      borderColor: 'rgba(255,255,255,0.16)',
+      background: 'linear-gradient(180deg, rgba(50,58,75,0.48), rgba(42,48,63,0.4))',
+      backdropFilter: 'blur(18px) saturate(165%)',
+      WebkitBackdropFilter: 'blur(18px) saturate(165%)',
+      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.13)',
       '&:hover': {
-        borderColor: 'rgba(255,255,255,0.3)',
-        backgroundColor: 'rgba(50,58,75,0.7)',
+        borderColor: 'rgba(255,255,255,0.28)',
+        backgroundColor: 'rgba(50,58,75,0.52)',
         transform: 'translateY(-1px)',
+        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.16)',
       },
       '&:active': { transform: 'translateY(0) scale(0.97)' },
       '&:disabled': {
@@ -139,6 +159,35 @@ const MuiButton: Components<Theme>['MuiButton'] = {
     sizeLarge: {
       minHeight: 48,
     },
+  },
+};
+
+const MuiIconButton: Components<Theme>['MuiIconButton'] = {
+  defaultProps: {
+    disableRipple: true,
+  },
+  styleOverrides: {
+    root: ({ theme }) => ({
+      transition: `transform 240ms ${EASE_OUT}, box-shadow 240ms ${EASE_OUT}, border-color 240ms ${EASE_OUT}, background-color 240ms ${EASE_OUT}, color 240ms ${EASE_OUT}`,
+      '& svg': {
+        transition: `transform 240ms ${EASE_OUT}`,
+      },
+      '&:hover': {
+        backgroundColor: varAlpha(theme.vars.palette.common.whiteChannel, 0.07),
+        transform: 'translateY(-1px)',
+        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.14)',
+      },
+      '&:hover svg': {
+        transform: 'scale(1.04)',
+      },
+      '&:active': {
+        transform: 'scale(0.96)',
+      },
+      '@media (prefers-reduced-motion: reduce)': {
+        transition: 'none',
+        '&:hover, &:active': { transform: 'none' },
+      },
+    }),
   },
 };
 
@@ -170,17 +219,23 @@ const MuiOutlinedInput: Components<Theme>['MuiOutlinedInput'] = {
   styleOverrides: {
     root: ({ theme }) => ({
       borderRadius: 12,
-      backgroundColor: varAlpha(theme.vars.palette.common.whiteChannel, 0.03),
-      transition: `box-shadow 260ms ${EASE_OUT}, background-color 260ms ${EASE_OUT}`,
+      backgroundColor: varAlpha(theme.vars.palette.common.whiteChannel, 0.035),
+      backdropFilter: 'blur(18px) saturate(160%)',
+      WebkitBackdropFilter: 'blur(18px) saturate(160%)',
+      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.08)',
+      transition: `box-shadow 260ms ${EASE_OUT}, background-color 260ms ${EASE_OUT}, transform 260ms ${EASE_OUT}`,
       '& .MuiOutlinedInput-notchedOutline': {
         borderColor: varAlpha(theme.vars.palette.common.whiteChannel, 0.28),
         transition: `border-color 260ms ${EASE_OUT}`,
       },
       '&:hover .MuiOutlinedInput-notchedOutline': {
-        borderColor: varAlpha(theme.vars.palette.common.whiteChannel, 0.46),
+        borderColor: varAlpha(theme.vars.palette.common.whiteChannel, 0.5),
+      },
+      '&:hover': {
+        backgroundColor: varAlpha(theme.vars.palette.common.whiteChannel, 0.048),
       },
       '&.Mui-focused': {
-        boxShadow: '0 0 0 4px rgba(147, 197, 253, 0.22)',
+        boxShadow: 'inset 0 0 0 1px rgba(147, 197, 253, 0.32)',
         backgroundColor: varAlpha(theme.vars.palette.common.whiteChannel, 0.05),
       },
       '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
@@ -191,7 +246,7 @@ const MuiOutlinedInput: Components<Theme>['MuiOutlinedInput'] = {
         borderColor: theme.vars.palette.error.main,
       },
       '&.Mui-error.Mui-focused': {
-        boxShadow: '0 0 0 3px rgba(248, 113, 113, 0.22)',
+        boxShadow: 'inset 0 0 0 1px rgba(248, 113, 113, 0.32)',
       },
       '&.Mui-disabled .MuiOutlinedInput-notchedOutline': {
         borderColor: varAlpha(theme.vars.palette.common.whiteChannel, 0.14),
@@ -275,6 +330,63 @@ const MuiMenuItem: Components<Theme>['MuiMenuItem'] = {
   },
 };
 
+const MuiToggleButtonGroup: Components<Theme>['MuiToggleButtonGroup'] = {
+  styleOverrides: {
+    root: {
+      padding: 3,
+      borderRadius: 12,
+      background: 'linear-gradient(180deg, rgba(20,32,56,0.52), rgba(12,22,42,0.46))',
+      border: '1px solid rgba(255,255,255,0.1)',
+      backdropFilter: 'blur(18px) saturate(165%)',
+      WebkitBackdropFilter: 'blur(18px) saturate(165%)',
+      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.11)',
+      gap: 3,
+    },
+  },
+};
+
+const MuiToggleButton: Components<Theme>['MuiToggleButton'] = {
+  defaultProps: {
+    disableRipple: true,
+  },
+  styleOverrides: {
+    root: {
+      border: 0,
+      borderRadius: 9,
+      color: 'rgba(226,232,240,0.58)',
+      transition: `transform 240ms ${EASE_OUT}, background 240ms ${EASE_OUT}, box-shadow 240ms ${EASE_OUT}, color 240ms ${EASE_OUT}`,
+      '&.MuiToggleButtonGroup-grouped': {
+        borderRadius: 9,
+        border: 0,
+        margin: 0,
+      },
+      '&:hover': {
+        color: '#fff',
+        background:
+          'linear-gradient(180deg, rgba(255,255,255,0.09) 0%, rgba(255,255,255,0.035) 100%)',
+        transform: 'translateY(-1px)',
+      },
+      '&.Mui-selected': {
+        color: '#fff',
+        background:
+          'linear-gradient(180deg, rgba(96,165,250,0.32) 0%, rgba(59,130,246,0.16) 100%)',
+        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.2), inset 0 -1px 0 rgba(15,23,42,0.2)',
+      },
+      '&.Mui-selected:hover': {
+        background:
+          'linear-gradient(180deg, rgba(111,178,255,0.38) 0%, rgba(59,130,246,0.2) 100%)',
+      },
+      '&.Mui-disabled': {
+        color: 'rgba(226,232,240,0.28)',
+      },
+      '@media (prefers-reduced-motion: reduce)': {
+        transition: 'none',
+        '&:hover': { transform: 'none' },
+      },
+    },
+  },
+};
+
 const MuiLink: Components<Theme>['MuiLink'] = {
   defaultProps: { underline: 'hover' },
 };
@@ -340,7 +452,7 @@ const MuiChip: Components<Theme>['MuiChip'] = {
       transition: `transform 240ms ${SPRING}, background-color 240ms ${EASE_OUT}`,
     },
     label: {
-      letterSpacing: '-0.006em',
+      letterSpacing: 0,
     },
   },
 };
@@ -419,8 +531,11 @@ export const components = {
   MuiTooltip,
   MuiPopover,
   MuiBackdrop,
+  MuiIconButton,
   MuiMenuItem,
   MuiCheckbox,
+  MuiToggleButton,
+  MuiToggleButtonGroup,
   MuiTableCell,
   MuiCardHeader,
   MuiOutlinedInput,

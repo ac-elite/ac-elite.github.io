@@ -53,7 +53,7 @@ export function NotFoundView() {
               }}
             >
               <Stack spacing={1} alignItems="center">
-                <Typography variant="h4" sx={{ fontWeight: 800, letterSpacing: 0.02 }}>
+                <Typography component="h1" variant="h4" sx={{ fontWeight: 800, letterSpacing: 0 }}>
                   Wrong chicane
                 </Typography>
                 <Typography variant="body2" sx={{ ...NOT_FOUND_SUPPORTING_TEXT_SX }}>
