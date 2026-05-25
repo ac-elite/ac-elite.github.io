@@ -19,8 +19,8 @@ import { getSiteUrl } from 'src/centralized/site-urls';
 import {
   GLASS_PANEL_SX,
   GLASS_INNER_ROW_SX,
-  GLASS_CARD_INNER_SX,
   GLASS_PANEL_SPACIOUS_SX,
+  GLASS_CARD_INNER_HOVER_SX,
 } from 'src/lib/glass';
 import { getSyncHealth, type SiteMetadata, getEffectiveLastSync } from 'src/lib/sync-utils';
 import { subtleEnterUpSx, glassCardMotionSx } from 'src/lib/subtle-motion';
@@ -28,10 +28,12 @@ import { brandAccentBorderSx } from 'src/lib/status-accent';
 import {
   CAR,
   getSRTier,
+  getSrTierRgb,
   formatNumber,
   safetyRating,
   formatLaptime,
   type RankDriver,
+  LICENSE_TIER_RGB,
   getDriverLicense,
   computeLicenseMap,
   LICENSE_TIER_ORDER,
@@ -47,24 +49,9 @@ import { DataPageHeader } from 'src/components/data-page-header/data-page-header
 import { TrendWindowStats } from 'src/components/trend-window/trend-window-stats';
 import { PageGridOverlay } from 'src/components/page-background/page-grid-overlay';
 
-// Mirrors the per-tier hues used by the license chips (getLicenseBadgeSx) so the
-// distribution donut and the chips speak one colour language — each metal a
-// distinct hue (icy-steel Platinum vs neutral Silver vs warm-stone Rookie).
-const LICENSE_TIER_COLORS: Record<string, string> = {
-  Elite: '#C084FC',
-  'Diamond+': '#60A5FA',
-  Diamond: '#22D3EE',
-  'Platinum+': '#A7E2F6',
-  Platinum: '#7DC4E0',
-  'Gold+': '#FDE047',
-  Gold: '#FACC15',
-  'Silver+': '#C4CDD8',
-  Silver: '#94A3B8',
-  'Bronze+': '#FB923C',
-  Bronze: '#D37848',
-  Rookie: '#F87171',
-};
-
+// License + SR chart colours come from the shared tier source (LICENSE_TIER_RGB
+// / getSrTierRgb in ac-elite-data) so the donut, the bars and the chips/cards
+// all speak one colour language and never drift apart.
 function GridCompositionSection({ rankData }: { rankData: RankDriver[] }) {
   const licenseMap = useMemo(() => computeLicenseMap(rankData), [rankData]);
 
@@ -89,22 +76,13 @@ function GridCompositionSection({ rankData }: { rankData: RankDriver[] }) {
     return {
       labels: entries.map((e) => e[0]),
       series: entries.map((e) => e[1]),
-      colors: entries.map((e) => LICENSE_TIER_COLORS[e[0]] ?? '#5B8DEF'),
+      colors: entries.map((e) => `rgb(${LICENSE_TIER_RGB[e[0]] ?? LICENSE_TIER_RGB.Bronze})`),
       total: entries.reduce((sum, e) => sum + e[1], 0),
     };
   }, [licenseMap, rankData]);
 
   const grades = useMemo(() => {
     const order = ['S', 'A', 'B', 'C', 'D', 'E', 'F'];
-    const gradeColor: Record<string, string> = {
-      S: '#22C55E',
-      A: '#5B8DEF',
-      B: '#38BDF8',
-      C: '#F59E0B',
-      D: '#F87171',
-      E: '#EF4444',
-      F: '#B91C1C',
-    };
     const counts = new Map<string, number>();
 
     rankData.forEach((driver) => {
@@ -126,7 +104,7 @@ function GridCompositionSection({ rankData }: { rankData: RankDriver[] }) {
     return {
       categories: entries.map((e) => e[0]),
       data: entries.map((e) => e[1]),
-      colors: entries.map((e) => gradeColor[e[0]] ?? '#94A3B8'),
+      colors: entries.map((e) => `rgb(${getSrTierRgb(e[0])})`),
     };
   }, [rankData]);
 
@@ -135,7 +113,7 @@ function GridCompositionSection({ rankData }: { rankData: RankDriver[] }) {
   return (
     <Grid size={{ xs: 12 }}>
       <Reveal>
-        <Box sx={{ ...GLASS_PANEL_SX, ...brandAccentBorderSx() }}>
+        <Box sx={{ ...GLASS_PANEL_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(8) }}>
         <Stack spacing={0.7} sx={{ mb: 2 }}>
           <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.78)' }}>
             Grid composition
@@ -152,7 +130,7 @@ function GridCompositionSection({ rankData }: { rankData: RankDriver[] }) {
       <Grid container spacing={2.5} alignItems="stretch">
         <Grid size={{ xs: 12, md: 6 }}>
           <Reveal index={1} sx={{ height: 1 }}>
-            <Box sx={{ ...GLASS_CARD_INNER_SX, height: 1, p: 2 }}>
+            <Box sx={{ ...GLASS_CARD_INNER_HOVER_SX, height: 1, p: 2, cursor: 'default' }}>
               <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.78)' }}>
                 License tiers
               </Typography>
@@ -199,7 +177,7 @@ function GridCompositionSection({ rankData }: { rankData: RankDriver[] }) {
 
         <Grid size={{ xs: 12, md: 6 }}>
           <Reveal index={2} sx={{ height: 1 }}>
-            <Box sx={{ ...GLASS_CARD_INNER_SX, height: 1, p: 2 }}>
+            <Box sx={{ ...GLASS_CARD_INNER_HOVER_SX, height: 1, p: 2, cursor: 'default' }}>
               <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.78)' }}>
                 Safety Rating grades
               </Typography>

@@ -23,6 +23,12 @@ import {
   LICENSE_CHIP_WIDTH,
   LICENSE_TIER_ORDER,
 } from 'src/lib/ac-elite-data';
+import {
+  GLASS_DIALOG_SX,
+  GLASS_CARD_INNER_SX,
+  GLASS_TABLE_CONTAINER_SX,
+  GLASS_CARD_INNER_HOVER_SX,
+} from 'src/lib/glass';
 
 export type GuideTab = 'license' | 'safety';
 
@@ -127,18 +133,9 @@ function LicenseSafetyGuideDialog({ open, onClose, initialTab = 'license' }: Lic
         maxWidth="sm"
         PaperProps={{
           sx: {
+            ...GLASS_DIALOG_SX,
             width: { xs: 'calc(100% - 20px)', sm: 760 },
             maxWidth: 'calc(100% - 20px)',
-            borderRadius: 3,
-            border: '1px solid rgba(255,255,255,0.12)',
-            // Apple vibrancy glass: top sheen + frosted navy + saturated blur.
-            backgroundImage:
-              'radial-gradient(120% 80% at 18% -10%, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.02) 30%, rgba(255,255,255,0) 56%),' +
-              'linear-gradient(180deg, rgba(34,48,80,0.94) 0%, rgba(17,26,48,0.96) 100%)',
-            backdropFilter: 'blur(30px) saturate(180%)',
-            WebkitBackdropFilter: 'blur(30px) saturate(180%)',
-            boxShadow:
-              'inset 0 1px 0 rgba(255,255,255,0.22), 0 2px 8px rgba(0,0,0,0.4), 0 40px 90px -20px rgba(0,0,0,0.72)',
             color: '#fff',
           },
         }}
@@ -159,20 +156,13 @@ function LicenseSafetyGuideDialog({ open, onClose, initialTab = 'license' }: Lic
           <IconButton
             onClick={onClose}
             sx={{
+              ...GLASS_CARD_INNER_HOVER_SX,
               width: { xs: 34, sm: 36 },
               height: { xs: 34, sm: 36 },
               borderRadius: '50%',
               color: 'rgba(255,255,255,0.72)',
-              border: '1px solid rgba(255,255,255,0.18)',
-              background:
-                'radial-gradient(120% 120% at 24% 0%, rgba(255,255,255,0.11), rgba(255,255,255,0.02) 46%, transparent 70%), rgba(255,255,255,0.035)',
-              backdropFilter: 'blur(16px) saturate(165%)',
-              WebkitBackdropFilter: 'blur(16px) saturate(165%)',
-              boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.12)',
               '&:hover': {
                 color: '#fff',
-                borderColor: 'rgba(226,242,255,0.38)',
-                bgcolor: 'rgba(255,255,255,0.075)',
               },
             }}
           >
@@ -202,15 +192,10 @@ function LicenseSafetyGuideDialog({ open, onClose, initialTab = 'license' }: Lic
             onChange={(_, value: GuideTab) => setActiveTab(value)}
             variant="fullWidth"
             sx={{
+              ...GLASS_CARD_INNER_SX,
               minHeight: 46,
               p: 0.5,
               borderRadius: 2.5,
-              background:
-                'radial-gradient(120% 120% at 16% -30%, rgba(255,255,255,0.12), rgba(255,255,255,0.025) 42%, transparent 66%), rgba(11,19,38,0.48)',
-              border: '1px solid rgba(255,255,255,0.1)',
-              backdropFilter: 'blur(18px) saturate(165%)',
-              WebkitBackdropFilter: 'blur(18px) saturate(165%)',
-              boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.11)',
               '& .MuiTabs-indicator': { display: 'none' },
               '& .MuiTabs-flexContainer': { gap: 0.5 },
             }}
@@ -271,8 +256,8 @@ function LicenseSafetyGuideDialog({ open, onClose, initialTab = 'license' }: Lic
 
               <Box
                 sx={{
+                  ...GLASS_TABLE_CONTAINER_SX,
                   borderRadius: 2,
-                  border: '1px solid rgba(255,255,255,0.1)',
                   overflow: 'hidden',
                   maxWidth: '100%',
                   overflowX: 'auto',
@@ -286,7 +271,7 @@ function LicenseSafetyGuideDialog({ open, onClose, initialTab = 'license' }: Lic
                     px: 2,
                     py: 1.1,
                     minWidth: { xs: 320, sm: 0 },
-                    bgcolor: 'rgba(255,255,255,0.06)',
+                    bgcolor: 'rgba(255,255,255,0.012)',
                   }}
                 >
                   <Typography
@@ -320,7 +305,6 @@ function LicenseSafetyGuideDialog({ open, onClose, initialTab = 'license' }: Lic
                           py: 1.2,
                           alignItems: 'center',
                           minWidth: { xs: 320, sm: 0 },
-                          bgcolor: 'rgba(23,33,59,0.36)',
                         }}
                       >
                         <Chip
@@ -355,7 +339,6 @@ function LicenseSafetyGuideDialog({ open, onClose, initialTab = 'license' }: Lic
                       py: 1.2,
                       alignItems: 'center',
                       minWidth: { xs: 320, sm: 0 },
-                      bgcolor: 'rgba(23,33,59,0.36)',
                     }}
                   >
                     <Chip
@@ -400,7 +383,7 @@ function LicenseSafetyGuideDialog({ open, onClose, initialTab = 'license' }: Lic
                 To unlock a tier you need both the minimum SR value and minimum total km for that tier.
               </Typography>
 
-              <Box sx={{ borderRadius: 2, border: '1px solid rgba(255,255,255,0.1)', overflow: 'hidden' }}>
+              <Box sx={{ ...GLASS_TABLE_CONTAINER_SX, borderRadius: 2, overflow: 'hidden' }}>
                 <Box
                   sx={{
                     display: 'grid',
@@ -408,7 +391,7 @@ function LicenseSafetyGuideDialog({ open, onClose, initialTab = 'license' }: Lic
                     gap: 1,
                     px: 2,
                     py: 1.1,
-                    bgcolor: 'rgba(255,255,255,0.06)',
+                    bgcolor: 'rgba(255,255,255,0.012)',
                   }}
                 >
                   <Typography
@@ -436,7 +419,6 @@ function LicenseSafetyGuideDialog({ open, onClose, initialTab = 'license' }: Lic
                         px: 2,
                         py: 1.2,
                         alignItems: 'center',
-                        bgcolor: 'rgba(23,33,59,0.36)',
                       }}
                     >
                       <Chip
@@ -466,7 +448,6 @@ function LicenseSafetyGuideDialog({ open, onClose, initialTab = 'license' }: Lic
                       px: 2,
                       py: 1.2,
                       alignItems: 'center',
-                      bgcolor: 'rgba(23,33,59,0.36)',
                     }}
                   >
                     <Chip

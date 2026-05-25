@@ -248,19 +248,17 @@ export const GLASS_SIDEBAR_ITEM_ACTIVE_SX: SystemStyleObject<Theme> = {
 export const GLASS_MATERIAL_BACKDROP = 'blur(28px) saturate(180%)';
 
 /**
- * Base glass surface — a floating macOS/visionOS-style window on the Elite Blue
- * (#101F3D) brand tint. Authentic Liquid Glass = an even translucent tint that
- * refracts the backdrop (backdrop blur + saturate) + a single bright specular
- * top edge + a soft grounding bottom for thickness. No baked corner bloom or
- * diagonal facet — those read as un-Apple glassmorphism. Calm by default; live
- * elements opt into {@link GLASS_CARD_LIVE_SX}.
+ * Base glass surface — Card 1. It always sits on the dark brand foundation
+ * (#17213B), independent of whether it contains child cards. The material still
+ * gets its glass feel from the specular top edge, rim, blur and shadow, while
+ * nested cards use lighter films on top instead of changing this base layer.
  */
 export const GLASS_CARD_SX: SxProps<Theme> = {
   position: 'relative',
   borderRadius: GLASS_RADIUS.panel,
   // Lighter hairline — the depth comes from light + shadow, not a heavy border.
   border: `1px solid rgba(226,242,255,0.11)`,
-  backgroundColor: `rgba(${BRAND.eliteBlueRgb},0.74)`,
+  backgroundColor: BRAND.navBase,
   // Even top-down specular sheen only (the lit top edge of the glass).
   backgroundImage:
     'linear-gradient(180deg, rgba(255,255,255,0.055) 0%, rgba(255,255,255,0.014) 44%, rgba(255,255,255,0) 100%)',
@@ -281,9 +279,8 @@ export const GLASS_CARD_LIVE_SX: SxProps<Theme> = {
 
 /**
  * Inner glass tile — a *secondary* surface that sits inside {@link GLASS_CARD_SX}.
- * It is a light translucent film over the parent (so the parent's Elite Blue
- * shows through and lifts it) rather than another dark navy box competing with
- * the parent. Quieter on purpose: weaker border, a subtle inner highlight, and
+ * It is a lighter translucent film over the dark level-1 surface. Quieter on
+ * purpose: weaker border, a subtle inner highlight, and
  * no outer drop shadow. It also drops `backdrop-filter` — the parent panel is
  * already a blurred surface, so a second nested blur only costs paint with no
  * visible gain. The deeper the nesting, the quieter the styling.
@@ -291,21 +288,54 @@ export const GLASS_CARD_LIVE_SX: SxProps<Theme> = {
 export const GLASS_CARD_INNER_SX: SxProps<Theme> = {
   position: 'relative',
   borderRadius: GLASS_RADIUS.innerPanel,
-  border: '1px solid rgba(255,255,255,0.07)',
-  backgroundColor: 'rgba(255,255,255,0.028)',
+  border: '1px solid rgba(226,242,255,0.12)',
+  backgroundColor: 'rgba(255,255,255,0.012)',
   backgroundImage:
-    'linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.014) 100%)',
-  boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.07)',
+    'linear-gradient(180deg, rgba(255,255,255,0.026) 0%, rgba(255,255,255,0.003) 100%)',
+  boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.09), inset 0 -1px 0 rgba(0,0,0,0.1)',
 };
 
 export const GLASS_CARD_INNER_HOVER_SX: SxProps<Theme> = {
   ...GLASS_CARD_INNER_SX,
   cursor: 'pointer',
-  transition: 'border-color 160ms ease, background-color 160ms ease',
-  '&:hover': {
-    borderColor: 'rgba(255,255,255,0.14)',
-    backgroundColor: 'rgba(255,255,255,0.05)',
+  transition:
+    'translate 220ms cubic-bezier(0.32, 0.72, 0, 1), border-color 220ms cubic-bezier(0.32, 0.72, 0, 1), background-color 220ms cubic-bezier(0.32, 0.72, 0, 1), filter 220ms cubic-bezier(0.32, 0.72, 0, 1)',
+  willChange: 'translate',
+  '@media (hover: hover)': {
+    '&:hover': {
+      translate: '0 -2px',
+      borderColor: 'rgba(226,242,255,0.18)',
+      backgroundColor: 'rgba(255,255,255,0.032)',
+      filter: 'brightness(1.018) saturate(1.04)',
+    },
   },
+  '@media (prefers-reduced-motion: reduce)': {
+    transition: 'none',
+    '&:hover': {
+      translate: 'none',
+      filter: 'none',
+    },
+  },
+};
+
+export const GLASS_DIALOG_SX: SxProps<Theme> = {
+  ...GLASS_CARD_SX,
+  overflow: 'hidden',
+};
+
+export const GLASS_TABLE_CONTAINER_SX: SxProps<Theme> = {
+  ...GLASS_CARD_INNER_SX,
+  overflow: 'auto',
+};
+
+export const GLASS_INLINE_CODE_SX: SxProps<Theme> = {
+  ...GLASS_CARD_INNER_SX,
+  display: 'inline-block',
+  px: 0.75,
+  py: 0.25,
+  borderRadius: 0.75,
+  fontFamily: 'ui-monospace, monospace',
+  color: '#fff',
 };
 
 export const GLASS_TABLE_WRAPPER_SX: SxProps<Theme> = {
@@ -345,8 +375,9 @@ export const GLASS_PANEL_TIGHT_SX: SxProps<Theme> = {
 };
 
 export const GLASS_INNER_PANEL_SX: SxProps<Theme> = {
-  ...GLASS_CARD_INNER_SX,
+  ...GLASS_CARD_INNER_HOVER_SX,
   p: GLASS_PADDING.innerPanel,
+  cursor: 'default',
 };
 
 export const GLASS_INNER_ROW_SX: SxProps<Theme> = {

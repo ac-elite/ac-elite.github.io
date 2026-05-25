@@ -7,6 +7,8 @@ import ReactApexChart from 'react-apexcharts';
 
 import Box, { type BoxProps } from '@mui/material/Box';
 
+import { BRAND } from 'src/lib/glass';
+
 // ----------------------------------------------------------------------
 
 /** Brand-led categorical palette: accent blue first, then semantic + supporting hues. */
@@ -125,7 +127,7 @@ export function Chart({ type = 'area', series, options, height = 280, width = '1
           '& .apexcharts-tooltip.apexcharts-theme-dark': {
             borderRadius: '12px !important',
             border: '1px solid rgba(255,255,255,0.12) !important',
-            background: 'rgba(16,24,44,0.92) !important',
+            background: `${BRAND.navBase} !important`,
             backdropFilter: 'blur(14px) saturate(160%)',
             boxShadow: '0 12px 32px -8px rgba(0,0,0,0.65) !important',
           },
@@ -137,7 +139,7 @@ export function Chart({ type = 'area', series, options, height = 280, width = '1
           '& .apexcharts-xaxistooltip, & .apexcharts-yaxistooltip': {
             borderRadius: '8px !important',
             border: '1px solid rgba(255,255,255,0.12) !important',
-            background: 'rgba(16,24,44,0.92) !important',
+            background: `${BRAND.navBase} !important`,
             color: 'rgba(255,255,255,0.9) !important',
           },
         },

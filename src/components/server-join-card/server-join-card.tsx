@@ -10,7 +10,7 @@ import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 
-import { GLASS_PADDING, GLASS_PANEL_SX, GLASS_CARD_INNER_SX } from 'src/lib/glass';
+import { GLASS_PADDING, GLASS_PANEL_SX, GLASS_CARD_INNER_HOVER_SX } from 'src/lib/glass';
 import { SERVER_ENDPOINTS } from 'src/centralized/server-endpoints';
 import { formatTimeAgo } from 'src/lib/sync-utils';
 import { BRAND_ACCENT } from 'src/lib/status-accent';
@@ -43,7 +43,7 @@ const badgeSx = {
 } as const;
 
 const infoBlockSx = {
-  ...GLASS_CARD_INNER_SX,
+  ...GLASS_CARD_INNER_HOVER_SX,
   borderRadius: 1.1,
   px: { xs: 1, md: 0.75 },
   /** Equal top/bottom padding; inner Stack uses fixed gap + lineHeight so content looks balanced. */
@@ -52,6 +52,7 @@ const infoBlockSx = {
   flexDirection: 'column',
   justifyContent: 'center',
   minWidth: 0,
+  cursor: 'default',
 } as const;
 
 const infoLabelSx = {

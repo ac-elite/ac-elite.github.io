@@ -52,9 +52,9 @@ import {
   MARKETING_CTA_SECONDARY_GLASS_SX,
 } from 'src/lib/page-shell';
 import {
-  GLASS_CARD_SX,
   GLASS_PANEL_SX,
   getPodiumRowSx,
+  GLASS_CARD_INNER_SX,
   GLASS_INNER_PANEL_SX,
   GLASS_TABLE_WRAPPER_SX,
   GLASS_TABLE_PAGINATION_SX,
@@ -830,7 +830,7 @@ function DriverSearchSection({
                 {!loading && !error && matches.length > 0 && (
                   <Paper
                     sx={{
-                      ...GLASS_CARD_SX,
+                      ...GLASS_CARD_INNER_SX,
                       width: '100%',
                       mt: 1,
                       maxHeight: 280,

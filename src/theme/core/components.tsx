@@ -327,12 +327,12 @@ const MuiTableCell: Components<Theme>['MuiTableCell'] = {
       color: varAlpha(theme.vars.palette.common.whiteChannel, 0.88),
       fontWeight: 800,
       letterSpacing: 0.3,
-      backgroundColor: 'rgba(148,163,184,0.12)',
+      backgroundColor: 'rgba(255,255,255,0.012)',
       boxShadow: 'inset 0 -1px 0 rgba(255,255,255,0.1)',
       whiteSpace: 'nowrap' as const,
     }),
     body: () => ({
-      backgroundColor: 'rgba(16,31,61,0.58)',
+      backgroundColor: 'transparent',
     }),
   },
 };

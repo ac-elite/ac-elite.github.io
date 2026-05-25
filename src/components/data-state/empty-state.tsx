@@ -4,7 +4,7 @@ import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 
-import { GLASS_CARD_INNER_SX } from 'src/lib/glass';
+import { GLASS_CARD_INNER_HOVER_SX } from 'src/lib/glass';
 import { DATA_STATE_HELP_TEXT_SX } from 'src/lib/page-shell';
 
 // ----------------------------------------------------------------------
@@ -20,7 +20,8 @@ export function EmptyState({ title, description, action }: EmptyStateProps) {
   return (
     <Box
       sx={{
-        ...GLASS_CARD_INNER_SX,
+        ...GLASS_CARD_INNER_HOVER_SX,
+        cursor: 'default',
         px: 2,
         py: 1.75,
       }}

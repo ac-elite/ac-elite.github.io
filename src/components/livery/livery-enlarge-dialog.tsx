@@ -8,7 +8,7 @@ import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import DialogContent from '@mui/material/DialogContent';
 
-import { GLASS_PANEL_SX, GLASS_CARD_INNER_SX } from 'src/lib/glass';
+import { GLASS_DIALOG_SX, GLASS_CARD_INNER_SX } from 'src/lib/glass';
 
 export type LiveryEnlargeDialogProps = {
   open: boolean;
@@ -39,11 +39,9 @@ export function LiveryEnlargeDialog({
       aria-labelledby="livery-enlarge-dialog-title"
       PaperProps={{
         sx: [
-          GLASS_PANEL_SX,
+          GLASS_DIALOG_SX,
           {
             p: 0,
-            overflow: 'hidden',
-            backgroundColor: 'rgba(8,14,28,0.92)',
             maxHeight: '96vh',
           },
         ] as SxProps<Theme>,

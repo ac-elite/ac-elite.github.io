@@ -13,7 +13,7 @@ import TableHead from '@mui/material/TableHead';
 import Typography from '@mui/material/Typography';
 import TableContainer from '@mui/material/TableContainer';
 
-import { GLASS_PANEL_COMPACT_SX } from 'src/lib/glass';
+import { GLASS_PANEL_COMPACT_SX, GLASS_TABLE_CONTAINER_SX } from 'src/lib/glass';
 import { glassCardMotionSx } from 'src/lib/subtle-motion';
 import { brandAccentBorderSx } from 'src/lib/status-accent';
 import { TABLE_HEAD_MUTED_COLOR } from 'src/lib/page-shell';
@@ -171,20 +171,17 @@ export function AdminSyncStatusPanel({ motionIndex = 2 }: { motionIndex?: number
 
       <TableContainer
         sx={{
+          ...GLASS_TABLE_CONTAINER_SX,
           mt: 1.5,
           maxWidth: '100%',
           overflowX: 'auto',
           borderRadius: 2,
-          border: '1px solid rgba(148,163,184,0.14)',
-          bgcolor: 'rgba(16,31,61,0.4)',
         }}
       >
         <Table size="small" sx={{ borderCollapse: 'separate', borderSpacing: 0, minWidth: 720 }}>
           <TableHead>
             <TableRow
               sx={{
-                background:
-                  'linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%), rgba(16,31,61,0.94)',
                 '& th': {
                   fontSize: '0.68rem',
                   textTransform: 'uppercase',

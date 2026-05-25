@@ -50,25 +50,24 @@ export type LeaderboardCarRow = {
 export const LICENSE_CHIP_WIDTH = 96;
 export const SR_CHIP_WIDTH = 62;
 
+function roleGlassChipSx(rgb: string, text: string): SxProps<Theme> {
+  return {
+    ...GLASS_CHIP_SHEEN_SX,
+    color: text,
+    background:
+      `linear-gradient(180deg, rgba(${rgb},0.52) 0%, rgba(${rgb},0.28) 100%)`,
+    border: `1px solid rgba(${rgb},0.68)`,
+    textShadow: '0 1px 1px rgba(0,0,0,0.35)',
+    boxShadow:
+      'inset 0 1px 0 rgba(255,255,255,0.32), inset 0 -1px 0 rgba(0,0,0,0.18),' +
+      ` 0 1px 2px rgba(0,0,0,0.24), 0 8px 20px -12px rgba(${rgb},0.7)`,
+  };
+}
+
 export const ROLE_CHIP_SX = {
-  Creator: {
-    color: '#fff',
-    background: 'linear-gradient(135deg, #FF6B6B 0%, #ED4245 100%)',
-    border: '1px solid rgba(237,66,69,0.72)',
-    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.22)',
-  },
-  Admin: {
-    color: '#fff',
-    background: 'linear-gradient(135deg, #A855F7 0%, #7C3AED 100%)',
-    border: '1px solid rgba(168,85,247,0.72)',
-    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.22)',
-  },
-  Moderator: {
-    color: '#0a2e14',
-    background: 'linear-gradient(135deg, #4ADE80 0%, #22C55E 100%)',
-    border: '1px solid rgba(74,222,128,0.72)',
-    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.3)',
-  },
+  Creator: roleGlassChipSx('237,66,69', '#fff'),
+  Admin: roleGlassChipSx('168,85,247', '#fff'),
+  Moderator: roleGlassChipSx('74,222,128', '#0a2e14'),
 } as const satisfies Record<string, SxProps<Theme>>;
 
 export type DiscordRole = keyof typeof ROLE_CHIP_SX;
@@ -176,37 +175,123 @@ function glassTierChipSx(rgb: string, text: string): SxProps<Theme> {
   };
 }
 
+/**
+ * Single source of truth for license tier accent colours ("r,g,b"). Drives BOTH
+ * the chips (getLicenseBadgeSx) and the medal panels on the driver profile
+ * (getLicensePanelSx), so a tier's chip and its card always match. Authentic
+ * materials, each a distinct hue: Elite amethyst, Diamond icy cyan, Platinum
+ * lustrous white, Gold warm metallic gold, Silver neutral grey, Bronze copper;
+ * "+" is the brighter shade. Rookie is red (lowest/entry tier).
+ */
+export const LICENSE_TIER_RGB: Record<string, string> = {
+  Elite: '192,132,252',
+  'Diamond+': '130,236,252',
+  Diamond: '45,212,232',
+  'Platinum+': '226,238,246',
+  Platinum: '183,206,223',
+  'Gold+': '246,205,90',
+  Gold: '226,170,40',
+  'Silver+': '203,210,217',
+  Silver: '165,174,185',
+  'Bronze+': '208,138,72',
+  Bronze: '180,110,55',
+  Rookie: '248,113,113',
+};
+
+/** Light text tint paired with each {@link LICENSE_TIER_RGB} entry. */
+const LICENSE_TIER_TEXT: Record<string, string> = {
+  Elite: '#EBDDFF',
+  'Diamond+': '#E2FBFF',
+  Diamond: '#CFFAFE',
+  'Platinum+': '#F2F8FC',
+  Platinum: '#E4F0FA',
+  'Gold+': '#FEF3C7',
+  Gold: '#FBEAB0',
+  'Silver+': '#EFF2F5',
+  Silver: '#E4E8EE',
+  'Bronze+': '#F7E2CC',
+  Bronze: '#EFD2B6',
+  Rookie: '#FEE2E2',
+};
+
+/** Medal-panel glow strength per tier [fill, border] — light metals glow less. */
+const LICENSE_TIER_PANEL_OPACITY: Record<string, [number, number]> = {
+  Elite: [0.42, 0.9],
+  'Diamond+': [0.4, 0.85],
+  Diamond: [0.38, 0.82],
+  'Platinum+': [0.28, 0.65],
+  Platinum: [0.25, 0.6],
+  'Gold+': [0.38, 0.82],
+  Gold: [0.36, 0.78],
+  'Silver+': [0.24, 0.58],
+  Silver: [0.22, 0.55],
+  'Bronze+': [0.36, 0.78],
+  Bronze: [0.34, 0.75],
+  Rookie: [0.3, 0.72],
+};
+
 export function getLicenseBadgeSx(license: string): SxProps<Theme> {
-  // Each metal gets a distinct hue *and* text tint so adjacent tiers never read
-  // as the same chip. The old Platinum / Silver / Rookie were all the same
-  // grey-blue; they are now icy-steel-blue / neutral-grey / warm-stone.
-  const styles: Record<string, SxProps<Theme>> = {
-    Elite: glassTierChipSx('192,132,252', '#EBDDFF'), // violet
-    'Diamond+': glassTierChipSx('96,165,250', '#DBEAFE'), // azure blue
-    Diamond: glassTierChipSx('34,211,238', '#CFFAFE'), // cyan
-    'Platinum+': glassTierChipSx('167,226,246', '#E8F8FF'), // icy cyan-white
-    Platinum: glassTierChipSx('125,196,224', '#D6F0FB'), // icy steel blue
-    'Gold+': glassTierChipSx('253,224,71', '#FEF9C3'), // bright yellow
-    Gold: glassTierChipSx('250,204,21', '#FDF0C2'), // gold
-    'Silver+': glassTierChipSx('196,205,216', '#EFF2F6'), // light neutral grey
-    Silver: glassTierChipSx('148,163,184', '#DEE5EE'), // medium slate grey
-    'Bronze+': glassTierChipSx('251,146,60', '#FFE7CC'), // light orange
-    Bronze: glassTierChipSx('211,120,72', '#FADFCD'), // copper / bronze
-    Rookie: glassTierChipSx('248,113,113', '#FEE2E2'), // red — the lowest/entry tier
-  };
-  return withBadgeGlassHover(styles[license] || styles.Bronze);
+  const rgb = LICENSE_TIER_RGB[license] ?? LICENSE_TIER_RGB.Bronze;
+  const text = LICENSE_TIER_TEXT[license] ?? LICENSE_TIER_TEXT.Bronze;
+  return withBadgeGlassHover(glassTierChipSx(rgb, text));
+}
+
+/**
+ * SR tier accent ("r,g,b") on a continuous green -> red *safety* scale (green =
+ * clean/safe, red = unsafe); F is the reddest/darkest. Single source for the SR
+ * chips and the driver-profile SR panel so they always match.
+ */
+export function getSrTierRgb(tier: string): string {
+  switch (tier.charAt(0)) {
+    case 'S':
+      return '34,197,94'; // green
+    case 'A':
+      return '132,204,22'; // lime
+    case 'B':
+      return '253,224,71'; // yellow
+    case 'C':
+      return '245,158,11'; // amber
+    case 'D':
+      return '249,115,22'; // orange
+    case 'E':
+      return '239,68,68'; // red
+    default:
+      return '220,38,38'; // F — deepest red
+  }
+}
+
+function srTierText(tier: string): string {
+  switch (tier.charAt(0)) {
+    case 'S':
+      return '#DCFCE7';
+    case 'A':
+      return '#ECFCCB';
+    case 'B':
+      return '#FEF9C3';
+    case 'C':
+      return '#FDEBC8';
+    case 'D':
+      return '#FFE2CC';
+    case 'E':
+      return '#FECACA';
+    default:
+      return '#FCA5A5'; // F
+  }
+}
+
+function srTierPanelOpacity(tier: string): [number, number] {
+  switch (tier.charAt(0)) {
+    case 'S':
+      return [0.42, 0.9];
+    case 'E':
+      return [0.34, 0.75];
+    default:
+      return [0.36, 0.78];
+  }
 }
 
 export function getSRBadgeSx(tier: string): SxProps<Theme> {
-  const first = tier.charAt(0);
-  if (first === 'S') return withBadgeGlassHover(glassTierChipSx('34,197,94', '#DCFCE7'));
-  if (first === 'A') return withBadgeGlassHover(glassTierChipSx('167,139,250', '#EDE9FE'));
-  if (first === 'B') return withBadgeGlassHover(glassTierChipSx('234,242,57', '#FBFCD3'));
-  if (first === 'C') return withBadgeGlassHover(glassTierChipSx('209,213,219', '#F1F5F9'));
-  if (first === 'D') return withBadgeGlassHover(glassTierChipSx('234,122,45', '#FFEDD5'));
-  if (first === 'E') return withBadgeGlassHover(glassTierChipSx('156,163,175', '#E5E7EB'));
-  // F — the lowest SR tier; red, matching the Rookie license chip.
-  return withBadgeGlassHover(glassTierChipSx('248,113,113', '#FEE2E2'));
+  return withBadgeGlassHover(glassTierChipSx(getSrTierRgb(tier), srTierText(tier)));
 }
 
 /**
@@ -216,12 +301,12 @@ function medalPanelShinySx(rgb: string, opacity: number, borderOpacity: number):
   const o = opacity;
   return {
     ...(GLASS_CARD_INNER_SX as Record<string, unknown>),
-    backgroundColor: 'rgba(16,31,61,0.62)',
+    backgroundColor: 'rgba(255,255,255,0.045)',
     backgroundImage:
       'linear-gradient(180deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.006) 44%, rgba(255,255,255,0) 100%),' +
       `radial-gradient(380px 190px at 96px -70px, rgba(${rgb},${o * 0.6}) 0%, rgba(${rgb},${o * 0.2}) 42%, rgba(${rgb},0) 76%),` +
       `linear-gradient(135deg, rgba(${rgb},${o * 0.22}) 0%, rgba(${rgb},${o * 0.105}) 48.5%, rgba(${rgb},${o * 0.045}) 50.5%, rgba(${rgb},${o * 0.025}) 100%),` +
-      'linear-gradient(180deg, rgba(22,38,70,0.24), rgba(16,31,61,0.5))',
+      'linear-gradient(180deg, rgba(255,255,255,0.028), rgba(255,255,255,0.006))',
     border: `1px solid rgba(${rgb},${borderOpacity * 0.56})`,
     boxShadow: [
       'inset 0 1px 0 rgba(255,255,255,0.18)',
@@ -238,39 +323,21 @@ function medalPanelShinySx(rgb: string, opacity: number, borderOpacity: number):
   } as SxProps<Theme>;
 }
 
-/** Medal-style tinted panel for license tier — used on driver profile stat cards. */
+/**
+ * Medal-style tinted panel for a license tier — used on driver profile cards.
+ * Same accent colour as the tier chip ({@link LICENSE_TIER_RGB}) so the card
+ * and its chip always match.
+ */
 export function getLicensePanelSx(license: string): SxProps<Theme> {
-  const medal = (rgb: string, opacity = 0.38, borderOpacity = 0.85) =>
-    medalPanelShinySx(rgb, opacity, borderOpacity);
-  const map: Record<string, SxProps<Theme>> = {
-    Elite: medal('192,132,252', 0.42, 0.9),
-    'Diamond+': medal('96,165,250', 0.4, 0.85),
-    Diamond: medal('34,211,238', 0.38, 0.82),
-    'Platinum+': medal('226,232,240', 0.28, 0.65),
-    Platinum: medal('203,213,225', 0.25, 0.6),
-    'Gold+': medal('253,224,71', 0.38, 0.82),
-    Gold: medal('250,204,21', 0.36, 0.78),
-    'Silver+': medal('168,185,204', 0.24, 0.58),
-    Silver: medal('201,213,225', 0.22, 0.55),
-    'Bronze+': medal('251,146,60', 0.36, 0.78),
-    Bronze: medal('249,115,22', 0.34, 0.75),
-    Rookie: medal('178,189,200', 0.18, 0.48),
-  };
-  return map[license] || map.Bronze;
+  const [opacity, borderOpacity] =
+    LICENSE_TIER_PANEL_OPACITY[license] ?? LICENSE_TIER_PANEL_OPACITY.Bronze;
+  return medalPanelShinySx(LICENSE_TIER_RGB[license] ?? LICENSE_TIER_RGB.Bronze, opacity, borderOpacity);
 }
 
-/** Medal-style tinted panel for safety rating tier. */
+/** Medal-style tinted panel for a safety rating tier (matches the SR chip). */
 export function getSRPanelSx(tier: string): SxProps<Theme> {
-  const medal = (rgb: string, opacity = 0.38, borderOpacity = 0.85) =>
-    medalPanelShinySx(rgb, opacity, borderOpacity);
-  const first = tier.charAt(0);
-  if (first === 'S') return medal('34,197,94', 0.42, 0.9);
-  if (first === 'A') return medal('124,58,237', 0.4, 0.85);
-  if (first === 'B') return medal('234,242,57', 0.36, 0.78);
-  if (first === 'C') return medal('209,213,219', 0.22, 0.55);
-  if (first === 'D') return medal('234,122,45', 0.36, 0.78);
-  if (first === 'E') return medal('156,163,175', 0.18, 0.48);
-  return medal('251,113,133', 0.36, 0.78);
+  const [opacity, borderOpacity] = srTierPanelOpacity(tier);
+  return medalPanelShinySx(getSrTierRgb(tier), opacity, borderOpacity);
 }
 
 const PACE_WEIGHT = 0.85;
