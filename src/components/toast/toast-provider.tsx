@@ -2,6 +2,7 @@ import { useState, useContext, useCallback, createContext } from 'react';
 import { Icon } from '@iconify/react';
 
 import Alert from '@mui/material/Alert';
+import { alpha } from '@mui/material/styles';
 import Snackbar from '@mui/material/Snackbar';
 
 // ----------------------------------------------------------------------
@@ -27,6 +28,14 @@ const VARIANT_ICON: Record<ToastVariant, string> = {
   error: 'solar:close-circle-bold',
   info: 'solar:info-circle-bold',
   warning: 'solar:danger-triangle-bold',
+};
+
+/** Per-severity accent for the glass toast (icon, rim, colour bloom). */
+const VARIANT_ACCENT: Record<ToastVariant, string> = {
+  success: '#4ade80',
+  error: '#fb7185',
+  info: '#93c5fd',
+  warning: '#fbbf24',
 };
 
 // Errors deserve more reading time than success confirmations.
@@ -75,7 +84,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
       >
         <Alert
           severity={state.variant}
-          variant="filled"
+          variant="outlined"
           onClose={handleClose}
           icon={<Icon icon={VARIANT_ICON[state.variant]} width={20} />}
           sx={{
@@ -83,9 +92,20 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
             maxWidth: 480,
             fontWeight: 600,
             alignItems: 'center',
-            boxShadow: '0 12px 32px rgba(0,0,0,0.45)',
+            borderRadius: 2.5,
+            // Dark vibrancy glass + a per-severity accent rim/bloom — matches every
+            // other surface on the site (the old filled alert was the one outlier).
+            color: 'rgba(255,255,255,0.95)',
+            border: `1px solid ${alpha(VARIANT_ACCENT[state.variant], 0.5)}`,
+            backgroundColor: 'rgba(16,24,44,0.82)',
+            backgroundImage: `linear-gradient(180deg, ${alpha(VARIANT_ACCENT[state.variant], 0.14)} 0%, ${alpha(VARIANT_ACCENT[state.variant], 0.04)} 100%)`,
+            backdropFilter: 'blur(24px) saturate(180%)',
+            WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+            boxShadow: `inset 0 1px 0 rgba(255,255,255,0.16), inset 0 0 0 1px ${alpha(VARIANT_ACCENT[state.variant], 0.12)}, 0 2px 6px -2px rgba(0,0,0,0.4), 0 18px 40px -16px rgba(0,0,0,0.6)`,
+            '& .MuiAlert-icon': { color: VARIANT_ACCENT[state.variant], alignItems: 'center' },
+            '& .MuiAlert-message': { color: 'rgba(255,255,255,0.95)' },
             // Make the dismiss/close button match the alert weight.
-            '& .MuiAlert-action': { alignItems: 'center', pt: 0 },
+            '& .MuiAlert-action': { alignItems: 'center', pt: 0, color: 'rgba(255,255,255,0.7)' },
           }}
         >
           {state.message}
