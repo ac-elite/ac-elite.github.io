@@ -176,8 +176,19 @@ function LicenseSafetyGuideDialog({ open, onClose, initialTab = 'license' }: Lic
               },
             }}
           >
-            <Box component="span" sx={{ fontSize: 18, lineHeight: 1, fontWeight: 800 }}>
-              x
+            <Box
+              component="svg"
+              viewBox="0 0 24 24"
+              aria-hidden
+              sx={{ width: 16, height: 16, display: 'block' }}
+            >
+              <path
+                d="M6 6L18 18M18 6L6 18"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2.4}
+                strokeLinecap="round"
+              />
             </Box>
           </IconButton>
         </Stack>
