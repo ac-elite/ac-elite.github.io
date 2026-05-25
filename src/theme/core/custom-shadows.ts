@@ -1,6 +1,6 @@
 import { varAlpha } from 'minimal-shared/utils';
 
-import { grey, info, error, common, primary, success, warning, secondary } from './palette';
+import { info, error, common, primary, success, warning, secondary } from './palette';
 
 import type { ThemeColorScheme } from '../types';
 
@@ -46,9 +46,11 @@ function createCustomShadows(colorChannel: string): CustomShadows {
     z20: `0 20px 40px -4px ${varAlpha(colorChannel, 0.16)}`,
     z24: `0 24px 48px 0 ${varAlpha(colorChannel, 0.16)}`,
     /********/
-    dialog: `-40px 40px 80px -8px ${varAlpha(common.blackChannel, 0.24)}`,
-    card: `0 0 2px 0 ${varAlpha(colorChannel, 0.2)}, 0 12px 24px -4px ${varAlpha(colorChannel, 0.12)}`,
-    dropdown: `0 0 2px 0 ${varAlpha(colorChannel, 0.24)}, -20px 20px 40px -4px ${varAlpha(colorChannel, 0.24)}`,
+    dialog: `0 2px 8px -2px ${varAlpha(common.blackChannel, 0.32)}, -40px 40px 80px -8px ${varAlpha(common.blackChannel, 0.5)}`,
+    // Soft, layered Apple-style elevation: a tight contact shadow + a wide
+    // ambient one. Reads as real depth on the dark navy surface.
+    card: `0 1px 2px 0 ${varAlpha(colorChannel, 0.32)}, 0 10px 28px -8px ${varAlpha(colorChannel, 0.46)}`,
+    dropdown: `0 1px 2px 0 ${varAlpha(colorChannel, 0.3)}, 0 16px 40px -8px ${varAlpha(colorChannel, 0.5)}`,
     /********/
     primary: createShadowColor(primary.mainChannel),
     secondary: createShadowColor(secondary.mainChannel),
@@ -60,5 +62,5 @@ function createCustomShadows(colorChannel: string): CustomShadows {
 }
 
 export const customShadows: Partial<Record<ThemeColorScheme, CustomShadows>> = {
-  light: createCustomShadows(grey['500Channel']),
+  light: createCustomShadows(common.blackChannel),
 };

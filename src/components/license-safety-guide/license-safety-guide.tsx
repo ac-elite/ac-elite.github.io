@@ -23,6 +23,12 @@ import {
   LICENSE_CHIP_WIDTH,
   LICENSE_TIER_ORDER,
 } from 'src/lib/ac-elite-data';
+import {
+  GLASS_DIALOG_SX,
+  GLASS_CARD_INNER_SX,
+  GLASS_TABLE_CONTAINER_SX,
+  GLASS_CARD_INNER_HOVER_SX,
+} from 'src/lib/glass';
 
 export type GuideTab = 'license' | 'safety';
 
@@ -127,13 +133,9 @@ function LicenseSafetyGuideDialog({ open, onClose, initialTab = 'license' }: Lic
         maxWidth="sm"
         PaperProps={{
           sx: {
+            ...GLASS_DIALOG_SX,
             width: { xs: 'calc(100% - 20px)', sm: 760 },
             maxWidth: 'calc(100% - 20px)',
-            borderRadius: 3,
-            border: '1px solid rgba(148,163,184,0.36)',
-            background: 'linear-gradient(150deg, rgba(19,36,71,0.96), rgba(15,27,52,0.96))',
-            backdropFilter: 'blur(16px)',
-            boxShadow: '0 30px 80px rgba(0,0,0,0.5)',
             color: '#fff',
           },
         }}
@@ -143,9 +145,8 @@ function LicenseSafetyGuideDialog({ open, onClose, initialTab = 'license' }: Lic
             variant="h6"
             sx={{
               fontWeight: 800,
-              color: 'warning.main',
-              letterSpacing: { xs: 0.2, sm: 0.4 },
-              textTransform: { xs: 'none', sm: 'uppercase' },
+              color: '#fff',
+              letterSpacing: 0,
               lineHeight: 1.25,
               pr: 1,
             }}
@@ -155,16 +156,29 @@ function LicenseSafetyGuideDialog({ open, onClose, initialTab = 'license' }: Lic
           <IconButton
             onClick={onClose}
             sx={{
+              ...GLASS_CARD_INNER_HOVER_SX,
               width: { xs: 34, sm: 36 },
               height: { xs: 34, sm: 36 },
               borderRadius: '50%',
               color: 'rgba(255,255,255,0.72)',
-              border: '1px solid rgba(255,255,255,0.18)',
-              '&:hover': { color: '#fff', bgcolor: 'rgba(255,255,255,0.08)' },
+              '&:hover': {
+                color: '#fff',
+              },
             }}
           >
-            <Box component="span" sx={{ fontSize: 22, lineHeight: 1 }}>
-              ×
+            <Box
+              component="svg"
+              viewBox="0 0 24 24"
+              aria-hidden
+              sx={{ width: 16, height: 16, display: 'block' }}
+            >
+              <path
+                d="M6 6L18 18M18 6L6 18"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2.4}
+                strokeLinecap="round"
+              />
             </Box>
           </IconButton>
         </Stack>
@@ -178,43 +192,47 @@ function LicenseSafetyGuideDialog({ open, onClose, initialTab = 'license' }: Lic
             onChange={(_, value: GuideTab) => setActiveTab(value)}
             variant="fullWidth"
             sx={{
-              minHeight: 48,
-              borderRadius: 2,
-              bgcolor: 'rgba(23,33,59,0.5)',
-              border: '1px solid rgba(148,163,184,0.22)',
+              ...GLASS_CARD_INNER_SX,
+              minHeight: 46,
+              p: 0.5,
+              borderRadius: 2.5,
               '& .MuiTabs-indicator': { display: 'none' },
+              '& .MuiTabs-flexContainer': { gap: 0.5 },
             }}
           >
-            <Tab
-              value="license"
-              label="License"
-              sx={{
-                minHeight: 48,
-                borderRadius: 1.5,
-                color: 'text.secondary',
-                fontWeight: 800,
-                '&.Mui-selected': {
-                  color: '#22e98a',
-                  bgcolor: 'rgba(18,96,90,0.42)',
-                  border: '1px solid rgba(34,233,138,0.22)',
-                },
-              }}
-            />
-            <Tab
-              value="safety"
-              label="Safety Rating"
-              sx={{
-                minHeight: 48,
-                borderRadius: 1.5,
-                color: 'text.secondary',
-                fontWeight: 800,
-                '&.Mui-selected': {
-                  color: '#22e98a',
-                  bgcolor: 'rgba(18,96,90,0.42)',
-                  border: '1px solid rgba(34,233,138,0.22)',
-                },
-              }}
-            />
+            {(['license', 'safety'] as const).map((value) => (
+              <Tab
+                key={value}
+                value={value}
+                label={value === 'license' ? 'License' : 'Safety Rating'}
+                disableRipple
+                sx={{
+                  minHeight: 38,
+                  borderRadius: 1.8,
+                  textTransform: 'none',
+                  color: 'rgba(255,255,255,0.6)',
+                  fontWeight: 700,
+                  transition:
+                    'color 240ms cubic-bezier(0.32,0.72,0,1), background 240ms cubic-bezier(0.32,0.72,0,1), transform 240ms cubic-bezier(0.32,0.72,0,1), box-shadow 240ms cubic-bezier(0.32,0.72,0,1)',
+                  '&.Mui-selected': {
+                    color: '#fff',
+                    background:
+                      'radial-gradient(120% 120% at 18% -20%, rgba(255,255,255,0.18), rgba(255,255,255,0.045) 42%, transparent 68%),' +
+                      'linear-gradient(180deg, rgba(96,165,250,0.24) 0%, rgba(59,130,246,0.12) 100%)',
+                    boxShadow:
+                      'inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -1px 0 rgba(15,23,42,0.2), 0 10px 24px -20px rgba(59,130,246,0.3)',
+                  },
+                  '&:hover': {
+                    color: '#fff',
+                    transform: 'translateY(-1px)',
+                  },
+                  '@media (prefers-reduced-motion: reduce)': {
+                    transition: 'none',
+                    '&:hover': { transform: 'none' },
+                  },
+                }}
+              />
+            ))}
           </Tabs>
         </Box>
 
@@ -238,8 +256,8 @@ function LicenseSafetyGuideDialog({ open, onClose, initialTab = 'license' }: Lic
 
               <Box
                 sx={{
+                  ...GLASS_TABLE_CONTAINER_SX,
                   borderRadius: 2,
-                  border: '1px solid rgba(148,163,184,0.24)',
                   overflow: 'hidden',
                   maxWidth: '100%',
                   overflowX: 'auto',
@@ -253,7 +271,7 @@ function LicenseSafetyGuideDialog({ open, onClose, initialTab = 'license' }: Lic
                     px: 2,
                     py: 1.1,
                     minWidth: { xs: 320, sm: 0 },
-                    bgcolor: 'rgba(148,163,184,0.12)',
+                    bgcolor: 'rgba(255,255,255,0.012)',
                   }}
                 >
                   <Typography
@@ -287,7 +305,6 @@ function LicenseSafetyGuideDialog({ open, onClose, initialTab = 'license' }: Lic
                           py: 1.2,
                           alignItems: 'center',
                           minWidth: { xs: 320, sm: 0 },
-                          bgcolor: 'rgba(23,33,59,0.36)',
                         }}
                       >
                         <Chip
@@ -322,7 +339,6 @@ function LicenseSafetyGuideDialog({ open, onClose, initialTab = 'license' }: Lic
                       py: 1.2,
                       alignItems: 'center',
                       minWidth: { xs: 320, sm: 0 },
-                      bgcolor: 'rgba(23,33,59,0.36)',
                     }}
                   >
                     <Chip
@@ -367,7 +383,7 @@ function LicenseSafetyGuideDialog({ open, onClose, initialTab = 'license' }: Lic
                 To unlock a tier you need both the minimum SR value and minimum total km for that tier.
               </Typography>
 
-              <Box sx={{ borderRadius: 2, border: '1px solid rgba(148,163,184,0.24)', overflow: 'hidden' }}>
+              <Box sx={{ ...GLASS_TABLE_CONTAINER_SX, borderRadius: 2, overflow: 'hidden' }}>
                 <Box
                   sx={{
                     display: 'grid',
@@ -375,7 +391,7 @@ function LicenseSafetyGuideDialog({ open, onClose, initialTab = 'license' }: Lic
                     gap: 1,
                     px: 2,
                     py: 1.1,
-                    bgcolor: 'rgba(148,163,184,0.12)',
+                    bgcolor: 'rgba(255,255,255,0.012)',
                   }}
                 >
                   <Typography
@@ -403,7 +419,6 @@ function LicenseSafetyGuideDialog({ open, onClose, initialTab = 'license' }: Lic
                         px: 2,
                         py: 1.2,
                         alignItems: 'center',
-                        bgcolor: 'rgba(23,33,59,0.36)',
                       }}
                     >
                       <Chip
@@ -433,7 +448,6 @@ function LicenseSafetyGuideDialog({ open, onClose, initialTab = 'license' }: Lic
                       px: 2,
                       py: 1.2,
                       alignItems: 'center',
-                      bgcolor: 'rgba(23,33,59,0.36)',
                     }}
                   >
                     <Chip

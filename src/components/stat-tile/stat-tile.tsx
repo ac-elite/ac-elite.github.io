@@ -1,7 +1,7 @@
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 
-import { GLASS_CARD_SX } from 'src/lib/glass';
+import { GLASS_PANEL_SPACIOUS_SX } from 'src/lib/glass';
 import { glassCardMotionSx } from 'src/lib/subtle-motion';
 import { brandAccentBorderSx } from 'src/lib/status-accent';
 
@@ -34,10 +34,10 @@ export function StatTile({ label, value, motionIndex, size = 'compact', ariaLabe
       aria-label={ariaLabel ?? label}
       tabIndex={0}
       sx={{
-        ...GLASS_CARD_SX,
+        ...GLASS_PANEL_SPACIOUS_SX,
         ...brandAccentBorderSx(),
         ...glassCardMotionSx(motionIndex),
-        p: isHero ? { xs: 2.5, md: 3 } : 2.75,
+        ...(isHero && { p: { xs: 2.5, md: 3 } }),
         textAlign: { xs: 'center', md: 'left' },
       }}
     >
@@ -56,7 +56,7 @@ export function StatTile({ label, value, motionIndex, size = 'compact', ariaLabe
           fontWeight: 900,
           mt: isHero ? 0.75 : 0.5,
           lineHeight: 1.05,
-          letterSpacing: -0.02,
+          letterSpacing: 0,
           fontVariantNumeric: 'tabular-nums',
           ...(isHero
             ? { fontSize: { xs: 38, md: 46 } }

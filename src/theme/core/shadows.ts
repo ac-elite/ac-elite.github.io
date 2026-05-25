@@ -2,16 +2,18 @@ import type { Shadows } from '@mui/material/styles';
 
 import { varAlpha } from 'minimal-shared/utils';
 
-import { grey } from './palette';
+import { common } from './palette';
 
 import type { ThemeColorScheme } from '../types';
 
 // ----------------------------------------------------------------------
 
 function createShadows(colorChannel: string): Shadows {
-  const color1 = varAlpha(colorChannel, 0.2);
-  const color2 = varAlpha(colorChannel, 0.14);
-  const color3 = varAlpha(colorChannel, 0.12);
+  // Black-based, slightly deeper alphas — on the dark navy theme, grey-tinted
+  // shadows were invisible. These read as soft Apple-style elevation.
+  const color1 = varAlpha(colorChannel, 0.28);
+  const color2 = varAlpha(colorChannel, 0.2);
+  const color3 = varAlpha(colorChannel, 0.16);
 
   return [
     'none',
@@ -43,5 +45,5 @@ function createShadows(colorChannel: string): Shadows {
 }
 
 export const shadows: Partial<Record<ThemeColorScheme, Shadows>> = {
-  light: createShadows(grey['500Channel']),
+  light: createShadows(common.blackChannel),
 };

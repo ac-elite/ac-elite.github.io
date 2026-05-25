@@ -1,21 +1,18 @@
-import { Icon } from '@iconify/react';
-
 import Box from '@mui/material/Box';
 
 import { APP_ROUTES } from 'src/centralized/app-routes';
 import { ADMIN_SECTIONS } from 'src/centralized/admin-sections';
 
 import { hasAtLeastRole, type AuthProfile } from 'src/lib/auth/auth-context';
+import { NAV_ICON_NAMES } from 'src/components/icons/ac-dashboard-icons';
 
 // ----------------------------------------------------------------------
-
-/** Wrap an Iconify name in a 24×24 box-aware glyph used by the sidebar. */
-const navIcon = (name: string) => <Icon icon={name} width={24} height={24} />;
 
 export type NavItem = {
   title: string;
   path: string;
-  icon: React.ReactNode;
+  /** Solar icon base name; the nav appends `-linear` (idle) or `-bold` (active). */
+  iconName: string;
   info?: React.ReactNode;
   disabled?: boolean;
   /** Optional grouping label rendered above the item. */
@@ -43,16 +40,16 @@ const comingSoonBadge = (
 );
 
 const baseNavData: NavItem[] = [
-  { title: 'Home', path: APP_ROUTES.home, icon: navIcon('solar:home-smile-bold-duotone') },
-  { title: 'Stats', path: APP_ROUTES.dashboard, icon: navIcon('solar:chart-2-bold-duotone') },
-  { title: 'Leaderboard', path: APP_ROUTES.leaderboard, icon: navIcon('solar:medal-ribbons-star-bold-duotone') },
-  { title: 'Rankings', path: APP_ROUTES.rankings, icon: navIcon('solar:ranking-bold-duotone') },
-  { title: 'Hall of Fame', path: APP_ROUTES.hallOfFame, icon: navIcon('solar:cup-star-bold-duotone') },
-  { title: 'Livery Showcase', path: APP_ROUTES.liveryShowcase, icon: navIcon('solar:palette-bold-duotone') },
+  { title: 'Home', path: APP_ROUTES.home, iconName: NAV_ICON_NAMES.home },
+  { title: 'Stats', path: APP_ROUTES.dashboard, iconName: NAV_ICON_NAMES.stats },
+  { title: 'Leaderboard', path: APP_ROUTES.leaderboard, iconName: NAV_ICON_NAMES.leaderboard },
+  { title: 'Rankings', path: APP_ROUTES.rankings, iconName: NAV_ICON_NAMES.rankings },
+  { title: 'Hall of Fame', path: APP_ROUTES.hallOfFame, iconName: NAV_ICON_NAMES.trophy },
+  { title: 'Livery Showcase', path: APP_ROUTES.liveryShowcase, iconName: NAV_ICON_NAMES.livery },
   {
     title: 'Setup Store',
     path: APP_ROUTES.setupStore,
-    icon: navIcon('solar:tuning-2-bold-duotone'),
+    iconName: NAV_ICON_NAMES.setup,
     info: comingSoonBadge,
     disabled: true,
   },
@@ -73,7 +70,7 @@ export function getNavData(profile: AuthProfile | null): NavItem[] {
   const adminItems: NavItem[] = ADMIN_SECTIONS.map((section, index) => ({
     title: section.label,
     path: section.path,
-    icon: navIcon(section.iconifyName),
+    iconName: section.iconifyName,
     group: index === 0 ? 'Admin' : undefined,
   }));
   return [...baseNavData, ...adminItems];

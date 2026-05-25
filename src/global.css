@@ -1,7 +1,9 @@
 /** **************************************
 * Fonts: app
+* DM Sans Variable is loaded via @fontsource in src/app.tsx (self-hosted,
+* no render-blocking external request). Fallback stack from setFont() begins
+* with -apple-system, so Apple devices degrade to San Francisco.
 *************************************** */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
 
 /** **************************************
 * Plugins
@@ -15,6 +17,10 @@
 html {
   height: 100%;
   -webkit-overflow-scrolling: touch;
+  /* Apple-grade text rendering: crisp, anti-aliased glyphs on dark surfaces. */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 body,
 #root,

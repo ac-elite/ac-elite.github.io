@@ -80,26 +80,7 @@ export default function Page() {
       <meta name="robots" content="noindex, nofollow" />
 
       <Box sx={{ ...DATA_PAGE_SHELL_SX, minHeight: '100vh', display: 'flex', alignItems: 'center', py: 6 }}>
-        <PageGridOverlay />
-
-        {/* Soft brand-coloured glow behind the card. Adds depth without competing with the form. */}
-        <Box
-          aria-hidden
-          sx={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            width: { xs: 360, sm: 540 },
-            height: { xs: 360, sm: 540 },
-            borderRadius: '50%',
-            background:
-              'radial-gradient(circle at center, rgba(96,165,250,0.22) 0%, rgba(96,165,250,0) 70%)',
-            filter: 'blur(8px)',
-            pointerEvents: 'none',
-            zIndex: 0,
-          }}
-        />
+        <PageGridOverlay opacity={0.3} />
 
         <Container maxWidth="xs" sx={{ position: 'relative', zIndex: 1 }}>
           <Stack spacing={2.5} alignItems="center">
@@ -120,7 +101,7 @@ export default function Page() {
                   >
                     AC Elite · Sign in
                   </Typography>
-                  <Typography variant="h4" sx={{ fontWeight: 800, mt: 0.5 }}>
+                  <Typography component="h1" variant="h4" sx={{ fontWeight: 800, mt: 0.5 }}>
                     Welcome back
                   </Typography>
                   <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.75, maxWidth: 320 }}>

@@ -1,19 +1,32 @@
+import { useRef, useState, useEffect } from 'react';
 import { keyframes, type Theme, type SxProps } from '@mui/material/styles';
 
-/** Soft one-shot entrance: fade + slight lift. No infinite loops. */
+// ----------------------------------------------------------------------
+// Apple-style easing. Smooth, decisive ease-out for content; a gentle
+// overshoot spring for interactive micro-motions (hover / press).
+// ----------------------------------------------------------------------
+
+/** iOS-sheet ease-out — smooth and premium. Use for entrances & reveals. */
+export const APPLE_EASE_OUT = 'cubic-bezier(0.32, 0.72, 0, 1)';
+/** Symmetric ease for state changes (color, transform back-and-forth). */
+export const APPLE_EASE_IN_OUT = 'cubic-bezier(0.65, 0, 0.35, 1)';
+/** Slight overshoot — playful spring for hover / press only (not big content). */
+export const APPLE_SPRING = 'cubic-bezier(0.34, 1.4, 0.5, 1)';
+
+/** Soft one-shot entrance: fade + slight lift + barely-there scale. */
 export const subtleFadeUp = keyframes`
   from {
     opacity: 0;
-    transform: translateY(12px);
+    transform: translate3d(0, 16px, 0) scale(0.985);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translate3d(0, 0, 0) scale(1);
   }
 `;
 
-const DURATION_MS = 420;
-const STAGGER_MS = 48;
+const DURATION_MS = 560;
+const STAGGER_MS = 60;
 
 export type SubtleEnterOptions = {
   /** Added before the stagger (ms), e.g. to run after a parent block. */
@@ -28,37 +41,111 @@ export function subtleEnterUpSx(index: number, options: SubtleEnterOptions = {})
   const { baseDelayMs = 0 } = options;
   const delay = baseDelayMs + index * STAGGER_MS;
   return {
-    animation: `${subtleFadeUp} ${DURATION_MS}ms cubic-bezier(0.22, 1, 0.36, 1) ${delay}ms both`,
+    animation: `${subtleFadeUp} ${DURATION_MS}ms ${APPLE_EASE_OUT} ${delay}ms both`,
     '@media (prefers-reduced-motion: reduce)': {
       animation: 'none',
     },
   };
 }
 
-/** Gentle vertical drift for hero panels; use on an outer wrapper so inner `glassCardHoverSx` still works. */
-const softFloatDrift = keyframes`
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-4px);
-  }
-`;
+// ----------------------------------------------------------------------
+// Scroll reveal — Apple-style "content animates in as it enters the viewport".
+// Pair the hook (gives a ref + revealed flag) with scrollRevealSx, or use the
+// <Reveal> wrapper component for a one-liner.
+// ----------------------------------------------------------------------
+
+export type ScrollRevealOptions = {
+  threshold?: number;
+  rootMargin?: string;
+  /** Re-hide and replay when scrolled back out of view. Default: false (reveal once). */
+  repeat?: boolean;
+};
+
+export function useScrollReveal<T extends HTMLElement = HTMLDivElement>(
+  options: ScrollRevealOptions = {}
+) {
+  const { threshold = 0.12, rootMargin = '0px 0px -8% 0px', repeat = false } = options;
+  const ref = useRef<T | null>(null);
+  const [revealed, setRevealed] = useState(false);
+
+  useEffect(() => {
+    const node = ref.current;
+    if (!node) return undefined;
+
+    // No IO (SSR/old browsers) or reduced-motion: show immediately, no animation.
+    if (typeof IntersectionObserver === 'undefined') {
+      setRevealed(true);
+      return undefined;
+    }
+    const prefersReduced =
+      typeof window !== 'undefined' &&
+      window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReduced) {
+      setRevealed(true);
+      return undefined;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setRevealed(true);
+            if (!repeat) observer.unobserve(entry.target);
+          } else if (repeat) {
+            setRevealed(false);
+          }
+        });
+      },
+      { threshold, rootMargin }
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [threshold, rootMargin, repeat]);
+
+  return { ref, revealed };
+}
+
+/** Transition styles for a scroll-revealed block; index adds a gentle stagger. */
+export function scrollRevealSx(revealed: boolean, index = 0): SxProps<Theme> {
+  const delay = index * 70;
+  return {
+    opacity: revealed ? 1 : 0,
+    transform: revealed ? 'translate3d(0,0,0) scale(1)' : 'translate3d(0,26px,0) scale(0.99)',
+    transition: `opacity 640ms ${APPLE_EASE_OUT} ${delay}ms, transform 760ms ${APPLE_EASE_OUT} ${delay}ms`,
+    willChange: 'opacity, transform',
+    '@media (prefers-reduced-motion: reduce)': {
+      opacity: 1,
+      transform: 'none',
+      transition: 'none',
+    },
+  };
+}
+
+// ----------------------------------------------------------------------
+// Hero / panel ambient wrapper. Apple keeps surfaces still, so the former
+// floating "bob" is retired — this is now a passthrough that only normalises
+// width. Kept for signature compatibility with existing callers.
+// ----------------------------------------------------------------------
 
 export type SoftFloatWrapperOptions = {
-  /** Half-cycle delay so two floats on one screen do not pulse in sync. */
   alternatePhase?: boolean;
 };
 
-export function softFloatWrapperSx(options?: SoftFloatWrapperOptions): SxProps<Theme> {
+const softAmbientFloat = keyframes`
+  0%, 100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -1.5px, 0);
+  }
+`;
+
+export function softFloatWrapperSx(_options?: SoftFloatWrapperOptions): SxProps<Theme> {
   return {
     width: '100%',
-    animation: `${softFloatDrift} 5.5s ease-in-out infinite`,
-    ...(options?.alternatePhase ? { animationDelay: '2.75s' } : {}),
+    animation: `${softAmbientFloat} 9s ease-in-out ${_options?.alternatePhase ? '-3.8s' : '0s'} infinite`,
     '@media (prefers-reduced-motion: reduce)': {
       animation: 'none',
-      animationDelay: '0s',
     },
   };
 }
@@ -85,7 +172,7 @@ export function subtleRowEnterSx(index: number, options: SubtleEnterOptions = {}
   const { baseDelayMs = 0 } = options;
   const delay = baseDelayMs + index * STAGGER_MS;
   return {
-    animation: `${subtleFadeIn} ${DURATION_MS}ms cubic-bezier(0.22, 1, 0.36, 1) ${delay}ms both`,
+    animation: `${subtleFadeIn} ${DURATION_MS}ms ${APPLE_EASE_OUT} ${delay}ms both`,
     '@media (prefers-reduced-motion: reduce)': {
       animation: 'none',
     },
@@ -93,15 +180,23 @@ export function subtleRowEnterSx(index: number, options: SubtleEnterOptions = {}
 }
 
 /**
- * Hover polish for glass `Paper` / cards: slight lift + stronger shadow.
- * Pair with {@link glassCardMotionSx} for entrance + hover site-wide.
+ * Hover polish for glass cards: a deliberate, weighty lift (no jittery scale) —
+ * the window rises, its top edge and rim brighten, and the float shadow deepens.
+ * Smooth ease-out, not a bouncy spring.
  */
 export const glassCardHoverSx = {
-  transition: (theme: Theme) => theme.transitions.create(['transform', 'box-shadow'], { duration: 200 }),
+  transition: `transform 260ms ${APPLE_EASE_OUT}, box-shadow 260ms ${APPLE_EASE_OUT}, border-color 260ms ${APPLE_EASE_OUT}, filter 260ms ${APPLE_EASE_OUT}, background 260ms ${APPLE_EASE_OUT}`,
+  willChange: 'transform',
   '@media (hover: hover)': {
     '&:hover': {
-      transform: 'translateY(-3px)',
-      boxShadow: '0 18px 44px rgba(0,0,0,0.38), inset 0 1px 0 rgba(255,255,255,0.12)',
+      // Glass rises and catches more light: brighter specular top edge + rim, and a
+      // saturation lift so the vibrant backdrop blooms through. Shadow hugs the card.
+      transform: 'translate3d(0,-3px,0)',
+      borderColor: 'rgba(226,242,255,0.3)',
+      filter: 'brightness(1.025) saturate(1.07)',
+      boxShadow:
+        'inset 0 1px 0 rgba(255,255,255,0.34), inset 0 -1px 0 rgba(0,0,0,0.16), inset 0 0 0 1px rgba(255,255,255,0.06),' +
+        ' 0 4px 10px -3px rgba(0,0,0,0.32), 0 30px 60px -20px rgba(0,0,0,0.58)',
     },
   },
   '&:focus-visible': {

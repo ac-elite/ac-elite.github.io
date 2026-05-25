@@ -29,9 +29,11 @@ export const themeConfig: ThemeConfig = {
   /** **************************************
    * Typography
    *************************************** */
+  // Reference only — the real San Francisco-first stacks live in
+  // theme/core/typography.ts (Apple devices get genuine SF via -apple-system).
   fontFamily: {
-    primary: 'Poppins',
-    secondary: 'Poppins',
+    primary: 'SF Pro Text',
+    secondary: 'SF Pro Display',
   },
   /** **************************************
    * Palette
@@ -40,8 +42,11 @@ export const themeConfig: ThemeConfig = {
     primary: {
       lighter: '#2b3857',
       light: '#1f2c49',
-      main: '#17213B', // Elite Blue (official)
-      dark: '#121a2f',
+      // Elite Blue — the deep brand surface color (cards, panels, brand identity).
+      // The navbar/sidebar base is the slightly lighter #17213B (matches the logo
+      // background) and lives in the shared nav-surface token in src/lib/glass.ts.
+      main: '#101F3D',
+      dark: '#0c1830',
       darker: '#0a1020',
       contrastText: '#FFFFFF',
     },
@@ -53,36 +58,40 @@ export const themeConfig: ThemeConfig = {
       darker: '#090708',
       contrastText: '#FFFFFF',
     },
+    // Semantic colors. Kept in the brand-blue family for `info`, with real
+    // green / amber / red for success / warning / error so live data reads
+    // instantly. Values match the status hex used across the app
+    // (#22c55e / #f59e0b / #ef4444) so the whole site speaks one color language.
     info: {
-      lighter: '#E4EAF7',
-      light: '#95A5C8',
-      main: '#5B6F9E',
-      dark: '#2F4472',
-      darker: '#1B2E55',
+      lighter: '#DCEAFE',
+      light: '#7DB1FB',
+      main: '#3B82F6', // brand-adjacent azure (accent blue, not a new hue)
+      dark: '#1D4ED8',
+      darker: '#172F73',
       contrastText: '#FFFFFF',
     },
     success: {
-      lighter: '#E4EAF7',
-      light: '#95A5C8',
-      main: '#5B6F9E',
-      dark: '#2F4472',
-      darker: '#1B2E55',
-      contrastText: '#ffffff',
+      lighter: '#DBF7E5',
+      light: '#6EE7A1',
+      main: '#22C55E', // live / online green
+      dark: '#15803D',
+      darker: '#0C4A24',
+      contrastText: '#06140B',
     },
     warning: {
-      lighter: '#E4EAF7',
-      light: '#95A5C8',
-      main: '#5B6F9E',
-      dark: '#2F4472',
-      darker: '#1B2E55',
-      contrastText: '#FFFFFF',
+      lighter: '#FEF0CD',
+      light: '#FBC65A',
+      main: '#F59E0B', // delayed / caution amber
+      dark: '#B45309',
+      darker: '#713F12',
+      contrastText: '#241803',
     },
     error: {
-      lighter: '#FFE9D5',
-      light: '#FFAC82',
-      main: '#FF5630',
-      dark: '#B71D18',
-      darker: '#7A0916',
+      lighter: '#FCE0E0',
+      light: '#F8908F',
+      main: '#EF4444', // stale / danger red
+      dark: '#B91C1C',
+      darker: '#7F1416',
       contrastText: '#FFFFFF',
     },
     grey: {

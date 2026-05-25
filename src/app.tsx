@@ -1,4 +1,7 @@
 import 'src/global.css';
+// Cross-platform fallback for San Francisco (Apple devices use system SF via
+// -apple-system in the theme font stack; Inter covers Windows / Android).
+import '@fontsource-variable/inter';
 
 import { useEffect } from 'react';
 

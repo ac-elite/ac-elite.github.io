@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
+import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import Table from '@mui/material/Table';
@@ -69,6 +70,8 @@ import {
 } from 'src/lib/ac-elite-data';
 import { useTrackCatalogVersion } from 'src/centralized/track-info';
 
+import { Chart, CHART_COLORS } from 'src/components/chart';
+import { Reveal } from 'src/components/reveal';
 import { DeltaChip } from 'src/components/delta-chip/delta-chip';
 import { EmptyState, ErrorPanel, LoadingPanel } from 'src/components/data-state';
 import { LiveryEnlargeDialog } from 'src/components/livery/livery-enlarge-dialog';
@@ -119,7 +122,7 @@ const DRIVER_STAT_HERO_SX = {
 } as const;
 
 /**
- * Chip-like “glass” hover: specular inset line + lift — only used on License / SR hero cards.
+ * Quiet glass hover for License / SR hero cards.
  * (Other stat tiles use {@link glassCardEnterOnlySx} without hover.)
  */
 const DRIVER_STAT_HERO_GLASS_HOVER_SX = {
@@ -128,13 +131,12 @@ const DRIVER_STAT_HERO_GLASS_HOVER_SX = {
     'transform 220ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 220ms cubic-bezier(0.22, 1, 0.36, 1), filter 220ms cubic-bezier(0.22, 1, 0.36, 1)',
   '@media (hover: hover)': {
     '&:hover': {
-      transform: 'translateY(-3px)',
-      filter: 'brightness(1.08)',
+      transform: 'translateY(-1px)',
+      filter: 'brightness(1.014)',
       boxShadow: [
-        'inset 0 1px 0 rgba(255,255,255,0.38)',
-        'inset 0 -1px 0 rgba(0,0,0,0.14)',
-        '0 18px 46px rgba(0,0,0,0.48)',
-        '0 0 36px rgba(255,255,255,0.14)',
+        'inset 0 1px 0 rgba(255,255,255,0.16)',
+        'inset 0 -1px 0 rgba(0,0,0,0.16)',
+        '0 10px 26px -24px rgba(0,0,0,0.7)',
       ].join(', '),
     },
   },
@@ -227,36 +229,37 @@ export default function Page() {
 
   const driverSeasonHeaderBandSx = useMemo(() => {
     const base = {
+      ...GLASS_INNER_PANEL_SX,
       borderRadius: 2,
       px: { xs: 2, md: 2.25 },
       py: { xs: 1.5, md: 1.75 },
       mb: 0,
-      border: '1px solid rgba(255,255,255,0.12)',
-      background: 'linear-gradient(120deg, rgba(31,44,73,0.5) 0%, rgba(23,33,59,0.28) 100%)',
-      borderLeft: '3px solid rgba(147,197,253,0.48)',
     };
     if (overallRank === 1) {
       return {
         ...base,
-        borderLeft: '3px solid rgba(245,158,11,0.78)',
-        background:
-          'linear-gradient(120deg, rgba(245,158,11,0.14) 0%, rgba(23,33,59,0.42) 48%, rgba(23,33,59,0.24) 100%)',
+        borderColor: 'rgba(245,158,11,0.42)',
+        backgroundImage:
+          'linear-gradient(180deg, rgba(255,255,255,0.018) 0%, rgba(255,255,255,0) 58%),' +
+          'radial-gradient(340px 160px at 80px -60px, rgba(245,158,11,0.18), rgba(245,158,11,0.04) 48%, transparent 78%)',
       };
     }
     if (overallRank === 2) {
       return {
         ...base,
-        borderLeft: '3px solid rgba(148,163,184,0.78)',
-        background:
-          'linear-gradient(120deg, rgba(148,163,184,0.12) 0%, rgba(23,33,59,0.42) 48%, rgba(23,33,59,0.24) 100%)',
+        borderColor: 'rgba(203,213,225,0.34)',
+        backgroundImage:
+          'linear-gradient(180deg, rgba(255,255,255,0.018) 0%, rgba(255,255,255,0) 58%),' +
+          'radial-gradient(340px 160px at 80px -60px, rgba(203,213,225,0.14), rgba(203,213,225,0.035) 48%, transparent 78%)',
       };
     }
     if (overallRank === 3) {
       return {
         ...base,
-        borderLeft: '3px solid rgba(194,101,31,0.78)',
-        background:
-          'linear-gradient(120deg, rgba(194,101,31,0.13) 0%, rgba(23,33,59,0.42) 48%, rgba(23,33,59,0.24) 100%)',
+        borderColor: 'rgba(194,101,31,0.38)',
+        backgroundImage:
+          'linear-gradient(180deg, rgba(255,255,255,0.018) 0%, rgba(255,255,255,0) 58%),' +
+          'radial-gradient(340px 160px at 80px -60px, rgba(194,101,31,0.16), rgba(194,101,31,0.04) 48%, transparent 78%)',
       };
     }
     return base;
@@ -343,6 +346,59 @@ export default function Page() {
       topThreeTracks: trackRows.filter((r) => r.position <= 3).length,
     };
   }, [trackRows]);
+
+  const performanceCharts = useMemo(() => {
+    if (trackRows.length < 2) return null;
+    const byLaps = [...trackRows].sort((a, b) => b.laps - a.laps).slice(0, 8);
+    if (!driver) return null;
+
+    const driverByGuid = new Map(rankData.map((item) => [item.guid, item]));
+    const qualifiedPaceRows = byLaps
+      .map((row) => {
+        const rawRows = Array.isArray((leaderboardData as Record<string, any>)?.[row.trackId]?.[CAR])
+          ? ([...(leaderboardData as Record<string, any>)[row.trackId][CAR]] as LeaderboardCarRow[])
+          : [];
+
+        const qualifiedRows = rawRows
+          .filter((entry) => {
+            if (typeof entry?.laptime !== 'number') return false;
+            if (entry.guid === driver.guid) return true;
+            const rankedDriver = driverByGuid.get(entry.guid);
+            return Boolean(rankedDriver && (rankedDriver.kilometers || 0) >= 100);
+          })
+          .sort((a, b) => (a.laptime || 0) - (b.laptime || 0));
+
+        const qualifiedIndex = qualifiedRows.findIndex((entry) => entry.guid === driver.guid);
+        if (qualifiedIndex < 0 || qualifiedRows.length < 8 || row.laps < 2) return null;
+
+        return {
+          trackName: row.trackName,
+          percentile:
+            qualifiedRows.length > 1
+              ? Math.round((1 - qualifiedIndex / (qualifiedRows.length - 1)) * 100)
+              : 100,
+        };
+      })
+      .filter((row): row is { trackName: string; percentile: number } => Boolean(row));
+
+    if (qualifiedPaceRows.length < 2) {
+      return {
+        laps: { categories: byLaps.map((r) => r.trackName), data: byLaps.map((r) => r.laps) },
+        radar: null,
+        avgPercentile: null,
+      };
+    }
+    // "Grid percentile" — 100% = pole/P1, 0% = last. Reads as relative pace.
+    const radarData = qualifiedPaceRows.map((r) => r.percentile);
+    const avgPercentile = radarData.length
+      ? Math.round(radarData.reduce((s, v) => s + v, 0) / radarData.length)
+      : 0;
+    return {
+      laps: { categories: byLaps.map((r) => r.trackName), data: byLaps.map((r) => r.laps) },
+      radar: { categories: qualifiedPaceRows.map((r) => r.trackName), data: radarData },
+      avgPercentile,
+    };
+  }, [driver, leaderboardData, rankData, trackRows]);
 
   const driverRoles = useMemo<DiscordRole[]>(
     () => (driverGuid ? getDiscordRolesForGuid(driverGuid, teamRoles) : []),
@@ -476,7 +532,7 @@ export default function Page() {
                           useFlexGap
                           sx={{ width: 1 }}
                         >
-                          <Typography variant="h4" sx={{ fontWeight: 800, letterSpacing: '-0.02em' }}>
+                          <Typography component="h1" variant="h4" sx={{ fontWeight: 800, letterSpacing: 0 }}>
                             {driver.name || 'Unknown Driver'}
                           </Typography>
                           {driverRoles.map((role) => (
@@ -713,6 +769,146 @@ export default function Page() {
                 </Paper>
                 </Box>
 
+                {performanceCharts && (
+                  <Grid container spacing={2.5}>
+                    <Grid size={{ xs: 12, md: 4 }}>
+                      <Reveal index={0} sx={{ height: 1 }}>
+                        <Paper sx={{ ...GLASS_PANEL_SX, ...brandAccentBorderSx(), height: 1 }}>
+                          <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.78)' }}>
+                            Overall pace
+                          </Typography>
+                          <Typography variant="h6" sx={{ fontWeight: 800, mt: 0.3 }}>
+                            Faster than the field
+                          </Typography>
+                          <Typography variant="caption" sx={{ display: 'block', color: 'text.secondary', mb: 0.5 }}>
+                            Qualified tracks only · 100% = pole
+                          </Typography>
+                          {performanceCharts.avgPercentile != null ? (
+                          <Chart
+                            type="radialBar"
+                            height={300}
+                            series={[performanceCharts.avgPercentile]}
+                            options={{
+                              colors: [BRAND_ACCENT],
+                              fill: { type: 'solid' },
+                              labels: ['of drivers'],
+                              stroke: { lineCap: 'round' },
+                              plotOptions: {
+                                radialBar: {
+                                  hollow: { size: '62%' },
+                                  track: { background: 'rgba(255,255,255,0.06)', strokeWidth: '100%' },
+                                  dataLabels: {
+                                    name: { color: 'rgba(255,255,255,0.6)', fontSize: '13px', offsetY: 22 },
+                                    value: {
+                                      color: '#fff',
+                                      fontSize: '38px',
+                                      fontWeight: 800,
+                                      offsetY: -12,
+                                      formatter: (v: number) => `${Math.round(Number(v))}%`,
+                                    },
+                                  },
+                                },
+                              },
+                            }}
+                          />
+                          ) : (
+                            <EmptyState
+                              title="Not enough qualified pace data yet."
+                              description="Pace graphs need multiple tracks with enough established drivers to avoid noisy comparisons."
+                            />
+                          )}
+                        </Paper>
+                      </Reveal>
+                    </Grid>
+                    <Grid size={{ xs: 12, md: 8 }}>
+                      <Reveal index={1} sx={{ height: 1 }}>
+                        <Paper sx={{ ...GLASS_PANEL_SX, ...brandAccentBorderSx(), height: 1 }}>
+                          <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.78)' }}>
+                            Track pace
+                          </Typography>
+                          <Typography variant="h6" sx={{ fontWeight: 800, mt: 0.3 }}>
+                            Pace by track
+                          </Typography>
+                          <Typography variant="caption" sx={{ display: 'block', color: 'text.secondary', mb: 1 }}>
+                            Qualified field you beat on each track · outer ring = fastest
+                          </Typography>
+                          {performanceCharts.radar ? (
+                          <Chart
+                            type="radar"
+                            height={340}
+                            series={[{ name: 'Beats', data: performanceCharts.radar.data }]}
+                            options={{
+                              labels: performanceCharts.radar.categories,
+                              colors: [BRAND_ACCENT],
+                              stroke: { width: 2.5 },
+                              fill: { type: 'solid', opacity: 0.32 },
+                              markers: { size: 4, strokeWidth: 0 },
+                              yaxis: { show: false, min: 0, max: 100 },
+                              tooltip: { y: { formatter: (v: number) => `Faster than ${v}% of the grid` } },
+                              plotOptions: {
+                                radar: {
+                                  polygons: {
+                                    strokeColors: 'rgba(255,255,255,0.08)',
+                                    connectorColors: 'rgba(255,255,255,0.08)',
+                                  },
+                                },
+                              },
+                            }}
+                          />
+                          ) : (
+                            <EmptyState
+                              title="Track pace is still building."
+                              description="This view ignores tiny grids and mostly-new fields so the shape stays meaningful."
+                            />
+                          )}
+                        </Paper>
+                      </Reveal>
+                    </Grid>
+                    <Grid size={{ xs: 12 }}>
+                      <Reveal index={2}>
+                        <Paper sx={{ ...GLASS_PANEL_SX, ...brandAccentBorderSx() }}>
+                          <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.78)' }}>
+                            Activity
+                          </Typography>
+                          <Typography variant="h6" sx={{ fontWeight: 800, mt: 0.3, mb: 1 }}>
+                            Laps by track
+                          </Typography>
+                          <Chart
+                            type="bar"
+                            height={Math.max(280, performanceCharts.laps.categories.length * 40)}
+                            series={[{ name: 'Laps', data: performanceCharts.laps.data }]}
+                            options={{
+                              colors: CHART_COLORS,
+                              fill: { type: 'solid' },
+                              legend: { show: false },
+                              plotOptions: {
+                                bar: {
+                                  horizontal: true,
+                                  distributed: true,
+                                  borderRadius: 6,
+                                  borderRadiusApplication: 'end',
+                                  barHeight: '62%',
+                                },
+                              },
+                              dataLabels: {
+                                enabled: true,
+                                textAnchor: 'start',
+                                offsetX: 4,
+                                formatter: (v: number) => formatNumber(Number(v)),
+                                style: { colors: ['rgba(255,255,255,0.92)'], fontWeight: 700, fontSize: '12px' },
+                              },
+                              xaxis: { categories: performanceCharts.laps.categories, labels: { show: false } },
+                              grid: { xaxis: { lines: { show: true } }, yaxis: { lines: { show: false } } },
+                              tooltip: { y: { formatter: (v: number) => `${formatNumber(v)} laps` } },
+                            }}
+                          />
+                        </Paper>
+                      </Reveal>
+                    </Grid>
+                  </Grid>
+                )}
+
+                <Reveal>
                 <Paper
                   sx={{
                     ...GLASS_TABLE_WRAPPER_SX,
@@ -779,6 +975,7 @@ export default function Page() {
                     </Table>
                   </TableContainer>
                 </Paper>
+                </Reveal>
 
                 {teamLiveryMeta && showTeamLiveryBlock ? (
                   <>

@@ -55,24 +55,18 @@ function kmrSupabaseDisabled(): boolean {
 }
 
 /**
- * Fetch the `rank_history` snapshot closest to (now - window), taken at or
- * before the target so the delta spans at least the requested window. Returns
- * null when Supabase is unavailable or no snapshot is old enough yet.
+ * PostgREST filter for snapshots that actually carry SR/pace. `sr`/`pace` live
+ * inside the `drivers` JSONB array and are all-or-nothing per snapshot, so
+ * testing the first element is a reliable, cheap proxy. Snapshots written before
+ * the Edge Function began capturing SR (pre 2026-05-17) are excluded.
  */
-export async function fetchRankHistorySnapshot(
-  window: HistoryWindowKey
-): Promise<RankHistorySnapshot | null> {
-  if (kmrSupabaseDisabled() || !supabaseReadConfigured()) return null;
-  const win = HISTORY_WINDOWS.find((w) => w.key === window);
-  if (!win) return null;
-  const target = new Date(Date.now() - win.ms).toISOString();
+const SR_PRESENT_FILTER = 'drivers->0->>sr=not.is.null';
+
+async function queryOneSnapshot(query: string): Promise<RankHistorySnapshot | null> {
   try {
-    const res = await fetch(
-      `${supabaseBaseUrl()}/rest/v1/rank_history` +
-        `?captured_at=lte.${encodeURIComponent(target)}` +
-        `&select=captured_at,drivers&order=captured_at.desc&limit=1`,
-      { headers: supabaseHeaders() }
-    );
+    const res = await fetch(`${supabaseBaseUrl()}/rest/v1/rank_history?${query}`, {
+      headers: supabaseHeaders(),
+    });
     if (!res.ok) return null;
     const rows = (await res.json()) as { captured_at?: string; drivers?: SlimDriver[] }[];
     const row = rows?.[0];
@@ -85,6 +79,31 @@ export async function fetchRankHistorySnapshot(
   } catch {
     return null;
   }
+}
+
+/**
+ * Snapshot to compare "now" against for the given window. We pick the newest
+ * **SR-bearing** snapshot at or before (now - window), so Safety Rating & license
+ * deltas always have a real baseline. When the window reaches further back than
+ * our SR history goes, we fall back to the oldest SR-bearing snapshot — a
+ * best-effort "as far back as we have SR data" comparison rather than nothing.
+ * Returns null only when Supabase is unavailable or no SR snapshot exists yet.
+ */
+export async function fetchRankHistorySnapshot(
+  window: HistoryWindowKey
+): Promise<RankHistorySnapshot | null> {
+  if (kmrSupabaseDisabled() || !supabaseReadConfigured()) return null;
+  const win = HISTORY_WINDOWS.find((w) => w.key === window);
+  if (!win) return null;
+  const target = new Date(Date.now() - win.ms).toISOString();
+  const windowed = await queryOneSnapshot(
+    `select=captured_at,drivers&captured_at=lte.${encodeURIComponent(target)}` +
+      `&${SR_PRESENT_FILTER}&order=captured_at.desc&limit=1`
+  );
+  if (windowed) return windowed;
+  return queryOneSnapshot(
+    `select=captured_at,drivers&${SR_PRESENT_FILTER}&order=captured_at.asc&limit=1`
+  );
 }
 
 /** Oldest snapshot timestamp in `rank_history`, or null when none / unavailable. */
@@ -121,6 +140,20 @@ export function availableHistoryWindows(oldestIso: string | null): Set<HistoryWi
     if (oldestMs <= now - w.ms) set.add(w.key);
   }
   return set;
+}
+
+/**
+ * Whether a snapshot carries Safety Rating / pace baselines. Snapshots taken
+ * before the Edge Function began capturing `sr`/`pace` (older 7d/30d windows)
+ * have none, so per-row SR & license deltas can't be computed for that window —
+ * callers use this to explain the gap instead of silently showing nothing.
+ */
+export function snapshotHasSrPace(snapshot: RankHistorySnapshot | null): boolean {
+  if (!snapshot) return false;
+  for (const d of snapshot.byGuid.values()) {
+    if (d.sr != null && d.pace != null) return true;
+  }
+  return false;
 }
 
 export type CommunityWindowDelta = {

@@ -6,10 +6,12 @@ import Typography from '@mui/material/Typography';
 import { CONFIG } from 'src/config-global';
 import { AuthGate } from 'src/lib/auth/auth-gate';
 import { GLASS_PANEL_SX } from 'src/lib/glass';
+import { ADMIN_SECTIONS } from 'src/centralized/admin-sections';
 import { brandAccentBorderSx } from 'src/lib/status-accent';
 import { glassCardMotionSx, softFloatWrapperSx } from 'src/lib/subtle-motion';
 import { DATA_PAGE_SHELL_SX } from 'src/lib/page-shell';
 
+import { renderNavIcon } from 'src/components/icons/ac-dashboard-icons';
 import { PageGridOverlay } from 'src/components/page-background/page-grid-overlay';
 
 // ----------------------------------------------------------------------
@@ -32,6 +34,8 @@ export type AdminPageShellProps = {
  */
 export function AdminPageShell({ title, description, documentTitle, children }: AdminPageShellProps) {
   const docTitle = documentTitle ?? title;
+  /** Match the sidebar icon for this section so the hero mirrors the data pages. */
+  const iconName = ADMIN_SECTIONS.find((section) => section.label === title)?.iconifyName;
 
   return (
     <>
@@ -53,12 +57,66 @@ export function AdminPageShell({ title, description, documentTitle, children }: 
                     alignItems: { xs: 'center', md: 'flex-start' },
                   }}
                 >
-                  <Typography variant="overline" sx={{ color: 'rgba(191,219,254,0.85)', fontWeight: 800, letterSpacing: '0.16em' }}>
-                    Admin Panel
-                  </Typography>
-                  <Typography variant="h4" fontWeight={800}>
-                    {title}
-                  </Typography>
+                  <Stack
+                    direction="row"
+                    spacing={1.5}
+                    alignItems="center"
+                    justifyContent={{ xs: 'center', md: 'flex-start' }}
+                  >
+                    {iconName && (
+                      <Box
+                        aria-hidden
+                        sx={{
+                          width: 38,
+                          height: 38,
+                          flexShrink: 0,
+                          borderRadius: 1.4,
+                          position: 'relative',
+                          display: 'grid',
+                          placeItems: 'center',
+                          lineHeight: 0,
+                          color: 'rgba(226,242,255,0.96)',
+                          background:
+                            'radial-gradient(120% 120% at 24% 0%, rgba(255,255,255,0.13), rgba(255,255,255,0.03) 46%, transparent 72%), rgba(255,255,255,0.045)',
+                          border: '1px solid rgba(226,242,255,0.14)',
+                          boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.12)',
+                          '& .nav-glyph': {
+                            position: 'absolute',
+                            inset: 0,
+                            display: 'grid',
+                            placeItems: 'center',
+                            lineHeight: 0,
+                            transform: 'translate(var(--nav-icon-x, 0px), var(--nav-icon-y, 0px))',
+                            pointerEvents: 'none',
+                          },
+                          '& svg': {
+                            display: 'block',
+                            width: 'var(--nav-icon-size, 25.5px)',
+                            height: 'var(--nav-icon-size, 25.5px)',
+                            overflow: 'visible',
+                          },
+                        }}
+                      >
+                        {renderNavIcon(iconName, true)}
+                      </Box>
+                    )}
+                    <Stack spacing={0.1} sx={{ alignItems: { xs: 'center', md: 'flex-start' } }}>
+                      <Typography
+                        variant="overline"
+                        sx={{
+                          color: 'rgba(147,197,253,0.9)',
+                          fontWeight: 800,
+                          letterSpacing: '0.18em',
+                          lineHeight: 1.2,
+                        }}
+                      >
+                        Admin Panel
+                      </Typography>
+                      <Typography component="h1" variant="h4" fontWeight={800} sx={{ lineHeight: 1.1 }}>
+                        {title}
+                      </Typography>
+                    </Stack>
+                  </Stack>
                   {description && (
                     <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                       {description}

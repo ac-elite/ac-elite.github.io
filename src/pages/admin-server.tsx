@@ -18,7 +18,7 @@ import { getTrackDisplayName } from 'src/lib/ac-elite-data';
 import { useTrackCatalogVersion } from 'src/centralized/track-info';
 import { glassCardMotionSx } from 'src/lib/subtle-motion';
 import { brandAccentBorderSx } from 'src/lib/status-accent';
-import { GLASS_PANEL_COMPACT_SX, GLASS_INNER_PANEL_SX } from 'src/lib/glass';
+import { GLASS_INNER_PANEL_SX, GLASS_PANEL_COMPACT_SX, GLASS_TABLE_CONTAINER_SX } from 'src/lib/glass';
 import {
   acSessionTypeLabel,
   AC_SESSION_TYPE_RACE,
@@ -320,12 +320,12 @@ export default function Page() {
             Every field the AC server reports. Useful when something looks off in the cards above and you want to see the raw value.
           </Typography>
         </Box>
-        <TableContainer sx={{ maxHeight: 400, borderRadius: 1, border: '1px solid rgba(148,163,184,0.14)', bgcolor: 'rgba(15,23,42,0.35)' }}>
+        <TableContainer sx={{ ...GLASS_TABLE_CONTAINER_SX, maxHeight: 400, borderRadius: 1 }}>
           <Table size="small" stickyHeader>
             <TableHead>
               <TableRow>
-                <TableCell sx={{ fontWeight: 800, width: '32%', bgcolor: 'rgba(15,23,42,0.88)' }}>Field</TableCell>
-                <TableCell sx={{ fontWeight: 800, bgcolor: 'rgba(15,23,42,0.88)' }}>Value</TableCell>
+                <TableCell sx={{ fontWeight: 800, width: '32%', bgcolor: 'rgba(255,255,255,0.012)' }}>Field</TableCell>
+                <TableCell sx={{ fontWeight: 800, bgcolor: 'rgba(255,255,255,0.012)' }}>Value</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>

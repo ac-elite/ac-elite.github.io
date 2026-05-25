@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import type { Theme, SxProps } from '@mui/material/styles';
 
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
@@ -6,6 +7,8 @@ import Dialog from '@mui/material/Dialog';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import DialogContent from '@mui/material/DialogContent';
+
+import { GLASS_DIALOG_SX, GLASS_CARD_INNER_SX } from 'src/lib/glass';
 
 export type LiveryEnlargeDialogProps = {
   open: boolean;
@@ -35,13 +38,13 @@ export function LiveryEnlargeDialog({
       fullWidth
       aria-labelledby="livery-enlarge-dialog-title"
       PaperProps={{
-        sx: {
-          bgcolor: 'rgba(15,23,42,0.98)',
-          border: '1px solid rgba(255,255,255,0.14)',
-          borderRadius: 2.5,
-          maxHeight: '96vh',
-          backgroundImage: 'none',
-        },
+        sx: [
+          GLASS_DIALOG_SX,
+          {
+            p: 0,
+            maxHeight: '96vh',
+          },
+        ] as SxProps<Theme>,
       }}
     >
       <Stack
@@ -66,8 +69,19 @@ export function LiveryEnlargeDialog({
             '&:hover': { color: '#fff', bgcolor: 'rgba(255,255,255,0.08)' },
           }}
         >
-          <Box component="span" sx={{ fontSize: 22, lineHeight: 1 }}>
-            ×
+          <Box
+            component="svg"
+            viewBox="0 0 24 24"
+            aria-hidden
+            sx={{ width: 16, height: 16, display: 'block' }}
+          >
+            <path
+              d="M6 6L18 18M18 6L6 18"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2.4}
+              strokeLinecap="round"
+            />
           </Box>
         </IconButton>
       </Stack>
@@ -76,14 +90,23 @@ export function LiveryEnlargeDialog({
           component="img"
           src={src}
           alt={alt}
-          sx={{
-            width: '100%',
-            maxHeight: { xs: 'calc(85vh - 120px)', sm: 'calc(90vh - 120px)' },
-            objectFit: 'contain',
-            display: 'block',
-            mx: 'auto',
-            borderRadius: 1,
-          }}
+          sx={
+            [
+              {
+                width: '100%',
+                maxHeight: { xs: 'calc(85vh - 120px)', sm: 'calc(90vh - 120px)' },
+                objectFit: 'contain',
+                display: 'block',
+                mx: 'auto',
+              },
+              GLASS_CARD_INNER_SX,
+              {
+                p: 0,
+                borderRadius: 1.4,
+                backgroundImage: 'none',
+              },
+            ] as SxProps<Theme>
+          }
         />
         {subtitle ? (
           <Typography variant="body2" sx={{ color: 'text.secondary', mt: 1.5, textAlign: 'center' }}>

@@ -40,7 +40,13 @@ import {
   type TrackRow,
   type TrackInput,
 } from 'src/lib/auth/tracks-db';
-import { GLASS_CARD_SX, GLASS_PANEL_COMPACT_SX, GLASS_INNER_PANEL_SX } from 'src/lib/glass';
+import {
+  GLASS_DIALOG_SX,
+  GLASS_INLINE_CODE_SX,
+  GLASS_INNER_PANEL_SX,
+  GLASS_PANEL_COMPACT_SX,
+  GLASS_TABLE_CONTAINER_SX,
+} from 'src/lib/glass';
 import { brandAccentBorderSx } from 'src/lib/status-accent';
 import { glassCardMotionSx } from 'src/lib/subtle-motion';
 import {
@@ -180,10 +186,9 @@ export function TrackCatalogManager() {
 
       <TableContainer
         sx={{
+          ...GLASS_TABLE_CONTAINER_SX,
           maxHeight: 480,
           borderRadius: 1,
-          border: '1px solid rgba(148,163,184,0.14)',
-          bgcolor: 'rgba(15,23,42,0.35)',
         }}
       >
         <Table size="small" stickyHeader>
@@ -196,7 +201,7 @@ export function TrackCatalogManager() {
                   letterSpacing: '0.1em',
                   fontWeight: 800,
                   color: TABLE_HEAD_MUTED_COLOR,
-                  bgcolor: 'rgba(15,23,42,0.92)',
+                  bgcolor: 'rgba(255,255,255,0.012)',
                   borderBottom: '1px solid rgba(148,163,184,0.28)',
                   py: 1.1,
                   px: 1.25,
@@ -353,10 +358,9 @@ export function TrackCatalogManager() {
             </Typography>
             <TableContainer
               sx={{
+                ...GLASS_TABLE_CONTAINER_SX,
                 maxHeight: 320,
                 borderRadius: 1,
-                border: '1px solid rgba(148,163,184,0.14)',
-                bgcolor: 'rgba(15,23,42,0.35)',
               }}
             >
               <Table size="small" stickyHeader>
@@ -369,7 +373,7 @@ export function TrackCatalogManager() {
                         letterSpacing: '0.1em',
                         fontWeight: 800,
                         color: TABLE_HEAD_MUTED_COLOR,
-                        bgcolor: 'rgba(15,23,42,0.92)',
+                        bgcolor: 'rgba(255,255,255,0.012)',
                         borderBottom: '1px solid rgba(148,163,184,0.28)',
                         py: 1.1,
                         px: 1.25,
@@ -430,9 +434,8 @@ export function TrackCatalogManager() {
         slotProps={{
           paper: {
             sx: {
-              ...GLASS_CARD_SX,
+              ...GLASS_DIALOG_SX,
               ...brandAccentBorderSx(),
-              backgroundImage: 'none',
               borderColor: 'rgba(252,165,165,0.35)',
             },
           },
@@ -457,13 +460,7 @@ export function TrackCatalogManager() {
             <Box
               component="code"
               sx={{
-                px: 0.75,
-                py: 0.25,
-                borderRadius: 0.75,
-                bgcolor: 'rgba(15,23,42,0.6)',
-                border: '1px solid rgba(148,163,184,0.25)',
-                fontFamily: 'ui-monospace, monospace',
-                color: '#fff',
+                ...GLASS_INLINE_CODE_SX,
               }}
             >
               {confirmDeleteId}
@@ -641,10 +638,8 @@ function TrackFormDialog({ mode, existingIds, onCancel, onSaved }: TrackFormDial
       slotProps={{
         paper: {
           sx: {
-            ...GLASS_CARD_SX,
+            ...GLASS_DIALOG_SX,
             ...brandAccentBorderSx(),
-            // Override the default MUI overlay backgroundImage so our gradient shows through.
-            backgroundImage: 'none',
           },
         },
       }}
@@ -766,7 +761,7 @@ function TrackFormDialog({ mode, existingIds, onCancel, onSaved }: TrackFormDial
                     height: 90,
                     borderRadius: 1.5,
                     border: '1px solid rgba(148,163,184,0.28)',
-                    bgcolor: 'rgba(15,23,42,0.55)',
+                    bgcolor: 'rgba(255,255,255,0.012)',
                     overflow: 'hidden',
                     flexShrink: 0,
                     display: 'flex',

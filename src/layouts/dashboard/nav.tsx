@@ -9,11 +9,17 @@ import { useTheme } from '@mui/material/styles';
 import ListItemButton from '@mui/material/ListItemButton';
 import Drawer, { drawerClasses } from '@mui/material/Drawer';
 
+import {
+  APP_NAV_SURFACE_SX,
+  GLASS_SIDEBAR_ITEM_HOVER_BG,
+  GLASS_SIDEBAR_ITEM_ACTIVE_SX,
+} from 'src/lib/glass';
 import { usePathname } from 'src/routes/hooks';
 import { RouterLink } from 'src/routes/components';
 
 import { Logo } from 'src/components/logo';
 import { Scrollbar } from 'src/components/scrollbar';
+import { renderNavIcon } from 'src/components/icons/ac-dashboard-icons';
 import { LicenseSafetyGuideButton } from 'src/components/license-safety-guide/license-safety-guide';
 
 import type { NavItem } from '../nav-config-dashboard';
@@ -40,18 +46,20 @@ export function NavDesktop({
   return (
     <Box
       sx={{
-        pt: 2.5,
-        px: 2.5,
-        bgcolor: '#17213B',
+        pt: 3,
+        px: 2,
+        ...APP_NAV_SURFACE_SX,
         top: 0,
         left: 0,
         height: 1,
+        overflowX: 'hidden',
         display: 'none',
         position: 'fixed',
         flexDirection: 'column',
         zIndex: 'var(--layout-nav-zIndex)',
         width: 'var(--layout-nav-vertical-width)',
-        borderRight: `1px solid ${varAlpha(theme.vars.palette.common.whiteChannel, 0.16)}`,
+        borderRight: `1px solid ${varAlpha(theme.vars.palette.common.whiteChannel, 0.1)}`,
+        boxShadow: 'inset -1px 0 0 rgba(255,255,255,0.035)',
         [theme.breakpoints.up(layoutQuery)]: {
           display: 'flex',
         },
@@ -89,8 +97,11 @@ export function NavMobile({
         [`& .${drawerClasses.paper}`]: {
           pt: 2.5,
           px: 2.5,
-          overflow: 'unset',
+          overflowX: 'hidden',
+          overflowY: 'hidden',
           width: 'var(--layout-nav-mobile-width)',
+          ...APP_NAV_SURFACE_SX,
+          borderRight: '1px solid rgba(255,255,255,0.1)',
           ...sx,
         },
       }}
@@ -110,17 +121,13 @@ export function NavContent({ data, slots, sx }: NavContentProps) {
       <Box
         sx={{
           mt: 0.5,
-          mb: 3.5,
-          px: 0.25,
-          py: 0.25,
+          mb: 3,
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
-          borderRadius: 1.5,
-          bgcolor: '#17213B',
         }}
       >
-        <Logo sx={{ width: 100, height: 100 }} />
+        <Logo sx={{ width: 96, height: 96 }} />
       </Box>
 
       <Box sx={{ mb: 2.75 }}>
@@ -129,7 +136,31 @@ export function NavContent({ data, slots, sx }: NavContentProps) {
 
       {slots?.topArea}
 
-      <Scrollbar fillContent>
+      <Scrollbar
+        fillContent
+        sx={{
+          overflowX: 'hidden',
+          '& .simplebar-wrapper': {
+            overflowX: 'hidden',
+          },
+          '& .simplebar-mask': {
+            overflowX: 'hidden',
+          },
+          '& .simplebar-offset': {
+            right: 0,
+            overflowX: 'hidden',
+          },
+          '& .simplebar-content-wrapper': {
+            overflowX: 'hidden !important',
+          },
+          '& .simplebar-content': {
+            overflowX: 'hidden',
+          },
+          '& .simplebar-track.simplebar-horizontal': {
+            display: 'none',
+          },
+        }}
+      >
         <Box
           component="nav"
           sx={[
@@ -137,6 +168,9 @@ export function NavContent({ data, slots, sx }: NavContentProps) {
               display: 'flex',
               flex: '1 1 auto',
               flexDirection: 'column',
+              minWidth: 0,
+              width: 1,
+              overflowX: 'hidden',
             },
             ...(Array.isArray(sx) ? sx : [sx]),
           ]}
@@ -147,6 +181,11 @@ export function NavContent({ data, slots, sx }: NavContentProps) {
               gap: 1,
               display: 'flex',
               flexDirection: 'column',
+              minWidth: 0,
+              width: 1,
+              m: 0,
+              p: 0,
+              listStyle: 'none',
             }}
           >
             {data.map((item) => {
@@ -174,53 +213,118 @@ export function NavContent({ data, slots, sx }: NavContentProps) {
                     {item.group}
                   </Box>
                 )}
-                <ListItem disableGutters disablePadding>
+                <ListItem disableGutters disablePadding sx={{ minWidth: 0, width: 1 }}>
                   <ListItemButton
                     disableGutters
                     {...navButtonProps}
                     sx={[
                       (theme) => ({
-                        pl: 2,
-                        py: 1.1,
-                        gap: 2,
+                        pl: 1.5,
+                        py: 1.05,
+                        gap: 1.5,
                         pr: 1.5,
-                        borderRadius: 1,
+                        minWidth: 0,
+                        width: 1,
+                        borderRadius: 1.4,
                         typography: 'body2',
                         fontWeight: 'fontWeightMedium',
-                        minHeight: 48,
-                        color: varAlpha(theme.vars.palette.common.whiteChannel, 0.72),
-                        transition: theme.transitions.create(['background-color', 'color', 'box-shadow'], {
-                          duration: theme.transitions.duration.shorter,
-                        }),
-                        '&:hover': {
-                          bgcolor: varAlpha(theme.vars.palette.common.whiteChannel, 0.08),
-                          color: theme.vars.palette.common.white,
+                        minHeight: 54,
+                        color: varAlpha(theme.vars.palette.common.whiteChannel, 0.68),
+                        transition:
+                          'background 240ms cubic-bezier(0.32,0.72,0,1), color 240ms cubic-bezier(0.32,0.72,0,1), transform 260ms cubic-bezier(0.32,0.72,0,1), box-shadow 240ms cubic-bezier(0.32,0.72,0,1), border-color 240ms cubic-bezier(0.32,0.72,0,1)',
+                        '@media (hover: hover)': {
+                          '&:hover': {
+                            background: GLASS_SIDEBAR_ITEM_HOVER_BG,
+                            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.1)',
+                            color: theme.vars.palette.common.white,
+                            transform: 'translateX(2px) scale(1.006)',
+                          },
+                        },
+                        '&:active': { transform: 'scale(0.98)' },
+                        '@media (prefers-reduced-motion: reduce)': {
+                          transition: 'none',
+                          '&:hover': { transform: 'none' },
+                          '&:active': { transform: 'none' },
                         },
                         ...(isDisabled && {
-                          opacity: 0.62,
+                          opacity: 0.6,
                           cursor: 'pointer',
-                          '&:hover': {
-                            bgcolor: varAlpha(theme.vars.palette.common.whiteChannel, 0.06),
-                            color: varAlpha(theme.vars.palette.common.whiteChannel, 0.82),
+                          '@media (hover: hover)': {
+                            '&:hover': {
+                              bgcolor: varAlpha(theme.vars.palette.common.whiteChannel, 0.04),
+                              color: varAlpha(theme.vars.palette.common.whiteChannel, 0.78),
+                              transform: 'none',
+                            },
                           },
                         }),
                         ...(isActived && {
                           fontWeight: 'fontWeightSemiBold',
                           color: theme.vars.palette.common.white,
-                          bgcolor: varAlpha(theme.vars.palette.common.whiteChannel, 0.16),
-                          boxShadow: `inset 0 0 0 1px ${varAlpha(theme.vars.palette.common.whiteChannel, 0.28)}`,
-                          '&:hover': {
-                            bgcolor: varAlpha(theme.vars.palette.common.whiteChannel, 0.22),
+                          ...GLASS_SIDEBAR_ITEM_ACTIVE_SX,
+                          '@media (hover: hover)': {
+                            '&:hover': {
+                              background: `linear-gradient(180deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.045) 100%), rgba(23,33,59,0.88)`,
+                              transform: 'translateX(1px)',
+                            },
                           },
                         }),
                       }),
                     ]}
                   >
-                    <Box component="span" sx={{ width: 24, height: 24, color: 'inherit' }}>
-                      {item.icon}
+                    <Box
+                      component="span"
+                      sx={{
+                        width: 38,
+                        height: 38,
+                        borderRadius: 1.3,
+                        color: 'inherit',
+                        display: 'grid',
+                        placeItems: 'center',
+                        flexShrink: 0,
+                        lineHeight: 0,
+                        position: 'relative',
+                        background: 'linear-gradient(180deg, rgba(255,255,255,0.055), rgba(255,255,255,0.026))',
+                        border: '1px solid rgba(255,255,255,0.08)',
+                        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.08)',
+                        transition:
+                          'background 240ms cubic-bezier(0.32,0.72,0,1), border-color 240ms cubic-bezier(0.32,0.72,0,1), box-shadow 240ms cubic-bezier(0.32,0.72,0,1), transform 240ms cubic-bezier(0.32,0.72,0,1)',
+                        '& .nav-glyph': {
+                          position: 'absolute',
+                          inset: 0,
+                          display: 'grid',
+                          placeItems: 'center',
+                          lineHeight: 0,
+                          transform: 'translate(var(--nav-icon-x, 0px), var(--nav-icon-y, 0px))',
+                          pointerEvents: 'none',
+                        },
+                        '& svg': {
+                          display: 'block',
+                          width: 'var(--nav-icon-size, 25.5px)',
+                          height: 'var(--nav-icon-size, 25.5px)',
+                          flexShrink: 0,
+                          margin: 0,
+                          overflow: 'visible',
+                        },
+                        ...(isActived && {
+                          background: 'linear-gradient(180deg, rgba(255,255,255,0.12), rgba(255,255,255,0.04))',
+                          borderColor: 'rgba(226,242,255,0.18)',
+                          boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.14)',
+                        }),
+                      }}
+                    >
+                      {renderNavIcon(item.iconName, isActived)}
                     </Box>
 
-                    <Box component="span" sx={{ flexGrow: 1 }}>
+                    <Box
+                      component="span"
+                      sx={{
+                        flexGrow: 1,
+                        minWidth: 0,
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
                       {item.title}
                     </Box>
 

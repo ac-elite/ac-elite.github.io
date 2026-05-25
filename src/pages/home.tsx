@@ -40,11 +40,11 @@ import {
   subtleEnterUpSx,
   subtleRowEnterSx,
   glassCardMotionSx,
-  subtleEnterOnceSx,
   softFloatWrapperSx,
 } from 'src/lib/subtle-motion';
 import {
   DATA_PAGE_SHELL_SX,
+  PAGE_BACKGROUND_GRADIENT,
   PAGINATION_NAV_BUTTON_SX,
   PAGINATION_PAGE_BUTTON_SX,
   MARKETING_CTA_LARGE_LAYOUT_SX,
@@ -52,9 +52,9 @@ import {
   MARKETING_CTA_SECONDARY_GLASS_SX,
 } from 'src/lib/page-shell';
 import {
-  GLASS_CARD_SX,
   GLASS_PANEL_SX,
   getPodiumRowSx,
+  GLASS_CARD_INNER_SX,
   GLASS_INNER_PANEL_SX,
   GLASS_TABLE_WRAPPER_SX,
   GLASS_TABLE_PAGINATION_SX,
@@ -94,6 +94,7 @@ import {
 } from 'src/lib/ac-elite-data';
 import { useTrackCatalogVersion } from 'src/centralized/track-info';
 
+import { Reveal } from 'src/components/reveal';
 import { EmptyState } from 'src/components/data-state';
 import { DeltaChip } from 'src/components/delta-chip/delta-chip';
 import { InfoNotesPanel } from 'src/components/info-notes/info-notes-panel';
@@ -123,47 +124,64 @@ type CurrentTrackData = CurrentTrackPayload;
 const HOME_CURRENT_TRACK_PER_PAGE = 20;
 
 /**
- * Hero CTA: subtle outer-glow pulse. Only changes `filter` so it composes with
- * the layered glass styling on the buttons (inner sheens + base box-shadow stay
- * intact). Each button gets a different delay so they breathe out of sync.
+ * Static Apple-style gradient keyword (white → soft ice-blue, clipped to text).
+ * Replaces the former infinite colour/shimmer pulses — premium through restraint.
  */
-const heroPrimaryPulse = keyframes`
-  0%, 100% { filter: brightness(1) drop-shadow(0 0 0 rgba(147,197,253,0)); }
-  50%      { filter: brightness(1.05) drop-shadow(0 0 14px rgba(147,197,253,0.35)); }
-`;
-
-/** Soft highlight on “leaderboard.” — white-forward, not loud accent color. */
-const heroWordShimmer = keyframes`
+const heroKeywordFloat = keyframes`
   0%, 100% {
-    text-shadow: 0 0 18px rgba(255,255,255,0.12), 0 0 36px rgba(23,33,59,0.45);
-    opacity: 0.96;
+    transform: translate3d(0, 0, 0) rotate(-1deg);
   }
   50% {
-    text-shadow: 0 0 26px rgba(255,255,255,0.2), 0 0 48px rgba(255,255,255,0.05);
-    opacity: 1;
+    transform: translate3d(0, -5px, 0) rotate(-1deg);
   }
 `;
 
-const heroKeywordPulse = keyframes`
-  0%, 100% {
-    color: rgba(255,255,255,0.97);
-    text-shadow: 0 0 18px rgba(255,255,255,0.14), 0 0 34px rgba(147,197,253,0.12);
-  }
-  50% {
-    color: #ffffff;
-    text-shadow: 0 0 24px rgba(255,255,255,0.22), 0 0 44px rgba(191,219,254,0.18);
-  }
-`;
+const heroKeywordSx = {
+  display: 'inline-block',
+  position: 'relative',
+  zIndex: 1,
+  mx: { xs: 0.35, md: 0.55 },
+  lineHeight: 0.9,
+  letterSpacing: 0,
+  // On-brand electric-blue accent gradient (matches the CTA / accent blue).
+  backgroundImage:
+    'linear-gradient(180deg, #F5FBFF 0%, #A9D8FF 26%, #4F8DF6 62%, #173EA8 100%)',
+  WebkitBackgroundClip: 'text',
+  backgroundClip: 'text',
+  color: 'transparent',
+  fontWeight: 800,
+  // Soft depth shadow; avoid neon-style glow.
+  textShadow: '0 2px 10px rgba(15,23,42,0.56)',
+  animation: `${heroKeywordFloat} 5.8s ease-in-out infinite`,
+  transformOrigin: '50% 65%',
+  '@media (prefers-reduced-motion: reduce)': {
+    animation: 'none',
+  },
+} as const;
+
+const heroStatsKeywordSx = {
+  ...heroKeywordSx,
+  fontSize: { xs: '1.18em', sm: '1.24em', md: '1.3em' },
+  top: { xs: 2, md: 4 },
+} as const;
+
+const heroLeaderboardKeywordSx = {
+  ...heroKeywordSx,
+  display: { xs: 'inline-block', md: 'block' },
+  width: 'fit-content',
+  ml: { xs: 0.35, md: 5.5 },
+  mt: { xs: 0, md: -0.4 },
+  fontSize: { xs: '1.12em', sm: '1.2em', md: '1.26em' },
+  animationDelay: '-1.8s',
+} as const;
 
 /** Soft "live" pulse for the green dot in the hero kicker. */
 const heroLiveDotPulse = keyframes`
   0%, 100% {
-    box-shadow: 0 0 0 0 rgba(34,197,94,0.55), 0 0 12px rgba(34,197,94,0.6);
     transform: scale(1);
   }
   50% {
-    box-shadow: 0 0 0 6px rgba(34,197,94,0), 0 0 18px rgba(34,197,94,0.85);
-    transform: scale(1.08);
+    transform: scale(1.04);
   }
 `;
 
@@ -245,29 +263,6 @@ function RaceIntelligenceCard({
                     flexDirection: 'column',
                     justifyContent: 'center',
                     alignItems: { xs: 'center', md: 'flex-start' },
-                    // Layered surface: subtle top sheen + soft outer glow + crisper border.
-                    // Lifts the tile from "flat box" to "deliberate glass surface".
-                    backgroundImage:
-                      'linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 36%),' +
-                      'linear-gradient(145deg, rgba(31,44,73,0.92), rgba(23,33,59,0.92))',
-                    border: '1px solid rgba(148,163,184,0.34)',
-                    boxShadow:
-                      'inset 0 1px 0 rgba(255,255,255,0.12), inset 0 -1px 0 rgba(0,0,0,0.22),' +
-                      ' 0 6px 16px rgba(0,0,0,0.28)',
-                    transition: 'transform 200ms ease, border-color 200ms ease, box-shadow 200ms ease',
-                    '@media (hover: hover)': {
-                      '&:hover': {
-                        transform: 'translateY(-1px)',
-                        borderColor: 'rgba(191,225,255,0.5)',
-                        boxShadow:
-                          'inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -1px 0 rgba(0,0,0,0.22),' +
-                          ' 0 10px 22px rgba(0,0,0,0.36), 0 0 0 1px rgba(147,197,253,0.2)',
-                      },
-                    },
-                    '@media (prefers-reduced-motion: reduce)': {
-                      transition: 'none',
-                      '&:hover': { transform: 'none' },
-                    },
                   }}
                 >
                   <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.72)', fontWeight: 600, letterSpacing: 0.2 }}>
@@ -302,15 +297,12 @@ function HeroSection({ currentTrack }: { currentTrack: CurrentTrackData | null }
         position: 'relative',
         pt: { xs: 8, md: 12 },
         pb: { xs: 6, md: 6 },
-        background:
-          'radial-gradient(circle at 0% 0%, rgba(23,33,59,0.28) 0, transparent 55%),' +
-          'radial-gradient(circle at 100% 100%, rgba(35,31,32,0.2) 0, transparent 55%),' +
-          'linear-gradient(180deg, #17213B 0%, #1f2c49 55%, #17213B 100%)',
+        background: PAGE_BACKGROUND_GRADIENT,
         color: '#fff',
         overflow: 'hidden',
       }}
     >
-      <PageGridOverlay opacity={0.42} />
+      <PageGridOverlay opacity={0.34} />
 
       <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1 }}>
         <Grid container spacing={{ xs: 4, md: 6 }} alignItems="center">
@@ -342,43 +334,41 @@ function HeroSection({ currentTrack }: { currentTrack: CurrentTrackData | null }
                 </Stack>
 
                 <Typography
+                  component="h1"
                   variant={isMdUp ? 'h2' : 'h3'}
                   sx={{
                     fontWeight: 800,
-                    letterSpacing: 0.5,
-                    textShadow: '0 0 16px rgba(0,0,0,0.72), 0 0 36px rgba(15,23,42,0.92)',
+                    letterSpacing: 0,
+                    lineHeight: { xs: 1.02, md: 0.96 },
+                    maxWidth: 840,
+                    textShadow: '0 2px 12px rgba(15,23,42,0.72)',
+                    '&::selection': {
+                      backgroundColor: 'rgba(147,197,253,0.32)',
+                    },
                   }}
                 >
                   Track your{' '}
-                  <Box
-                    component="span"
-                    sx={{
-                      color: 'rgba(255,255,255,0.97)',
-                      fontWeight: 900,
-                      animation: `${heroKeywordPulse} 5.2s ease-in-out infinite`,
-                      ...reducedMotionNone,
-                    }}
-                  >
+                  <Box component="span" sx={heroStatsKeywordSx}>
                     stats
                   </Box>
                   .
                   <br />
                   Dominate the{' '}
-                  <Box
-                    component="span"
-                    sx={{
-                      color: 'rgba(255,255,255,0.98)',
-                      fontWeight: 900,
-                      animation: `${heroKeywordPulse} 5.2s ease-in-out 1.2s infinite, ${heroWordShimmer} 5.5s ease-in-out 1.2s infinite`,
-                      textShadow: '0 0 28px rgba(255,255,255,0.16)',
-                      ...reducedMotionNone,
-                    }}
-                  >
+                  <Box component="span" sx={heroLeaderboardKeywordSx}>
                     leaderboard.
                   </Box>
                 </Typography>
 
-                <Typography variant="body1" sx={{ maxWidth: 580, color: 'text.secondary' }}>
+                <Typography
+                  variant="body1"
+                  sx={{
+                    maxWidth: 610,
+                    color: 'rgba(226,232,240,0.9)',
+                    fontSize: { xs: '1rem', md: '1.075rem' },
+                    lineHeight: 1.6,
+                    textShadow: '0 1px 8px rgba(15,23,42,0.62)',
+                  }}
+                >
                   Real-time leaderboards, license rankings, and Safety Rating — every lap from
                   the AC Elite server, updated as drivers cross the line.
                 </Typography>
@@ -388,8 +378,8 @@ function HeroSection({ currentTrack }: { currentTrack: CurrentTrackData | null }
                 direction={{ xs: 'column', sm: 'row' }}
                 spacing={1.25}
                 flexWrap="wrap"
-                alignItems={{ xs: 'center', sm: 'flex-start' }}
-                justifyContent={{ xs: 'center', sm: 'flex-start' }}
+                alignItems={{ xs: 'center', md: 'flex-start' }}
+                justifyContent={{ xs: 'center', md: 'flex-start' }}
                 sx={{ width: '100%' }}
               >
                 <Button
@@ -398,8 +388,6 @@ function HeroSection({ currentTrack }: { currentTrack: CurrentTrackData | null }
                   sx={{
                     ...MARKETING_CTA_LARGE_LAYOUT_SX,
                     ...MARKETING_CTA_PRIMARY_GLASS_SX,
-                    animation: `${heroPrimaryPulse} 4.5s ease-in-out infinite`,
-                    '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
                   }}
                   href="https://discord.gg/d2EbxGYBbj"
                   target="_blank"
@@ -413,9 +401,6 @@ function HeroSection({ currentTrack }: { currentTrack: CurrentTrackData | null }
                   sx={{
                     ...MARKETING_CTA_LARGE_LAYOUT_SX,
                     ...MARKETING_CTA_SECONDARY_GLASS_SX,
-                    // Same pulse, half-cycle delay so the two CTAs breathe out of sync.
-                    animation: `${heroPrimaryPulse} 4.5s ease-in-out 2.25s infinite`,
-                    '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
                   }}
                   href={ACE_SKIN_PACK_DOWNLOAD_URL}
                   target="_blank"
@@ -494,29 +479,31 @@ function CurrentTrackLeaderboardSection({
 
   return (
     <Box component="section" sx={{ ...DATA_PAGE_SHELL_SX }}>
-      <PageGridOverlay opacity={0.28} />
+      <PageGridOverlay />
 
       <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1 }}>
         <Stack spacing={3}>
+          <Reveal>
           <Stack
             spacing={0.7}
             sx={{
               textAlign: { xs: 'center', md: 'left' },
               alignItems: { xs: 'center', md: 'flex-start' },
-              ...subtleEnterOnceSx(340),
             }}
           >
             <Typography variant="overline" sx={sectionKickerSx}>
               Live track leaderboard
             </Typography>
-            <Typography variant="h4" fontWeight={800}>
+            <Typography component="h2" variant="h4" fontWeight={800}>
               Current track: {getTrackDisplayName(currentTrack.track)}
             </Typography>
             <Typography color="text.secondary">
               Full leaderboard for {CAR} on the currently active server track.
             </Typography>
           </Stack>
+          </Reveal>
 
+          <Reveal index={1}>
           <Paper
             sx={{
               ...GLASS_TABLE_WRAPPER_SX,
@@ -529,7 +516,7 @@ function CurrentTrackLeaderboardSection({
                 size="small"
                 sx={{
                   '& .MuiTableBody-root .MuiTableRow-root:hover': {
-                    backgroundColor: 'rgba(255,255,255,0.04)',
+                    backgroundColor: 'rgba(255,255,255,0.028)',
                   },
                 }}
               >
@@ -677,6 +664,7 @@ function CurrentTrackLeaderboardSection({
               </Table>
             </TableContainer>
           </Paper>
+          </Reveal>
 
           {!loading && !error && totalPages > 1 && (
             <Paper sx={{ ...GLASS_TABLE_PAGINATION_SX, ...glassCardMotionSx(0, { baseDelayMs: 460 }) }}>
@@ -774,12 +762,12 @@ function DriverSearchSection({
       sx={{
         position: 'relative',
         py: 4,
-        background: 'linear-gradient(180deg, rgba(31,44,73,0.98) 0%, rgba(23,33,59,0.98) 100%)',
+        background: 'transparent',
         // Slightly stronger so the seam reads as crisp on both sides — the
         // grid-pattern transition below already adds visual contrast on its own;
         // the top boundary needs the border to do all the work.
-        borderTop: '1px solid rgba(255,255,255,0.14)',
-        borderBottom: '1px solid rgba(255,255,255,0.14)',
+        borderTop: '1px solid rgba(226,242,255,0.08)',
+        borderBottom: '1px solid rgba(226,242,255,0.08)',
         overflow: 'hidden',
       }}
     >
@@ -790,7 +778,7 @@ function DriverSearchSection({
               <Typography variant="overline" sx={sectionKickerSx}>
                 Driver statistics
               </Typography>
-              <Typography variant="h4" sx={{ fontWeight: 800 }}>
+              <Typography component="h2" variant="h4" sx={{ fontWeight: 800 }}>
                 Driver search
               </Typography>
               <Typography variant="body1" sx={{ maxWidth: 680, color: 'text.secondary' }}>
@@ -830,22 +818,7 @@ function DriverSearchSection({
                   sx={{
                     '& .MuiOutlinedInput-root': {
                       borderRadius: 2,
-                      bgcolor: 'rgba(13,27,56,0.72)',
                       color: '#fff',
-                      backdropFilter: 'blur(10px)',
-                      '& fieldset': {
-                        borderColor: 'rgba(255,255,255,0.26)',
-                      },
-                      '&:hover fieldset': {
-                        borderColor: 'rgba(255,255,255,0.42)',
-                      },
-                      '&.Mui-focused': {
-                        boxShadow: '0 0 0 3px rgba(147, 197, 253, 0.28)',
-                      },
-                      '&.Mui-focused fieldset': {
-                        borderColor: 'rgba(191,225,255,0.92)',
-                        borderWidth: 2,
-                      },
                     },
                     '& .MuiInputBase-input::placeholder': {
                       color: 'rgba(255,255,255,0.65)',
@@ -857,13 +830,11 @@ function DriverSearchSection({
                 {!loading && !error && matches.length > 0 && (
                   <Paper
                     sx={{
-                      ...GLASS_CARD_SX,
+                      ...GLASS_CARD_INNER_SX,
                       width: '100%',
                       mt: 1,
-                      borderRadius: 2,
                       maxHeight: 280,
                       overflowY: 'auto',
-                      boxShadow: '0 8px 26px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.08)',
                     }}
                   >
                     <List dense disablePadding sx={{ width: '100%' }}>

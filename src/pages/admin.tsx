@@ -21,7 +21,7 @@ import { getTrackDisplayName } from 'src/lib/ac-elite-data';
 import { useTrackCatalogVersion } from 'src/centralized/track-info';
 import { glassCardMotionSx } from 'src/lib/subtle-motion';
 import { brandAccentBorderSx } from 'src/lib/status-accent';
-import { GLASS_PANEL_COMPACT_SX } from 'src/lib/glass';
+import { GLASS_INLINE_CODE_SX, GLASS_PANEL_COMPACT_SX, GLASS_TABLE_CONTAINER_SX } from 'src/lib/glass';
 import {
   TABLE_HEAD_MUTED_COLOR,
   ADMIN_JOIN_SERVER_OUTLINED_SX,
@@ -217,21 +217,18 @@ export default function Page() {
 
         <TableContainer
           sx={{
+            ...GLASS_TABLE_CONTAINER_SX,
             maxWidth: '100%',
             overflowX: 'auto',
             overflowY: 'hidden',
             WebkitOverflowScrolling: 'touch',
             borderRadius: 2,
-            border: '1px solid rgba(148,163,184,0.14)',
-            bgcolor: 'rgba(15,23,42,0.35)',
-            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)',
           }}
         >
           <Table size="small" sx={{ borderCollapse: 'separate', borderSpacing: 0, minWidth: 980, tableLayout: 'fixed' }}>
             <TableHead>
               <TableRow
                 sx={{
-                  background: 'linear-gradient(180deg, rgba(36,52,88,0.92) 0%, rgba(24,35,58,0.88) 100%)',
                   '& th': {
                     fontSize: '0.68rem',
                     textTransform: 'uppercase',
@@ -258,8 +255,8 @@ export default function Page() {
                   hover
                   sx={{
                     transition: 'background-color 0.15s ease',
-                    '&:nth-of-type(even)': { bgcolor: 'rgba(15,23,42,0.35)' },
-                    '&:hover': { bgcolor: 'rgba(30,41,64,0.65)' },
+                    '&:nth-of-type(even)': { bgcolor: 'rgba(255,255,255,0.022)' },
+                    '&:hover': { bgcolor: 'rgba(255,255,255,0.06)' },
                     '&:last-of-type td': { borderBottom: 'none' },
                     borderLeft: '3px solid',
                     borderLeftColor: health.color,
@@ -273,12 +270,8 @@ export default function Page() {
                         fontFamily: 'ui-monospace, monospace',
                         fontWeight: 700,
                         fontSize: '0.8rem',
-                        px: 1,
-                        py: 0.35,
+                        ...GLASS_INLINE_CODE_SX,
                         borderRadius: 1,
-                        bgcolor: 'rgba(15,23,42,0.55)',
-                        border: '1px solid rgba(148,163,184,0.22)',
-                        color: 'rgba(248,250,252,0.95)',
                       }}
                     >
                       {df.file}

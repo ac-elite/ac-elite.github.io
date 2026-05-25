@@ -63,6 +63,7 @@ import {
   getOverallCombinedScore,
 } from 'src/lib/ac-elite-data';
 
+import { Reveal } from 'src/components/reveal';
 import { DeltaChip } from 'src/components/delta-chip/delta-chip';
 import { EmptyState, ErrorPanel, LoadingPanel } from 'src/components/data-state';
 import { DataPageHeader } from 'src/components/data-page-header/data-page-header';
@@ -418,6 +419,7 @@ export default function Page() {
                   )}
                 </Paper>
 
+                <Reveal>
                 <Paper
                   sx={{
                     ...GLASS_TABLE_WRAPPER_SX,
@@ -430,7 +432,7 @@ export default function Page() {
                       size="small"
                       sx={{
                         '& .MuiTableBody-root .MuiTableRow-root:hover': {
-                          backgroundColor: 'rgba(255,255,255,0.04)',
+                          backgroundColor: 'rgba(255,255,255,0.028)',
                         },
                       }}
                     >
@@ -540,6 +542,7 @@ export default function Page() {
                     </Table>
                   </TableContainer>
                 </Paper>
+                </Reveal>
 
                 <Paginate
                   page={activeData.page}
