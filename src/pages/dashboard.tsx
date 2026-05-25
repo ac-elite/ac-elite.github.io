@@ -47,18 +47,22 @@ import { DataPageHeader } from 'src/components/data-page-header/data-page-header
 import { TrendWindowStats } from 'src/components/trend-window/trend-window-stats';
 import { PageGridOverlay } from 'src/components/page-background/page-grid-overlay';
 
+// Mirrors the per-tier hues used by the license chips (getLicenseBadgeSx) so the
+// distribution donut and the chips speak one colour language — each metal a
+// distinct hue (icy-steel Platinum vs neutral Silver vs warm-stone Rookie).
 const LICENSE_TIER_COLORS: Record<string, string> = {
-  'Diamond+': '#22D3EE',
+  Elite: '#C084FC',
+  'Diamond+': '#60A5FA',
   Diamond: '#22D3EE',
-  'Platinum+': '#E2E8F0',
-  Platinum: '#CBD5E1',
+  'Platinum+': '#A7E2F6',
+  Platinum: '#7DC4E0',
   'Gold+': '#FDE047',
   Gold: '#FACC15',
-  'Silver+': '#C9D5E1',
-  Silver: '#AEBED0',
+  'Silver+': '#C4CDD8',
+  Silver: '#94A3B8',
   'Bronze+': '#FB923C',
-  Bronze: '#F97316',
-  Rookie: '#94A3B8',
+  Bronze: '#D37848',
+  Rookie: '#9C948C',
 };
 
 function GridCompositionSection({ rankData }: { rankData: RankDriver[] }) {

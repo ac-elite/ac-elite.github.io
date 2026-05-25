@@ -177,19 +177,22 @@ function glassTierChipSx(rgb: string, text: string): SxProps<Theme> {
 }
 
 export function getLicenseBadgeSx(license: string): SxProps<Theme> {
+  // Each metal gets a distinct hue *and* text tint so adjacent tiers never read
+  // as the same chip. The old Platinum / Silver / Rookie were all the same
+  // grey-blue; they are now icy-steel-blue / neutral-grey / warm-stone.
   const styles: Record<string, SxProps<Theme>> = {
-    Elite: glassTierChipSx('192,132,252', '#F3E8FF'),
-    'Diamond+': glassTierChipSx('96,165,250', '#DBEAFE'),
-    Diamond: glassTierChipSx('34,211,238', '#CFFAFE'),
-    'Platinum+': glassTierChipSx('226,232,240', '#F8FAFC'),
-    Platinum: glassTierChipSx('203,213,225', '#F1F5F9'),
-    'Gold+': glassTierChipSx('253,224,71', '#FEF9C3'),
-    Gold: glassTierChipSx('250,204,21', '#FEF3C7'),
-    'Silver+': glassTierChipSx('200,212,224', '#EEF2F6'),
-    Silver: glassTierChipSx('201,213,225', '#EEF2F6'),
-    'Bronze+': glassTierChipSx('251,146,60', '#FFEDD5'),
-    Bronze: glassTierChipSx('249,115,22', '#FFE8D2'),
-    Rookie: glassTierChipSx('178,189,200', '#E6EBF1'),
+    Elite: glassTierChipSx('192,132,252', '#EBDDFF'), // violet
+    'Diamond+': glassTierChipSx('96,165,250', '#DBEAFE'), // azure blue
+    Diamond: glassTierChipSx('34,211,238', '#CFFAFE'), // cyan
+    'Platinum+': glassTierChipSx('167,226,246', '#E8F8FF'), // icy cyan-white
+    Platinum: glassTierChipSx('125,196,224', '#D6F0FB'), // icy steel blue
+    'Gold+': glassTierChipSx('253,224,71', '#FEF9C3'), // bright yellow
+    Gold: glassTierChipSx('250,204,21', '#FDF0C2'), // gold
+    'Silver+': glassTierChipSx('196,205,216', '#EFF2F6'), // light neutral grey
+    Silver: glassTierChipSx('148,163,184', '#DEE5EE'), // medium slate grey
+    'Bronze+': glassTierChipSx('251,146,60', '#FFE7CC'), // light orange
+    Bronze: glassTierChipSx('211,120,72', '#FADFCD'), // copper / bronze
+    Rookie: glassTierChipSx('156,148,140', '#E8E3DB'), // warm stone grey
   };
   return withBadgeGlassHover(styles[license] || styles.Bronze);
 }
