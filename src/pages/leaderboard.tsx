@@ -314,7 +314,7 @@ export default function Page() {
                       size="small"
                       sx={{
                         '& .MuiTableBody-root .MuiTableRow-root:hover': {
-                          backgroundColor: 'rgba(255,255,255,0.04)',
+                          backgroundColor: 'rgba(255,255,255,0.028)',
                         },
                       }}
                     >

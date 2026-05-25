@@ -81,29 +81,32 @@ export function getPodiumChipSx(position: number, zeroIndexed = false): SxProps<
 
   if (rank === 1) {
     return {
-      color: '#fef3c7',
-      border: '1px solid rgba(245, 158, 11, 0.55)',
-      background: 'linear-gradient(135deg, rgba(245,158,11,0.38), rgba(245,158,11,0.14))',
+      ...GLASS_CHIP_SHEEN_SX,
+      color: '#fde68a',
+      border: '1px solid rgba(245, 158, 11, 0.42)',
+      background: 'linear-gradient(180deg, rgba(245,158,11,0.26), rgba(245,158,11,0.11))',
       backdropFilter: 'blur(10px)',
-      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.22)',
+      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.2), inset 0 -1px 0 rgba(0,0,0,0.14)',
     };
   }
   if (rank === 2) {
     return {
+      ...GLASS_CHIP_SHEEN_SX,
       color: '#e2e8f0',
-      border: '1px solid rgba(148, 163, 184, 0.55)',
-      background: 'linear-gradient(135deg, rgba(148,163,184,0.35), rgba(148,163,184,0.12))',
+      border: '1px solid rgba(203, 213, 225, 0.34)',
+      background: 'linear-gradient(180deg, rgba(203,213,225,0.2), rgba(148,163,184,0.09))',
       backdropFilter: 'blur(10px)',
-      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.2)',
+      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -1px 0 rgba(0,0,0,0.12)',
     };
   }
   if (rank === 3) {
     return {
+      ...GLASS_CHIP_SHEEN_SX,
       color: '#ffedd5',
-      border: '1px solid rgba(194, 101, 31, 0.6)',
-      background: 'linear-gradient(135deg, rgba(194,101,31,0.36), rgba(194,101,31,0.14))',
+      border: '1px solid rgba(194, 101, 31, 0.42)',
+      background: 'linear-gradient(180deg, rgba(194,101,31,0.24), rgba(194,101,31,0.1))',
       backdropFilter: 'blur(10px)',
-      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.2)',
+      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -1px 0 rgba(0,0,0,0.12)',
     };
   }
   return {
