@@ -192,7 +192,7 @@ export function getLicenseBadgeSx(license: string): SxProps<Theme> {
     Silver: glassTierChipSx('148,163,184', '#DEE5EE'), // medium slate grey
     'Bronze+': glassTierChipSx('251,146,60', '#FFE7CC'), // light orange
     Bronze: glassTierChipSx('211,120,72', '#FADFCD'), // copper / bronze
-    Rookie: glassTierChipSx('156,148,140', '#E8E3DB'), // warm stone grey
+    Rookie: glassTierChipSx('248,113,113', '#FEE2E2'), // red — the lowest/entry tier
   };
   return withBadgeGlassHover(styles[license] || styles.Bronze);
 }
@@ -205,7 +205,8 @@ export function getSRBadgeSx(tier: string): SxProps<Theme> {
   if (first === 'C') return withBadgeGlassHover(glassTierChipSx('209,213,219', '#F1F5F9'));
   if (first === 'D') return withBadgeGlassHover(glassTierChipSx('234,122,45', '#FFEDD5'));
   if (first === 'E') return withBadgeGlassHover(glassTierChipSx('156,163,175', '#E5E7EB'));
-  return withBadgeGlassHover(glassTierChipSx('251,113,133', '#FFE4E6'));
+  // F — the lowest SR tier; red, matching the Rookie license chip.
+  return withBadgeGlassHover(glassTierChipSx('248,113,113', '#FEE2E2'));
 }
 
 /**

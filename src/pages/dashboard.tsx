@@ -62,7 +62,7 @@ const LICENSE_TIER_COLORS: Record<string, string> = {
   Silver: '#94A3B8',
   'Bronze+': '#FB923C',
   Bronze: '#D37848',
-  Rookie: '#9C948C',
+  Rookie: '#F87171',
 };
 
 function GridCompositionSection({ rankData }: { rankData: RankDriver[] }) {
