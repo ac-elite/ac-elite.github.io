@@ -57,12 +57,9 @@ export function AdminPageShell({ title, description, documentTitle, children }: 
                     alignItems: { xs: 'center', md: 'flex-start' },
                   }}
                 >
-                  <Typography variant="overline" sx={{ color: 'rgba(191,219,254,0.85)', fontWeight: 800, letterSpacing: '0.16em' }}>
-                    Admin Panel
-                  </Typography>
                   <Stack
                     direction="row"
-                    spacing={1.25}
+                    spacing={1.5}
                     alignItems="center"
                     justifyContent={{ xs: 'center', md: 'flex-start' }}
                   >
@@ -72,6 +69,7 @@ export function AdminPageShell({ title, description, documentTitle, children }: 
                         sx={{
                           width: 38,
                           height: 38,
+                          flexShrink: 0,
                           borderRadius: 1.4,
                           position: 'relative',
                           display: 'grid',
@@ -102,9 +100,22 @@ export function AdminPageShell({ title, description, documentTitle, children }: 
                         {renderNavIcon(iconName, true)}
                       </Box>
                     )}
-                    <Typography component="h1" variant="h4" fontWeight={800}>
-                      {title}
-                    </Typography>
+                    <Stack spacing={0.1} sx={{ alignItems: { xs: 'center', md: 'flex-start' } }}>
+                      <Typography
+                        variant="overline"
+                        sx={{
+                          color: 'rgba(147,197,253,0.9)',
+                          fontWeight: 800,
+                          letterSpacing: '0.18em',
+                          lineHeight: 1.2,
+                        }}
+                      >
+                        Admin Panel
+                      </Typography>
+                      <Typography component="h1" variant="h4" fontWeight={800} sx={{ lineHeight: 1.1 }}>
+                        {title}
+                      </Typography>
+                    </Stack>
                   </Stack>
                   {description && (
                     <Typography variant="body2" sx={{ color: 'text.secondary' }}>
