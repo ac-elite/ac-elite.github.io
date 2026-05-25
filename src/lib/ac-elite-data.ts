@@ -152,58 +152,57 @@ function withBadgeGlassHover(base: SxProps<Theme>): SxProps<Theme> {
   } as SxProps<Theme>;
 }
 
-export function getLicenseBadgeSx(license: string): SxProps<Theme> {
-  const textColor = '#111827';
-  const glass = (start: string, end: string, border: string, color = textColor): SxProps<Theme> => ({
-    color,
-    background: `linear-gradient(180deg, ${start} 0%, ${end} 100%)`,
-    border: `1px solid ${border}`,
+/**
+ * Translucent frosted-glass tier chip. The tier colour is a *tint* that lets the
+ * dark surface bloom through (real Liquid Glass) instead of a solid enamel pill:
+ * an even colour wash, a bright specular top edge + grounding bottom, vibrancy
+ * and light tier-tinted text that reads on the dark glass. `rgb` is the tier's
+ * base colour as "r,g,b"; `text` is a bright pastel of that hue.
+ *
+ * No `backdrop-filter` on purpose: a single page (e.g. Hall of Fame) renders
+ * ~80 of these chips, so per-chip blur would be an aggressive, janky cost for
+ * no real gain — there is almost nothing behind a small chip to refract. The
+ * translucent tint + specular edge + light text already read as frosted glass.
+ */
+function glassTierChipSx(rgb: string, text: string): SxProps<Theme> {
+  return {
+    color: text,
+    background: `linear-gradient(180deg, rgba(${rgb},0.34) 0%, rgba(${rgb},0.16) 100%)`,
+    border: `1px solid rgba(${rgb},0.55)`,
+    textShadow: '0 1px 1px rgba(0,0,0,0.45)',
     boxShadow:
-      'inset 0 1px 0 rgba(255,255,255,0.34), inset 0 -1px 1px rgba(0,0,0,0.14),' +
-      ' 0 1px 1px rgba(0,0,0,0.22), 0 4px 10px -7px rgba(0,0,0,0.4)',
-  });
+      'inset 0 1px 0 rgba(255,255,255,0.28), inset 0 -1px 0 rgba(0,0,0,0.18),' +
+      ` 0 1px 2px rgba(0,0,0,0.22), 0 6px 16px -11px rgba(${rgb},0.55)`,
+  };
+}
 
+export function getLicenseBadgeSx(license: string): SxProps<Theme> {
   const styles: Record<string, SxProps<Theme>> = {
-    Elite: glass('#D8B4FE', '#C084FC', 'rgba(216,180,254,0.9)'),
-    'Diamond+': {
-      color: '#0b1f3a',
-      background: 'linear-gradient(135deg, #93C5FD 0%, #60A5FA 52%, #A5F3FC 100%)',
-      border: '1px solid rgba(191,219,254,0.92)',
-      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.38), 0 0 0 1px rgba(147,197,253,0.14)',
-    },
-    Diamond: glass('#67E8F9', '#22D3EE', 'rgba(103,232,249,0.8)'),
-    'Platinum+': glass('#F8FAFC', '#E2E8F0', 'rgba(226,232,240,0.95)'),
-    Platinum: glass('#E2E8F0', '#CBD5E1', 'rgba(203,213,225,0.86)'),
-    'Gold+': glass('#FEF08A', '#FDE047', 'rgba(254,240,138,0.88)'),
-    Gold: glass('#FDE047', '#FACC15', 'rgba(250,204,21,0.86)'),
-    'Silver+': glass('#C9D5E1', '#A8B9CC', 'rgba(201,213,225,0.84)'),
-    Silver: glass('#D9E2EC', '#C9D5E1', 'rgba(201,213,225,0.82)'),
-    'Bronze+': glass('#FDBA74', '#FB923C', 'rgba(251,146,60,0.86)'),
-    Bronze: glass('#FB923C', '#F97316', 'rgba(249,115,22,0.84)'),
-    Rookie: glass('#CBD5E1', '#B2BDC8', 'rgba(178,189,200,0.82)'),
+    Elite: glassTierChipSx('192,132,252', '#F3E8FF'),
+    'Diamond+': glassTierChipSx('96,165,250', '#DBEAFE'),
+    Diamond: glassTierChipSx('34,211,238', '#CFFAFE'),
+    'Platinum+': glassTierChipSx('226,232,240', '#F8FAFC'),
+    Platinum: glassTierChipSx('203,213,225', '#F1F5F9'),
+    'Gold+': glassTierChipSx('253,224,71', '#FEF9C3'),
+    Gold: glassTierChipSx('250,204,21', '#FEF3C7'),
+    'Silver+': glassTierChipSx('200,212,224', '#EEF2F6'),
+    Silver: glassTierChipSx('201,213,225', '#EEF2F6'),
+    'Bronze+': glassTierChipSx('251,146,60', '#FFEDD5'),
+    Bronze: glassTierChipSx('249,115,22', '#FFE8D2'),
+    Rookie: glassTierChipSx('178,189,200', '#E6EBF1'),
   };
   return withBadgeGlassHover(styles[license] || styles.Bronze);
 }
 
 export function getSRBadgeSx(tier: string): SxProps<Theme> {
-  const textColor = '#111827';
-  const glass = (start: string, end: string, border: string, color = textColor): SxProps<Theme> => ({
-    color,
-    background: `linear-gradient(180deg, ${start} 0%, ${end} 100%)`,
-    border: `1px solid ${border}`,
-    boxShadow:
-      'inset 0 1px 0 rgba(255,255,255,0.34), inset 0 -1px 1px rgba(0,0,0,0.14),' +
-      ' 0 1px 1px rgba(0,0,0,0.22), 0 4px 10px -7px rgba(0,0,0,0.4)',
-  });
-
   const first = tier.charAt(0);
-  if (first === 'S') return withBadgeGlassHover(glass('#4ADE80', '#22C55E', 'rgba(74,222,128,0.86)'));
-  if (first === 'A') return withBadgeGlassHover(glass('#A78BFA', '#7C3AED', 'rgba(167,139,250,0.84)'));
-  if (first === 'B') return withBadgeGlassHover(glass('#FDE047', '#EAF239', 'rgba(234,242,57,0.86)'));
-  if (first === 'C') return withBadgeGlassHover(glass('#E5E7EB', '#D1D5DB', 'rgba(209,213,219,0.84)'));
-  if (first === 'D') return withBadgeGlassHover(glass('#FDBA74', '#EA7A2D', 'rgba(253,186,116,0.84)'));
-  if (first === 'E') return withBadgeGlassHover(glass('#D1D5DB', '#9CA3AF', 'rgba(209,213,219,0.8)'));
-  return withBadgeGlassHover(glass('#FB7185', '#FF1F2D', 'rgba(251,113,133,0.86)'));
+  if (first === 'S') return withBadgeGlassHover(glassTierChipSx('34,197,94', '#DCFCE7'));
+  if (first === 'A') return withBadgeGlassHover(glassTierChipSx('167,139,250', '#EDE9FE'));
+  if (first === 'B') return withBadgeGlassHover(glassTierChipSx('234,242,57', '#FBFCD3'));
+  if (first === 'C') return withBadgeGlassHover(glassTierChipSx('209,213,219', '#F1F5F9'));
+  if (first === 'D') return withBadgeGlassHover(glassTierChipSx('234,122,45', '#FFEDD5'));
+  if (first === 'E') return withBadgeGlassHover(glassTierChipSx('156,163,175', '#E5E7EB'));
+  return withBadgeGlassHover(glassTierChipSx('251,113,133', '#FFE4E6'));
 }
 
 /**
