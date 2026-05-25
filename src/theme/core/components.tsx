@@ -390,7 +390,10 @@ const MuiToggleButton: Components<Theme>['MuiToggleButton'] = {
         color: '#fff',
         background:
           'linear-gradient(180deg, rgba(96,165,250,0.32) 0%, rgba(59,130,246,0.16) 100%)',
-        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.2), inset 0 -1px 0 rgba(15,23,42,0.2)',
+        // Continuous hairline rim (follows the radius, even on all sides) + a faint
+        // top specular — not a top-only bright line that left the box looking unrounded.
+        boxShadow:
+          'inset 0 0 0 1px rgba(226,242,255,0.2), inset 0 1px 0 rgba(255,255,255,0.16)',
       },
       '&.Mui-selected:hover': {
         background:
