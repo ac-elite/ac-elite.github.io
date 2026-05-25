@@ -9,6 +9,8 @@ import Stack from '@mui/material/Stack';
 import Skeleton from '@mui/material/Skeleton';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
+import ToggleButton from '@mui/material/ToggleButton';
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 
 import { CONFIG } from 'src/config-global';
 import { APP_ROUTES } from 'src/centralized/app-routes';
@@ -22,6 +24,7 @@ import {
   GLASS_PANEL_SX,
   GLASS_INNER_ROW_SX,
   getTintedGlassPanelSx,
+  GLASS_PANEL_SPACIOUS_SX,
   getTintedGlassInnerRowSx,
 } from 'src/lib/glass';
 import { getSyncHealth, type SiteMetadata, getEffectiveLastSync } from 'src/lib/sync-utils';
@@ -42,6 +45,8 @@ import {
 } from 'src/lib/ac-elite-data';
 
 import { Reveal } from 'src/components/reveal';
+import { Chart, CHART_COLORS } from 'src/components/chart';
+import { StatTile } from 'src/components/stat-tile/stat-tile';
 import { EmptyState, ErrorPanel, LoadingPanel } from 'src/components/data-state';
 import { DataPageHeader } from 'src/components/data-page-header/data-page-header';
 import { TrendWindowStats } from 'src/components/trend-window/trend-window-stats';
@@ -63,6 +68,145 @@ const TEAM_SPOTLIGHT_ACCENTS: Record<string, string> = {
   Admins: '#A855F7',
   Moderators: '#22C55E',
 };
+
+/** Per-driver row aggregated from rank data — shared by the cards + the charts. */
+type FameRow = {
+  guid: string;
+  name: string;
+  kilometers: number;
+  collisions: number;
+  infractions: number;
+  wins: number;
+  podiums: number;
+  poles: number;
+  flaps: number;
+  laps: number;
+  tracksDriven: number;
+  license: string;
+  srTier: string;
+  srValue: number;
+};
+
+type LeaderboardMetricKey = 'kilometers' | 'wins' | 'podiums' | 'poles' | 'flaps';
+
+const LEADERBOARD_METRICS: {
+  key: LeaderboardMetricKey;
+  label: string;
+  unit: string;
+  round?: boolean;
+}[] = [
+  { key: 'kilometers', label: 'Distance', unit: 'km', round: true },
+  { key: 'wins', label: 'Wins', unit: 'wins' },
+  { key: 'podiums', label: 'Podiums', unit: 'podiums' },
+  { key: 'poles', label: 'Poles', unit: 'poles' },
+  { key: 'flaps', label: 'Fastest laps', unit: 'fastest laps' },
+];
+
+/**
+ * Interactive Top-10 leaderboard. One horizontal glass bar chart with a metric
+ * toggle (distance / wins / podiums / poles / fastest laps) so visitors can
+ * explore the field beyond the top-3 cards. Tapping a bar opens that driver.
+ */
+function LeaderboardChartSection({ driverView }: { driverView: FameRow[] }) {
+  const [metricKey, setMetricKey] = useState<LeaderboardMetricKey>('kilometers');
+  const metric = LEADERBOARD_METRICS.find((m) => m.key === metricKey) ?? LEADERBOARD_METRICS[0];
+
+  const top = useMemo(
+    () =>
+      [...driverView]
+        .filter((d) => d[metric.key] > 0)
+        .sort((a, b) => b[metric.key] - a[metric.key])
+        .slice(0, 10),
+    [driverView, metric.key]
+  );
+
+  if (top.length === 0) return null;
+
+  const categories = top.map((d) => d.name);
+  const data = top.map((d) => (metric.round ? Math.round(d[metric.key]) : d[metric.key]));
+  const guids = top.map((d) => d.guid);
+
+  return (
+    <Reveal>
+      <Paper sx={{ ...GLASS_PANEL_SPACIOUS_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(2) }}>
+        <Stack
+          direction={{ xs: 'column', sm: 'row' }}
+          spacing={1.5}
+          justifyContent="space-between"
+          alignItems={{ xs: 'flex-start', sm: 'center' }}
+          sx={{ mb: 1.5 }}
+        >
+          <Box>
+            <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.78)', fontWeight: 700 }}>
+              Leaderboards
+            </Typography>
+            <Typography variant="h6" sx={{ fontWeight: 800, mt: 0.3 }}>
+              Top 10 by {metric.label.toLowerCase()}
+            </Typography>
+          </Box>
+          <ToggleButtonGroup
+            exclusive
+            size="small"
+            value={metricKey}
+            onChange={(_e, v) => {
+              if (v) setMetricKey(v as LeaderboardMetricKey);
+            }}
+            aria-label="Leaderboard metric"
+            sx={{ flexWrap: 'wrap' }}
+          >
+            {LEADERBOARD_METRICS.map((m) => (
+              <ToggleButton key={m.key} value={m.key}>
+                {m.label}
+              </ToggleButton>
+            ))}
+          </ToggleButtonGroup>
+        </Stack>
+
+        <Chart
+          type="bar"
+          height={Math.max(360, top.length * 42)}
+          series={[{ name: metric.label, data }]}
+          sx={{ cursor: 'pointer' }}
+          options={{
+            colors: CHART_COLORS,
+            fill: { type: 'solid' },
+            legend: { show: false },
+            chart: {
+              events: {
+                dataPointSelection: (_e: unknown, _ctx: unknown, opts: { dataPointIndex: number }) => {
+                  const guid = guids[opts.dataPointIndex];
+                  if (guid) window.location.href = getDriverProfileHref(guid);
+                },
+              },
+            },
+            plotOptions: {
+              bar: {
+                horizontal: true,
+                distributed: true,
+                borderRadius: 7,
+                borderRadiusApplication: 'end',
+                barHeight: '64%',
+              },
+            },
+            dataLabels: {
+              enabled: true,
+              textAnchor: 'start',
+              offsetX: 4,
+              formatter: (v: number) => formatNumber(Number(v)),
+              style: { colors: ['rgba(255,255,255,0.92)'], fontWeight: 700, fontSize: '12px' },
+            },
+            xaxis: { categories, labels: { show: false } },
+            grid: { xaxis: { lines: { show: true } }, yaxis: { lines: { show: false } } },
+            tooltip: { y: { formatter: (v: number) => `${formatNumber(v)} ${metric.unit}` } },
+          }}
+        />
+        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)', display: 'block', mt: 0.5 }}>
+          Tap a bar to open the driver profile.
+        </Typography>
+      </Paper>
+    </Reveal>
+  );
+}
 
 function CategoryCard({
   title,
@@ -377,6 +521,24 @@ export default function Page() {
     [drivers, licenseMap]
   );
 
+  const communityTotals = useMemo(() => {
+    let km = 0;
+    let laps = 0;
+    let wins = 0;
+    let podiums = 0;
+    let poles = 0;
+    let flaps = 0;
+    for (const d of driverView) {
+      km += d.kilometers;
+      laps += d.laps;
+      wins += d.wins;
+      podiums += d.podiums;
+      poles += d.poles;
+      flaps += d.flaps;
+    }
+    return { km: Math.round(km), laps, wins, podiums, poles, flaps };
+  }, [driverView]);
+
   const categories = useMemo(
     () => [
       {
@@ -529,6 +691,39 @@ export default function Page() {
 
             {!loading && !error && (
               <>
+                <Reveal>
+                  <Stack spacing={1.5}>
+                    <Stack
+                      spacing={0.5}
+                      sx={{
+                        textAlign: { xs: 'center', md: 'left' },
+                        alignItems: { xs: 'center', md: 'flex-start' },
+                      }}
+                    >
+                      <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.78)', fontWeight: 700 }}>
+                        Community achievements
+                      </Typography>
+                      <Typography component="h2" variant="h5" sx={{ fontWeight: 800 }}>
+                        What the grid has racked up
+                      </Typography>
+                    </Stack>
+                    <Grid container spacing={2.5}>
+                      {[
+                        { label: 'Total KM', value: formatNumber(communityTotals.km) },
+                        { label: 'Total Laps', value: formatNumber(communityTotals.laps) },
+                        { label: 'Wins', value: formatNumber(communityTotals.wins) },
+                        { label: 'Podiums', value: formatNumber(communityTotals.podiums) },
+                        { label: 'Poles', value: formatNumber(communityTotals.poles) },
+                        { label: 'Fastest Laps', value: formatNumber(communityTotals.flaps) },
+                      ].map((tile, i) => (
+                        <Grid key={tile.label} size={{ xs: 6, sm: 4, md: 2 }}>
+                          <StatTile label={tile.label} value={tile.value} motionIndex={i + 1} />
+                        </Grid>
+                      ))}
+                    </Grid>
+                  </Stack>
+                </Reveal>
+
                 <Grid container spacing={2.5}>
                   {categories.map((category, categoryIndex) => (
                     <Grid key={category.title} size={{ xs: 12, md: 6 }}>
@@ -543,6 +738,8 @@ export default function Page() {
                     </Grid>
                   ))}
                 </Grid>
+
+                <LeaderboardChartSection driverView={driverView} />
 
                 <Stack spacing={2}>
                   <Box sx={softFloatWrapperSx()}>
