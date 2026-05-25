@@ -785,7 +785,7 @@
     }
    }
   },
-  "last_seen": 1779743645032,
+  "last_seen": 1779743699592,
   "wins": 39,
   "podiums": 219,
   "poles": 8,
@@ -6488,8 +6488,8 @@
  {
   "guid": "76561199442944100",
   "name": "Jamal alabyte",
-  "points": 549.002,
-  "kilometers": 12469.2,
+  "points": 549.414,
+  "kilometers": 12478.9,
   "collisions": 847,
   "leaderboard": {
    "ks_zandvoort_": {
@@ -6572,8 +6572,8 @@
    "ks_barcelona_layout_moto": {
     "tatuusfa1": {
      "laptime": 100757,
-     "laps": 61,
-     "ts": 1779743165905
+     "laps": 62,
+     "ts": 1779743974839
     }
    },
    "ks_vallelunga_classic_circuit": {
@@ -6598,7 +6598,7 @@
     }
    }
   },
-  "last_seen": 1779743645032,
+  "last_seen": 1779744015330,
   "wins": 16,
   "podiums": 57,
   "poles": 8,
@@ -57194,6 +57194,49 @@
   "infr": 0
  },
  {
+  "guid": "76561198058146669",
+  "name": "GAMBITA",
+  "points": 63.24,
+  "kilometers": 224.5,
+  "collisions": 29,
+  "leaderboard": {
+   "mugello_": {
+    "tatuusfa1": {
+     "laptime": 109005,
+     "laps": 2,
+     "ts": 1757700511604
+    }
+   },
+   "monza_": {
+    "tatuusfa1": {
+     "laptime": 115569,
+     "laps": 2,
+     "ts": 1777064704286
+    }
+   },
+   "ks_red_bull_ring_layout_gp": {
+    "tatuusfa1": {
+     "laptime": 92306,
+     "laps": 9,
+     "ts": 1778445914348
+    }
+   },
+   "ks_barcelona_layout_moto": {
+    "tatuusfa1": {
+     "laptime": 104298,
+     "laps": 7,
+     "ts": 1779743889066
+    }
+   }
+  },
+  "last_seen": 1779743941074,
+  "wins": 0,
+  "podiums": 2,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 3
+ },
+ {
   "guid": "76561198105726899",
   "name": "Michel Krause",
   "points": 63.206999999999994,
@@ -58025,49 +58068,6 @@
   "poles": 0,
   "flaps": 0,
   "infr": 0
- },
- {
-  "guid": "76561198058146669",
-  "name": "GAMBITA",
-  "points": 62.92,
-  "kilometers": 211.2,
-  "collisions": 29,
-  "leaderboard": {
-   "mugello_": {
-    "tatuusfa1": {
-     "laptime": 109005,
-     "laps": 2,
-     "ts": 1757700511604
-    }
-   },
-   "monza_": {
-    "tatuusfa1": {
-     "laptime": 115569,
-     "laps": 2,
-     "ts": 1777064704286
-    }
-   },
-   "ks_red_bull_ring_layout_gp": {
-    "tatuusfa1": {
-     "laptime": 92306,
-     "laps": 9,
-     "ts": 1778445914348
-    }
-   },
-   "ks_barcelona_layout_moto": {
-    "tatuusfa1": {
-     "laptime": 104298,
-     "laps": 6,
-     "ts": 1779743483604
-    }
-   }
-  },
-  "last_seen": 1779743645032,
-  "wins": 0,
-  "podiums": 2,
-  "poles": 0,
-  "flaps": 0,
-  "infr": 3
  },
  {
   "guid": "76561199031224054",
@@ -140492,6 +140492,21 @@
   "infr": 0
  },
  {
+  "guid": "76561199157041270",
+  "name": "GigaTrigga",
+  "points": 50,
+  "kilometers": 4.7,
+  "collisions": 0,
+  "leaderboard": {
+  },
+  "last_seen": 1779746877026,
+  "wins": 0,
+  "podiums": 0,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 0
+ },
+ {
   "guid": "76561198336288813",
   "name": "MisterGG",
   "points": 49.999,
@@ -171750,7 +171765,7 @@
     }
    }
   },
-  "last_seen": 1779743645032,
+  "last_seen": 1779744274896,
   "wins": 0,
   "podiums": 0,
   "poles": 0,
@@ -269321,6 +269336,35 @@
   "infr": 0
  },
  {
+  "guid": "76561199454712112",
+  "name": "Aiki",
+  "points": 33.326,
+  "kilometers": 318,
+  "collisions": 76,
+  "leaderboard": {
+   "ks_vallelunga_extended_circuit": {
+    "tatuusfa1": {
+     "laptime": 96295,
+     "laps": 38,
+     "ts": 1774783381258
+    }
+   },
+   "ks_barcelona_layout_moto": {
+    "tatuusfa1": {
+     "laptime": 107672,
+     "laps": 6,
+     "ts": 1779743592635
+    }
+   }
+  },
+  "last_seen": 1779743862244,
+  "wins": 1,
+  "podiums": 3,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 5
+ },
+ {
   "guid": "76561198392836584",
   "name": "Jon_volgs",
   "points": 33.325,
@@ -294574,35 +294618,6 @@
   "infr": 1
  },
  {
-  "guid": "76561199454712112",
-  "name": "Aiki",
-  "points": 30.029,
-  "kilometers": 312.6,
-  "collisions": 76,
-  "leaderboard": {
-   "ks_vallelunga_extended_circuit": {
-    "tatuusfa1": {
-     "laptime": 96295,
-     "laps": 38,
-     "ts": 1774783381258
-    }
-   },
-   "ks_barcelona_layout_moto": {
-    "tatuusfa1": {
-     "laptime": 107672,
-     "laps": 6,
-     "ts": 1779743592635
-    }
-   }
-  },
-  "last_seen": 1779743619729,
-  "wins": 1,
-  "podiums": 2,
-  "poles": 0,
-  "flaps": 0,
-  "infr": 5
- },
- {
   "guid": "76561198258092863",
   "name": "Cankatrose",
   "points": 30.02,
@@ -297232,13 +297247,13 @@
  },
  {
   "guid": "76561198093220749",
-  "name": "CMF",
+  "name": "NightFury",
   "points": 29.992,
   "kilometers": 7.3,
   "collisions": 0,
   "leaderboard": {
   },
-  "last_seen": 1761580731422,
+  "last_seen": 1779743702350,
   "wins": 0,
   "podiums": 0,
   "poles": 0,
