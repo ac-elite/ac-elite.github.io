@@ -189,12 +189,14 @@ export const glassCardHoverSx = {
   willChange: 'transform',
   '@media (hover: hover)': {
     '&:hover': {
-      transform: 'translate3d(0,-2px,0)',
-      borderColor: 'rgba(226,242,255,0.22)',
-      filter: 'brightness(1.018)',
+      // Glass rises and catches more light: brighter specular top edge + rim, and a
+      // saturation lift so the vibrant backdrop blooms through. Shadow hugs the card.
+      transform: 'translate3d(0,-3px,0)',
+      borderColor: 'rgba(226,242,255,0.3)',
+      filter: 'brightness(1.025) saturate(1.07)',
       boxShadow:
-        'inset 0 1px 0 rgba(255,255,255,0.26), inset 0 -1px 0 rgba(0,0,0,0.15), inset 0 0 0 1px rgba(255,255,255,0.035),' +
-        ' 0 2px 6px rgba(0,0,0,0.24), 0 26px 54px -32px rgba(0,0,0,0.78)',
+        'inset 0 1px 0 rgba(255,255,255,0.34), inset 0 -1px 0 rgba(0,0,0,0.16), inset 0 0 0 1px rgba(255,255,255,0.06),' +
+        ' 0 4px 10px -3px rgba(0,0,0,0.32), 0 30px 60px -20px rgba(0,0,0,0.58)',
     },
   },
   '&:focus-visible': {

@@ -1,33 +1,18 @@
-import { Icon } from '@iconify/react';
-
 import Box from '@mui/material/Box';
 
 import { APP_ROUTES } from 'src/centralized/app-routes';
 import { ADMIN_SECTIONS } from 'src/centralized/admin-sections';
 
 import { hasAtLeastRole, type AuthProfile } from 'src/lib/auth/auth-context';
-import { dashboardIcons } from 'src/components/icons/ac-dashboard-icons';
+import { NAV_ICON_NAMES } from 'src/components/icons/ac-dashboard-icons';
 
 // ----------------------------------------------------------------------
-
-const navIcon = (name: string) => (
-  <Box
-    component="span"
-    className="nav-glyph"
-    sx={
-      {
-        '--nav-icon-size': '25.5px',
-      } as React.CSSProperties
-    }
-  >
-    <Icon icon={name} width={25.5} height={25.5} />
-  </Box>
-);
 
 export type NavItem = {
   title: string;
   path: string;
-  icon: React.ReactNode;
+  /** Solar icon base name; the nav appends `-linear` (idle) or `-bold` (active). */
+  iconName: string;
   info?: React.ReactNode;
   disabled?: boolean;
   /** Optional grouping label rendered above the item. */
@@ -55,16 +40,16 @@ const comingSoonBadge = (
 );
 
 const baseNavData: NavItem[] = [
-  { title: 'Home', path: APP_ROUTES.home, icon: dashboardIcons.home },
-  { title: 'Stats', path: APP_ROUTES.dashboard, icon: dashboardIcons.stats },
-  { title: 'Leaderboard', path: APP_ROUTES.leaderboard, icon: dashboardIcons.leaderboard },
-  { title: 'Rankings', path: APP_ROUTES.rankings, icon: dashboardIcons.rankings },
-  { title: 'Hall of Fame', path: APP_ROUTES.hallOfFame, icon: dashboardIcons.trophy },
-  { title: 'Livery Showcase', path: APP_ROUTES.liveryShowcase, icon: dashboardIcons.livery },
+  { title: 'Home', path: APP_ROUTES.home, iconName: NAV_ICON_NAMES.home },
+  { title: 'Stats', path: APP_ROUTES.dashboard, iconName: NAV_ICON_NAMES.stats },
+  { title: 'Leaderboard', path: APP_ROUTES.leaderboard, iconName: NAV_ICON_NAMES.leaderboard },
+  { title: 'Rankings', path: APP_ROUTES.rankings, iconName: NAV_ICON_NAMES.rankings },
+  { title: 'Hall of Fame', path: APP_ROUTES.hallOfFame, iconName: NAV_ICON_NAMES.trophy },
+  { title: 'Livery Showcase', path: APP_ROUTES.liveryShowcase, iconName: NAV_ICON_NAMES.livery },
   {
     title: 'Setup Store',
     path: APP_ROUTES.setupStore,
-    icon: dashboardIcons.setup,
+    iconName: NAV_ICON_NAMES.setup,
     info: comingSoonBadge,
     disabled: true,
   },
@@ -85,7 +70,7 @@ export function getNavData(profile: AuthProfile | null): NavItem[] {
   const adminItems: NavItem[] = ADMIN_SECTIONS.map((section, index) => ({
     title: section.label,
     path: section.path,
-    icon: navIcon(section.iconifyName),
+    iconName: section.iconifyName,
     group: index === 0 ? 'Admin' : undefined,
   }));
   return [...baseNavData, ...adminItems];

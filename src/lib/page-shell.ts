@@ -63,7 +63,7 @@ export const PANEL_OVERLINE_MUTED_SX: SxProps<Theme> = {
 /** Large marketing CTAs (home hero row). Merge `animation` in the page when needed. */
 export const MARKETING_CTA_LARGE_LAYOUT_SX: SxProps<Theme> = {
   px: 3.5,
-  borderRadius: 3,
+  borderRadius: 1.4,
   minHeight: { xs: 46, sm: 48 },
   width: { xs: '100%', sm: 'auto' },
   maxWidth: { xs: 320, sm: 'none' },
@@ -77,23 +77,23 @@ export const MARKETING_CTA_LARGE_LAYOUT_SX: SxProps<Theme> = {
  */
 export const MARKETING_CTA_PRIMARY_GLASS_SX = {
   background:
-    'linear-gradient(180deg, rgba(72,132,222,0.7) 0%, rgba(45,101,204,0.66) 100%)',
+    'linear-gradient(180deg, rgba(96,150,236,0.52) 0%, rgba(48,98,196,0.48) 100%)',
   backdropFilter: 'blur(22px) saturate(185%)',
   WebkitBackdropFilter: 'blur(22px) saturate(185%)',
-  border: '1px solid rgba(219,234,254,0.2)',
+  border: '1px solid rgba(219,234,254,0.22)',
   color: '#fff',
   textShadow: '0 1px 0 rgba(15,23,42,0.35)',
   boxShadow:
-    'inset 0 1px 0 rgba(255,255,255,0.17), inset 0 -1px 0 rgba(255,255,255,0.03),' +
-    ' 0 1px 2px rgba(0,0,0,0.2)',
+    'inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -1px 0 rgba(15,23,42,0.22), inset 0 0 0 1px rgba(226,242,255,0.12),' +
+    ' 0 1px 2px rgba(0,0,0,0.2), 0 12px 26px -18px rgba(28,72,150,0.7)',
   transition:
     'transform 320ms cubic-bezier(0.34, 1.4, 0.5, 1), box-shadow 320ms cubic-bezier(0.32, 0.72, 0, 1), filter 320ms cubic-bezier(0.32, 0.72, 0, 1)',
   '&:hover': {
     transform: 'translateY(-1px)',
     filter: 'brightness(1.018) saturate(1.035)',
     boxShadow:
-      'inset 0 1px 0 rgba(255,255,255,0.21), inset 0 -1px 0 rgba(255,255,255,0.035),' +
-      ' 0 2px 4px rgba(0,0,0,0.22)',
+      'inset 0 1px 0 rgba(255,255,255,0.26), inset 0 -1px 0 rgba(15,23,42,0.24), inset 0 0 0 1px rgba(226,242,255,0.2),' +
+      ' 0 2px 4px rgba(0,0,0,0.22), 0 16px 30px -18px rgba(28,72,150,0.82)',
   },
   '&:active': {
     transform: 'translateY(0) scale(0.97)',
@@ -118,7 +118,7 @@ export const MARKETING_CTA_SECONDARY_GLASS_SX = {
   color: '#fff',
   textShadow: '0 1px 0 rgba(15,23,42,0.4)',
   boxShadow:
-    'inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -1px 0 rgba(255,255,255,0.028),' +
+    'inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -1px 0 rgba(15,23,42,0.22), inset 0 0 0 1px rgba(226,242,255,0.12),' +
     ' 0 1px 2px rgba(0,0,0,0.2)',
   transition:
     'transform 320ms cubic-bezier(0.34, 1.4, 0.5, 1), box-shadow 320ms cubic-bezier(0.32, 0.72, 0, 1), border-color 320ms cubic-bezier(0.32, 0.72, 0, 1)',
@@ -126,7 +126,7 @@ export const MARKETING_CTA_SECONDARY_GLASS_SX = {
     borderColor: 'rgba(226,242,255,0.3)',
     transform: 'translateY(-1px)',
     boxShadow:
-      'inset 0 1px 0 rgba(255,255,255,0.2), inset 0 -1px 0 rgba(255,255,255,0.035),' +
+      'inset 0 1px 0 rgba(255,255,255,0.26), inset 0 -1px 0 rgba(15,23,42,0.24), inset 0 0 0 1px rgba(226,242,255,0.2),' +
       ' 0 2px 4px rgba(0,0,0,0.22)',
   },
   '&:active': {
@@ -147,7 +147,7 @@ export const LINK_PRIMARY_CONTAINED_LARGE_SX: SxProps<Theme> = {
 export const DATA_PAGE_CALLOUT_PRIMARY_SX: SxProps<Theme> = {
   fontWeight: 800,
   minHeight: 50,
-  borderRadius: 2,
+  borderRadius: 1.4,
 };
 
 /** Small primary contained (preview unlock, compact actions). */
@@ -161,12 +161,20 @@ export const ACTION_PRIMARY_SMALL_SX: SxProps<Theme> = {
   fontWeight: 800,
 };
 
-/** License / SR guide launcher (contained; size set on Button). */
+/**
+ * License / SR guide launcher (contained; size set on Button). This button only ever
+ * sits inside already-blurred chrome (the nav rail / mobile header), so it drops its
+ * own backdrop-filter — a nested blur over the drifting page grid caused a crawling
+ * shimmer during load with no visual gain.
+ */
 export const GUIDE_LAUNCH_BUTTON_SX: SxProps<Theme> = {
   fontWeight: 800,
-  borderRadius: 999,
+  borderRadius: 1.4,
+  backdropFilter: 'none',
+  WebkitBackdropFilter: 'none',
   boxShadow:
-    'inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -1px 0 rgba(255,255,255,0.035)',
+    'inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -1px 0 rgba(15,23,42,0.22), inset 0 0 0 1px rgba(226,242,255,0.12),' +
+    ' 0 1px 2px rgba(0,0,0,0.18), 0 12px 26px -18px rgba(28,72,150,0.7)',
 };
 
 /** Small outlined / toggle controls — default font weight for labels. */

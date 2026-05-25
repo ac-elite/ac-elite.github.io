@@ -4,15 +4,17 @@ import { varAlpha } from 'minimal-shared/utils';
 
 import SvgIcon from '@mui/material/SvgIcon';
 
+import { GLASS_BOXJE_RIM_SHADOW, GLASS_BOXJE_RIM_SHADOW_HOVER } from 'src/lib/glass';
+
 // ----------------------------------------------------------------------
 
 /** Apple easing — smooth ease-out for fills/shadows, gentle spring for press. */
 const EASE_OUT = 'cubic-bezier(0.32, 0.72, 0, 1)';
 const SPRING = 'cubic-bezier(0.34, 1.4, 0.5, 1)';
 
-/** Subtle inset top-highlight shared by filled glass buttons. */
-const buttonInsetHighlight =
-  'inset 0 1px 0 rgba(255,255,255,0.17), inset 0 -1px 0 rgba(255,255,255,0.03)';
+/** The nav "boxje" rim (bright top + grounding bottom + full hairline), shared by all glass buttons. */
+const glassBoxInset = GLASS_BOXJE_RIM_SHADOW;
+const glassBoxInsetHover = GLASS_BOXJE_RIM_SHADOW_HOVER;
 
 const MuiBackdrop: Components<Theme>['MuiBackdrop'] = {
   styleOverrides: {
@@ -39,7 +41,8 @@ const MuiButton: Components<Theme>['MuiButton'] = {
     root: {
       textTransform: 'none' as const,
       fontWeight: 700,
-      borderRadius: 999,
+      // Soft rounded rectangle to match the nav "boxje" — not a full pill.
+      borderRadius: 14,
       // Spring on transform (the press/lift), smooth ease on everything else.
       transition: `transform 260ms ${EASE_OUT}, box-shadow 260ms ${EASE_OUT}, border-color 260ms ${EASE_OUT}, background 260ms ${EASE_OUT}, background-color 260ms ${EASE_OUT}, filter 260ms ${EASE_OUT}`,
       '& .MuiButton-startIcon, & .MuiButton-endIcon': {
@@ -62,18 +65,21 @@ const MuiButton: Components<Theme>['MuiButton'] = {
         '&:active': { transform: 'none' },
       },
     },
-    /** Main CTA — clean navy fill with a soft top highlight. */
+    /** Main CTA — tinted navy glass pill: translucent fill so the backdrop blooms through, nav "boxje" rim. */
     containedPrimary: ({ theme }) => ({
       color: theme.palette.primary.contrastText,
+      textShadow: '0 1px 0 rgba(15,23,42,0.35)',
       background:
-        'linear-gradient(180deg, rgba(72,132,222,0.7) 0%, rgba(45,101,204,0.66) 100%)',
-      backdropFilter: 'blur(18px) saturate(175%)',
-      WebkitBackdropFilter: 'blur(18px) saturate(175%)',
-      border: '1px solid rgba(219,234,254,0.2)',
-      boxShadow: `${buttonInsetHighlight}, 0 1px 2px rgba(0,0,0,0.18)`,
+        'linear-gradient(180deg, rgba(96,150,236,0.52) 0%, rgba(48,98,196,0.48) 100%)',
+      backdropFilter: 'blur(22px) saturate(185%)',
+      WebkitBackdropFilter: 'blur(22px) saturate(185%)',
+      border: '1px solid rgba(219,234,254,0.22)',
+      boxShadow: `${glassBoxInset}, 0 1px 2px rgba(0,0,0,0.18), 0 12px 26px -18px rgba(28,72,150,0.7)`,
       '&:hover': {
-        borderColor: 'rgba(226,242,255,0.38)',
-        boxShadow: `${buttonInsetHighlight}, 0 2px 4px rgba(0,0,0,0.2)`,
+        background:
+          'linear-gradient(180deg, rgba(110,164,245,0.58) 0%, rgba(56,110,212,0.54) 100%)',
+        borderColor: 'rgba(226,242,255,0.4)',
+        boxShadow: `${glassBoxInsetHover}, 0 2px 4px rgba(0,0,0,0.2), 0 16px 30px -18px rgba(28,72,150,0.82)`,
         transform: 'translateY(-1px)',
       },
       '&:active': { transform: 'translateY(0) scale(0.97)' },
@@ -85,18 +91,18 @@ const MuiButton: Components<Theme>['MuiButton'] = {
         transform: 'none',
       },
     }),
-    /** Secondary filled — graphite, distinct from the navy primary. */
+    /** Secondary filled — graphite glass, distinct from the navy primary, same nav "boxje" rim. */
     containedSecondary: ({ theme }) => ({
       color: theme.palette.secondary.contrastText,
-      background: 'linear-gradient(180deg, rgba(54,62,80,0.56), rgba(43,50,66,0.48))',
-      border: '1px solid rgba(255,255,255,0.14)',
-      backdropFilter: 'blur(18px) saturate(165%)',
-      WebkitBackdropFilter: 'blur(18px) saturate(165%)',
-      boxShadow: `inset 0 1px 0 rgba(255,255,255,0.14), 0 1px 2px rgba(0,0,0,0.2)`,
+      background: 'linear-gradient(180deg, rgba(60,72,98,0.5) 0%, rgba(40,50,72,0.44) 100%)',
+      border: '1px solid rgba(226,242,255,0.16)',
+      backdropFilter: 'blur(22px) saturate(170%)',
+      WebkitBackdropFilter: 'blur(22px) saturate(170%)',
+      boxShadow: `${glassBoxInset}, 0 1px 2px rgba(0,0,0,0.2)`,
       '&:hover': {
-        backgroundColor: 'rgba(50,58,75,0.54)',
-        borderColor: 'rgba(255,255,255,0.24)',
-        boxShadow: `inset 0 1px 0 rgba(255,255,255,0.18), 0 2px 4px rgba(0,0,0,0.22)`,
+        background: 'linear-gradient(180deg, rgba(70,84,114,0.56) 0%, rgba(46,58,84,0.5) 100%)',
+        borderColor: 'rgba(226,242,255,0.26)',
+        boxShadow: `${glassBoxInsetHover}, 0 2px 4px rgba(0,0,0,0.22)`,
         transform: 'translateY(-1px)',
       },
       '&:active': { transform: 'translateY(0) scale(0.97)' },
@@ -108,18 +114,20 @@ const MuiButton: Components<Theme>['MuiButton'] = {
         transform: 'none',
       },
     }),
+    /** Light navy glass — mirrors the active nav "boxje" (faint blue bloom + bright rim). */
     outlinedPrimary: ({ theme }) => ({
       color: 'rgba(255,255,255,0.94)',
-      borderColor: 'rgba(226,242,255,0.18)',
-      background: 'linear-gradient(180deg, rgba(42,60,96,0.42), rgba(33,47,76,0.36))',
-      backdropFilter: 'blur(18px) saturate(165%)',
-      WebkitBackdropFilter: 'blur(18px) saturate(165%)',
-      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.12)',
+      borderColor: 'rgba(147,180,236,0.28)',
+      background: 'linear-gradient(180deg, rgba(96,150,236,0.16) 0%, rgba(50,86,150,0.08) 100%)',
+      backdropFilter: 'blur(20px) saturate(170%)',
+      WebkitBackdropFilter: 'blur(20px) saturate(170%)',
+      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.16), inset 0 0 0 1px rgba(147,180,236,0.1)',
       '&:hover': {
-        borderColor: 'rgba(226,242,255,0.32)',
-        backgroundColor: 'rgba(42,60,96,0.46)',
+        borderColor: 'rgba(180,206,247,0.42)',
+        background: 'linear-gradient(180deg, rgba(108,162,244,0.22) 0%, rgba(56,96,168,0.12) 100%)',
         transform: 'translateY(-1px)',
-        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.16)',
+        boxShadow:
+          'inset 0 1px 0 rgba(255,255,255,0.22), inset 0 -1px 0 rgba(15,23,42,0.2), inset 0 0 0 1px rgba(180,206,247,0.18)',
       },
       '&:active': { transform: 'translateY(0) scale(0.97)' },
       '&:disabled': {
@@ -128,18 +136,20 @@ const MuiButton: Components<Theme>['MuiButton'] = {
         transform: 'none',
       },
     }),
+    /** Neutral white glass — mirrors the nav hover "boxje". */
     outlinedSecondary: ({ theme }) => ({
-      color: 'rgba(255,255,255,0.88)',
-      borderColor: 'rgba(255,255,255,0.16)',
-      background: 'linear-gradient(180deg, rgba(50,58,75,0.48), rgba(42,48,63,0.4))',
-      backdropFilter: 'blur(18px) saturate(165%)',
-      WebkitBackdropFilter: 'blur(18px) saturate(165%)',
-      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.13)',
+      color: 'rgba(255,255,255,0.9)',
+      borderColor: 'rgba(226,242,255,0.18)',
+      background: 'linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.028) 100%)',
+      backdropFilter: 'blur(20px) saturate(165%)',
+      WebkitBackdropFilter: 'blur(20px) saturate(165%)',
+      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.14)',
       '&:hover': {
-        borderColor: 'rgba(255,255,255,0.28)',
-        backgroundColor: 'rgba(50,58,75,0.52)',
+        borderColor: 'rgba(226,242,255,0.32)',
+        background: 'linear-gradient(180deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.045) 100%)',
         transform: 'translateY(-1px)',
-        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.16)',
+        boxShadow:
+          'inset 0 1px 0 rgba(255,255,255,0.2), inset 0 -1px 0 rgba(15,23,42,0.18), inset 0 0 0 1px rgba(226,242,255,0.14)',
       },
       '&:active': { transform: 'translateY(0) scale(0.97)' },
       '&:disabled': {
@@ -150,11 +160,19 @@ const MuiButton: Components<Theme>['MuiButton'] = {
     }),
     containedInherit: ({ theme }) => ({
       color: theme.vars.palette.common.white,
-      backgroundColor: theme.vars.palette.grey[800],
+      background: 'linear-gradient(180deg, rgba(58,70,96,0.5) 0%, rgba(38,48,70,0.44) 100%)',
+      border: '1px solid rgba(226,242,255,0.15)',
+      backdropFilter: 'blur(22px) saturate(170%)',
+      WebkitBackdropFilter: 'blur(22px) saturate(170%)',
+      boxShadow: `${glassBoxInset}, 0 1px 2px rgba(0,0,0,0.2)`,
       '&:hover': {
         color: theme.vars.palette.common.white,
-        backgroundColor: theme.vars.palette.grey[800],
+        background: 'linear-gradient(180deg, rgba(68,82,112,0.56) 0%, rgba(44,56,82,0.5) 100%)',
+        borderColor: 'rgba(226,242,255,0.24)',
+        boxShadow: `${glassBoxInsetHover}, 0 2px 4px rgba(0,0,0,0.22)`,
+        transform: 'translateY(-1px)',
       },
+      '&:active': { transform: 'translateY(0) scale(0.97)' },
     }),
     sizeLarge: {
       minHeight: 48,
@@ -339,7 +357,9 @@ const MuiToggleButtonGroup: Components<Theme>['MuiToggleButtonGroup'] = {
       border: '1px solid rgba(255,255,255,0.1)',
       backdropFilter: 'blur(18px) saturate(165%)',
       WebkitBackdropFilter: 'blur(18px) saturate(165%)',
-      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.11)',
+      // Full boxje rim, not a top-only highlight — otherwise the bottom edge sinks
+      // into the dark end of the gradient and reads as a missing border.
+      boxShadow: GLASS_BOXJE_RIM_SHADOW,
       gap: 3,
     },
   },

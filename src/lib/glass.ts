@@ -174,6 +174,16 @@ export const GLASS_NOTE_AMBER_RIM_SX: SxProps<Theme> = {
 };
 
 /**
+ * The nav "boxje" rim — bright specular top edge + grounding dark bottom + full
+ * hairline, built only from inset shadows. The shared signature for buttons, the
+ * trend toggle, server-card stat tiles, and any small frosted control.
+ */
+export const GLASS_BOXJE_RIM_SHADOW =
+  'inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -1px 0 rgba(15,23,42,0.22), inset 0 0 0 1px rgba(226,242,255,0.12)';
+export const GLASS_BOXJE_RIM_SHADOW_HOVER =
+  'inset 0 1px 0 rgba(255,255,255,0.26), inset 0 -1px 0 rgba(15,23,42,0.24), inset 0 0 0 1px rgba(226,242,255,0.2)';
+
+/**
  * Apple "material": heavy blur + saturation so colour behind the glass blooms
  * through (the vibrancy trick). `saturate(180%)` is the key to the premium feel.
  */
@@ -198,7 +208,10 @@ export const GLASS_CARD_SX: SxProps<Theme> = {
   WebkitBackdropFilter: GLASS_MATERIAL_BACKDROP,
   boxShadow:
     'inset 0 1px 0 rgba(255,255,255,0.22), inset 0 -1px 0 rgba(0,0,0,0.16), inset 0 0 0 1px rgba(255,255,255,0.028),' +
-    ' 0 1px 2px rgba(0,0,0,0.22), 0 22px 50px -30px rgba(0,0,0,0.72)',
+    // Two soft layers that hug the card footprint and ground it. The old single
+    // `0 22px 50px -30px` had so much negative spread it shrank into a detached
+    // oval blob under the card instead of reading as a real shadow.
+    ' 0 2px 6px -2px rgba(0,0,0,0.3), 0 18px 40px -16px rgba(0,0,0,0.5)',
 };
 
 /** Opt-in: base card + the soft live rim pulse. Reserve for live data. */
