@@ -48,7 +48,6 @@ const infoBlockSx = {
   px: { xs: 1, md: 0.75 },
   /** Equal top/bottom padding; inner Stack uses fixed gap + lineHeight so content looks balanced. */
   py: { xs: 1.5, md: 1.15 },
-  backgroundColor: 'rgba(19,30,54,0.42)',
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'center',

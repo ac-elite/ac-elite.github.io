@@ -231,7 +231,7 @@ export function DriverBansManager() {
           maxHeight: 480,
           borderRadius: 1,
           border: '1px solid rgba(148,163,184,0.14)',
-          bgcolor: 'rgba(15,23,42,0.35)',
+          bgcolor: 'rgba(16,31,61,0.35)',
         }}
       >
         <Table size="small" stickyHeader>
@@ -244,7 +244,7 @@ export function DriverBansManager() {
                   letterSpacing: '0.1em',
                   fontWeight: 800,
                   color: TABLE_HEAD_MUTED_COLOR,
-                  bgcolor: 'rgba(15,23,42,0.92)',
+                  bgcolor: 'rgba(16,31,61,0.92)',
                   borderBottom: '1px solid rgba(148,163,184,0.28)',
                   py: 1.1,
                   px: 1.25,
@@ -381,7 +381,7 @@ export function DriverBansManager() {
                 maxHeight: 320,
                 borderRadius: 1,
                 border: '1px solid rgba(148,163,184,0.14)',
-                bgcolor: 'rgba(15,23,42,0.35)',
+                bgcolor: 'rgba(16,31,61,0.35)',
               }}
             >
               <Table size="small" stickyHeader>
@@ -394,7 +394,7 @@ export function DriverBansManager() {
                         letterSpacing: '0.1em',
                         fontWeight: 800,
                         color: TABLE_HEAD_MUTED_COLOR,
-                        bgcolor: 'rgba(15,23,42,0.92)',
+                        bgcolor: 'rgba(16,31,61,0.92)',
                         borderBottom: '1px solid rgba(148,163,184,0.28)',
                         py: 1.1,
                         px: 1.25,
@@ -551,7 +551,7 @@ export function DriverBansManager() {
                   px: 0.75,
                   py: 0.25,
                   borderRadius: 0.75,
-                  bgcolor: 'rgba(15,23,42,0.6)',
+                  bgcolor: 'rgba(16,31,61,0.6)',
                   border: '1px solid rgba(148,163,184,0.25)',
                   fontFamily: 'ui-monospace, monospace',
                   color: '#fff',

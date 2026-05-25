@@ -6,7 +6,7 @@ import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 
-import { GLASS_PANEL_SX, GLASS_CARD_INNER_SX } from 'src/lib/glass';
+import { GLASS_PANEL_SX, GLASS_CARD_INNER_SX, getTintedGlassInnerRowSx } from 'src/lib/glass';
 
 /**
  * A small glass "notes" panel — same dark-glass look as the License/SR modal.
@@ -37,29 +37,25 @@ export function InfoNotesPanel({ notes, sx }: InfoNotesPanelProps) {
         {notes.map((note, index) => (
           <Box
             key={note.lead}
-            sx={{
-              ...GLASS_CARD_INNER_SX,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 1.5,
-              px: { xs: 2, md: 2.5 },
-              py: { xs: 1.5, md: 1.75 },
-              border: 0,
-              borderRadius: 0,
-              backgroundColor: alpha(note.accent, 0.105),
-              backgroundImage:
-                `radial-gradient(420px 150px at 42px -44px, ${alpha(note.accent, 0.24)} 0%, ${alpha(note.accent, 0.09)} 42%, rgba(255,255,255,0) 78%),` +
-                `linear-gradient(90deg, ${alpha(note.accent, 0.12)} 0%, ${alpha(note.accent, 0.045)} 24%, rgba(19,30,54,0.12) 62%, rgba(19,30,54,0) 100%),` +
-                'linear-gradient(180deg, rgba(255,255,255,0.018) 0%, rgba(255,255,255,0) 58%)',
-              // Match the container's rounded corners on the first/last note so
-              // the inset accent line curves with them.
-              borderTopLeftRadius: index === 0 ? '22px' : 0,
-              borderTopRightRadius: index === 0 ? '22px' : 0,
-              borderBottomLeftRadius: index === notes.length - 1 ? '22px' : 0,
-              borderBottomRightRadius: index === notes.length - 1 ? '22px' : 0,
-              boxShadow:
-                `inset 0 1px 0 rgba(255,255,255,0.08), inset 3px 0 0 ${alpha(note.accent, 0.86)}`,
-            }}
+            sx={[
+              GLASS_CARD_INNER_SX,
+              getTintedGlassInnerRowSx(note.accent),
+              {
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1.5,
+                px: { xs: 2, md: 2.5 },
+                py: { xs: 1.5, md: 1.75 },
+                border: 0,
+                borderRadius: 0,
+                // Match the container's rounded corners on the first/last note so
+                // the inset accent line curves with them.
+                borderTopLeftRadius: index === 0 ? '22px' : 0,
+                borderTopRightRadius: index === 0 ? '22px' : 0,
+                borderBottomLeftRadius: index === notes.length - 1 ? '22px' : 0,
+                borderBottomRightRadius: index === notes.length - 1 ? '22px' : 0,
+              },
+            ] as SxProps<Theme>}
           >
             <Box
               sx={{

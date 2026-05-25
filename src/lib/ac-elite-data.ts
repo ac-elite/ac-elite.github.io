@@ -213,12 +213,12 @@ function medalPanelShinySx(rgb: string, opacity: number, borderOpacity: number):
   const o = opacity;
   return {
     ...(GLASS_CARD_INNER_SX as Record<string, unknown>),
-    backgroundColor: 'rgba(19,30,54,0.62)',
+    backgroundColor: 'rgba(16,31,61,0.62)',
     backgroundImage:
       'linear-gradient(180deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.006) 44%, rgba(255,255,255,0) 100%),' +
       `radial-gradient(380px 190px at 96px -70px, rgba(${rgb},${o * 0.6}) 0%, rgba(${rgb},${o * 0.2}) 42%, rgba(${rgb},0) 76%),` +
       `linear-gradient(135deg, rgba(${rgb},${o * 0.22}) 0%, rgba(${rgb},${o * 0.105}) 48.5%, rgba(${rgb},${o * 0.045}) 50.5%, rgba(${rgb},${o * 0.025}) 100%),` +
-      'linear-gradient(180deg, rgba(35,49,78,0.22), rgba(17,28,51,0.46))',
+      'linear-gradient(180deg, rgba(22,38,70,0.24), rgba(16,31,61,0.5))',
     border: `1px solid rgba(${rgb},${borderOpacity * 0.56})`,
     boxShadow: [
       'inset 0 1px 0 rgba(255,255,255,0.18)',

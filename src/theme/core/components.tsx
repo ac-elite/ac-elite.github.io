@@ -332,7 +332,7 @@ const MuiTableCell: Components<Theme>['MuiTableCell'] = {
       whiteSpace: 'nowrap' as const,
     }),
     body: () => ({
-      backgroundColor: 'rgba(18,31,56,0.58)',
+      backgroundColor: 'rgba(16,31,61,0.58)',
     }),
   },
 };

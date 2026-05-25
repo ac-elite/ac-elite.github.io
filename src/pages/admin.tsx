@@ -223,7 +223,7 @@ export default function Page() {
             WebkitOverflowScrolling: 'touch',
             borderRadius: 2,
             border: '1px solid rgba(148,163,184,0.14)',
-            bgcolor: 'rgba(15,23,42,0.35)',
+            bgcolor: 'rgba(16,31,61,0.4)',
             boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)',
           }}
         >
@@ -231,7 +231,8 @@ export default function Page() {
             <TableHead>
               <TableRow
                 sx={{
-                  background: 'linear-gradient(180deg, rgba(36,52,88,0.92) 0%, rgba(24,35,58,0.88) 100%)',
+                  background:
+                    'linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%), rgba(16,31,61,0.94)',
                   '& th': {
                     fontSize: '0.68rem',
                     textTransform: 'uppercase',
@@ -258,8 +259,8 @@ export default function Page() {
                   hover
                   sx={{
                     transition: 'background-color 0.15s ease',
-                    '&:nth-of-type(even)': { bgcolor: 'rgba(15,23,42,0.35)' },
-                    '&:hover': { bgcolor: 'rgba(30,41,64,0.65)' },
+                    '&:nth-of-type(even)': { bgcolor: 'rgba(255,255,255,0.022)' },
+                    '&:hover': { bgcolor: 'rgba(255,255,255,0.06)' },
                     '&:last-of-type td': { borderBottom: 'none' },
                     borderLeft: '3px solid',
                     borderLeftColor: health.color,
@@ -276,7 +277,7 @@ export default function Page() {
                         px: 1,
                         py: 0.35,
                         borderRadius: 1,
-                        bgcolor: 'rgba(15,23,42,0.55)',
+                        bgcolor: 'rgba(16,31,61,0.55)',
                         border: '1px solid rgba(148,163,184,0.22)',
                         color: 'rgba(248,250,252,0.95)',
                       }}

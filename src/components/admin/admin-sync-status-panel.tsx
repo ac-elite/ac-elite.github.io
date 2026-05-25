@@ -176,14 +176,15 @@ export function AdminSyncStatusPanel({ motionIndex = 2 }: { motionIndex?: number
           overflowX: 'auto',
           borderRadius: 2,
           border: '1px solid rgba(148,163,184,0.14)',
-          bgcolor: 'rgba(15,23,42,0.35)',
+          bgcolor: 'rgba(16,31,61,0.4)',
         }}
       >
         <Table size="small" sx={{ borderCollapse: 'separate', borderSpacing: 0, minWidth: 720 }}>
           <TableHead>
             <TableRow
               sx={{
-                background: 'linear-gradient(180deg, rgba(36,52,88,0.92) 0%, rgba(24,35,58,0.88) 100%)',
+                background:
+                  'linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%), rgba(16,31,61,0.94)',
                 '& th': {
                   fontSize: '0.68rem',
                   textTransform: 'uppercase',

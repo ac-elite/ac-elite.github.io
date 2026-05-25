@@ -9,6 +9,11 @@ import { useTheme } from '@mui/material/styles';
 import ListItemButton from '@mui/material/ListItemButton';
 import Drawer, { drawerClasses } from '@mui/material/Drawer';
 
+import {
+  APP_NAV_SURFACE_SX,
+  GLASS_SIDEBAR_ITEM_HOVER_BG,
+  GLASS_SIDEBAR_ITEM_ACTIVE_SX,
+} from 'src/lib/glass';
 import { usePathname } from 'src/routes/hooks';
 import { RouterLink } from 'src/routes/components';
 
@@ -43,12 +48,7 @@ export function NavDesktop({
       sx={{
         pt: 3,
         px: 2,
-        bgcolor: 'rgba(18,28,50,0.72)',
-        backgroundImage:
-          'linear-gradient(180deg, #17213B 0px, #17213B 150px, rgba(23,33,59,0) 215px),' +
-          'linear-gradient(180deg, rgba(25,37,64,0.76) 0%, rgba(18,28,50,0.8) 100%)',
-        backdropFilter: 'blur(28px) saturate(180%)',
-        WebkitBackdropFilter: 'blur(28px) saturate(180%)',
+        ...APP_NAV_SURFACE_SX,
         top: 0,
         left: 0,
         height: 1,
@@ -58,7 +58,7 @@ export function NavDesktop({
         flexDirection: 'column',
         zIndex: 'var(--layout-nav-zIndex)',
         width: 'var(--layout-nav-vertical-width)',
-        borderRight: `1px solid ${varAlpha(theme.vars.palette.common.whiteChannel, 0.12)}`,
+        borderRight: `1px solid ${varAlpha(theme.vars.palette.common.whiteChannel, 0.1)}`,
         boxShadow: 'inset -1px 0 0 rgba(255,255,255,0.035)',
         [theme.breakpoints.up(layoutQuery)]: {
           display: 'flex',
@@ -100,12 +100,8 @@ export function NavMobile({
           overflowX: 'hidden',
           overflowY: 'hidden',
           width: 'var(--layout-nav-mobile-width)',
-          bgcolor: 'rgba(18,28,50,0.78)',
-          backgroundImage:
-            'linear-gradient(180deg, rgba(25,37,64,0.82) 0%, rgba(18,28,50,0.88) 100%)',
-          backdropFilter: 'blur(30px) saturate(185%)',
-          WebkitBackdropFilter: 'blur(30px) saturate(185%)',
-          borderRight: '1px solid rgba(255,255,255,0.12)',
+          ...APP_NAV_SURFACE_SX,
+          borderRight: '1px solid rgba(255,255,255,0.1)',
           ...sx,
         },
       }}
@@ -238,9 +234,8 @@ export function NavContent({ data, slots, sx }: NavContentProps) {
                           'background 240ms cubic-bezier(0.32,0.72,0,1), color 240ms cubic-bezier(0.32,0.72,0,1), transform 260ms cubic-bezier(0.32,0.72,0,1), box-shadow 240ms cubic-bezier(0.32,0.72,0,1), border-color 240ms cubic-bezier(0.32,0.72,0,1)',
                         '@media (hover: hover)': {
                           '&:hover': {
-                            background:
-                              'linear-gradient(180deg, rgba(255,255,255,0.095) 0%, rgba(255,255,255,0.035) 100%)',
-                            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.12)',
+                            background: GLASS_SIDEBAR_ITEM_HOVER_BG,
+                            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.1)',
                             color: theme.vars.palette.common.white,
                             transform: 'translateX(2px) scale(1.006)',
                           },
@@ -265,13 +260,10 @@ export function NavContent({ data, slots, sx }: NavContentProps) {
                         ...(isActived && {
                           fontWeight: 'fontWeightSemiBold',
                           color: theme.vars.palette.common.white,
-                          background:
-                            'linear-gradient(180deg, rgba(120,165,226,0.16) 0%, rgba(58,86,132,0.1) 100%)',
-                          boxShadow: `inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -1px 0 rgba(15,23,42,0.22), inset 0 0 0 1px ${varAlpha(theme.vars.palette.common.whiteChannel, 0.13)}`,
+                          ...GLASS_SIDEBAR_ITEM_ACTIVE_SX,
                           '@media (hover: hover)': {
                             '&:hover': {
-                              background:
-                                'linear-gradient(180deg, rgba(128,174,236,0.18) 0%, rgba(58,86,132,0.12) 100%)',
+                              background: `linear-gradient(180deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.045) 100%), rgba(23,33,59,0.88)`,
                               transform: 'translateX(1px)',
                             },
                           },
@@ -314,8 +306,8 @@ export function NavContent({ data, slots, sx }: NavContentProps) {
                           overflow: 'visible',
                         },
                         ...(isActived && {
-                          background: 'linear-gradient(180deg, rgba(226,242,255,0.12), rgba(120,165,226,0.055))',
-                          borderColor: 'rgba(226,242,255,0.2)',
+                          background: 'linear-gradient(180deg, rgba(255,255,255,0.12), rgba(255,255,255,0.04))',
+                          borderColor: 'rgba(226,242,255,0.18)',
                           boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.14)',
                         }),
                       }}

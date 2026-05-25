@@ -42,8 +42,11 @@ export const themeConfig: ThemeConfig = {
     primary: {
       lighter: '#2b3857',
       light: '#1f2c49',
-      main: '#17213B', // Elite Blue (official)
-      dark: '#121a2f',
+      // Elite Blue — the deep brand surface color (cards, panels, brand identity).
+      // The navbar/sidebar base is the slightly lighter #17213B (matches the logo
+      // background) and lives in the shared nav-surface token in src/lib/glass.ts.
+      main: '#101F3D',
+      dark: '#0c1830',
       darker: '#0a1020',
       contrastText: '#FFFFFF',
     },

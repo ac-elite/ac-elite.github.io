@@ -28,7 +28,7 @@ export function UpdateBar({ sx, compact = false }: UpdateBarProps) {
           transition: 'border-color 160ms ease, box-shadow 160ms ease, background-color 160ms ease',
           '&:hover': {
             borderColor: 'rgba(191,219,254,0.42)',
-            backgroundColor: 'rgba(19,30,54,0.72)',
+            backgroundColor: 'rgba(16,31,61,0.78)',
           },
           '& .MuiAlert-icon': {
             color: '#93c5fd',

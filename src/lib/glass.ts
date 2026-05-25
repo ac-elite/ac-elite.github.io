@@ -2,6 +2,25 @@ import { alpha, keyframes, type Theme, type SxProps } from '@mui/material/styles
 import type { SystemStyleObject } from '@mui/system';
 
 /**
+ * AC Elite brand surfaces — single source of truth for the navy levels.
+ *
+ * - `NAV_BASE` (#17213B) is the navbar / sidebar / mobile-header foundation
+ *   because it matches the background behind the AC Elite logo.
+ * - `ELITE_BLUE` (#101F3D) is the deeper brand surface for the main glass
+ *   panels and cards.
+ *
+ * The `*_RGB` strings feed `rgba(...)` so translucent glass tints stay on-brand
+ * instead of drifting to ad-hoc blues.
+ */
+export const BRAND = {
+  navBase: '#17213B',
+  navBaseRgb: '23,33,59',
+  eliteBlue: '#101F3D',
+  eliteBlueRgb: '16,31,61',
+  graphite: '#231F20',
+} as const;
+
+/**
  * Rim pulse on `::after` above content (`z-index: 2`, `pointer-events: none`) so the glow is
  * actually visible — a full-bleed layer under opaque children was nearly invisible on home/hero.
  */
@@ -184,34 +203,74 @@ export const GLASS_BOXJE_RIM_SHADOW_HOVER =
   'inset 0 1px 0 rgba(255,255,255,0.26), inset 0 -1px 0 rgba(15,23,42,0.24), inset 0 0 0 1px rgba(226,242,255,0.2)';
 
 /**
- * Apple "material": heavy blur + saturation so colour behind the glass blooms
- * through (the vibrancy trick). `saturate(180%)` is the key to the premium feel.
+ * Navbar / sidebar / mobile-header foundation. Built on {@link BRAND.navBase}
+ * (#17213B) because it matches the background behind the AC Elite logo, kept
+ * highly opaque so the logo always sits on strong, even contrast. A faint
+ * top-light sheen + vibrancy blur give it the same glass family as the panels
+ * without competing with them. Each surface adds its own border edge
+ * (right for the rail, bottom for the mobile header).
  */
-export const GLASS_MATERIAL_BACKDROP = 'blur(30px) saturate(190%)';
+export const APP_NAV_SURFACE_SX: SystemStyleObject<Theme> = {
+  // Translucent floor so the blurred page shows through lower down (real glass).
+  backgroundColor: `rgba(${BRAND.navBaseRgb},0.5)`,
+  backgroundImage:
+    // Topmost layer: a solid, opaque #17213B block behind the logo that fades out
+    // below it — so the logo's own #17213B background square blends seamlessly into
+    // the nav instead of reading as a visible rectangle.
+    `linear-gradient(180deg, ${BRAND.navBase} 0, ${BRAND.navBase} 128px, rgba(${BRAND.navBaseRgb},0) 220px),` +
+    // Faint top-light sheen (below the logo block).
+    `linear-gradient(180deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.012) 220px, rgba(255,255,255,0) 380px),` +
+    // Body: grounded near the top, fading to translucent glass toward the bottom.
+    `linear-gradient(180deg, rgba(${BRAND.navBaseRgb},0.86) 0%, rgba(${BRAND.navBaseRgb},0.86) 150px, rgba(${BRAND.navBaseRgb},0.5) 100%)`,
+  backdropFilter: 'blur(28px) saturate(180%)',
+  WebkitBackdropFilter: 'blur(28px) saturate(180%)',
+};
+
+/** Sidebar nav item — resting state is transparent (sits on the nav surface). */
+export const GLASS_SIDEBAR_ITEM_HOVER_BG =
+  `linear-gradient(180deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.02) 100%), rgba(${BRAND.navBaseRgb},0.72)`;
 
 /**
- * Base glass surface — a floating macOS/visionOS-style window. More translucent
- * so the blurred backdrop blooms through (real vibrancy), with a glassy top-left
- * specular sheen, a crisp light top edge + fine rim, and a big soft float shadow.
- * Calm by default; live elements opt into {@link GLASS_CARD_LIVE_SX}.
+ * Active sidebar item — frosted glass with a quiet brand tint rather than a
+ * bright blue "selected button". Frosted white film over the #17213B base + a
+ * full hairline rim, so it reads as a lit pane of the same material.
+ */
+export const GLASS_SIDEBAR_ITEM_ACTIVE_SX: SystemStyleObject<Theme> = {
+  background: `linear-gradient(180deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.035) 100%), rgba(${BRAND.navBaseRgb},0.86)`,
+  boxShadow:
+    'inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -1px 0 rgba(0,0,0,0.22), inset 0 0 0 1px rgba(255,255,255,0.13)',
+};
+
+/**
+ * Apple "material": heavy blur + saturation so colour behind the glass blooms
+ * through (the vibrancy trick). High saturation is the key to the premium feel.
+ */
+export const GLASS_MATERIAL_BACKDROP = 'blur(28px) saturate(180%)';
+
+/**
+ * Base glass surface — a floating macOS/visionOS-style window on the Elite Blue
+ * (#101F3D) brand tint. Authentic Liquid Glass = an even translucent tint that
+ * refracts the backdrop (backdrop blur + saturate) + a single bright specular
+ * top edge + a soft grounding bottom for thickness. No baked corner bloom or
+ * diagonal facet — those read as un-Apple glassmorphism. Calm by default; live
+ * elements opt into {@link GLASS_CARD_LIVE_SX}.
  */
 export const GLASS_CARD_SX: SxProps<Theme> = {
   position: 'relative',
   borderRadius: GLASS_RADIUS.panel,
-  border: '1px solid rgba(226,242,255,0.14)',
-  backgroundColor: 'rgba(19,30,54,0.66)',
+  // Lighter hairline — the depth comes from light + shadow, not a heavy border.
+  border: `1px solid rgba(226,242,255,0.11)`,
+  backgroundColor: `rgba(${BRAND.eliteBlueRgb},0.74)`,
+  // Even top-down specular sheen only (the lit top edge of the glass).
   backgroundImage:
-    'linear-gradient(180deg, rgba(255,255,255,0.02) 0%, rgba(255,255,255,0.004) 42%, rgba(255,255,255,0) 100%),' +
-    'radial-gradient(430px 210px at 110px -88px, rgba(255,255,255,0.038) 0%, rgba(255,255,255,0.012) 42%, rgba(255,255,255,0) 72%),' +
-    'linear-gradient(180deg, rgba(35,49,78,0.34) 0%, rgba(17,28,51,0.54) 100%)',
+    'linear-gradient(180deg, rgba(255,255,255,0.055) 0%, rgba(255,255,255,0.014) 44%, rgba(255,255,255,0) 100%)',
   backdropFilter: GLASS_MATERIAL_BACKDROP,
   WebkitBackdropFilter: GLASS_MATERIAL_BACKDROP,
   boxShadow:
-    'inset 0 1px 0 rgba(255,255,255,0.22), inset 0 -1px 0 rgba(0,0,0,0.16), inset 0 0 0 1px rgba(255,255,255,0.028),' +
-    // Two soft layers that hug the card footprint and ground it. The old single
-    // `0 22px 50px -30px` had so much negative spread it shrank into a detached
-    // oval blob under the card instead of reading as a real shadow.
-    ' 0 2px 6px -2px rgba(0,0,0,0.3), 0 18px 40px -16px rgba(0,0,0,0.5)',
+    // Bright thin specular top edge + grounding dark bottom (glass thickness)…
+    'inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -1px 0 rgba(0,0,0,0.18),' +
+    // …then two soft layers that hug the footprint as the primary container depth.
+    ' 0 2px 6px -2px rgba(0,0,0,0.3), 0 18px 44px -16px rgba(0,0,0,0.5)',
 };
 
 /** Opt-in: base card + the soft live rim pulse. Reserve for live data. */
@@ -220,31 +279,32 @@ export const GLASS_CARD_LIVE_SX: SxProps<Theme> = {
   ...GLASS_LIVE_RIM_SX,
 };
 
+/**
+ * Inner glass tile — a *secondary* surface that sits inside {@link GLASS_CARD_SX}.
+ * It is a light translucent film over the parent (so the parent's Elite Blue
+ * shows through and lifts it) rather than another dark navy box competing with
+ * the parent. Quieter on purpose: weaker border, a subtle inner highlight, and
+ * no outer drop shadow. It also drops `backdrop-filter` — the parent panel is
+ * already a blurred surface, so a second nested blur only costs paint with no
+ * visible gain. The deeper the nesting, the quieter the styling.
+ */
 export const GLASS_CARD_INNER_SX: SxProps<Theme> = {
   position: 'relative',
   borderRadius: GLASS_RADIUS.innerPanel,
-  border: '1px solid rgba(226,242,255,0.1)',
-  backgroundColor: 'rgba(19,30,54,0.6)',
+  border: '1px solid rgba(255,255,255,0.07)',
+  backgroundColor: 'rgba(255,255,255,0.028)',
   backgroundImage:
-    'linear-gradient(180deg, rgba(255,255,255,0.014) 0%, rgba(255,255,255,0.003) 44%, rgba(255,255,255,0) 100%),' +
-    'radial-gradient(340px 170px at 86px -72px, rgba(255,255,255,0.028) 0%, rgba(255,255,255,0.008) 44%, rgba(255,255,255,0) 74%),' +
-    'linear-gradient(180deg, rgba(35,49,78,0.24), rgba(17,28,51,0.42))',
-  backdropFilter: 'blur(18px) saturate(160%)',
-  WebkitBackdropFilter: 'blur(18px) saturate(160%)',
-  boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.1), 0 10px 26px -24px rgba(0,0,0,0.7)',
+    'linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.014) 100%)',
+  boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.07)',
 };
 
 export const GLASS_CARD_INNER_HOVER_SX: SxProps<Theme> = {
   ...GLASS_CARD_INNER_SX,
   cursor: 'pointer',
-  transition: 'border-color 160ms ease, background 160ms ease',
+  transition: 'border-color 160ms ease, background-color 160ms ease',
   '&:hover': {
-    borderColor: 'rgba(226,242,255,0.24)',
-    backgroundColor: 'rgba(21,32,56,0.64)',
-    backgroundImage:
-      'linear-gradient(180deg, rgba(255,255,255,0.018) 0%, rgba(255,255,255,0.004) 44%, rgba(255,255,255,0) 100%),' +
-      'radial-gradient(340px 170px at 86px -72px, rgba(255,255,255,0.036) 0%, rgba(255,255,255,0.01) 44%, rgba(255,255,255,0) 74%),' +
-      'linear-gradient(180deg, rgba(35,49,78,0.28), rgba(17,28,51,0.46))',
+    borderColor: 'rgba(255,255,255,0.14)',
+    backgroundColor: 'rgba(255,255,255,0.05)',
   },
 };
 
@@ -295,31 +355,36 @@ export const GLASS_INNER_ROW_SX: SxProps<Theme> = {
   py: GLASS_PADDING.innerRowY,
 };
 
-/** Role/semantic tinted outer glass: same base card, with a quiet colour bloom. */
+/**
+ * Role/semantic tinted outer glass — same Elite Blue base card with an even,
+ * quiet accent wash (no diagonal facet, no corner bloom). Drives the info /
+ * warning banners so they read as the same material, just colour-shifted.
+ */
 export function getTintedGlassPanelSx(accent: string): SystemStyleObject<Theme> {
   return {
-    borderColor: alpha(accent, 0.24),
+    borderColor: alpha(accent, 0.22),
     backgroundImage:
-      `radial-gradient(520px 240px at 84px -88px, ${alpha(accent, 0.16)} 0%, ${alpha(accent, 0.052)} 43%, rgba(255,255,255,0) 76%),` +
-      `linear-gradient(135deg, ${alpha(accent, 0.08)} 0%, ${alpha(accent, 0.032)} 48%, rgba(17,28,51,0.03) 51%, rgba(17,28,51,0) 100%),` +
-      'linear-gradient(180deg, rgba(255,255,255,0.018) 0%, rgba(255,255,255,0.004) 42%, rgba(255,255,255,0) 100%),' +
-      'linear-gradient(180deg, rgba(35,49,78,0.34) 0%, rgba(17,28,51,0.54) 100%)',
+      `linear-gradient(180deg, ${alpha(accent, 0.1)} 0%, ${alpha(accent, 0.035)} 100%),` +
+      'linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.012) 44%, rgba(255,255,255,0) 100%)',
     boxShadow:
-      `inset 0 1px 0 rgba(255,255,255,0.18), inset 0 0 0 1px ${alpha(accent, 0.035)},` +
-      ' 0 1px 2px rgba(0,0,0,0.22)',
+      `inset 0 1px 0 rgba(255,255,255,0.16), inset 0 0 0 1px ${alpha(accent, 0.05)},` +
+      ' 0 2px 6px -2px rgba(0,0,0,0.3), 0 18px 44px -16px rgba(0,0,0,0.5)',
   };
 }
 
-/** Role/semantic tinted inner row: use on rows inside a tinted glass card. */
+/**
+ * Role/semantic tinted inner row — a tinted variant of the light inner-tile
+ * film, with a left accent bar. Quiet like {@link GLASS_CARD_INNER_SX}: no
+ * outer drop shadow, just the accent edge + a subtle inner highlight.
+ */
 export function getTintedGlassInnerRowSx(accent: string): SystemStyleObject<Theme> {
   return {
     borderColor: alpha(accent, 0.18),
+    backgroundColor: alpha(accent, 0.05),
     backgroundImage:
-      `radial-gradient(360px 150px at 52px -64px, ${alpha(accent, 0.09)} 0%, ${alpha(accent, 0.03)} 46%, transparent 78%),` +
-      'linear-gradient(180deg, rgba(255,255,255,0.014) 0%, rgba(255,255,255,0.003) 44%, rgba(255,255,255,0) 100%),' +
-      'linear-gradient(180deg, rgba(35,49,78,0.22), rgba(17,28,51,0.42))',
-    boxShadow:
-      `inset 0 1px 0 rgba(255,255,255,0.1), inset 3px 0 0 ${alpha(accent, 0.62)}, 0 10px 26px -24px rgba(0,0,0,0.7)`,
+      `linear-gradient(180deg, ${alpha(accent, 0.08)} 0%, ${alpha(accent, 0.025)} 100%),` +
+      'linear-gradient(180deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%)',
+    boxShadow: `inset 0 1px 0 rgba(255,255,255,0.08), inset 3px 0 0 ${alpha(accent, 0.62)}`,
   };
 }
 

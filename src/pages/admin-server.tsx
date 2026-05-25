@@ -320,12 +320,12 @@ export default function Page() {
             Every field the AC server reports. Useful when something looks off in the cards above and you want to see the raw value.
           </Typography>
         </Box>
-        <TableContainer sx={{ maxHeight: 400, borderRadius: 1, border: '1px solid rgba(148,163,184,0.14)', bgcolor: 'rgba(15,23,42,0.35)' }}>
+        <TableContainer sx={{ maxHeight: 400, borderRadius: 1, border: '1px solid rgba(148,163,184,0.14)', bgcolor: 'rgba(16,31,61,0.4)' }}>
           <Table size="small" stickyHeader>
             <TableHead>
               <TableRow>
-                <TableCell sx={{ fontWeight: 800, width: '32%', bgcolor: 'rgba(15,23,42,0.88)' }}>Field</TableCell>
-                <TableCell sx={{ fontWeight: 800, bgcolor: 'rgba(15,23,42,0.88)' }}>Value</TableCell>
+                <TableCell sx={{ fontWeight: 800, width: '32%', bgcolor: 'rgba(16,31,61,0.94)' }}>Field</TableCell>
+                <TableCell sx={{ fontWeight: 800, bgcolor: 'rgba(16,31,61,0.94)' }}>Value</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>

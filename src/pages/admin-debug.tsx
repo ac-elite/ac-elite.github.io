@@ -123,7 +123,7 @@ export default function Page() {
                   px: 1.25,
                   py: 1,
                   borderRadius: 1,
-                  bgcolor: 'rgba(15,23,42,0.65)',
+                  bgcolor: 'rgba(16,31,61,0.6)',
                   border: '1px solid rgba(148,163,184,0.28)',
                   fontFamily: 'ui-monospace, monospace',
                   fontSize: '0.85rem',
@@ -177,7 +177,7 @@ export default function Page() {
               WebkitOverflowScrolling: 'touch',
               borderRadius: 2,
               border: '1px solid rgba(148,163,184,0.14)',
-              bgcolor: 'rgba(15,23,42,0.35)',
+              bgcolor: 'rgba(16,31,61,0.4)',
               boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)',
             }}
           >
@@ -185,7 +185,8 @@ export default function Page() {
               <TableHead>
                 <TableRow
                   sx={{
-                    background: 'linear-gradient(180deg, rgba(36,52,88,0.92) 0%, rgba(24,35,58,0.88) 100%)',
+                    background:
+                      'linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%), rgba(16,31,61,0.94)',
                     '& th': {
                       fontSize: '0.68rem',
                       textTransform: 'uppercase',
@@ -210,7 +211,7 @@ export default function Page() {
                   <TableRow
                     key={row.title}
                     sx={{
-                      '&:nth-of-type(even)': { bgcolor: 'rgba(15,23,42,0.35)' },
+                      '&:nth-of-type(even)': { bgcolor: 'rgba(255,255,255,0.022)' },
                       '&:last-of-type td': { borderBottom: 'none' },
                     }}
                   >
