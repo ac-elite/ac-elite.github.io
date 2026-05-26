@@ -176,12 +176,21 @@ const heroStatsKeywordSx = {
 
 const heroLeaderboardKeywordSx = {
   ...heroKeywordSx,
+  mx: 0,
+  fontSize: { xs: 'clamp(1.04em, 0.98em + 0.5vw, 1.12em)', sm: '1.2em', md: '1.26em' },
+  animationDelay: '-1.8s',
+} as const;
+
+const heroLeaderboardLineSx = {
   display: { xs: 'inline-block', md: 'block' },
   width: 'fit-content',
   ml: { xs: 0.35, md: 5.5 },
   mt: { xs: 0, md: -0.4 },
-  fontSize: { xs: 'clamp(1.04em, 0.98em + 0.5vw, 1.12em)', sm: '1.2em', md: '1.26em' },
-  animationDelay: '-1.8s',
+} as const;
+
+const heroStaticDotSx = {
+  color: '#fff',
+  textShadow: '0 2px 12px rgba(15,23,42,0.72)',
 } as const;
 
 /** Soft "live" pulse for the green dot in the hero kicker. */
@@ -376,10 +385,14 @@ function HeroSection({ currentTrack }: { currentTrack: CurrentTrackData | null }
                   .
                   <br />
                   Dominate the{' '}
-                  <Box component="span" sx={heroLeaderboardKeywordSx}>
-                    leaderboard
+                  <Box component="span" sx={heroLeaderboardLineSx}>
+                    <Box component="span" sx={heroLeaderboardKeywordSx}>
+                      leaderboard
+                    </Box>
+                    <Box component="span" sx={heroStaticDotSx}>
+                      .
+                    </Box>
                   </Box>
-                  .
                 </Typography>
 
                 <Typography
