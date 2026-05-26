@@ -349,9 +349,12 @@ const MuiTableCell: Components<Theme>['MuiTableCell'] = {
   styleOverrides: {
     root: ({ theme }) => ({
       borderColor: varAlpha(theme.vars.palette.common.whiteChannel, 0.1),
-      padding: 'clamp(8px, 2.4vw, 16px)',
+      padding: 'clamp(7px, 1.35vw, 10px) clamp(9px, 1.8vw, 14px)',
       fontSize: 'clamp(0.75rem, 0.69rem + 0.25vw, 0.875rem)',
     }),
+    sizeSmall: {
+      padding: 'clamp(6px, 1.15vw, 8px) clamp(8px, 1.55vw, 12px)',
+    },
     head: ({ theme }) => ({
       fontSize: 'clamp(0.72rem, 0.66rem + 0.24vw, 0.8125rem)',
       color: varAlpha(theme.vars.palette.common.whiteChannel, 0.88),

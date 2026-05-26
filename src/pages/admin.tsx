@@ -119,7 +119,7 @@ function formatAbsolute(iso?: string): string {
 const FRESHNESS_ROW_BORDER = '1px solid rgba(148,163,184,0.1)';
 const freshnessBodyCellSx = {
   borderBottom: FRESHNESS_ROW_BORDER,
-  py: 1.35,
+  py: { xs: 1.1, md: 0.8 },
   verticalAlign: 'top' as const,
 };
 
@@ -259,7 +259,7 @@ export default function Page() {
                     fontWeight: 800,
                     color: TABLE_HEAD_MUTED_COLOR,
                     borderBottom: '1px solid rgba(148,163,184,0.28)',
-                    py: 1.35,
+                    py: { xs: 1, md: 0.75 },
                     px: 1.5,
                   },
                 }}

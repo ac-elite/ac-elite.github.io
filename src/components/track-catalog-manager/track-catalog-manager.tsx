@@ -76,7 +76,7 @@ function formatError(err: unknown, fallback: string): string {
 
 const bodyCellSx = {
   borderBottom: '1px solid rgba(148,163,184,0.1)',
-  py: 1.35,
+  py: { xs: 1.1, md: 0.8 },
   verticalAlign: 'top' as const,
 };
 
@@ -195,7 +195,7 @@ export function TrackCatalogManager() {
                   color: TABLE_HEAD_MUTED_COLOR,
                   bgcolor: 'rgba(255,255,255,0.012)',
                   borderBottom: '1px solid rgba(148,163,184,0.28)',
-                  py: 1.1,
+                  py: { xs: 0.95, md: 0.7 },
                   px: 1.25,
                 },
               }}
@@ -367,7 +367,7 @@ export function TrackCatalogManager() {
                         color: TABLE_HEAD_MUTED_COLOR,
                         bgcolor: 'rgba(255,255,255,0.012)',
                         borderBottom: '1px solid rgba(148,163,184,0.28)',
-                        py: 1.1,
+                        py: { xs: 0.95, md: 0.7 },
                         px: 1.25,
                       },
                     }}
