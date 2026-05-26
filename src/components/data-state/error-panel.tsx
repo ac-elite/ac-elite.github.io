@@ -30,15 +30,28 @@ export function ErrorPanel({ error, title = 'Failed to load data', onRetry }: Er
       }
     >
       <Stack spacing={1.35} alignItems="flex-start">
-        <Typography sx={{ color: ERROR_ACCENT, fontWeight: 800, fontSize: '0.95rem', letterSpacing: 0.04 }}>
+        <Typography
+          sx={{
+            color: ERROR_ACCENT,
+            fontWeight: 800,
+            fontSize: 'clamp(0.85rem, 0.76rem + 0.4vw, 0.95rem)',
+            letterSpacing: 0.04,
+          }}
+        >
           {title}
         </Typography>
-        <Typography sx={{ color: 'rgba(255,255,255,0.88)', fontFamily: 'ui-monospace, monospace', fontSize: '0.8125rem' }}>
+        <Typography
+          sx={{
+            color: 'rgba(255,255,255,0.88)',
+            fontFamily: 'ui-monospace, monospace',
+            fontSize: '0.8125rem',
+          }}
+        >
           {error}
         </Typography>
         <Typography variant="body2" sx={{ ...DATA_STATE_HELP_TEXT_SX }}>
-          This is usually temporary. Try again in a moment, or refresh the page. Stats are synced regularly from the
-          AC Elite server.
+          This is usually temporary. Try again in a moment, or refresh the page. Stats are synced
+          regularly from the AC Elite server.
         </Typography>
         {onRetry && (
           <Button

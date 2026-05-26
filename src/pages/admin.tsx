@@ -21,7 +21,11 @@ import { getTrackDisplayName } from 'src/lib/ac-elite-data';
 import { useTrackCatalogVersion } from 'src/centralized/track-info';
 import { glassCardMotionSx } from 'src/lib/subtle-motion';
 import { brandAccentBorderSx } from 'src/lib/status-accent';
-import { GLASS_INLINE_CODE_SX, GLASS_PANEL_COMPACT_SX, GLASS_TABLE_CONTAINER_SX } from 'src/lib/glass';
+import {
+  GLASS_INLINE_CODE_SX,
+  GLASS_PANEL_COMPACT_SX,
+  GLASS_TABLE_CONTAINER_SX,
+} from 'src/lib/glass';
 import {
   TABLE_HEAD_MUTED_COLOR,
   ADMIN_JOIN_SERVER_OUTLINED_SX,
@@ -58,7 +62,8 @@ const DATA_FILES: readonly DataFileEntry[] = [
     updatedBy: 'Ranking sync (KMR)',
     getTimestamp: (s) => s.metadata?.lastSync,
     syncHealthProfile: 'liveFeed',
-    getNote: (s) => (s.metadata?.status === 'success' ? 'Last run reported success' : s.metadata?.status ?? ''),
+    getNote: (s) =>
+      s.metadata?.status === 'success' ? 'Last run reported success' : (s.metadata?.status ?? ''),
   },
   {
     file: 'current-track.json',
@@ -66,10 +71,9 @@ const DATA_FILES: readonly DataFileEntry[] = [
     getTimestamp: (s) => s.currentTrack?.fetchedAt,
     syncHealthProfile: 'liveFeed',
     getNote: (s) => {
-      const state =
-        s.currentTrack?.online
-          ? `Online · ${s.currentTrack.track ? getTrackDisplayName(s.currentTrack.track) : '—'}`
-          : 'Offline';
+      const state = s.currentTrack?.online
+        ? `Online · ${s.currentTrack.track ? getTrackDisplayName(s.currentTrack.track) : '—'}`
+        : 'Offline';
       return `${state} · Time shown is the newest of: frequent live checks, or the hourly backup when the lobby/track changed`;
     },
   },
@@ -130,16 +134,19 @@ export default function Page() {
   const [visitCount, setVisitCount] = useState<number | undefined>(undefined);
   const [visitPageRows, setVisitPageRows] = useState<SitePageVisitRow[] | undefined>(undefined);
 
-  const applyVisitStatsResult = useCallback((n: number | null, pages: SitePageVisitRow[] | null) => {
-    if (n !== null) {
-      setVisitCount(n);
-      setVisitPhase('ready');
-      setVisitPageRows(pages ?? []);
-    } else {
-      setVisitPhase('error');
-      setVisitPageRows(undefined);
-    }
-  }, []);
+  const applyVisitStatsResult = useCallback(
+    (n: number | null, pages: SitePageVisitRow[] | null) => {
+      if (n !== null) {
+        setVisitCount(n);
+        setVisitPhase('ready');
+        setVisitPageRows(pages ?? []);
+      } else {
+        setVisitPhase('error');
+        setVisitPageRows(undefined);
+      }
+    },
+    []
+  );
 
   const loadVisitStats = useCallback(async () => {
     if (!isSiteVisitsConfigured()) return;
@@ -200,14 +207,22 @@ export default function Page() {
           Data freshness
         </Typography>
         <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.4, mb: 1 }}>
-          Each row is one file the website reads. If something looks old, note the time and tell a tech lead which row it was.
+          Each row is one file the website reads. If something looks old, note the time and tell a
+          tech lead which row it was.
         </Typography>
         <Typography
           variant="caption"
-          sx={{ color: 'text.secondary', display: 'block', mb: data.metadata?.error ? 1 : 2, lineHeight: 1.55, maxWidth: 900 }}
+          sx={{
+            color: 'text.secondary',
+            display: 'block',
+            mb: data.metadata?.error ? 1 : 2,
+            lineHeight: 1.55,
+            maxWidth: 900,
+          }}
         >
-          <strong>Live</strong> — updated recently. <strong>Delayed</strong> — older than we like for that type of file; worth a look if players ask.{' '}
-          <strong>Stale</strong> — please flag to a tech lead. <strong>Unknown</strong> — no date yet (first load or missing file).
+          <strong>Live</strong> — updated recently. <strong>Delayed</strong> — older than we like
+          for that type of file; worth a look if players ask. <strong>Stale</strong> — please flag
+          to a tech lead. <strong>Unknown</strong> — no date yet (first load or missing file).
         </Typography>
         {data.metadata?.error && (
           <Typography variant="body2" sx={{ mb: 2, color: '#fca5a5', overflowWrap: 'anywhere' }}>
@@ -225,7 +240,15 @@ export default function Page() {
             borderRadius: 2,
           }}
         >
-          <Table size="small" sx={{ borderCollapse: 'separate', borderSpacing: 0, minWidth: 980, tableLayout: 'fixed' }}>
+          <Table
+            size="small"
+            sx={{
+              borderCollapse: 'separate',
+              borderSpacing: 0,
+              minWidth: 980,
+              tableLayout: 'fixed',
+            }}
+          >
             <TableHead>
               <TableRow
                 sx={{
@@ -262,7 +285,9 @@ export default function Page() {
                     borderLeftColor: health.color,
                   }}
                 >
-                  <TableCell sx={{ ...freshnessBodyCellSx, pl: 1.5, pr: 1, width: { xs: 170, sm: 180 } }}>
+                  <TableCell
+                    sx={{ ...freshnessBodyCellSx, pl: 1.5, pr: 1, width: { xs: 170, sm: 180 } }}
+                  >
                     <Box
                       component="span"
                       sx={{
@@ -277,7 +302,13 @@ export default function Page() {
                       {df.file}
                     </Box>
                   </TableCell>
-                  <TableCell sx={{ ...freshnessBodyCellSx, color: 'text.secondary', width: { xs: 120, sm: 140 } }}>
+                  <TableCell
+                    sx={{
+                      ...freshnessBodyCellSx,
+                      color: 'text.secondary',
+                      width: { xs: 120, sm: 140 },
+                    }}
+                  >
                     {df.updatedBy}
                   </TableCell>
                   <TableCell
@@ -291,8 +322,16 @@ export default function Page() {
                   >
                     {formatAbsolute(ts)}
                   </TableCell>
-                  <TableCell sx={{ ...freshnessBodyCellSx, minWidth: 140, width: { xs: 150, sm: 170 } }}>
-                    <Stack direction="row" alignItems="center" spacing={1} flexWrap="wrap" useFlexGap>
+                  <TableCell
+                    sx={{ ...freshnessBodyCellSx, minWidth: 140, width: { xs: 150, sm: 170 } }}
+                  >
+                    <Stack
+                      direction="row"
+                      alignItems="center"
+                      spacing={1}
+                      flexWrap="wrap"
+                      useFlexGap
+                    >
                       <Chip
                         size="small"
                         label={health.label}
@@ -336,13 +375,17 @@ export default function Page() {
         <Stack
           direction={{ xs: 'column', md: 'row' }}
           justifyContent="space-between"
-          alignItems={{ xs: 'flex-start', md: 'center' }}
+          alignItems={{ xs: 'center', md: 'center' }}
           spacing={1.5}
+          sx={{ textAlign: { xs: 'center', md: 'left' } }}
         >
           <Box>
-            <Typography variant="h6" sx={{ fontWeight: 800 }}>Quick links</Typography>
+            <Typography variant="h6" sx={{ fontWeight: 800 }}>
+              Quick links
+            </Typography>
             <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.4 }}>
-              Jump to the live server status page, recent automation runs, or join the server in Content Manager.
+              Jump to the live server status page, recent automation runs, or join the server in
+              Content Manager.
             </Typography>
           </Box>
           <Stack
@@ -350,15 +393,47 @@ export default function Page() {
             spacing={1.25}
             useFlexGap
             flexWrap="wrap"
-            alignItems={{ xs: 'stretch', sm: 'center' }}
+            alignItems={{ xs: 'center', sm: 'center' }}
+            justifyContent={{ xs: 'center', md: 'flex-end' }}
+            sx={{
+              width: { xs: '100%', md: 'auto' },
+              '& .MuiButton-root': {
+                width: { xs: '100%', sm: 'auto' },
+                maxWidth: { xs: 320, sm: 'none' },
+              },
+            }}
           >
-            <Button component="a" href={SERVER_ENDPOINTS.info} target="_blank" rel="noreferrer" variant="outlined" size="small" sx={{ ...ADMIN_EXTERNAL_LINK_OUTLINED_SX }}>
+            <Button
+              component="a"
+              href={SERVER_ENDPOINTS.info}
+              target="_blank"
+              rel="noreferrer"
+              variant="outlined"
+              size="small"
+              sx={{ ...ADMIN_EXTERNAL_LINK_OUTLINED_SX }}
+            >
               Live status page
             </Button>
-            <Button component="a" href={`${SITE_REPO_URL}/actions`} target="_blank" rel="noopener noreferrer" variant="outlined" size="small" sx={{ ...ADMIN_EXTERNAL_LINK_OUTLINED_SX }}>
+            <Button
+              component="a"
+              href={`${SITE_REPO_URL}/actions`}
+              target="_blank"
+              rel="noopener noreferrer"
+              variant="outlined"
+              size="small"
+              sx={{ ...ADMIN_EXTERNAL_LINK_OUTLINED_SX }}
+            >
               Automation runs (GitHub)
             </Button>
-            <Button component="a" href={SERVER_ENDPOINTS.join} target="_blank" rel="noopener noreferrer" variant="outlined" size="small" sx={{ ...ADMIN_JOIN_SERVER_OUTLINED_SX }}>
+            <Button
+              component="a"
+              href={SERVER_ENDPOINTS.join}
+              target="_blank"
+              rel="noopener noreferrer"
+              variant="outlined"
+              size="small"
+              sx={{ ...ADMIN_JOIN_SERVER_OUTLINED_SX }}
+            >
               Join server (Content Manager)
             </Button>
           </Stack>

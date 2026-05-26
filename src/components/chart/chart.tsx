@@ -16,6 +16,9 @@ export const CHART_COLORS = ['#5B8DEF', '#22C55E', '#F59E0B', '#A78BFA', '#38BDF
 
 const CHART_FONT =
   '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter Variable", "Inter", system-ui, "Segoe UI", Roboto, sans-serif';
+const CHART_AXIS_FONT_SIZE = 'clamp(10px, 2.7vw, 12px)';
+const CHART_LEGEND_FONT_SIZE = 'clamp(11px, 2.9vw, 13px)';
+const CHART_TOOLTIP_FONT_SIZE = 'clamp(10.5px, 2.8vw, 12px)';
 
 function usePrefersReducedMotion() {
   const [reduced, setReduced] = useState(false);
@@ -55,7 +58,13 @@ function baseChartOptions(reducedMotion: boolean): ApexOptions {
     stroke: { curve: 'smooth', width: 2.5, lineCap: 'round' },
     fill: {
       type: 'gradient',
-      gradient: { shadeIntensity: 1, type: 'vertical', opacityFrom: 0.42, opacityTo: 0.02, stops: [0, 96] },
+      gradient: {
+        shadeIntensity: 1,
+        type: 'vertical',
+        opacityFrom: 0.42,
+        opacityTo: 0.02,
+        stops: [0, 96],
+      },
     },
     grid: {
       borderColor: 'rgba(255,255,255,0.06)',
@@ -67,21 +76,25 @@ function baseChartOptions(reducedMotion: boolean): ApexOptions {
     xaxis: {
       axisBorder: { show: false },
       axisTicks: { show: false },
-      labels: { style: { colors: 'rgba(255,255,255,0.5)', fontSize: '12px', fontWeight: 500 } },
+      labels: {
+        style: { colors: 'rgba(255,255,255,0.5)', fontSize: CHART_AXIS_FONT_SIZE, fontWeight: 500 },
+      },
       tooltip: { enabled: false },
     },
     yaxis: {
-      labels: { style: { colors: 'rgba(255,255,255,0.5)', fontSize: '12px', fontWeight: 500 } },
+      labels: {
+        style: { colors: 'rgba(255,255,255,0.5)', fontSize: CHART_AXIS_FONT_SIZE, fontWeight: 500 },
+      },
     },
     legend: {
       labels: { colors: 'rgba(255,255,255,0.72)' },
-      fontSize: '13px',
+      fontSize: CHART_LEGEND_FONT_SIZE,
       fontWeight: 600,
       itemMargin: { horizontal: 10, vertical: 4 },
     },
     tooltip: {
       theme: 'dark',
-      style: { fontSize: '12px', fontFamily: CHART_FONT },
+      style: { fontSize: CHART_TOOLTIP_FONT_SIZE, fontFamily: CHART_FONT },
     },
     markers: { size: 0, strokeWidth: 0, hover: { size: 5 } },
     states: {
@@ -111,7 +124,14 @@ export type ChartProps = {
  * defaults are deep-merged underneath (consumer values win). Honours
  * `prefers-reduced-motion` by disabling chart animations.
  */
-export function Chart({ type = 'area', series, options, height = 280, width = '100%', sx }: ChartProps) {
+export function Chart({
+  type = 'area',
+  series,
+  options,
+  height = 280,
+  width = '100%',
+  sx,
+}: ChartProps) {
   const reducedMotion = usePrefersReducedMotion();
 
   const mergedOptions = useMemo(
@@ -146,7 +166,13 @@ export function Chart({ type = 'area', series, options, height = 280, width = '1
         ...(Array.isArray(sx) ? sx : [sx]),
       ]}
     >
-      <ReactApexChart type={type} series={series} options={mergedOptions} height={height} width={width} />
+      <ReactApexChart
+        type={type}
+        series={series}
+        options={mergedOptions}
+        height={height}
+        width={width}
+      />
     </Box>
   );
 }

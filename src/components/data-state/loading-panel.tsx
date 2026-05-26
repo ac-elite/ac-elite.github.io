@@ -40,7 +40,14 @@ function LoadingPanel({
         }}
       />
       <Stack spacing={1.25} sx={{ pt: 2 }}>
-        <Typography sx={{ fontWeight: 800, fontSize: '0.95rem', letterSpacing: 0.04, color: 'rgba(255,255,255,0.92)' }}>
+        <Typography
+          sx={{
+            fontWeight: 800,
+            fontSize: 'clamp(0.85rem, 0.76rem + 0.4vw, 0.95rem)',
+            letterSpacing: 0.04,
+            color: 'rgba(255,255,255,0.92)',
+          }}
+        >
           {title}
         </Typography>
         <Typography variant="body2" sx={{ ...DATA_STATE_HELP_TEXT_SX }}>

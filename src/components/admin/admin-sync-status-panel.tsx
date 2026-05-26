@@ -147,12 +147,19 @@ export function AdminSyncStatusPanel({ motionIndex = 2 }: { motionIndex?: number
   }, []);
 
   return (
-    <Paper sx={{ ...GLASS_PANEL_COMPACT_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(motionIndex) }}>
+    <Paper
+      sx={{
+        ...GLASS_PANEL_COMPACT_SX,
+        ...brandAccentBorderSx(),
+        ...glassCardMotionSx(motionIndex),
+      }}
+    >
       <Stack
         direction={{ xs: 'column', sm: 'row' }}
         justifyContent="space-between"
-        alignItems={{ xs: 'flex-start', sm: 'center' }}
+        alignItems={{ xs: 'center', sm: 'center' }}
         spacing={1}
+        sx={{ textAlign: { xs: 'center', sm: 'left' } }}
       >
         <Box>
           <Typography variant="h6" sx={{ fontWeight: 800 }}>

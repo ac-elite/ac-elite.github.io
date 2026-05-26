@@ -125,7 +125,13 @@ function useAnimatedCount(target: number | undefined, run: boolean) {
  * Site visit stats card (admin). Uses the same title + body2 header pattern as other admin Papers.
  * Do not add `glassCardMotionSx` on this `Paper` — merge with the rim animation can break dev `String()` on this chunk.
  */
-export function SiteVisitsShowcase({ phase, count, configured, pageRows, onRefresh }: SiteVisitsShowcaseProps) {
+export function SiteVisitsShowcase({
+  phase,
+  count,
+  configured,
+  pageRows,
+  onRefresh,
+}: SiteVisitsShowcaseProps) {
   const [showPageBreakdown, setShowPageBreakdown] = useState(false);
   const safeCount =
     typeof count === 'number' && Number.isFinite(count)
@@ -153,15 +159,20 @@ export function SiteVisitsShowcase({ phase, count, configured, pageRows, onRefre
         <Stack
           direction={{ xs: 'column', sm: 'row' }}
           justifyContent="space-between"
-          alignItems={{ xs: 'flex-start', sm: 'center' }}
+          alignItems={{ xs: 'center', sm: 'center' }}
           spacing={1}
+          sx={{ textAlign: { xs: 'center', sm: 'left' } }}
         >
           <Box sx={{ flex: 1, minWidth: 0, pr: { sm: 1 } }}>
             <Typography variant="h6" sx={{ fontWeight: 800 }}>
               Public site visits (sessions)
             </Typography>
-            <Typography variant="caption" sx={{ color: 'text.secondary', lineHeight: 1.45, display: 'block', mt: 0.25 }}>
-              Top number uses the {SITE_VISIT_COUNT_GAP_MINUTES}-minute session rule. The breakdown below shows page opens.
+            <Typography
+              variant="caption"
+              sx={{ color: 'text.secondary', lineHeight: 1.45, display: 'block', mt: 0.25 }}
+            >
+              Top number uses the {SITE_VISIT_COUNT_GAP_MINUTES}-minute session rule. The breakdown
+              below shows page opens.
             </Typography>
           </Box>
           {configured && (
@@ -172,7 +183,7 @@ export function SiteVisitsShowcase({ phase, count, configured, pageRows, onRefre
               onClick={onRefresh}
               sx={{
                 flexShrink: 0,
-                alignSelf: { xs: 'flex-start', sm: 'auto' },
+                alignSelf: { xs: 'center', sm: 'auto' },
                 mt: { xs: 0.5, sm: 0 },
                 ...ACTION_OUTLINED_SMALL_DENSE_SX,
                 borderColor: alpha(VISIT_ACCENT, 0.55),
@@ -192,14 +203,28 @@ export function SiteVisitsShowcase({ phase, count, configured, pageRows, onRefre
           {phase === 'off' && (
             <Stack spacing={1} sx={{ maxWidth: 680 }}>
               <Typography variant="body2" sx={{ ...DATA_STATE_HELP_TEXT_SX, lineHeight: 1.55 }}>
-                Visitor counting is not set up on this copy of the site. <strong>Moderators:</strong> you do not need
-                to change anything here. <strong>If you need this on the live site,</strong> ask a tech lead — they turn
-                it on once (build settings + a small database step).
+                Visitor counting is not set up on this copy of the site.{' '}
+                <strong>Moderators:</strong> you do not need to change anything here.{' '}
+                <strong>If you need this on the live site,</strong> ask a tech lead — they turn it
+                on once (build settings + a small database step).
               </Typography>
-              <Typography variant="caption" sx={{ color: 'text.secondary', lineHeight: 1.55, display: 'block' }}>
-                Tech reference: set <Box component="span" sx={{ fontFamily: 'monospace', color: 'text.primary' }}>VITE_SUPABASE_URL</Box> and{' '}
-                <Box component="span" sx={{ fontFamily: 'monospace', color: 'text.primary' }}>VITE_SUPABASE_ANON_KEY</Box>, then run{' '}
-                <Box component="span" sx={{ fontFamily: 'monospace', color: 'text.primary' }}>scripts/supabase-site-stats.sql</Box> in the Supabase SQL editor.
+              <Typography
+                variant="caption"
+                sx={{ color: 'text.secondary', lineHeight: 1.55, display: 'block' }}
+              >
+                Tech reference: set{' '}
+                <Box component="span" sx={{ fontFamily: 'monospace', color: 'text.primary' }}>
+                  VITE_SUPABASE_URL
+                </Box>{' '}
+                and{' '}
+                <Box component="span" sx={{ fontFamily: 'monospace', color: 'text.primary' }}>
+                  VITE_SUPABASE_ANON_KEY
+                </Box>
+                , then run{' '}
+                <Box component="span" sx={{ fontFamily: 'monospace', color: 'text.primary' }}>
+                  scripts/supabase-site-stats.sql
+                </Box>{' '}
+                in the Supabase SQL editor.
               </Typography>
             </Stack>
           )}
@@ -211,9 +236,13 @@ export function SiteVisitsShowcase({ phase, count, configured, pageRows, onRefre
           )}
 
           {phase === 'error' && (
-            <Typography variant="body2" sx={{ color: 'error.light', lineHeight: 1.55, maxWidth: 640 }}>
-              We could not load the visitor count. This is usually a connection or database setup issue —{' '}
-              <strong>ask a tech lead</strong>, not something you fix with the admin password.
+            <Typography
+              variant="body2"
+              sx={{ color: 'error.light', lineHeight: 1.55, maxWidth: 640 }}
+            >
+              We could not load the visitor count. This is usually a connection or database setup
+              issue — <strong>ask a tech lead</strong>, not something you fix with the admin
+              password.
             </Typography>
           )}
 
@@ -241,125 +270,162 @@ export function SiteVisitsShowcase({ phase, count, configured, pageRows, onRefre
                   {fmt(animated)}
                 </Typography>
                 {phase === 'loading' && (
-                  <Typography variant="caption" sx={{ ...PANEL_OVERLINE_MUTED_SX, fontWeight: 600 }}>
+                  <Typography
+                    variant="caption"
+                    sx={{ ...PANEL_OVERLINE_MUTED_SX, fontWeight: 600 }}
+                  >
                     Updating numbers…
                   </Typography>
                 )}
               </Stack>
-              {(phase === 'ready' || (phase === 'loading' && showCount)) && safeCount !== undefined && (
-                <Stack spacing={2}>
-                  <Typography variant="body2" sx={{ color: 'text.secondary', lineHeight: 1.55 }}>
-                    {blurbForCount(safeCount)}
-                  </Typography>
-                  {milestone && (
-                    <Stack spacing={1}>
-                      <Stack direction="row" justifyContent="space-between" alignItems="baseline">
-                        <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700 }}>
-                          Next fun target
-                        </Typography>
-                        <Typography variant="caption" sx={{ color: VISIT_ACCENT_2, fontWeight: 800 }}>
-                          {fmt(milestone.next)}
-                        </Typography>
-                      </Stack>
-                      <LinearProgress
-                        variant="determinate"
-                        value={Number.isFinite(milestone.progress) ? milestone.progress : 0}
-                        sx={{
-                          height: 8,
-                          borderRadius: 99,
-                          bgcolor: 'rgba(255,255,255,0.08)',
-                          '& .MuiLinearProgress-bar': {
-                            borderRadius: 99,
-                            background: `linear-gradient(90deg, ${alpha(VISIT_ACCENT, 0.95)}, ${VISIT_ACCENT_2})`,
-                          },
-                        }}
-                      />
-                    </Stack>
-                  )}
-                  {pageRows !== undefined && (
-                    <Stack spacing={1}>
-                      <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={1}>
-                        <Typography variant="subtitle2" sx={{ fontWeight: 800 }}>
-                          Page opens by route
-                        </Typography>
-                        <Button
-                          size="small"
-                          variant="text"
-                          onClick={() => setShowPageBreakdown((prev) => !prev)}
-                          sx={{
-                            minWidth: 0,
-                            px: 1,
-                            color: 'text.secondary',
-                            textTransform: 'none',
-                            fontWeight: 700,
-                          }}
-                        >
-                          {showPageBreakdown ? 'Hide' : 'Show'}
-                        </Button>
-                      </Stack>
-                      {showPageBreakdown &&
-                        (pageRows.length === 0 ? (
-                          <Typography variant="body2" sx={{ color: 'text.secondary', lineHeight: 1.55 }}>
-                            No breakdown by page yet. <strong>Moderators:</strong> you can ignore this — the big number
-                            above may still be correct. <strong>Tech team:</strong> run the latest{' '}
-                            <Box component="span" sx={{ fontFamily: 'ui-monospace, monospace', color: 'text.primary' }}>
-                              scripts/supabase-site-stats.sql
-                            </Box>{' '}
-                            in Supabase if you expect a list here.
+              {(phase === 'ready' || (phase === 'loading' && showCount)) &&
+                safeCount !== undefined && (
+                  <Stack spacing={2}>
+                    <Typography variant="body2" sx={{ color: 'text.secondary', lineHeight: 1.55 }}>
+                      {blurbForCount(safeCount)}
+                    </Typography>
+                    {milestone && (
+                      <Stack spacing={1}>
+                        <Stack direction="row" justifyContent="space-between" alignItems="baseline">
+                          <Typography
+                            variant="caption"
+                            sx={{ color: 'text.secondary', fontWeight: 700 }}
+                          >
+                            Next fun target
                           </Typography>
-                        ) : (
-                          <TableContainer
+                          <Typography
+                            variant="caption"
+                            sx={{ color: VISIT_ACCENT_2, fontWeight: 800 }}
+                          >
+                            {fmt(milestone.next)}
+                          </Typography>
+                        </Stack>
+                        <LinearProgress
+                          variant="determinate"
+                          value={Number.isFinite(milestone.progress) ? milestone.progress : 0}
+                          sx={{
+                            height: 8,
+                            borderRadius: 99,
+                            bgcolor: 'rgba(255,255,255,0.08)',
+                            '& .MuiLinearProgress-bar': {
+                              borderRadius: 99,
+                              background: `linear-gradient(90deg, ${alpha(VISIT_ACCENT, 0.95)}, ${VISIT_ACCENT_2})`,
+                            },
+                          }}
+                        />
+                      </Stack>
+                    )}
+                    {pageRows !== undefined && (
+                      <Stack spacing={1}>
+                        <Stack
+                          direction="row"
+                          alignItems="center"
+                          justifyContent="space-between"
+                          spacing={1}
+                        >
+                          <Typography variant="subtitle2" sx={{ fontWeight: 800 }}>
+                            Page opens by route
+                          </Typography>
+                          <Button
+                            size="small"
+                            variant="text"
+                            onClick={() => setShowPageBreakdown((prev) => !prev)}
                             sx={{
-                              maxHeight: 280,
-                              borderRadius: 1,
-                              border: '1px solid rgba(148,163,184,0.14)',
-                              bgcolor: 'rgba(15,23,42,0.35)',
+                              minWidth: 0,
+                              px: 1,
+                              color: 'text.secondary',
+                              textTransform: 'none',
+                              fontWeight: 700,
                             }}
                           >
-                            <Table size="small" stickyHeader>
-                              <TableHead>
-                                <TableRow>
-                                  <TableCell sx={{ fontWeight: 800, bgcolor: 'rgba(15,23,42,0.92)' }}>Site area</TableCell>
-                                  <TableCell align="right" sx={{ fontWeight: 800, width: 120, bgcolor: 'rgba(15,23,42,0.92)' }}>
-                                    Opens
-                                  </TableCell>
-                                </TableRow>
-                              </TableHead>
-                              <TableBody>
-                                {pageRows.map((row) => (
-                                  <TableRow key={row.path} hover>
+                            {showPageBreakdown ? 'Hide' : 'Show'}
+                          </Button>
+                        </Stack>
+                        {showPageBreakdown &&
+                          (pageRows.length === 0 ? (
+                            <Typography
+                              variant="body2"
+                              sx={{ color: 'text.secondary', lineHeight: 1.55 }}
+                            >
+                              No breakdown by page yet. <strong>Moderators:</strong> you can ignore
+                              this — the big number above may still be correct.{' '}
+                              <strong>Tech team:</strong> run the latest{' '}
+                              <Box
+                                component="span"
+                                sx={{
+                                  fontFamily: 'ui-monospace, monospace',
+                                  color: 'text.primary',
+                                }}
+                              >
+                                scripts/supabase-site-stats.sql
+                              </Box>{' '}
+                              in Supabase if you expect a list here.
+                            </Typography>
+                          ) : (
+                            <TableContainer
+                              sx={{
+                                maxHeight: 280,
+                                borderRadius: 1,
+                                border: '1px solid rgba(148,163,184,0.14)',
+                                bgcolor: 'rgba(15,23,42,0.35)',
+                              }}
+                            >
+                              <Table size="small" stickyHeader>
+                                <TableHead>
+                                  <TableRow>
                                     <TableCell
-                                      sx={{
-                                        fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
-                                        fontSize: '0.78rem',
-                                        color: 'rgba(248,250,252,0.92)',
-                                        borderColor: 'rgba(148,163,184,0.12)',
-                                        wordBreak: 'break-all',
-                                      }}
+                                      sx={{ fontWeight: 800, bgcolor: 'rgba(15,23,42,0.92)' }}
                                     >
-                                      {row.path}
+                                      Site area
                                     </TableCell>
                                     <TableCell
                                       align="right"
                                       sx={{
-                                        fontVariantNumeric: 'tabular-nums',
                                         fontWeight: 800,
-                                        color: 'rgba(248,250,252,0.95)',
-                                        borderColor: 'rgba(148,163,184,0.12)',
+                                        width: 120,
+                                        bgcolor: 'rgba(15,23,42,0.92)',
                                       }}
                                     >
-                                      {fmt(row.visit_count)}
+                                      Opens
                                     </TableCell>
                                   </TableRow>
-                                ))}
-                              </TableBody>
-                            </Table>
-                          </TableContainer>
-                        ))}
-                    </Stack>
-                  )}
-                </Stack>
-              )}
+                                </TableHead>
+                                <TableBody>
+                                  {pageRows.map((row) => (
+                                    <TableRow key={row.path} hover>
+                                      <TableCell
+                                        sx={{
+                                          fontFamily:
+                                            'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
+                                          fontSize: '0.78rem',
+                                          color: 'rgba(248,250,252,0.92)',
+                                          borderColor: 'rgba(148,163,184,0.12)',
+                                          wordBreak: 'break-all',
+                                        }}
+                                      >
+                                        {row.path}
+                                      </TableCell>
+                                      <TableCell
+                                        align="right"
+                                        sx={{
+                                          fontVariantNumeric: 'tabular-nums',
+                                          fontWeight: 800,
+                                          color: 'rgba(248,250,252,0.95)',
+                                          borderColor: 'rgba(148,163,184,0.12)',
+                                        }}
+                                      >
+                                        {fmt(row.visit_count)}
+                                      </TableCell>
+                                    </TableRow>
+                                  ))}
+                                </TableBody>
+                              </Table>
+                            </TableContainer>
+                          ))}
+                      </Stack>
+                    )}
+                  </Stack>
+                )}
             </Stack>
           )}
         </Stack>

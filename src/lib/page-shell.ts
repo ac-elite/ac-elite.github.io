@@ -62,12 +62,14 @@ export const PANEL_OVERLINE_MUTED_SX: SxProps<Theme> = {
 
 /** Large marketing CTAs (home hero row). Merge `animation` in the page when needed. */
 export const MARKETING_CTA_LARGE_LAYOUT_SX: SxProps<Theme> = {
-  px: 3.5,
+  px: { xs: 'clamp(18px, 5vw, 28px)', md: 3.5 },
   borderRadius: 1.4,
-  minHeight: { xs: 46, sm: 48 },
+  minHeight: { xs: 'clamp(40px, 11vw, 46px)', sm: 48 },
   width: { xs: '100%', sm: 'auto' },
-  maxWidth: { xs: 320, sm: 'none' },
+  maxWidth: { xs: 'clamp(260px, 82vw, 320px)', sm: 'none' },
   fontWeight: 800,
+  fontSize: { xs: 'clamp(0.8125rem, 0.72rem + 0.42vw, 0.9375rem)', md: '0.875rem' },
+  lineHeight: 1.2,
 };
 
 /**
@@ -76,8 +78,7 @@ export const MARKETING_CTA_LARGE_LAYOUT_SX: SxProps<Theme> = {
  * `MARKETING_CTA_LARGE_LAYOUT_SX` for the home hero buttons.
  */
 export const MARKETING_CTA_PRIMARY_GLASS_SX = {
-  background:
-    'linear-gradient(180deg, rgba(96,150,236,0.52) 0%, rgba(48,98,196,0.48) 100%)',
+  background: 'linear-gradient(180deg, rgba(96,150,236,0.52) 0%, rgba(48,98,196,0.48) 100%)',
   backdropFilter: 'blur(22px) saturate(185%)',
   WebkitBackdropFilter: 'blur(22px) saturate(185%)',
   border: '1px solid rgba(219,234,254,0.22)',
@@ -110,8 +111,7 @@ export const MARKETING_CTA_PRIMARY_GLASS_SX = {
  * primary above without competing for attention.
  */
 export const MARKETING_CTA_SECONDARY_GLASS_SX = {
-  background:
-    'linear-gradient(180deg, rgba(43,59,92,0.48) 0%, rgba(20,30,54,0.58) 100%)',
+  background: 'linear-gradient(180deg, rgba(43,59,92,0.48) 0%, rgba(20,30,54,0.58) 100%)',
   backdropFilter: 'blur(24px) saturate(180%)',
   WebkitBackdropFilter: 'blur(24px) saturate(180%)',
   border: '1px solid rgba(226,232,240,0.18)',
@@ -146,14 +146,14 @@ export const LINK_PRIMARY_CONTAINED_LARGE_SX: SxProps<Theme> = {
 /** Full-width primary block linking to a data page (home driver search rail). */
 export const DATA_PAGE_CALLOUT_PRIMARY_SX: SxProps<Theme> = {
   fontWeight: 800,
-  minHeight: 50,
+  minHeight: 'clamp(42px, 10vw, 50px)',
   borderRadius: 1.4,
 };
 
 /** Small primary contained (preview unlock, compact actions). */
 export const ACTION_CONTAINED_PRIMARY_SMALL_SX: SxProps<Theme> = {
   fontWeight: 800,
-  minHeight: 40,
+  minHeight: 'clamp(34px, 9vw, 40px)',
 };
 
 /** Small primary `contained` without forced min-height (inline nav actions). */
@@ -216,7 +216,7 @@ export const OUTLINED_GLASS_WHITE_SX: SxProps<Theme> = {
 
 /** Discord / info strip outlined button (update bar). */
 export const OUTLINED_INFO_STRIP_SX: SxProps<Theme> = {
-  minHeight: 30,
+  minHeight: 'clamp(26px, 7vw, 30px)',
   mt: 0.5,
   px: 1.25,
   fontWeight: 700,
@@ -234,8 +234,8 @@ export const OUTLINED_INFO_STRIP_SX: SxProps<Theme> = {
 export const OUTLINED_MENU_TRIGGER_SMALL_SX: SxProps<Theme> = {
   fontWeight: 700,
   minWidth: 0,
-  px: 1.5,
-  py: 0.75,
+  px: { xs: 1.1, sm: 1.5 },
+  py: { xs: 0.55, sm: 0.75 },
   borderRadius: 1.25,
   borderColor: 'rgba(226,242,255,0.24)',
 };

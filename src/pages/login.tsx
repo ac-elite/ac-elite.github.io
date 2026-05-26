@@ -79,7 +79,15 @@ export default function Page() {
       <title>{`Sign in - ${CONFIG.appName}`}</title>
       <meta name="robots" content="noindex, nofollow" />
 
-      <Box sx={{ ...DATA_PAGE_SHELL_SX, minHeight: '100vh', display: 'flex', alignItems: 'center', py: 6 }}>
+      <Box
+        sx={{
+          ...DATA_PAGE_SHELL_SX,
+          minHeight: '100vh',
+          display: 'flex',
+          alignItems: 'center',
+          py: 6,
+        }}
+      >
         <PageGridOverlay opacity={0.3} />
 
         <Container maxWidth="xs" sx={{ position: 'relative', zIndex: 1 }}>
@@ -104,7 +112,10 @@ export default function Page() {
                   <Typography component="h1" variant="h4" sx={{ fontWeight: 800, mt: 0.5 }}>
                     Welcome back
                   </Typography>
-                  <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.75, maxWidth: 320 }}>
+                  <Typography
+                    variant="body2"
+                    sx={{ color: 'text.secondary', mt: 0.75, maxWidth: 320 }}
+                  >
                     Sign in to your AC Elite account to continue. Driver accounts are coming soon.
                   </Typography>
                 </Box>
@@ -124,14 +135,23 @@ export default function Page() {
             >
               <Stack spacing={2}>
                 {!auth.configured && (
-                  <Alert severity="error" variant="outlined" icon={<Icon icon="solar:danger-triangle-bold" />}>
+                  <Alert
+                    severity="error"
+                    variant="outlined"
+                    icon={<Icon icon="solar:danger-triangle-bold" />}
+                  >
                     Authentication is not configured. Set <code>VITE_SUPABASE_URL</code> and{' '}
-                    <code>VITE_SUPABASE_ANON_KEY</code> in your <code>.env</code> and restart the dev server.
+                    <code>VITE_SUPABASE_ANON_KEY</code> in your <code>.env</code> and restart the
+                    dev server.
                   </Alert>
                 )}
 
                 {error && (
-                  <Alert severity="error" variant="outlined" icon={<Icon icon="solar:close-circle-bold" />}>
+                  <Alert
+                    severity="error"
+                    variant="outlined"
+                    icon={<Icon icon="solar:close-circle-bold" />}
+                  >
                     {error}
                   </Alert>
                 )}
@@ -168,7 +188,11 @@ export default function Page() {
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                        <Icon icon="solar:lock-password-bold" width={18} style={{ color: '#bfdbfe' }} />
+                        <Icon
+                          icon="solar:lock-password-bold"
+                          width={18}
+                          style={{ color: '#bfdbfe' }}
+                        />
                       </InputAdornment>
                     ),
                     endAdornment: (
@@ -189,7 +213,10 @@ export default function Page() {
                             '&:hover': { color: '#bfdbfe', bgcolor: 'rgba(148,163,184,0.12)' },
                           }}
                         >
-                          <Icon icon={showPassword ? 'solar:eye-closed-linear' : 'solar:eye-linear'} width={18} />
+                          <Icon
+                            icon={showPassword ? 'solar:eye-closed-linear' : 'solar:eye-linear'}
+                            width={18}
+                          />
                         </Box>
                       </InputAdornment>
                     ),
@@ -202,13 +229,11 @@ export default function Page() {
                   color="primary"
                   size="large"
                   disabled={!auth.configured || submitting || !username || !password}
-                  startIcon={
-                    !submitting ? <Icon icon="solar:login-3-bold" width={20} /> : null
-                  }
+                  startIcon={!submitting ? <Icon icon="solar:login-3-bold" width={20} /> : null}
                   sx={{
                     ...ACTION_CONTAINED_PRIMARY_SMALL_SX,
-                    minHeight: 44,
-                    fontSize: '0.95rem',
+                    minHeight: 'clamp(38px, 10vw, 44px)',
+                    fontSize: 'clamp(0.85rem, 0.76rem + 0.4vw, 0.95rem)',
                   }}
                 >
                   {submitting ? 'Signing in…' : 'Sign in'}
@@ -221,7 +246,11 @@ export default function Page() {
                   justifyContent="center"
                   sx={{ pt: 0.5 }}
                 >
-                  <Icon icon="solar:shield-check-bold" width={14} style={{ color: 'rgba(148,163,184,0.7)' }} />
+                  <Icon
+                    icon="solar:shield-check-bold"
+                    width={14}
+                    style={{ color: 'rgba(148,163,184,0.7)' }}
+                  />
                   <Typography variant="caption" sx={{ color: 'text.secondary' }}>
                     Your session stays private to this browser
                   </Typography>

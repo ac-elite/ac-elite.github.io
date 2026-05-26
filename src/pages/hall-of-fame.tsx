@@ -29,7 +29,12 @@ import {
 } from 'src/lib/glass';
 import { getSyncHealth, type SiteMetadata, getEffectiveLastSync } from 'src/lib/sync-utils';
 import { subtleEnterUpSx, glassCardMotionSx, softFloatWrapperSx } from 'src/lib/subtle-motion';
-import { BRAND_ACCENT, roleAccentBorderSx, brandAccentBorderSx, statusAccentSplitRimSx } from 'src/lib/status-accent';
+import {
+  BRAND_ACCENT,
+  roleAccentBorderSx,
+  brandAccentBorderSx,
+  statusAccentSplitRimSx,
+} from 'src/lib/status-accent';
 import {
   CAR,
   type CarLap,
@@ -133,11 +138,14 @@ function LeaderboardChartSection({ driverView }: { driverView: FameRow[] }) {
           direction={{ xs: 'column', sm: 'row' }}
           spacing={1.5}
           justifyContent="space-between"
-          alignItems={{ xs: 'flex-start', sm: 'center' }}
-          sx={{ mb: 1.5 }}
+          alignItems={{ xs: 'center', sm: 'center' }}
+          sx={{ mb: 1.5, textAlign: { xs: 'center', sm: 'left' } }}
         >
           <Box>
-            <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.78)', fontWeight: 700 }}>
+            <Typography
+              variant="overline"
+              sx={{ color: 'rgba(255,255,255,0.78)', fontWeight: 700 }}
+            >
               Leaderboards
             </Typography>
             <Typography variant="h6" sx={{ fontWeight: 800, mt: 0.3 }}>
@@ -152,7 +160,7 @@ function LeaderboardChartSection({ driverView }: { driverView: FameRow[] }) {
               if (v) setMetricKey(v as LeaderboardMetricKey);
             }}
             aria-label="Leaderboard metric"
-            sx={{ flexWrap: 'wrap' }}
+            sx={{ flexWrap: 'wrap', justifyContent: 'center' }}
           >
             {LEADERBOARD_METRICS.map((m) => (
               <ToggleButton key={m.key} value={m.key}>
@@ -173,7 +181,11 @@ function LeaderboardChartSection({ driverView }: { driverView: FameRow[] }) {
             legend: { show: false },
             chart: {
               events: {
-                dataPointSelection: (_e: unknown, _ctx: unknown, opts: { dataPointIndex: number }) => {
+                dataPointSelection: (
+                  _e: unknown,
+                  _ctx: unknown,
+                  opts: { dataPointIndex: number }
+                ) => {
                   const guid = guids[opts.dataPointIndex];
                   if (guid) window.location.href = getDriverProfileHref(guid);
                 },
@@ -193,14 +205,21 @@ function LeaderboardChartSection({ driverView }: { driverView: FameRow[] }) {
               textAnchor: 'start',
               offsetX: 4,
               formatter: (v: number) => formatNumber(Number(v)),
-              style: { colors: ['rgba(255,255,255,0.92)'], fontWeight: 700, fontSize: '12px' },
+              style: {
+                colors: ['rgba(255,255,255,0.92)'],
+                fontWeight: 700,
+                fontSize: 'clamp(10px, 2.7vw, 12px)',
+              },
             },
             xaxis: { categories, labels: { show: false } },
             grid: { xaxis: { lines: { show: true } }, yaxis: { lines: { show: false } } },
             tooltip: { y: { formatter: (v: number) => `${formatNumber(v)} ${metric.unit}` } },
           }}
         />
-        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)', display: 'block', mt: 0.5 }}>
+        <Typography
+          variant="caption"
+          sx={{ color: 'rgba(255,255,255,0.5)', display: 'block', mt: 0.5 }}
+        >
           Tap a bar to open the driver profile.
         </Typography>
       </Paper>
@@ -275,7 +294,11 @@ function CategoryCard({
                     }}
                   />
 
-                  <Typography variant="subtitle2" sx={{ fontWeight: 700, textAlign: { xs: 'center', md: 'left' } }} noWrap>
+                  <Typography
+                    variant="subtitle2"
+                    sx={{ fontWeight: 700, textAlign: { xs: 'center', md: 'left' } }}
+                    noWrap
+                  >
                     {entry.name}
                   </Typography>
 
@@ -291,7 +314,10 @@ function CategoryCard({
                     <Chip
                       size="small"
                       label={entry.license}
-                      onClick={(e) => { e.stopPropagation(); openGuide('license'); }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        openGuide('license');
+                      }}
                       sx={{
                         minWidth: LICENSE_CHIP_WIDTH,
                         justifyContent: 'center',
@@ -303,7 +329,10 @@ function CategoryCard({
                     <Chip
                       size="small"
                       label={entry.srTier}
-                      onClick={(e) => { e.stopPropagation(); openGuide('safety'); }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        openGuide('safety');
+                      }}
                       sx={{
                         minWidth: SR_CHIP_WIDTH,
                         justifyContent: 'center',
@@ -380,17 +409,19 @@ function TeamRoleColumn({
 
   return (
     <Paper
-      sx={[
-        GLASS_PANEL_SX,
-        roleAccentBorderSx(accent),
-        statusAccentSplitRimSx(accent),
-        getTintedGlassPanelSx(accent),
-        glassCardMotionSx(enterIndex),
-        {
-          height: '100%',
-          textAlign: { xs: 'center', md: 'left' },
-        },
-      ] as SxProps<Theme>}
+      sx={
+        [
+          GLASS_PANEL_SX,
+          roleAccentBorderSx(accent),
+          statusAccentSplitRimSx(accent),
+          getTintedGlassPanelSx(accent),
+          glassCardMotionSx(enterIndex),
+          {
+            height: '100%',
+            textAlign: { xs: 'center', md: 'left' },
+          },
+        ] as SxProps<Theme>
+      }
     >
       <Typography variant="h6" sx={{ fontWeight: 800, mb: 1.25 }}>
         {title}
@@ -408,21 +439,34 @@ function TeamRoleColumn({
             onClick={() => {
               window.location.href = getDriverProfileHref(member.guid);
             }}
-            sx={[
-              GLASS_INNER_ROW_SX,
-              getTintedGlassInnerRowSx(accent),
-              subtleEnterUpSx(mi, { baseDelayMs: 380 }),
-              { cursor: 'pointer' },
-            ] as SxProps<Theme>}
+            sx={
+              [
+                GLASS_INNER_ROW_SX,
+                getTintedGlassInnerRowSx(accent),
+                subtleEnterUpSx(mi, { baseDelayMs: 380 }),
+                { cursor: 'pointer' },
+              ] as SxProps<Theme>
+            }
           >
-            <Typography variant="subtitle2" sx={{ fontWeight: 700, textAlign: { xs: 'center', md: 'left' } }}>
+            <Typography
+              variant="subtitle2"
+              sx={{ fontWeight: 700, textAlign: { xs: 'center', md: 'left' } }}
+            >
               {member.name}
             </Typography>
-            <Stack direction="row" spacing={1} justifyContent={{ xs: 'center', md: 'flex-start' }} sx={{ mt: 0.6 }}>
+            <Stack
+              direction="row"
+              spacing={1}
+              justifyContent={{ xs: 'center', md: 'flex-start' }}
+              sx={{ mt: 0.6 }}
+            >
               <Chip
                 size="small"
                 label={member.license}
-                onClick={(e) => { e.stopPropagation(); openGuide('license'); }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  openGuide('license');
+                }}
                 sx={{
                   minWidth: LICENSE_CHIP_WIDTH,
                   justifyContent: 'center',
@@ -434,7 +478,10 @@ function TeamRoleColumn({
               <Chip
                 size="small"
                 label={member.srTier}
-                onClick={(e) => { e.stopPropagation(); openGuide('safety'); }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  openGuide('safety');
+                }}
                 sx={{
                   minWidth: SR_CHIP_WIDTH,
                   justifyContent: 'center',
@@ -548,12 +595,12 @@ export default function Page() {
           .sort((a, b) => b.kilometers - a.kilometers)
           .slice(0, 3)
           .map((d) => ({
-          guid: d.guid,
-          name: d.name,
-          value: `${formatNumber(Math.round(d.kilometers))} km`,
-          secondary: `${formatNumber(d.laps)} laps`,
-          license: d.license,
-          srTier: d.srTier,
+            guid: d.guid,
+            name: d.name,
+            value: `${formatNumber(Math.round(d.kilometers))} km`,
+            secondary: `${formatNumber(d.laps)} laps`,
+            license: d.license,
+            srTier: d.srTier,
           })),
       },
       {
@@ -579,12 +626,12 @@ export default function Page() {
           .sort((a, b) => b.wins - a.wins)
           .slice(0, 3)
           .map((d) => ({
-          guid: d.guid,
-          name: d.name,
-          value: `${formatNumber(d.wins)} wins`,
-          secondary: `${formatNumber(d.podiums)} podiums`,
-          license: d.license,
-          srTier: d.srTier,
+            guid: d.guid,
+            name: d.name,
+            value: `${formatNumber(d.wins)} wins`,
+            secondary: `${formatNumber(d.podiums)} podiums`,
+            license: d.license,
+            srTier: d.srTier,
           })),
       },
       {
@@ -594,12 +641,12 @@ export default function Page() {
           .sort((a, b) => b.podiums - a.podiums)
           .slice(0, 3)
           .map((d) => ({
-          guid: d.guid,
-          name: d.name,
-          value: `${formatNumber(d.podiums)} podiums`,
-          secondary: `${formatNumber(d.wins)} wins`,
-          license: d.license,
-          srTier: d.srTier,
+            guid: d.guid,
+            name: d.name,
+            value: `${formatNumber(d.podiums)} podiums`,
+            secondary: `${formatNumber(d.wins)} wins`,
+            license: d.license,
+            srTier: d.srTier,
           })),
       },
       {
@@ -609,12 +656,12 @@ export default function Page() {
           .sort((a, b) => b.poles - a.poles)
           .slice(0, 3)
           .map((d) => ({
-          guid: d.guid,
-          name: d.name,
-          value: `${formatNumber(d.poles)} poles`,
-          secondary: `${formatNumber(d.flaps)} fastest laps`,
-          license: d.license,
-          srTier: d.srTier,
+            guid: d.guid,
+            name: d.name,
+            value: `${formatNumber(d.poles)} poles`,
+            secondary: `${formatNumber(d.flaps)} fastest laps`,
+            license: d.license,
+            srTier: d.srTier,
           })),
       },
       {
@@ -624,12 +671,12 @@ export default function Page() {
           .sort((a, b) => b.flaps - a.flaps)
           .slice(0, 3)
           .map((d) => ({
-          guid: d.guid,
-          name: d.name,
-          value: `${formatNumber(d.flaps)} fastest laps`,
-          secondary: `${formatNumber(d.wins)} wins`,
-          license: d.license,
-          srTier: d.srTier,
+            guid: d.guid,
+            name: d.name,
+            value: `${formatNumber(d.flaps)} fastest laps`,
+            secondary: `${formatNumber(d.wins)} wins`,
+            license: d.license,
+            srTier: d.srTier,
           })),
       },
     ],
@@ -646,16 +693,25 @@ export default function Page() {
     [teamRoles.admin, teamRoles.creator]
   );
   const teamModerators = useMemo(
-    () => teamRoles.moderator.filter((guid) => !teamRoles.creator.includes(guid) && !teamRoles.admin.includes(guid)),
+    () =>
+      teamRoles.moderator.filter(
+        (guid) => !teamRoles.creator.includes(guid) && !teamRoles.admin.includes(guid)
+      ),
     [teamRoles.moderator, teamRoles.creator, teamRoles.admin]
   );
 
   return (
     <>
       <title>{`Hall of Fame - ${CONFIG.appName}`}</title>
-      <meta name="description" content="AC Elite Hall of Fame with standout drivers and team members." />
+      <meta
+        name="description"
+        content="AC Elite Hall of Fame with standout drivers and team members."
+      />
       <meta property="og:title" content="Hall of Fame - AC Elite" />
-      <meta property="og:description" content="AC Elite Hall of Fame with standout drivers and team members." />
+      <meta
+        property="og:description"
+        content="AC Elite Hall of Fame with standout drivers and team members."
+      />
       <meta property="og:url" content={getSiteUrl(APP_ROUTES.hallOfFame)} />
 
       <Box sx={{ ...DATA_PAGE_SHELL_SX }}>
@@ -676,11 +732,18 @@ export default function Page() {
             </DataPageHeader>
 
             {loading && (
-              <LoadingPanel title="Loading Hall of Fame…" message="Loading drivers, spotlight stats, and team roster matches.">
+              <LoadingPanel
+                title="Loading Hall of Fame…"
+                message="Loading drivers, spotlight stats, and team roster matches."
+              >
                 <Grid container spacing={2.5}>
                   {Array.from({ length: 6 }).map((_, i) => (
                     <Grid key={i} size={{ xs: 12, md: 6 }}>
-                      <Skeleton variant="rounded" height={220} sx={{ borderRadius: 2, bgcolor: 'rgba(255,255,255,0.06)' }} />
+                      <Skeleton
+                        variant="rounded"
+                        height={220}
+                        sx={{ borderRadius: 2, bgcolor: 'rgba(255,255,255,0.06)' }}
+                      />
                     </Grid>
                   ))}
                 </Grid>
@@ -701,11 +764,11 @@ export default function Page() {
                     }}
                   >
                     <Stack spacing={1.5}>
-                      <Stack
-                        spacing={0.5}
-                        sx={{ alignItems: { xs: 'center', md: 'flex-start' } }}
-                      >
-                        <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.78)', fontWeight: 700 }}>
+                      <Stack spacing={0.5} sx={{ alignItems: { xs: 'center', md: 'flex-start' } }}>
+                        <Typography
+                          variant="overline"
+                          sx={{ color: 'rgba(255,255,255,0.78)', fontWeight: 700 }}
+                        >
                           Community achievements
                         </Typography>
                         <Typography component="h2" variant="h5" sx={{ fontWeight: 800 }}>
@@ -722,7 +785,12 @@ export default function Page() {
                           { label: 'Fastest Laps', value: formatNumber(communityTotals.flaps) },
                         ].map((tile, i) => (
                           <Grid key={tile.label} size={{ xs: 6, sm: 4, md: 2 }}>
-                            <StatTile label={tile.label} value={tile.value} motionIndex={i + 1} nested />
+                            <StatTile
+                              label={tile.label}
+                              value={tile.value}
+                              motionIndex={i + 1}
+                              nested
+                            />
                           </Grid>
                         ))}
                       </Grid>
@@ -749,8 +817,16 @@ export default function Page() {
 
                 <Stack spacing={2}>
                   <Box sx={softFloatWrapperSx()}>
-                    <Box sx={{ ...GLASS_PANEL_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(6) }}>
-                      <Stack spacing={0.5} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: { xs: 'center', md: 'flex-start' } }}>
+                    <Box
+                      sx={{ ...GLASS_PANEL_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(6) }}
+                    >
+                      <Stack
+                        spacing={0.5}
+                        sx={{
+                          textAlign: { xs: 'center', md: 'left' },
+                          alignItems: { xs: 'center', md: 'flex-start' },
+                        }}
+                      >
                         <Typography variant="h6" sx={{ fontWeight: 800 }}>
                           Team Spotlight
                         </Typography>
@@ -762,13 +838,28 @@ export default function Page() {
                   </Box>
                   <Grid container spacing={2.5}>
                     <Grid size={{ xs: 12, md: 4 }}>
-                      <TeamRoleColumn title="Creators" guids={teamRoles.creator} allDrivers={drivers} enterIndex={7} />
+                      <TeamRoleColumn
+                        title="Creators"
+                        guids={teamRoles.creator}
+                        allDrivers={drivers}
+                        enterIndex={7}
+                      />
                     </Grid>
                     <Grid size={{ xs: 12, md: 4 }}>
-                      <TeamRoleColumn title="Admins" guids={teamAdmins} allDrivers={drivers} enterIndex={8} />
+                      <TeamRoleColumn
+                        title="Admins"
+                        guids={teamAdmins}
+                        allDrivers={drivers}
+                        enterIndex={8}
+                      />
                     </Grid>
                     <Grid size={{ xs: 12, md: 4 }}>
-                      <TeamRoleColumn title="Moderators" guids={teamModerators} allDrivers={drivers} enterIndex={9} />
+                      <TeamRoleColumn
+                        title="Moderators"
+                        guids={teamModerators}
+                        allDrivers={drivers}
+                        enterIndex={9}
+                      />
                     </Grid>
                   </Grid>
                 </Stack>

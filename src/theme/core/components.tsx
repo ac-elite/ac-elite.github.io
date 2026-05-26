@@ -41,6 +41,7 @@ const MuiButton: Components<Theme>['MuiButton'] = {
     root: {
       textTransform: 'none' as const,
       fontWeight: 700,
+      fontSize: 'clamp(0.8125rem, 0.72rem + 0.35vw, 0.875rem)',
       // Soft rounded rectangle to match the nav "boxje" — not a full pill.
       borderRadius: 14,
       // Spring on transform (the press/lift), smooth ease on everything else.
@@ -69,8 +70,7 @@ const MuiButton: Components<Theme>['MuiButton'] = {
     containedPrimary: ({ theme }) => ({
       color: theme.palette.primary.contrastText,
       textShadow: '0 1px 0 rgba(15,23,42,0.35)',
-      background:
-        'linear-gradient(180deg, rgba(96,150,236,0.52) 0%, rgba(48,98,196,0.48) 100%)',
+      background: 'linear-gradient(180deg, rgba(96,150,236,0.52) 0%, rgba(48,98,196,0.48) 100%)',
       backdropFilter: 'blur(22px) saturate(185%)',
       WebkitBackdropFilter: 'blur(22px) saturate(185%)',
       border: '1px solid rgba(219,234,254,0.22)',
@@ -140,13 +140,15 @@ const MuiButton: Components<Theme>['MuiButton'] = {
     outlinedSecondary: ({ theme }) => ({
       color: 'rgba(255,255,255,0.9)',
       borderColor: 'rgba(226,242,255,0.18)',
-      background: 'linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.028) 100%)',
+      background:
+        'linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.028) 100%)',
       backdropFilter: 'blur(20px) saturate(165%)',
       WebkitBackdropFilter: 'blur(20px) saturate(165%)',
       boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.14)',
       '&:hover': {
         borderColor: 'rgba(226,242,255,0.32)',
-        background: 'linear-gradient(180deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.045) 100%)',
+        background:
+          'linear-gradient(180deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.045) 100%)',
         transform: 'translateY(-1px)',
         boxShadow:
           'inset 0 1px 0 rgba(255,255,255,0.2), inset 0 -1px 0 rgba(15,23,42,0.18), inset 0 0 0 1px rgba(226,242,255,0.14)',
@@ -175,7 +177,15 @@ const MuiButton: Components<Theme>['MuiButton'] = {
       '&:active': { transform: 'translateY(0) scale(0.97)' },
     }),
     sizeLarge: {
-      minHeight: 48,
+      minHeight: 'clamp(42px, 10vw, 48px)',
+      fontSize: 'clamp(0.875rem, 0.78rem + 0.38vw, 0.9375rem)',
+    },
+    sizeMedium: {
+      minHeight: 'clamp(36px, 9vw, 40px)',
+    },
+    sizeSmall: {
+      minHeight: 'clamp(30px, 8vw, 34px)',
+      fontSize: 'clamp(0.75rem, 0.68rem + 0.3vw, 0.8125rem)',
     },
   },
 };
@@ -233,6 +243,19 @@ const MuiCardHeader: Components<Theme>['MuiCardHeader'] = {
   },
 };
 
+const MuiContainer: Components<Theme>['MuiContainer'] = {
+  styleOverrides: {
+    root: ({ theme }) => ({
+      paddingLeft: 'clamp(12px, 3.2vw, 24px)',
+      paddingRight: 'clamp(12px, 3.2vw, 24px)',
+      [theme.breakpoints.up('lg')]: {
+        paddingLeft: theme.spacing(3),
+        paddingRight: theme.spacing(3),
+      },
+    }),
+  },
+};
+
 const MuiOutlinedInput: Components<Theme>['MuiOutlinedInput'] = {
   styleOverrides: {
     root: ({ theme }) => ({
@@ -257,7 +280,8 @@ const MuiOutlinedInput: Components<Theme>['MuiOutlinedInput'] = {
         backgroundColor: 'rgba(255,255,255,0.032)',
       },
       '&.Mui-focused': {
-        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.09), inset 0 0 0 1px rgba(147, 197, 253, 0.32)',
+        boxShadow:
+          'inset 0 1px 0 rgba(255,255,255,0.09), inset 0 0 0 1px rgba(147, 197, 253, 0.32)',
         backgroundColor: 'rgba(255,255,255,0.04)',
       },
       '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
@@ -325,9 +349,11 @@ const MuiTableCell: Components<Theme>['MuiTableCell'] = {
   styleOverrides: {
     root: ({ theme }) => ({
       borderColor: varAlpha(theme.vars.palette.common.whiteChannel, 0.1),
+      padding: 'clamp(8px, 2.4vw, 16px)',
+      fontSize: 'clamp(0.75rem, 0.69rem + 0.25vw, 0.875rem)',
     }),
     head: ({ theme }) => ({
-      fontSize: theme.typography.pxToRem(13),
+      fontSize: 'clamp(0.72rem, 0.66rem + 0.24vw, 0.8125rem)',
       color: varAlpha(theme.vars.palette.common.whiteChannel, 0.88),
       fontWeight: 800,
       letterSpacing: 0.3,
@@ -392,16 +418,13 @@ const MuiToggleButton: Components<Theme>['MuiToggleButton'] = {
       },
       '&.Mui-selected': {
         color: '#fff',
-        background:
-          'linear-gradient(180deg, rgba(96,165,250,0.32) 0%, rgba(59,130,246,0.16) 100%)',
+        background: 'linear-gradient(180deg, rgba(96,165,250,0.32) 0%, rgba(59,130,246,0.16) 100%)',
         // Continuous hairline rim (follows the radius, even on all sides) + a faint
         // top specular — not a top-only bright line that left the box looking unrounded.
-        boxShadow:
-          'inset 0 0 0 1px rgba(226,242,255,0.2), inset 0 1px 0 rgba(255,255,255,0.16)',
+        boxShadow: 'inset 0 0 0 1px rgba(226,242,255,0.2), inset 0 1px 0 rgba(255,255,255,0.16)',
       },
       '&.Mui-selected:hover': {
-        background:
-          'linear-gradient(180deg, rgba(111,178,255,0.38) 0%, rgba(59,130,246,0.2) 100%)',
+        background: 'linear-gradient(180deg, rgba(111,178,255,0.38) 0%, rgba(59,130,246,0.2) 100%)',
       },
       '&.Mui-disabled': {
         color: 'rgba(226,232,240,0.28)',
@@ -476,6 +499,8 @@ const MuiChip: Components<Theme>['MuiChip'] = {
     root: {
       borderRadius: 9,
       fontWeight: 600,
+      height: 'clamp(22px, 6vw, 24px)',
+      fontSize: 'clamp(0.68rem, 0.62rem + 0.24vw, 0.8125rem)',
       transition: `transform 240ms ${SPRING}, background-color 240ms ${EASE_OUT}`,
     },
     label: {
@@ -544,6 +569,39 @@ const MuiDialog: Components<Theme>['MuiDialog'] = {
   },
 };
 
+const MuiDialogTitle: Components<Theme>['MuiDialogTitle'] = {
+  styleOverrides: {
+    root: {
+      fontSize: 'clamp(1rem, 0.88rem + 0.5vw, 1.25rem)',
+      lineHeight: 1.25,
+    },
+  },
+};
+
+const MuiDialogContent: Components<Theme>['MuiDialogContent'] = {
+  styleOverrides: {
+    root: {
+      paddingLeft: 'clamp(16px, 4vw, 24px)',
+      paddingRight: 'clamp(16px, 4vw, 24px)',
+    },
+  },
+};
+
+const MuiDialogActions: Components<Theme>['MuiDialogActions'] = {
+  styleOverrides: {
+    root: ({ theme }) => ({
+      justifyContent: 'center',
+      flexWrap: 'wrap',
+      gap: theme.spacing(1),
+      paddingLeft: 'clamp(16px, 4vw, 24px)',
+      paddingRight: 'clamp(16px, 4vw, 24px)',
+      [theme.breakpoints.up('sm')]: {
+        justifyContent: 'flex-end',
+      },
+    }),
+  },
+};
+
 // ----------------------------------------------------------------------
 
 export const components = {
@@ -555,8 +613,12 @@ export const components = {
   MuiRadio,
   MuiButton,
   MuiDialog,
+  MuiDialogTitle,
+  MuiDialogContent,
+  MuiDialogActions,
   MuiTooltip,
   MuiPopover,
+  MuiContainer,
   MuiBackdrop,
   MuiIconButton,
   MuiMenuItem,

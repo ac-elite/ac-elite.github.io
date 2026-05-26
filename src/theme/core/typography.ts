@@ -32,6 +32,13 @@ export const MONO_FONT_STACK =
 const primaryFont = SF_TEXT_STACK;
 const secondaryFont = SF_DISPLAY_STACK;
 
+function fluidFont(minPx: number, maxPx: number, minViewportPx = 360, maxViewportPx = 960) {
+  const slope = (maxPx - minPx) / (maxViewportPx - minViewportPx);
+  const intercept = minPx - slope * minViewportPx;
+
+  return `clamp(${pxToRem(minPx)}, calc(${pxToRem(intercept)} + ${(slope * 100).toFixed(4)}vw), ${pxToRem(maxPx)})`;
+}
+
 /**
  * Apple-style type scale: large display sizes carry tight negative tracking
  * (SF Pro Display behaviour), body text breathes a little more, and small
@@ -79,54 +86,55 @@ export const typography: TypographyVariantsOptions = {
   h5: {
     fontWeight: 600,
     lineHeight: 1.4,
-    // Grow-only: never below the 18px mobile size, eases up on large screens.
-    fontSize: 'clamp(1.125rem, 1.05rem + 0.32vw, 1.3rem)',
+    // Grow-only from the original Minimal pxToRem scale, so card titles never
+    // render smaller than main while still easing up on wider screens.
+    fontSize: `clamp(${pxToRem(18)}, calc(${pxToRem(17)} + 0.32vw), ${pxToRem(20.8)})`,
     letterSpacing: 0,
   },
   h6: {
     fontWeight: 600,
     lineHeight: 1.5,
-    fontSize: 'clamp(1.0625rem, 1rem + 0.28vw, 1.2rem)',
+    fontSize: `clamp(${pxToRem(17)}, calc(${pxToRem(16)} + 0.28vw), ${pxToRem(19.2)})`,
     letterSpacing: 0,
   },
   subtitle1: {
     fontWeight: 600,
     lineHeight: 1.5,
-    fontSize: pxToRem(16),
+    fontSize: fluidFont(14.5, 16),
     letterSpacing: 0,
   },
   subtitle2: {
     fontWeight: 600,
     lineHeight: 22 / 14,
-    fontSize: pxToRem(14),
+    fontSize: fluidFont(13, 14),
     letterSpacing: 0,
   },
   body1: {
     lineHeight: 1.55,
-    fontSize: pxToRem(16),
+    fontSize: fluidFont(14, 16),
     letterSpacing: 0,
   },
   body2: {
     lineHeight: 1.57,
-    fontSize: pxToRem(14),
+    fontSize: fluidFont(13, 14),
     letterSpacing: 0,
   },
   caption: {
     lineHeight: 1.5,
-    fontSize: pxToRem(12),
+    fontSize: fluidFont(11.5, 12),
     letterSpacing: 0,
   },
   overline: {
     fontWeight: 700,
     lineHeight: 1.5,
-    fontSize: pxToRem(12),
+    fontSize: fluidFont(11, 12),
     letterSpacing: '0.1em',
     textTransform: 'uppercase',
   },
   button: {
     fontWeight: 600,
     lineHeight: 24 / 14,
-    fontSize: pxToRem(14),
+    fontSize: fluidFont(13, 14),
     letterSpacing: 0,
     textTransform: 'unset',
   },
