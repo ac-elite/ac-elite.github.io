@@ -603,7 +603,7 @@ function CurrentTrackLeaderboardSection({
                           <Link
                             href={getDriverProfileHref(entry.guid)}
                             onClick={(e) => e.stopPropagation()}
-                            underline="hover"
+                            underline="none"
                             color="inherit"
                             sx={{ fontWeight: 700 }}
                           >
@@ -859,7 +859,7 @@ function DriverSearchSection({
                                 <Link
                                   href={getDriverProfileHref(driver.guid)}
                                   onClick={(e) => e.stopPropagation()}
-                                  underline="hover"
+                                  underline="none"
                                   color="inherit"
                                   variant="body2"
                                   sx={{ fontWeight: 400 }}

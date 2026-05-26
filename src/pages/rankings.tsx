@@ -487,7 +487,7 @@ export default function Page() {
                                 <Link
                                   href={getDriverProfileHref(item.driver.guid)}
                                   onClick={(e) => e.stopPropagation()}
-                                  underline="hover"
+                                  underline="none"
                                   color="inherit"
                                   sx={{ fontWeight: 700 }}
                                 >

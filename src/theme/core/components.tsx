@@ -415,7 +415,7 @@ const MuiToggleButton: Components<Theme>['MuiToggleButton'] = {
 };
 
 const MuiLink: Components<Theme>['MuiLink'] = {
-  defaultProps: { underline: 'hover' },
+  defaultProps: { underline: 'none' },
 };
 
 const MuiFormControlLabel: Components<Theme>['MuiFormControlLabel'] = {

@@ -468,7 +468,7 @@ export default function Page() {
                                     component={RouterLink}
                                     href={getDriverProfileHref(author.guid)}
                                     variant="caption"
-                                    underline="hover"
+                                    underline="none"
                                     color="inherit"
                                     sx={{ fontWeight: 700 }}
                                   >
@@ -563,7 +563,7 @@ export default function Page() {
                               component={RouterLink}
                               href={getDriverProfileHref(livery.steamGuid)}
                               variant="body2"
-                              underline="hover"
+                              underline="none"
                               color="text.secondary"
                               sx={{ px: 0.25, display: 'block' }}
                             >
@@ -595,7 +595,7 @@ export default function Page() {
               component={RouterLink}
               href={getDriverProfileHref(imagePreview.profileGuid)}
               variant="body2"
-              underline="hover"
+              underline="none"
               color="text.secondary"
             >
               Driver profile

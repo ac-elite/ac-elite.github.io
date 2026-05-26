@@ -63,9 +63,13 @@ export function StatTile({ label, value, motionIndex, size = 'compact', ariaLabe
           lineHeight: 1.05,
           letterSpacing: 0,
           fontVariantNumeric: 'tabular-nums',
+          // Fluid size so long numbers (e.g. "2.024.451") never overflow a narrow
+          // 2-up mobile tile. clamp(min, viewport-scaled, max): rem min/max keep it
+          // zoom/accessibility-safe; the vw middle term does the scaling.
+          maxWidth: '100%',
           ...(isHero
-            ? { fontSize: { xs: 38, md: 46 } }
-            : { fontSize: 40 }),
+            ? { fontSize: 'clamp(2.25rem, 4.6vw, 2.875rem)' }
+            : { fontSize: 'clamp(1.25rem, 5.4vw, 2.5rem)' }),
         }}
       >
         {value}

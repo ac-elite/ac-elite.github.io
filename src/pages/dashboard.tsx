@@ -607,7 +607,7 @@ export default function Page() {
                             <Link
                               href={getLeaderboardHref(track.trackId)}
                               onClick={(e) => e.stopPropagation()}
-                              underline="hover"
+                              underline="none"
                               color="inherit"
                               sx={{ fontWeight: 600 }}
                             >
