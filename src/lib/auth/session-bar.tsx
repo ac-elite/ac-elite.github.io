@@ -5,6 +5,7 @@ import Chip from '@mui/material/Chip';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
+import { alpha } from '@mui/material/styles';
 
 import { GLASS_CARD_INNER_SX } from 'src/lib/glass';
 import { ROLE_CHIP_SX } from 'src/lib/ac-elite-data';
@@ -30,17 +31,13 @@ const ROLE_ICON: Record<AppRole, string> = {
   moderator: 'solar:user-id-bold',
 };
 
-function roleStripeSx(accent: string, width: number, opacity: number) {
+function roleAccentEdgeSx(accent: string, width: number, opacity: number) {
   return {
-    content: '""',
-    position: 'absolute',
-    inset: '0 auto 0 0',
-    width,
-    background: accent,
-    opacity,
-    borderTopLeftRadius: 'inherit',
-    borderBottomLeftRadius: 'inherit',
-    pointerEvents: 'none',
+    boxShadow: [
+      `inset ${width}px 0 0 ${alpha(accent, opacity)}`,
+      'inset 0 1px 0 rgba(255,255,255,0.09)',
+      'inset 0 -1px 0 rgba(0,0,0,0.1)',
+    ].join(', '),
   } as const;
 }
 
@@ -72,6 +69,7 @@ export function SessionBar({ compact = false }: SessionBarProps = {}) {
       <Box
         sx={{
           ...GLASS_CARD_INNER_SX,
+          ...roleAccentEdgeSx(accent, 3, 0.9),
           overflow: 'hidden',
           // Sits in the sidebar's flex column — never let it shrink when the
           // viewport is short, or the content squishes out of centre.
@@ -81,7 +79,6 @@ export function SessionBar({ compact = false }: SessionBarProps = {}) {
           px: 1.25,
           py: 1,
           borderRadius: 1.25,
-          '&::before': roleStripeSx(accent, 3, 0.9),
         }}
       >
         <Stack direction="row" spacing={1} alignItems="center">
@@ -178,14 +175,13 @@ export function SessionBar({ compact = false }: SessionBarProps = {}) {
     <Box
       sx={{
         ...GLASS_CARD_INNER_SX,
+        ...roleAccentEdgeSx(accent, 4, 0.85),
         position: 'relative',
         overflow: 'hidden',
         flexShrink: 0,
         py: 1.5,
         pl: 2.5,
         pr: 2,
-        // Coloured stripe along the left edge so the role is unmissable.
-        '&::before': roleStripeSx(accent, 4, 0.85),
       }}
     >
       <Stack
