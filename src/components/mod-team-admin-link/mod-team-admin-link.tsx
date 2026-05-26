@@ -30,21 +30,19 @@ export function ModTeamAdminLink() {
         component={RouterLink}
         href={APP_ROUTES.login}
         variant="outlined"
+        color="primary"
         fullWidth
         size="small"
         startIcon={<Icon icon="solar:login-3-linear" width={16} />}
         sx={{
           fontWeight: 700,
           letterSpacing: '0.04em',
-          color: 'rgba(226,232,240,0.92)',
-          borderColor: 'rgba(148,163,184,0.4)',
-          bgcolor: 'rgba(15,23,42,0.45)',
           textTransform: 'none',
-          '&:hover': {
-            borderColor: 'rgba(191,219,254,0.7)',
-            color: '#fff',
-            bgcolor: 'rgba(96,165,250,0.12)',
-          },
+          // Uses the theme's light-navy-glass `outlinedPrimary` (mirrors the active
+          // nav boxje). Drops its own backdrop blur — it sits in the already-blurred
+          // sidebar chrome, where a nested blur shimmers over the drifting grid.
+          backdropFilter: 'none',
+          WebkitBackdropFilter: 'none',
         }}
       >
         Sign in

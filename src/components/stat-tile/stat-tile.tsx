@@ -1,8 +1,8 @@
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 
-import { GLASS_PANEL_SPACIOUS_SX } from 'src/lib/glass';
-import { glassCardMotionSx } from 'src/lib/subtle-motion';
+import { GLASS_PANEL_SPACIOUS_SX, GLASS_INNER_PANEL_SX } from 'src/lib/glass';
+import { glassCardMotionSx, glassCardEnterOnlySx } from 'src/lib/subtle-motion';
 import { brandAccentBorderSx } from 'src/lib/status-accent';
 
 // ----------------------------------------------------------------------
@@ -19,6 +19,11 @@ type StatTileProps = {
   size?: 'hero' | 'compact';
   /** Optional accessibility label for the article element. */
   ariaLabel?: string;
+  /**
+   * When the tile sits *inside* another glass card, use the lighter inner-panel
+   * film instead of a second full level-1 surface, per the nesting model.
+   */
+  nested?: boolean;
 };
 
 /**
@@ -26,7 +31,7 @@ type StatTileProps = {
  * brand accent rim, entrance motion, and an overline + big number. Centralises
  * the spacing/typography that was duplicated across seven inline cards.
  */
-export function StatTile({ label, value, motionIndex, size = 'compact', ariaLabel }: StatTileProps) {
+export function StatTile({ label, value, motionIndex, size = 'compact', ariaLabel, nested = false }: StatTileProps) {
   const isHero = size === 'hero';
   return (
     <Paper
@@ -34,9 +39,9 @@ export function StatTile({ label, value, motionIndex, size = 'compact', ariaLabe
       aria-label={ariaLabel ?? label}
       tabIndex={0}
       sx={{
-        ...GLASS_PANEL_SPACIOUS_SX,
-        ...brandAccentBorderSx(),
-        ...glassCardMotionSx(motionIndex),
+        ...(nested
+          ? { ...GLASS_INNER_PANEL_SX, ...glassCardEnterOnlySx(motionIndex) }
+          : { ...GLASS_PANEL_SPACIOUS_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(motionIndex) }),
         ...(isHero && { p: { xs: 2.5, md: 3 } }),
         textAlign: { xs: 'center', md: 'left' },
       }}

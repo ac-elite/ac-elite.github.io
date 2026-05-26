@@ -8,6 +8,7 @@ import Typography from '@mui/material/Typography';
 
 import { GLASS_CARD_INNER_SX } from 'src/lib/glass';
 import { ROLE_CHIP_SX } from 'src/lib/ac-elite-data';
+import { OUTLINED_GLASS_WHITE_SX } from 'src/lib/page-shell';
 
 import { useAuth, ROLE_LABEL, type AppRole, ROLE_TO_CHIP_STYLE } from './auth-context';
 
@@ -56,7 +57,7 @@ export function SessionBar({ compact = false }: SessionBarProps = {}) {
     return (
       <Box
         sx={{
-          position: 'relative',
+          ...GLASS_CARD_INNER_SX,
           overflow: 'hidden',
           // Sits in the sidebar's flex column — never let it shrink when the
           // viewport is short, or the content squishes out of centre.
@@ -66,8 +67,6 @@ export function SessionBar({ compact = false }: SessionBarProps = {}) {
           px: 1.25,
           py: 1,
           borderRadius: 1.25,
-          bgcolor: 'rgba(15,23,42,0.55)',
-          border: '1px solid rgba(148,163,184,0.18)',
           '&::before': {
             content: '""',
             position: 'absolute',
@@ -141,8 +140,11 @@ export function SessionBar({ compact = false }: SessionBarProps = {}) {
             aria-label="Sign out"
             title="Sign out"
             sx={{
-              border: '1px solid rgba(148,163,184,0.32)',
-              bgcolor: 'transparent',
+              // Neutral white glass mini-control (mirrors the nav hover boxje); no
+              // backdrop-filter — it sits in the already-blurred sidebar chrome.
+              border: '1px solid rgba(226,242,255,0.2)',
+              background: 'linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.028) 100%)',
+              boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.14)',
               color: 'rgba(226,232,240,0.85)',
               cursor: 'pointer',
               p: 0.65,
@@ -150,11 +152,11 @@ export function SessionBar({ compact = false }: SessionBarProps = {}) {
               display: 'inline-flex',
               alignItems: 'center',
               justifyContent: 'center',
-              transition: 'color 0.15s ease, border-color 0.15s ease, background-color 0.15s ease',
+              transition: 'color 0.15s ease, border-color 0.15s ease, background 0.15s ease',
               '&:hover': {
                 color: '#fca5a5',
                 borderColor: 'rgba(252,165,165,0.6)',
-                bgcolor: 'rgba(252,165,165,0.08)',
+                background: 'rgba(252,165,165,0.1)',
               },
             }}
           >
@@ -256,13 +258,12 @@ export function SessionBar({ compact = false }: SessionBarProps = {}) {
           onClick={() => void auth.signOut()}
           startIcon={<Icon icon="solar:logout-3-linear" width={16} />}
           sx={{
-            fontWeight: 700,
-            borderColor: 'rgba(148,163,184,0.4)',
-            color: 'text.primary',
+            ...OUTLINED_GLASS_WHITE_SX,
             '&:hover': {
               borderColor: 'rgba(252,165,165,0.6)',
               color: '#fca5a5',
-              bgcolor: 'rgba(252,165,165,0.06)',
+              bgcolor: 'rgba(252,165,165,0.08)',
+              boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.18)',
             },
           }}
         >

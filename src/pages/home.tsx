@@ -40,6 +40,7 @@ import {
   subtleEnterUpSx,
   subtleRowEnterSx,
   glassCardMotionSx,
+  glassCardEnterOnlySx,
   softFloatWrapperSx,
 } from 'src/lib/subtle-motion';
 import {
@@ -257,7 +258,7 @@ function RaceIntelligenceCard({
                 <Box
                   sx={{
                     ...GLASS_INNER_PANEL_SX,
-                    ...glassCardMotionSx(3 + tileIndex),
+                    ...glassCardEnterOnlySx(3 + tileIndex),
                     minHeight: 78,
                     display: 'flex',
                     flexDirection: 'column',

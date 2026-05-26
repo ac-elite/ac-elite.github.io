@@ -17,16 +17,24 @@ import type { Theme, SxProps } from '@mui/material/styles';
 export const GLASS_SELECT_SX: SxProps<Theme> = {
   borderRadius: 2,
   color: '#fff',
-  bgcolor: 'rgba(10,22,47,0.88)',
-  boxShadow: '0 0 0 1px rgba(255,255,255,0.08), inset 0 1px 0 rgba(255,255,255,0.08)',
+  // Match the level-2 inner card (GLASS_CARD_INNER_SX), in lockstep with the
+  // global outlined input (theme components.tsx): same subtle film + inset rims,
+  // no backdrop blur (the parent card already blurs).
+  bgcolor: 'rgba(255,255,255,0.012)',
+  backgroundImage: 'linear-gradient(180deg, rgba(255,255,255,0.026) 0%, rgba(255,255,255,0.003) 100%)',
+  boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.09), inset 0 -1px 0 rgba(0,0,0,0.1)',
   '& .MuiOutlinedInput-notchedOutline': {
-    borderColor: 'rgba(191,225,255,0.4)',
+    borderColor: 'rgba(226,242,255,0.12)',
+  },
+  '&:hover': {
+    bgcolor: 'rgba(255,255,255,0.032)',
   },
   '&:hover .MuiOutlinedInput-notchedOutline': {
-    borderColor: 'rgba(191,225,255,0.65)',
+    borderColor: 'rgba(226,242,255,0.18)',
   },
   '&.Mui-focused': {
-    boxShadow: '0 0 0 3px rgba(173, 216, 255, 0.22)',
+    bgcolor: 'rgba(255,255,255,0.04)',
+    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.09), inset 0 0 0 1px rgba(147, 197, 253, 0.32)',
   },
   '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
     borderColor: 'rgba(191,225,255,0.95)',

@@ -19,8 +19,8 @@ import { getSiteUrl } from 'src/centralized/site-urls';
 import {
   GLASS_PANEL_SX,
   GLASS_INNER_ROW_SX,
+  GLASS_INNER_PANEL_SX,
   GLASS_PANEL_SPACIOUS_SX,
-  GLASS_CARD_INNER_HOVER_SX,
 } from 'src/lib/glass';
 import { getSyncHealth, type SiteMetadata, getEffectiveLastSync } from 'src/lib/sync-utils';
 import { subtleEnterUpSx, glassCardMotionSx } from 'src/lib/subtle-motion';
@@ -130,7 +130,7 @@ function GridCompositionSection({ rankData }: { rankData: RankDriver[] }) {
       <Grid container spacing={2.5} alignItems="stretch">
         <Grid size={{ xs: 12, md: 6 }}>
           <Reveal index={1} sx={{ height: 1 }}>
-            <Box sx={{ ...GLASS_CARD_INNER_HOVER_SX, height: 1, p: 2, cursor: 'default' }}>
+            <Box sx={{ ...GLASS_INNER_PANEL_SX, height: 1, p: 2 }}>
               <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.78)' }}>
                 License tiers
               </Typography>
@@ -177,7 +177,7 @@ function GridCompositionSection({ rankData }: { rankData: RankDriver[] }) {
 
         <Grid size={{ xs: 12, md: 6 }}>
           <Reveal index={2} sx={{ height: 1 }}>
-            <Box sx={{ ...GLASS_CARD_INNER_HOVER_SX, height: 1, p: 2, cursor: 'default' }}>
+            <Box sx={{ ...GLASS_INNER_PANEL_SX, height: 1, p: 2 }}>
               <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.78)' }}>
                 Safety Rating grades
               </Typography>

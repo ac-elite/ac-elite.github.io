@@ -237,24 +237,28 @@ const MuiOutlinedInput: Components<Theme>['MuiOutlinedInput'] = {
   styleOverrides: {
     root: ({ theme }) => ({
       borderRadius: 12,
-      backgroundColor: varAlpha(theme.vars.palette.common.whiteChannel, 0.035),
-      backdropFilter: 'blur(18px) saturate(160%)',
-      WebkitBackdropFilter: 'blur(18px) saturate(160%)',
-      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.08)',
-      transition: `box-shadow 260ms ${EASE_OUT}, background-color 260ms ${EASE_OUT}, transform 260ms ${EASE_OUT}`,
+      // Match the level-2 inner card (GLASS_CARD_INNER_SX): same subtle film,
+      // gradient and inset rims, and NO backdrop blur (the parent card is already
+      // a blurred surface). So an input nested in a card reads as the same
+      // material as the inner cards beside it.
+      backgroundColor: 'rgba(255,255,255,0.012)',
+      backgroundImage:
+        'linear-gradient(180deg, rgba(255,255,255,0.026) 0%, rgba(255,255,255,0.003) 100%)',
+      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.09), inset 0 -1px 0 rgba(0,0,0,0.1)',
+      transition: `box-shadow 260ms ${EASE_OUT}, background-color 260ms ${EASE_OUT}, border-color 260ms ${EASE_OUT}`,
       '& .MuiOutlinedInput-notchedOutline': {
-        borderColor: varAlpha(theme.vars.palette.common.whiteChannel, 0.28),
+        borderColor: 'rgba(226,242,255,0.12)',
         transition: `border-color 260ms ${EASE_OUT}`,
       },
       '&:hover .MuiOutlinedInput-notchedOutline': {
-        borderColor: varAlpha(theme.vars.palette.common.whiteChannel, 0.5),
+        borderColor: 'rgba(226,242,255,0.18)',
       },
       '&:hover': {
-        backgroundColor: varAlpha(theme.vars.palette.common.whiteChannel, 0.048),
+        backgroundColor: 'rgba(255,255,255,0.032)',
       },
       '&.Mui-focused': {
-        boxShadow: 'inset 0 0 0 1px rgba(147, 197, 253, 0.32)',
-        backgroundColor: varAlpha(theme.vars.palette.common.whiteChannel, 0.05),
+        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.09), inset 0 0 0 1px rgba(147, 197, 253, 0.32)',
+        backgroundColor: 'rgba(255,255,255,0.04)',
       },
       '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
         borderColor: '#93c5fd',

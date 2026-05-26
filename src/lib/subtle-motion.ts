@@ -64,7 +64,10 @@ export type ScrollRevealOptions = {
 export function useScrollReveal<T extends HTMLElement = HTMLDivElement>(
   options: ScrollRevealOptions = {}
 ) {
-  const { threshold = 0.12, rootMargin = '0px 0px -8% 0px', repeat = false } = options;
+  // Pre-trigger: a positive bottom margin reveals items just *before* they reach
+  // the viewport (and immediately for anything already on screen), so there's no
+  // invisible below-the-fold content hiding the fact that the page can scroll.
+  const { threshold = 0, rootMargin = '0px 0px 12% 0px', repeat = false } = options;
   const ref = useRef<T | null>(null);
   const [revealed, setRevealed] = useState(false);
 

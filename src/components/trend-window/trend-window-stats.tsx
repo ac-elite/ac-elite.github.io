@@ -15,6 +15,7 @@ import Typography from '@mui/material/Typography';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 
+import { GLASS_BOXJE_RIM_SHADOW } from 'src/lib/glass';
 import { formatSignedKm } from 'src/lib/delta';
 import { type RankDriver } from 'src/lib/ac-elite-data';
 import { useTrendWindow } from 'src/lib/trend-window/trend-window-context';
@@ -135,10 +136,14 @@ export function TrendWindowStats(props: TrendWindowStatsProps) {
           gap: 0.85,
           px: 1.15,
           py: 0.55,
-          borderRadius: 1.25,
-          bgcolor: 'rgba(15,23,42,0.55)',
-          border: '1px solid rgba(148,163,184,0.2)',
-          boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.05)',
+          borderRadius: '12px',
+          // Same control glass as the trend-window toggle beside it (theme
+          // MuiToggleButtonGroup) so the pill reads as the same material.
+          background: 'linear-gradient(180deg, rgba(20,32,56,0.52), rgba(12,22,42,0.46))',
+          border: '1px solid rgba(255,255,255,0.1)',
+          backdropFilter: 'blur(18px) saturate(165%)',
+          WebkitBackdropFilter: 'blur(18px) saturate(165%)',
+          boxShadow: GLASS_BOXJE_RIM_SHADOW,
         }}
       >
         <Box

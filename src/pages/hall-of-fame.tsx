@@ -692,36 +692,42 @@ export default function Page() {
             {!loading && !error && (
               <>
                 <Reveal>
-                  <Stack spacing={1.5}>
-                    <Stack
-                      spacing={0.5}
-                      sx={{
-                        textAlign: { xs: 'center', md: 'left' },
-                        alignItems: { xs: 'center', md: 'flex-start' },
-                      }}
-                    >
-                      <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.78)', fontWeight: 700 }}>
-                        Community achievements
-                      </Typography>
-                      <Typography component="h2" variant="h5" sx={{ fontWeight: 800 }}>
-                        What the grid has racked up
-                      </Typography>
+                  <Paper
+                    sx={{
+                      ...GLASS_PANEL_SX,
+                      ...brandAccentBorderSx(),
+                      ...glassCardMotionSx(0),
+                      textAlign: { xs: 'center', md: 'left' },
+                    }}
+                  >
+                    <Stack spacing={1.5}>
+                      <Stack
+                        spacing={0.5}
+                        sx={{ alignItems: { xs: 'center', md: 'flex-start' } }}
+                      >
+                        <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.78)', fontWeight: 700 }}>
+                          Community achievements
+                        </Typography>
+                        <Typography component="h2" variant="h5" sx={{ fontWeight: 800 }}>
+                          What the grid has racked up
+                        </Typography>
+                      </Stack>
+                      <Grid container spacing={2.5}>
+                        {[
+                          { label: 'Total KM', value: formatNumber(communityTotals.km) },
+                          { label: 'Total Laps', value: formatNumber(communityTotals.laps) },
+                          { label: 'Wins', value: formatNumber(communityTotals.wins) },
+                          { label: 'Podiums', value: formatNumber(communityTotals.podiums) },
+                          { label: 'Poles', value: formatNumber(communityTotals.poles) },
+                          { label: 'Fastest Laps', value: formatNumber(communityTotals.flaps) },
+                        ].map((tile, i) => (
+                          <Grid key={tile.label} size={{ xs: 6, sm: 4, md: 2 }}>
+                            <StatTile label={tile.label} value={tile.value} motionIndex={i + 1} nested />
+                          </Grid>
+                        ))}
+                      </Grid>
                     </Stack>
-                    <Grid container spacing={2.5}>
-                      {[
-                        { label: 'Total KM', value: formatNumber(communityTotals.km) },
-                        { label: 'Total Laps', value: formatNumber(communityTotals.laps) },
-                        { label: 'Wins', value: formatNumber(communityTotals.wins) },
-                        { label: 'Podiums', value: formatNumber(communityTotals.podiums) },
-                        { label: 'Poles', value: formatNumber(communityTotals.poles) },
-                        { label: 'Fastest Laps', value: formatNumber(communityTotals.flaps) },
-                      ].map((tile, i) => (
-                        <Grid key={tile.label} size={{ xs: 6, sm: 4, md: 2 }}>
-                          <StatTile label={tile.label} value={tile.value} motionIndex={i + 1} />
-                        </Grid>
-                      ))}
-                    </Grid>
-                  </Stack>
+                  </Paper>
                 </Reveal>
 
                 <Grid container spacing={2.5}>
