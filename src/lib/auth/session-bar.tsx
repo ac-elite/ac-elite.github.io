@@ -30,6 +30,20 @@ const ROLE_ICON: Record<AppRole, string> = {
   moderator: 'solar:user-id-bold',
 };
 
+function roleStripeSx(accent: string, width: number, opacity: number) {
+  return {
+    content: '""',
+    position: 'absolute',
+    inset: '0 auto 0 0',
+    width,
+    background: accent,
+    opacity,
+    borderTopLeftRadius: 'inherit',
+    borderBottomLeftRadius: 'inherit',
+    pointerEvents: 'none',
+  } as const;
+}
+
 /**
  * Top-of-page status bar shown on protected routes. Surfaces the signed-in
  * role with a coloured accent and a sign-out shortcut. Intentionally renders
@@ -67,14 +81,7 @@ export function SessionBar({ compact = false }: SessionBarProps = {}) {
           px: 1.25,
           py: 1,
           borderRadius: 1.25,
-          '&::before': {
-            content: '""',
-            position: 'absolute',
-            inset: '0 auto 0 0',
-            width: 3,
-            background: accent,
-            opacity: 0.9,
-          },
+          '&::before': roleStripeSx(accent, 3, 0.9),
         }}
       >
         <Stack direction="row" spacing={1} alignItems="center">
@@ -178,14 +185,7 @@ export function SessionBar({ compact = false }: SessionBarProps = {}) {
         pl: 2.5,
         pr: 2,
         // Coloured stripe along the left edge so the role is unmissable.
-        '&::before': {
-          content: '""',
-          position: 'absolute',
-          inset: '0 auto 0 0',
-          width: 4,
-          background: accent,
-          opacity: 0.85,
-        },
+        '&::before': roleStripeSx(accent, 4, 0.85),
       }}
     >
       <Stack
