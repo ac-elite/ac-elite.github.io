@@ -1002,18 +1002,6 @@ function DriverSearchSection({
       })
       .slice(0, 8);
   }, [drivers, query]);
-  const hasSearchQuery = query.trim().length > 0;
-  const profileSignal = useMemo(() => {
-    const profiles = drivers.length;
-    const profilesWithLaps = drivers.filter((driver) => driver.totalLaps > 0).length;
-    const syncedLaps = drivers.reduce((sum, driver) => sum + driver.totalLaps, 0);
-
-    return [
-      { label: 'Profiles', value: formatNumber(profiles) },
-      { label: 'With laps', value: formatNumber(profilesWithLaps) },
-      { label: 'Synced laps', value: formatNumber(syncedLaps) },
-    ];
-  }, [drivers]);
 
   return (
     <Box
@@ -1097,7 +1085,7 @@ function DriverSearchSection({
                   }}
                 />
 
-                {!loading && !error && hasSearchQuery && matches.length > 0 && (
+                {!loading && !error && matches.length > 0 && (
                   <Paper
                     sx={{
                       ...GLASS_CARD_INNER_SX,
@@ -1169,80 +1157,6 @@ function DriverSearchSection({
                       ))}
                     </List>
                   </Paper>
-                )}
-
-                {!loading && !error && !hasSearchQuery && (
-                  <Box
-                    sx={{
-                      ...GLASS_INNER_PANEL_SX,
-                      mt: 1,
-                      minHeight: { xs: 190, md: 230 },
-                      display: 'flex',
-                      flexDirection: 'column',
-                      justifyContent: 'space-between',
-                      gap: 2,
-                      textAlign: { xs: 'center', md: 'left' },
-                    }}
-                  >
-                    <Stack spacing={1}>
-                      <Typography variant="overline" sx={sectionKickerSx}>
-                        Driver signal
-                      </Typography>
-                      <Typography
-                        variant="h6"
-                        sx={{
-                          fontWeight: 800,
-                          lineHeight: 1.2,
-                          maxWidth: 620,
-                          mx: { xs: 'auto', md: 0 },
-                        }}
-                      >
-                        Every lap leaves a fingerprint.
-                      </Typography>
-                      <Typography
-                        variant="body2"
-                        sx={{
-                          color: 'text.secondary',
-                          maxWidth: 650,
-                          mx: { xs: 'auto', md: 0 },
-                        }}
-                      >
-                        Profiles connect clean driving, pace, license progress, favorite tracks, and
-                        lap history into one searchable record.
-                      </Typography>
-                    </Stack>
-
-                    <Grid container spacing={1}>
-                      {profileSignal.map((item) => (
-                        <Grid key={item.label} size={{ xs: 12, sm: 4 }}>
-                          <Box
-                            sx={{
-                              borderRadius: 2,
-                              border: '1px solid rgba(255,255,255,0.1)',
-                              bgcolor: 'rgba(255,255,255,0.04)',
-                              px: 1.25,
-                              py: 1,
-                            }}
-                          >
-                            <Typography
-                              variant="caption"
-                              sx={{
-                                display: 'block',
-                                color: 'rgba(255,255,255,0.62)',
-                                fontWeight: 700,
-                                letterSpacing: 0,
-                              }}
-                            >
-                              {item.label}
-                            </Typography>
-                            <Typography variant="subtitle2" sx={{ fontWeight: 800 }}>
-                              {item.value}
-                            </Typography>
-                          </Box>
-                        </Grid>
-                      ))}
-                    </Grid>
-                  </Box>
                 )}
               </Stack>
             </Paper>
