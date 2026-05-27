@@ -12,7 +12,6 @@ import { OUTLINED_MENU_TRIGGER_SMALL_SX } from 'src/lib/page-shell';
 
 import { Logo } from 'src/components/logo';
 import { SessionBar } from 'src/lib/auth/session-bar';
-import { LiveStatusPill } from 'src/components/live-status-pill';
 import { ModTeamAdminLink } from 'src/components/mod-team-admin-link/mod-team-admin-link';
 import { LicenseSafetyGuideButton } from 'src/components/license-safety-guide/license-safety-guide';
 
@@ -75,7 +74,6 @@ export function DashboardLayout({
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1 }}>
         <Logo />
         <Stack direction="row" spacing={1} alignItems="center">
-          <LiveStatusPill compact sx={{ display: { xs: 'none', sm: 'block' } }} />
           <LicenseSafetyGuideButton compact />
           <Button
             variant="outlined"
@@ -88,10 +86,6 @@ export function DashboardLayout({
           </Button>
         </Stack>
       </Box>
-      <LiveStatusPill
-        compact
-        sx={{ display: { xs: 'block', sm: 'none' }, alignSelf: 'center', mt: 1 }}
-      />
     </Box>
   );
 
@@ -110,7 +104,6 @@ export function DashboardLayout({
             data={navData}
             layoutQuery={layoutQuery}
             slots={{
-              topArea: <LiveStatusPill sx={{ mb: 2.25 }} />,
               bottomArea: (
                 <>
                   <SessionBar compact />
@@ -124,7 +117,6 @@ export function DashboardLayout({
             open={openMobileNav}
             onClose={() => setOpenMobileNav(false)}
             slots={{
-              topArea: <LiveStatusPill sx={{ mb: 2.25 }} />,
               bottomArea: (
                 <>
                   <SessionBar compact />

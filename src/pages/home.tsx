@@ -34,12 +34,23 @@ import { type DriverDelta, fetchPrevRankData } from 'src/lib/delta';
 import { subscribeKmrSync } from 'src/lib/kmr-sync';
 import { useWindowedDriverDeltas } from 'src/lib/trend-window/trend-window-context';
 import { getTeamRole, type TeamRole, teamRoleToDiscordRole } from 'src/lib/team-roles';
-import { brandAccentBorderSx } from 'src/lib/status-accent';
+import {
+  brandAccentBorderSx,
+  statusAccentBorderSx,
+  statusAccentSplitRimSx,
+} from 'src/lib/status-accent';
+import {
+  getSyncHealth,
+  type SyncHealth,
+  type SiteMetadata,
+  getEffectiveLastSync,
+} from 'src/lib/sync-utils';
 import {
   subtleEnterUpSx,
   subtleRowEnterSx,
   glassCardMotionSx,
   glassCardEnterOnlySx,
+  softFloatWrapperSx,
 } from 'src/lib/subtle-motion';
 import {
   DATA_PAGE_SHELL_SX,
@@ -54,6 +65,7 @@ import {
   GLASS_PANEL_SX,
   getPodiumRowSx,
   GLASS_CARD_INNER_SX,
+  GLASS_INNER_PANEL_SX,
   GLASS_TABLE_WRAPPER_SX,
   GLASS_TABLE_PAGINATION_SX,
 } from 'src/lib/glass';
@@ -122,8 +134,8 @@ type CurrentTrackData = CurrentTrackPayload;
 const HOME_CURRENT_TRACK_PER_PAGE = 20;
 
 /**
- * Static Apple-style gradient keyword (white â†’ soft ice-blue, clipped to text).
- * Replaces the former infinite colour/shimmer pulses â€” premium through restraint.
+ * Static Apple-style gradient keyword (white → soft ice-blue, clipped to text).
+ * Replaces the former infinite colour/shimmer pulses — premium through restraint.
  */
 const heroKeywordFloat = keyframes`
   0%, 100% {
@@ -203,63 +215,99 @@ const sectionKickerSx = {
   fontWeight: 700,
 };
 
-function CommunitySnapshotStrip({
+function RaceIntelligenceCard({
+  syncStatus,
   totalDrivers,
   totalLaps,
   activeTracks,
   currentTrack,
+  motionSxIndex = 1,
 }: {
+  syncStatus: SyncHealth;
   totalDrivers: number;
   totalLaps: number;
   activeTracks: number;
   currentTrack: CurrentTrackData | null;
+  motionSxIndex?: number;
 }) {
-  const items = [
-    { label: 'Drivers', value: formatNumber(totalDrivers) },
-    { label: 'Logged laps', value: formatNumber(totalLaps) },
-    { label: 'Active tracks', value: formatNumber(activeTracks) },
-    {
-      label: 'Server track',
-      value: currentTrack?.track ? getTrackDisplayName(currentTrack.track) : 'â€”',
-    },
-  ];
-
   return (
-    <Grid container spacing={1.25} sx={{ mt: 2 }}>
-      {items.map((item, index) => (
-        <Grid key={item.label} size={{ xs: 6, md: 3 }}>
-          <Box
+    <Box sx={softFloatWrapperSx({ alternatePhase: true })}>
+      <Box
+        sx={{
+          ...GLASS_PANEL_SX,
+          ...statusAccentBorderSx(syncStatus.color),
+          ...statusAccentSplitRimSx(syncStatus.color),
+          textAlign: { xs: 'center', md: 'left' },
+          ...glassCardMotionSx(motionSxIndex),
+        }}
+      >
+        <Stack spacing={2}>
+          <Box>
+            <Typography variant="overline" sx={sectionKickerSx}>
+              Race Intelligence
+            </Typography>
+            <Typography variant="h6" sx={{ fontWeight: 800, mt: 0.4 }}>
+              One view. All key data.
+            </Typography>
+            <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5 }}>
+              Live KMR-powered insights for driver search, safety rating, and license progression.
+            </Typography>
+          </Box>
+
+          <Typography
+            variant="body2"
             sx={{
-              ...GLASS_CARD_INNER_SX,
-              ...glassCardEnterOnlySx(index + 1),
-              minHeight: { xs: 72, md: 68 },
-              px: { xs: 1.35, md: 1.5 },
-              py: { xs: 1.15, md: 1 },
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
-              alignItems: { xs: 'center', md: 'flex-start' },
+              color: syncStatus.color,
+              fontWeight: 700,
               textAlign: { xs: 'center', md: 'left' },
             }}
           >
-            <Typography
-              variant="caption"
-              sx={{ color: 'rgba(255,255,255,0.66)', fontWeight: 700, letterSpacing: 0.2 }}
-            >
-              {item.label}
-            </Typography>
-            <Typography
-              variant="subtitle2"
-              sx={{ fontWeight: 800, lineHeight: 1.2, mt: 0.25 }}
-              noWrap
-              title={item.value}
-            >
-              {item.value}
-            </Typography>
-          </Box>
-        </Grid>
-      ))}
-    </Grid>
+            {syncStatus.label} · {syncStatus.ageText}
+          </Typography>
+
+          <Grid container spacing={1}>
+            {[
+              { label: 'Total drivers', value: formatNumber(totalDrivers) },
+              { label: 'Logged laps', value: formatNumber(totalLaps) },
+              { label: 'Active tracks', value: formatNumber(activeTracks) },
+              {
+                label: 'Live server track',
+                value: currentTrack?.track ? getTrackDisplayName(currentTrack.track) : '—',
+              },
+            ].map((item, tileIndex) => (
+              <Grid key={item.label} size={{ xs: 6 }}>
+                <Box
+                  sx={{
+                    ...GLASS_INNER_PANEL_SX,
+                    ...glassCardEnterOnlySx(3 + tileIndex),
+                    minHeight: 78,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    alignItems: { xs: 'center', md: 'flex-start' },
+                  }}
+                >
+                  <Typography
+                    variant="caption"
+                    sx={{ color: 'rgba(255,255,255,0.72)', fontWeight: 600, letterSpacing: 0.2 }}
+                  >
+                    {item.label}
+                  </Typography>
+                  <Typography
+                    variant="subtitle2"
+                    sx={{ fontWeight: 800, lineHeight: 1.25, mt: 0.2 }}
+                    noWrap
+                    title={typeof item.value === 'string' ? item.value : undefined}
+                  >
+                    {item.value}
+                  </Typography>
+                </Box>
+              </Grid>
+            ))}
+          </Grid>
+        </Stack>
+      </Box>
+    </Box>
   );
 }
 
@@ -299,7 +347,7 @@ function HeroSection({ currentTrack }: { currentTrack: CurrentTrackData | null }
                 }}
               >
                 <Stack direction="row" spacing={{ xs: 0.75, md: 1 }} alignItems="center">
-                  {/* Live dot â€” subtle "we're alive and updating" cue. */}
+                  {/* Live dot — subtle "we're alive and updating" cue. */}
                   <Box
                     aria-hidden
                     sx={{
@@ -312,7 +360,7 @@ function HeroSection({ currentTrack }: { currentTrack: CurrentTrackData | null }
                     }}
                   />
                   <Typography variant="overline" sx={sectionKickerSx}>
-                    AC Elite Simracing Â· Live
+                    AC Elite Simracing · Live
                   </Typography>
                 </Stack>
 
@@ -357,7 +405,7 @@ function HeroSection({ currentTrack }: { currentTrack: CurrentTrackData | null }
                     textShadow: '0 1px 8px rgba(15,23,42,0.62)',
                   }}
                 >
-                  Real-time leaderboards, license rankings, and Safety Rating â€” every lap from the
+                  Real-time leaderboards, license rankings, and Safety Rating — every lap from the
                   AC Elite server, updated as drivers cross the line.
                 </Typography>
               </Stack>
@@ -413,13 +461,13 @@ function HeroSection({ currentTrack }: { currentTrack: CurrentTrackData | null }
             {
               icon: 'solar:danger-triangle-bold',
               accent: '#f5c43b',
-              lead: 'License & Safety Rating â€” work in progress',
+              lead: 'License & Safety Rating — work in progress',
               body: 'These calculations are still being tuned, so values and thresholds may change as we refine them.',
             },
             {
               icon: 'solar:info-circle-bold',
               accent: '#7dd3fc',
-              lead: 'New â€” trend filter on every stats page',
+              lead: 'New — trend filter on every stats page',
               body: 'Use the 1h / 24h / 7d / 30d switch to see how Safety Rating, license pace, distance and more have changed over the window you pick.',
             },
           ]}
@@ -442,6 +490,7 @@ function CurrentTrackLeaderboardSection({
   driversByGuid,
   licenseMap,
   deltas,
+  syncStatus,
   onPageChange,
   onOpenGuide,
 }: {
@@ -457,6 +506,7 @@ function CurrentTrackLeaderboardSection({
   driversByGuid: Map<string, RankDriver>;
   licenseMap: Map<string, { license: string; paceScore: number }>;
   deltas: Map<string, DriverDelta>;
+  syncStatus: SyncHealth;
   onPageChange: (page: number) => void;
   onOpenGuide: (tab: 'license' | 'safety') => void;
 }) {
@@ -522,7 +572,7 @@ function CurrentTrackLeaderboardSection({
                       <TableRow>
                         <TableCell colSpan={8} sx={{ py: 4, px: 2 }}>
                           <EmptyState
-                            title="Loading leaderboardâ€¦"
+                            title="Loading leaderboard…"
                             description="Pulling current-track lap times. This usually takes a second."
                           />
                         </TableCell>
@@ -532,10 +582,7 @@ function CurrentTrackLeaderboardSection({
                     {!loading && error && (
                       <TableRow>
                         <TableCell colSpan={8} sx={{ py: 4, px: 2 }}>
-                          <EmptyState
-                            title="Couldnâ€™t load leaderboard data"
-                            description={error}
-                          />
+                          <EmptyState title="Couldn’t load leaderboard data" description={error} />
                         </TableCell>
                       </TableRow>
                     )}
@@ -663,7 +710,7 @@ function CurrentTrackLeaderboardSection({
                             <TableCell align="right" sx={{ fontFamily: 'monospace' }}>
                               {typeof entry.laptime === 'number'
                                 ? calculateGap(fastestLap, entry.laptime)
-                                : 'â€”'}
+                                : '—'}
                             </TableCell>
                             <TableCell align="right">
                               {(entry.laps || 0).toLocaleString()}
@@ -742,16 +789,18 @@ function DriverSearchSection({
   loading,
   error,
   currentTrack,
+  syncStatus,
   totalDrivers,
   totalLaps,
   activeTracks,
 }: {
   drivers: DriverView[];
-  /** Raw rank rows (with wins/points/km) â€” DriverView drops those fields. */
+  /** Raw rank rows (with wins/points/km) — DriverView drops those fields. */
   rankData: RankDriver[];
   loading: boolean;
   error: string | null;
   currentTrack: CurrentTrackData | null;
+  syncStatus: SyncHealth;
   totalDrivers: number;
   totalLaps: number;
   activeTracks: number;
@@ -781,7 +830,7 @@ function DriverSearchSection({
         position: 'relative',
         py: 4,
         background: 'transparent',
-        // Slightly stronger so the seam reads as crisp on both sides â€” the
+        // Slightly stronger so the seam reads as crisp on both sides — the
         // grid-pattern transition below already adds visual contrast on its own;
         // the top boundary needs the border to do all the work.
         borderTop: '1px solid rgba(226,242,255,0.08)',
@@ -791,7 +840,7 @@ function DriverSearchSection({
     >
       <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1 }}>
         <Grid container spacing={{ xs: 2, md: 4.5 }} alignItems="stretch">
-          <Grid size={{ xs: 12 }}>
+          <Grid size={{ xs: 12, md: 7 }}>
             <Stack
               spacing={1}
               sx={{
@@ -826,13 +875,20 @@ function DriverSearchSection({
               }}
             >
               <Stack spacing={1.5} sx={{ alignItems: 'stretch', width: '100%' }}>
+                <Typography
+                  variant="subtitle2"
+                  sx={{ color: 'text.secondary', textAlign: { xs: 'center', md: 'left' } }}
+                >
+                  Search driver
+                </Typography>
+
                 <TextField
                   fullWidth
                   value={query}
                   onChange={(event) => {
                     setQuery(event.target.value);
                   }}
-                  placeholder="Search by driver name or numeric IDâ€¦"
+                  placeholder="Search by driver name or numeric ID…"
                   variant="outlined"
                   size="medium"
                   autoComplete="off"
@@ -846,12 +902,6 @@ function DriverSearchSection({
                       opacity: 1,
                     },
                   }}
-                />
-                <CommunitySnapshotStrip
-                  totalDrivers={totalDrivers}
-                  totalLaps={totalLaps}
-                  activeTracks={activeTracks}
-                  currentTrack={currentTrack}
                 />
 
                 {!loading && !error && matches.length > 0 && (
@@ -941,6 +991,19 @@ function DriverSearchSection({
               </Typography>
             )}
           </Grid>
+
+          <Grid size={{ xs: 12, md: 5 }}>
+            <Stack spacing={1.25} sx={{ height: 1, alignItems: { xs: 'center', md: 'stretch' } }}>
+              <RaceIntelligenceCard
+                syncStatus={syncStatus}
+                totalDrivers={totalDrivers}
+                totalLaps={totalLaps}
+                activeTracks={activeTracks}
+                currentTrack={currentTrack}
+                motionSxIndex={1}
+              />
+            </Stack>
+          </Grid>
         </Grid>
       </Container>
     </Box>
@@ -959,6 +1022,7 @@ export default function Page() {
   // Per-row SR/pace deltas follow the shared trend-window filter.
   const deltas = useWindowedDriverDeltas(rankData, prevRankData);
   const teamRoles = SITE_TEAM_ROLES;
+  const [metadata, setMetadata] = useState<SiteMetadata>({});
   const [currentTrack, setCurrentTrack] = useState<CurrentTrackData | null>(null);
   const [currentTrackPage, setCurrentTrackPage] = useState(1);
   const staticCurrentTrackRef = useRef<CurrentTrackData | null>(null);
@@ -986,9 +1050,10 @@ export default function Page() {
       setLoading(true);
       setError(null);
       try {
-        const [rank, leaderboard, prevRank, trackJson] = await Promise.all([
+        const [rank, leaderboard, meta, prevRank, trackJson] = await Promise.all([
           fetchJson<RankDriver[]>(DATA_FILES.rank),
           fetchJson<Record<string, any>>(DATA_FILES.leaderboard),
+          fetchJson<SiteMetadata>(DATA_FILES.metadata),
           fetchPrevRankData(),
           fetchJson<CurrentTrackData>(DATA_FILES.currentTrack).catch(() => null),
         ]);
@@ -998,6 +1063,7 @@ export default function Page() {
         setRankData(rank);
         setPrevRankData(prevRank);
         setLeaderboardData(leaderboard);
+        setMetadata(meta);
 
         const staticPayload = toCurrentTrackPayload(trackJson);
         if (!canAttemptLiveServerStatusFetch()) {
@@ -1059,16 +1125,18 @@ export default function Page() {
       void Promise.all([
         fetchJson<RankDriver[]>(DATA_FILES.rank),
         fetchJson<Record<string, any>>(DATA_FILES.leaderboard),
+        fetchJson<SiteMetadata>(DATA_FILES.metadata),
         fetchPrevRankData(),
       ])
-        .then(([rank, leaderboard, prevRank]) => {
+        .then(([rank, leaderboard, meta, prevRank]) => {
           if (!mounted) return;
           setRankData(rank);
           setPrevRankData(prevRank);
           setLeaderboardData(leaderboard);
+          setMetadata(meta);
         })
         .catch(() => {
-          // Transient fetch failure â€” the next sync event will retry.
+          // Transient fetch failure — the next sync event will retry.
         });
     });
     return () => {
@@ -1183,6 +1251,7 @@ export default function Page() {
 
     return { totalDrivers, totalLaps, activeTracks: trackIds.size };
   }, [drivers, rankData]);
+  const syncStatus = getSyncHealth(getEffectiveLastSync(metadata.lastSync, rankData));
 
   return (
     <>
@@ -1205,6 +1274,7 @@ export default function Page() {
         loading={loading}
         error={error}
         currentTrack={currentTrack}
+        syncStatus={syncStatus}
         totalDrivers={community.totalDrivers}
         totalLaps={community.totalLaps}
         activeTracks={community.activeTracks}
@@ -1222,6 +1292,7 @@ export default function Page() {
         driversByGuid={driversByGuid}
         licenseMap={leaderboardLicenseMap}
         deltas={deltas}
+        syncStatus={syncStatus}
         onPageChange={setCurrentTrackPage}
         onOpenGuide={openGuide}
       />
