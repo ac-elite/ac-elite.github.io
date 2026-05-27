@@ -17,17 +17,41 @@ export function subscribeKmrSync(onSync: () => void): () => void {
   if (kmrSupabaseDisabled() || !supabaseReadConfigured()) return () => {};
   const client = getSupabaseClient();
   if (!client) return () => {};
+
+  const hasDocument = typeof document !== 'undefined';
+  // Defer refetches while the tab is hidden so abandoned/background tabs don't
+  // re-pull the multi-MB rank/leaderboard JSON on every ~15-min sync. Missed
+  // syncs coalesce into a single refetch when the tab becomes visible again.
+  let pendingWhileHidden = false;
+
+  const triggerSync = () => {
+    if (hasDocument && document.visibilityState === 'hidden') {
+      pendingWhileHidden = true;
+      return;
+    }
+    onSync();
+  };
+
+  const onVisibilityChange = () => {
+    if (pendingWhileHidden && document.visibilityState === 'visible') {
+      pendingWhileHidden = false;
+      onSync();
+    }
+  };
+  if (hasDocument) document.addEventListener('visibilitychange', onVisibilityChange);
+
   const channel = client
     .channel('kmr-sync-live')
     .on(
       'postgres_changes',
       { event: '*', schema: 'public', table: 'kmr_sync' },
       () => {
-        onSync();
+        triggerSync();
       }
     )
     .subscribe();
   return () => {
+    if (hasDocument) document.removeEventListener('visibilitychange', onVisibilityChange);
     void client.removeChannel(channel);
   };
 }
