@@ -238,6 +238,8 @@ function buildCommunityPulse(rankData: RankDriver[]) {
       avgSafety7d: null as number | null,
       buckets: [],
       peakDrivers: 0,
+      srAxisMax: 3,
+      srAxisMin: 1,
       totalLaps7d: 0,
     };
   }
@@ -289,12 +291,22 @@ function buildCommunityPulse(rankData: RankDriver[]) {
           0
         ) / active7d
       : null;
+  const safetyValues = normalizedBuckets
+    .map((bucket) => bucket.avgSafety)
+    .filter((value): value is number => value != null);
+  const safetyMin = safetyValues.length ? Math.min(...safetyValues) : 1;
+  const safetyMax = safetyValues.length ? Math.max(...safetyValues) : 3;
+  const safetyPadding = Math.max(0.08, (safetyMax - safetyMin) * 0.35);
+  const srAxisMin = Math.max(1, Math.floor((safetyMin - safetyPadding) * 10) / 10);
+  const srAxisMax = Math.min(10, Math.ceil((safetyMax + safetyPadding) * 10) / 10);
 
   return {
     active7d,
     avgSafety7d,
     buckets: normalizedBuckets,
     peakDrivers: Math.max(...normalizedBuckets.map((bucket) => bucket.activeDrivers)),
+    srAxisMax: srAxisMax <= srAxisMin ? Math.min(10, srAxisMin + 0.3) : srAxisMax,
+    srAxisMin,
     totalLaps7d,
   };
 }
@@ -448,10 +460,10 @@ function CommunityPulseCard({
                     },
                     {
                       opposite: true,
-                      min: 1,
-                      max: 10,
-                      tickAmount: 3,
-                      labels: { formatter: (value: number) => value.toFixed(0) },
+                      min: pulse.srAxisMin,
+                      max: pulse.srAxisMax,
+                      tickAmount: 4,
+                      labels: { formatter: (value: number) => value.toFixed(1) },
                     },
                   ],
                 }}
