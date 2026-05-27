@@ -221,6 +221,14 @@ function parseSession(raw: RawSession, fileName: string) {
   const numLaps = classification.reduce((m, c) => Math.max(m, c.numLaps), 0);
   const winner = classification[0];
 
+  // "Active" drivers = those who completed at least one lap (i.e. actually drove).
+  // Only sessions with >= 2 active drivers are shown on the site. The rest (empty
+  // / idle server sessions) are still recorded as `listed: false` markers with no
+  // detail, so the sync dedupes them and never re-downloads them — but they don't
+  // appear in the list and cost almost no storage.
+  const activeDrivers = lapsByGuid.size;
+  const listed = activeDrivers >= 2;
+
   return {
     session_file: raw.SessionFile || fileName,
     type,
@@ -228,14 +236,15 @@ function parseSession(raw: RawSession, fileName: string) {
     track_config: raw.TrackConfig ?? null,
     event_name: raw.EventName ?? null,
     session_date: raw.Date ? new Date(raw.Date).toISOString() : null,
-    num_drivers: classification.length,
-    num_laps: numLaps,
-    best_lap_ms: bestLapMs,
-    best_lap_guid: bestLapGuid || null,
-    best_lap_name: bestLapName || null,
-    winner_guid: winner?.guid ?? null,
-    winner_name: winner?.name ?? null,
-    detail: { classification, laps, incidents },
+    num_drivers: listed ? classification.length : activeDrivers,
+    num_laps: listed ? numLaps : 0,
+    best_lap_ms: listed ? bestLapMs : null,
+    best_lap_guid: listed ? bestLapGuid || null : null,
+    best_lap_name: listed ? bestLapName || null : null,
+    winner_guid: listed ? winner?.guid ?? null : null,
+    winner_name: listed ? winner?.name ?? null : null,
+    listed,
+    detail: listed ? { classification, laps, incidents } : { classification: [], laps: [], incidents: [] },
   };
 }
 

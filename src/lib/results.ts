@@ -103,6 +103,7 @@ export async function fetchSessions(
   const params = new URLSearchParams();
   params.set('select', SUMMARY_SELECT);
   params.set('order', 'session_date.desc.nullslast');
+  params.set('listed', 'eq.true');
   if (q.type && q.type !== 'ALL') params.set('type', `eq.${q.type}`);
   if (q.track && q.track !== 'ALL') params.set('track_name', `eq.${q.track}`);
 
@@ -125,7 +126,7 @@ export async function fetchSessions(
 /** Distinct track ids present in the sessions table, for the track filter. */
 export async function fetchSessionTrackOptions(): Promise<string[]> {
   if (!supabaseReadConfigured()) return [];
-  const params = new URLSearchParams({ select: 'track_name', order: 'track_name.asc' });
+  const params = new URLSearchParams({ select: 'track_name', order: 'track_name.asc', listed: 'eq.true' });
   try {
     const res = await fetch(restUrl('sessions', params), {
       headers: { ...(supabaseHeaders() as Record<string, string>), 'Range-Unit': 'items', Range: '0-4999' },

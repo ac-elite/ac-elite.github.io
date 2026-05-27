@@ -33,11 +33,15 @@ create table if not exists public.sessions (
   best_lap_name text,
   winner_guid   text,                           -- P1 (race) / pole (qualify/practice)
   winner_name   text,
+  -- Only sessions with >= 2 drivers who actually drove are `listed`. Idle/empty
+  -- sessions are kept as `listed = false` markers (no detail) so the sync dedupes
+  -- them without re-downloading, but they never show on the site.
+  listed        boolean not null default true,
   detail        jsonb not null default '{}'::jsonb,
   created_at    timestamptz not null default now()
 );
 
-create index if not exists sessions_date_idx  on public.sessions (session_date desc);
+create index if not exists sessions_listed_date_idx on public.sessions (listed, session_date desc);
 create index if not exists sessions_type_idx  on public.sessions (type);
 create index if not exists sessions_track_idx on public.sessions (track_name);
 
