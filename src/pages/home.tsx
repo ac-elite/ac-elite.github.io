@@ -488,7 +488,7 @@ function CommunityPulseCard({
             }}
           >
             <Typography variant="caption" sx={{ fontWeight: 700 }}>
-              {formatNumber(pulse.totalLaps7d)} profile laps from recently active drivers
+              {formatNumber(pulse.totalLaps7d)} total laps by recently active drivers
             </Typography>
             <Typography variant="caption" sx={{ color: syncStatus.color, fontWeight: 800 }}>
               {syncStatus.label} · {syncStatus.ageText}
