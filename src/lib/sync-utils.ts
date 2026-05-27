@@ -6,8 +6,6 @@ export type SiteMetadata = {
   lastSync?: string;
   status?: string;
   error?: string;
-  /** Set when Daily Rank Snapshot commits `rank-24h.json` (ISO 8601). Preserved across KMR syncs. */
-  rank24hSnapshotAt?: string;
 };
 
 export type SyncHealthLabel = 'Live' | 'Delayed' | 'Stale' | 'Unknown';
@@ -23,17 +21,13 @@ export type SyncHealth = {
  * - `default`      hourly-ish feeds (Live < 2h)
  * - `liveFeed`     realtime Supabase feeds synced every ~15 min or faster
  *                  (Live < 30 min, so a couple of missed cycles flag Delayed)
- * - `dailySnapshot` jobs that run at most once per day
  */
-export type SyncHealthProfile = 'default' | 'liveFeed' | 'dailySnapshot';
+export type SyncHealthProfile = 'default' | 'liveFeed';
 
 /**
  * Data freshness for UI badges (same thresholds as former home/dashboard helpers).
  * Use `color` with `statusAccentBorderSx` from `src/lib/status-accent` **only** for accents that
  * represent this freshness. For other panels use `brandAccentBorderSx()`.
- *
- * @param profile `dailySnapshot` — job runs at most once per day; age under ~30h stays **Live**
- *   so a snapshot from “yesterday morning” is not flagged **Delayed** like an hourly feed.
  */
 export function getSyncHealth(lastSync?: string, profile: SyncHealthProfile = 'default'): SyncHealth {
   if (!lastSync) {
@@ -49,18 +43,6 @@ export function getSyncHealth(lastSync?: string, profile: SyncHealthProfile = 'd
   const hour = 60 * 60 * 1000;
   const day = 24 * hour;
   const ago = formatTimeAgo(lastSync);
-
-  if (profile === 'dailySnapshot') {
-    const liveWindow = 30 * hour;
-    const delayedWindow = 54 * hour;
-    if (diffMs <= liveWindow) {
-      return { label: 'Live', color: '#22c55e', ageText: ago };
-    }
-    if (diffMs <= delayedWindow) {
-      return { label: 'Delayed', color: '#f59e0b', ageText: ago };
-    }
-    return { label: 'Stale', color: '#ef4444', ageText: ago };
-  }
 
   if (profile === 'liveFeed') {
     const minute = 60 * 1000;

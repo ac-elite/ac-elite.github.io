@@ -10,8 +10,7 @@
  *      workflow used; tries the `kissmyrank/` folder then the FTP root).
  *   2. Validate the JSON shape (array / object) so we never publish garbage.
  *   3. Upload both files + a `metadata.json` to the public Storage bucket
- *      `kmr-data`. The site reads from there, falling back to the static
- *      `public/data/*.json` still committed by the workflow (kept as backup).
+ *      `kmr-data`. The site reads these live Storage objects directly.
  *   4. Upsert the `kmr_sync` status row (id=1) — the site subscribes to this
  *      via Realtime and refetches within ~1s of a successful sync.
  *   5. Phase 3: if the newest `rank_history` row is older than ~55 min, insert

@@ -17,7 +17,7 @@ import { GLASS_PANEL_COMPACT_SX, GLASS_TABLE_CONTAINER_SX } from 'src/lib/glass'
 import { glassCardMotionSx } from 'src/lib/subtle-motion';
 import { brandAccentBorderSx } from 'src/lib/status-accent';
 import { TABLE_HEAD_MUTED_COLOR } from 'src/lib/page-shell';
-import { getSyncHealth, formatTimeAgo } from 'src/lib/sync-utils';
+import { getSyncHealth } from 'src/lib/sync-utils';
 import {
   fetchAdminSyncStatus,
   type AdminSyncStatus,
@@ -26,17 +26,16 @@ import {
 
 type Verdict = { label: string; color: string };
 
-/** What the *site* is actually serving right now for this feed. */
-function siteSourceVerdict(service: SyncServiceStatus): Verdict {
-  if (service.siteOnBackup) {
-    return { label: 'ON BACKUP', color: '#ef4444' };
+function liveServiceVerdict(service: SyncServiceStatus): Verdict {
+  if (!service.live.reachable) {
+    return { label: 'UNREACHABLE', color: '#ef4444' };
   }
   if (service.live.status === 'error') {
-    return { label: 'LIVE · last sync failed', color: '#f59e0b' };
+    return { label: 'LIVE - LAST SYNC FAILED', color: '#f59e0b' };
   }
   const health = getSyncHealth(service.live.at ?? undefined, 'liveFeed');
   if (health.label !== 'Live') {
-    return { label: `LIVE · ${health.label.toLowerCase()}`, color: health.color };
+    return { label: `LIVE - ${health.label.toUpperCase()}`, color: health.color };
   }
   return { label: 'LIVE', color: '#22c55e' };
 }
@@ -50,7 +49,7 @@ const bodyCellSx = {
 
 function ServiceRow({ feed, service }: { feed: string; service: SyncServiceStatus }) {
   const health = getSyncHealth(service.live.at ?? undefined, 'liveFeed');
-  const verdict = siteSourceVerdict(service);
+  const verdict = liveServiceVerdict(service);
 
   return (
     <TableRow
@@ -101,10 +100,6 @@ function ServiceRow({ feed, service }: { feed: string; service: SyncServiceStatu
             Supabase unreachable
           </Typography>
         )}
-      </TableCell>
-
-      <TableCell sx={{ ...bodyCellSx, color: 'text.secondary' }}>
-        <Typography variant="caption">{formatTimeAgo(service.backupAt ?? undefined)}</Typography>
       </TableCell>
 
       <TableCell sx={{ ...bodyCellSx }}>
@@ -170,13 +165,11 @@ export function AdminSyncStatusPanel({ motionIndex = 2 }: { motionIndex?: number
             Live data services
           </Typography>
           <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.4 }}>
-            Realtime Supabase sync vs the GitHub Actions backup. When &ldquo;Site source&rdquo;
-            shows <strong>ON BACKUP</strong>, the live sync is down and the site is serving the
-            Actions data. A long all-green streak means the Actions are safe to retire.
+            Realtime Supabase sync status for KMR data and live server status.
           </Typography>
         </Box>
         <Button variant="outlined" size="small" onClick={() => void load()} disabled={loading}>
-          {loading ? 'Refreshing…' : 'Refresh'}
+          {loading ? 'Refreshing...' : 'Refresh'}
         </Button>
       </Stack>
 
@@ -189,7 +182,7 @@ export function AdminSyncStatusPanel({ motionIndex = 2 }: { motionIndex?: number
           borderRadius: 2,
         }}
       >
-        <Table size="small" sx={{ borderCollapse: 'separate', borderSpacing: 0, minWidth: 720 }}>
+        <Table size="small" sx={{ borderCollapse: 'separate', borderSpacing: 0, minWidth: 600 }}>
           <TableHead>
             <TableRow
               sx={{
@@ -207,8 +200,7 @@ export function AdminSyncStatusPanel({ motionIndex = 2 }: { motionIndex?: number
             >
               <TableCell sx={{ width: { xs: 150, sm: 190 } }}>Feed</TableCell>
               <TableCell sx={{ width: { xs: 220, sm: 280 } }}>Live sync (Supabase)</TableCell>
-              <TableCell sx={{ width: { xs: 130, sm: 150 } }}>Backup (GitHub)</TableCell>
-              <TableCell sx={{ width: { xs: 150, sm: 180 } }}>Site source</TableCell>
+              <TableCell sx={{ width: { xs: 150, sm: 180 } }}>Status</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>

@@ -66,15 +66,15 @@ const DATA_FILES: readonly DataFileEntry[] = [
       s.metadata?.status === 'success' ? 'Last run reported success' : (s.metadata?.status ?? ''),
   },
   {
-    file: 'current-track.json',
-    updatedBy: 'AC Elite server (live check + hourly backup)',
+    file: 'server_status',
+    updatedBy: 'Supabase live server check',
     getTimestamp: (s) => s.currentTrack?.fetchedAt,
     syncHealthProfile: 'liveFeed',
     getNote: (s) => {
       const state = s.currentTrack?.online
-        ? `Online · ${s.currentTrack.track ? getTrackDisplayName(s.currentTrack.track) : '—'}`
+        ? `Online - ${s.currentTrack.track ? getTrackDisplayName(s.currentTrack.track) : '-'}`
         : 'Offline';
-      return `${state} · Time shown is the newest of: frequent live checks, or the hourly backup when the lobby/track changed`;
+      return `${state} - live row from Supabase`;
     },
   },
   {
@@ -82,16 +82,6 @@ const DATA_FILES: readonly DataFileEntry[] = [
     updatedBy: 'Ranking sync (KMR)',
     getTimestamp: (s) => s.metadata?.lastSync,
     syncHealthProfile: 'liveFeed',
-  },
-  {
-    file: 'rank-24h.json',
-    updatedBy: 'Daily 24h snapshot (once per day)',
-    getTimestamp: (s) => s.metadata?.rank24hSnapshotAt,
-    syncHealthProfile: 'dailySnapshot',
-    getNote: (s) =>
-      s.metadata?.rank24hSnapshotAt
-        ? 'Runs at most once per day; timestamp is kept when the main rank file refreshes'
-        : 'Will fill in automatically after the next daily snapshot job',
   },
   {
     file: 'leaderboard.json',

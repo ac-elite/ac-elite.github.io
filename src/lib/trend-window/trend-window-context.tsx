@@ -18,7 +18,7 @@ import {
   type ReactNode,
 } from 'react';
 
-import { computeDeltas, type DriverDelta } from 'src/lib/delta';
+import { type DriverDelta } from 'src/lib/delta';
 import { type RankDriver } from 'src/lib/ac-elite-data';
 import {
   HISTORY_WINDOWS,
@@ -125,21 +125,9 @@ export function useTrendWindow(): TrendWindowValue {
 
 /**
  * Per-row SR + pace deltas for the active window, ready for the `DeltaChip`s.
- *
- * For the **24h** window the proven `rank-24h.json` baseline is used while
- * `rank_history` snapshots are still accumulating SR/pace — so 24h never
- * regresses. Other windows use the windowed `rank_history` snapshot.
+ * Every window uses the Supabase `rank_history` snapshot for that timeframe.
  */
-export function useWindowedDriverDeltas(
-  rankData: RankDriver[],
-  prevRank24h: RankDriver[]
-): Map<string, DriverDelta> {
-  const { activeWindow, snapshot } = useTrendWindow();
-  return useMemo(() => {
-    const windowed = computeWindowedDeltas(rankData, snapshot);
-    if (activeWindow === '24h' && windowed.size === 0) {
-      return computeDeltas(rankData, prevRank24h);
-    }
-    return windowed;
-  }, [activeWindow, snapshot, rankData, prevRank24h]);
+export function useWindowedDriverDeltas(rankData: RankDriver[]): Map<string, DriverDelta> {
+  const { snapshot } = useTrendWindow();
+  return useMemo(() => computeWindowedDeltas(rankData, snapshot), [snapshot, rankData]);
 }

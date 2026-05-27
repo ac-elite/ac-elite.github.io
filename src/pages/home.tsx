@@ -1,4 +1,4 @@
-import { useRef, useMemo, useState, useEffect } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
@@ -30,7 +30,7 @@ import { getDriverProfileHref } from 'src/lib/routes';
 import { getSiteUrl } from 'src/centralized/site-urls';
 import { SITE_TEAM_ROLES } from 'src/site-manual-config';
 import { ACE_SKIN_PACK_DOWNLOAD_URL } from 'src/lib/ace-skin-pack-download';
-import { type DriverDelta, fetchPrevRankData } from 'src/lib/delta';
+import { type DriverDelta } from 'src/lib/delta';
 import { subscribeKmrSync } from 'src/lib/kmr-sync';
 import { useWindowedDriverDeltas } from 'src/lib/trend-window/trend-window-context';
 import { getTeamRole, type TeamRole, teamRoleToDiscordRole } from 'src/lib/team-roles';
@@ -71,9 +71,6 @@ import {
   GLASS_TABLE_PAGINATION_SX,
 } from 'src/lib/glass';
 import {
-  pickNewerCurrentTrack,
-  toCurrentTrackPayload,
-  applyServerOfflineDebug,
   type CurrentTrackPayload,
   subscribeLiveServerStatus,
   LIVE_SERVER_STATUS_POLL_MS,
@@ -1191,15 +1188,13 @@ export default function Page() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [rankData, setRankData] = useState<RankDriver[]>([]);
-  const [prevRankData, setPrevRankData] = useState<RankDriver[]>([]);
   const [leaderboardData, setLeaderboardData] = useState<Record<string, any>>({});
   // Per-row SR/pace deltas follow the shared trend-window filter.
-  const deltas = useWindowedDriverDeltas(rankData, prevRankData);
+  const deltas = useWindowedDriverDeltas(rankData);
   const teamRoles = SITE_TEAM_ROLES;
   const [metadata, setMetadata] = useState<SiteMetadata>({});
   const [currentTrack, setCurrentTrack] = useState<CurrentTrackData | null>(null);
   const [currentTrackPage, setCurrentTrackPage] = useState(1);
-  const staticCurrentTrackRef = useRef<CurrentTrackData | null>(null);
 
   useEffect(() => {
     if (!isServerStatusDebugEnabled()) return;
@@ -1224,30 +1219,20 @@ export default function Page() {
       setLoading(true);
       setError(null);
       try {
-        const [rank, leaderboard, meta, prevRank, trackJson] = await Promise.all([
+        const [rank, leaderboard, meta, live] = await Promise.all([
           fetchJson<RankDriver[]>(DATA_FILES.rank),
           fetchJson<Record<string, any>>(DATA_FILES.leaderboard),
           fetchJson<SiteMetadata>(DATA_FILES.metadata),
-          fetchPrevRankData(),
-          fetchJson<CurrentTrackData>(DATA_FILES.currentTrack).catch(() => null),
+          canAttemptLiveServerStatusFetch()
+            ? fetchLiveServerStatusFromSupabase()
+            : Promise.resolve(null),
         ]);
 
         if (!mounted) return;
-        staticCurrentTrackRef.current = trackJson;
         setRankData(rank);
-        setPrevRankData(prevRank);
         setLeaderboardData(leaderboard);
         setMetadata(meta);
-
-        const staticPayload = toCurrentTrackPayload(trackJson);
-        if (!canAttemptLiveServerStatusFetch()) {
-          setCurrentTrack(applyServerOfflineDebug(staticPayload));
-        } else {
-          void fetchLiveServerStatusFromSupabase().then((live) => {
-            if (!mounted) return;
-            setCurrentTrack(pickNewerCurrentTrack(staticPayload, live));
-          });
-        }
+        setCurrentTrack(live);
       } catch (e) {
         if (!mounted) return;
         setError(e instanceof Error ? e.message : 'Unknown error');
@@ -1267,21 +1252,13 @@ export default function Page() {
     if (!shouldPollLiveServerStatus()) return undefined;
     let mounted = true;
     const tick = () => {
-      void fetchJson<CurrentTrackData>(DATA_FILES.currentTrack)
-        .catch(() => null)
-        .then((trackJson) => {
-          if (!mounted) return;
-          staticCurrentTrackRef.current = trackJson;
-          void fetchLiveServerStatusFromSupabase().then((live) => {
-            if (!mounted) return;
-            setCurrentTrack(
-              pickNewerCurrentTrack(toCurrentTrackPayload(staticCurrentTrackRef.current), live)
-            );
-          });
-        });
+      void fetchLiveServerStatusFromSupabase().then((live) => {
+        if (!mounted) return;
+        setCurrentTrack(live);
+      });
     };
     // Realtime push updates the card within ~1s of the Edge Function writing a
-    // new row; the interval below stays as a backup if the socket drops.
+    // new row; the interval below keeps polling if the socket drops.
     const unsubscribe = subscribeLiveServerStatus(tick);
     const id = window.setInterval(tick, LIVE_SERVER_STATUS_POLL_MS);
     return () => {
@@ -1300,12 +1277,10 @@ export default function Page() {
         fetchJson<RankDriver[]>(DATA_FILES.rank),
         fetchJson<Record<string, any>>(DATA_FILES.leaderboard),
         fetchJson<SiteMetadata>(DATA_FILES.metadata),
-        fetchPrevRankData(),
       ])
-        .then(([rank, leaderboard, meta, prevRank]) => {
+        .then(([rank, leaderboard, meta]) => {
           if (!mounted) return;
           setRankData(rank);
-          setPrevRankData(prevRank);
           setLeaderboardData(leaderboard);
           setMetadata(meta);
         })

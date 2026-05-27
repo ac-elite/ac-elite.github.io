@@ -22,8 +22,6 @@
 --   Uitzetten live-read: VITE_SUPABASE_LIVE_SERVER_STATUS=0 (of false / off).
 --   Expliciet forceren: VITE_SUPABASE_LIVE_SERVER_STATUS=1 (zelfde gedrag als keys aanwezig + niet uit).
 --
--- Optioneel: GitHub workflow "Current Track Snapshot (GitHub)" (current-track.json) zeldzamer maken als Supabase
---   de bron van waarheid is; de JSON blijft nuttig als fallback en voor git-history.
 
 create table if not exists public.server_status (
   id int primary key check (id = 1),
@@ -67,7 +65,7 @@ $policy$;
 -- === Realtime: push i.p.v. pollen ===
 -- Zet de tabel in de `supabase_realtime` publication zodat de site via een
 -- WebSocket meteen een melding krijgt als de Edge Function een nieuwe rij schrijft
--- (track-wissel zichtbaar binnen ~1s i.p.v. de 90s-poll). De poll blijft als backup.
+-- (track-wissel zichtbaar binnen ~1s i.p.v. de 90s-poll). De poll blijft actief als de realtime socket wegvalt.
 do $realtime$
 begin
   if not exists (

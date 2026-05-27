@@ -25,7 +25,6 @@ import { DATA_FILES } from 'src/centralized/data-files';
 import { fetchJson } from 'src/lib/fetch-json';
 import { getDriverProfileHref } from 'src/lib/routes';
 import { getSiteUrl } from 'src/centralized/site-urls';
-import { fetchPrevRankData } from 'src/lib/delta';
 import { useWindowedDriverDeltas } from 'src/lib/trend-window/trend-window-context';
 import { getSyncHealth, type SiteMetadata, getEffectiveLastSync } from 'src/lib/sync-utils';
 import { subtleRowEnterSx, glassCardMotionSx } from 'src/lib/subtle-motion';
@@ -159,10 +158,9 @@ export default function Page() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [rankData, setRankData] = useState<RankDriver[]>([]);
-  const [prevRankData, setPrevRankData] = useState<RankDriver[]>([]);
   const [metadata, setMetadata] = useState<SiteMetadata>({});
   // Per-row SR/pace deltas follow the shared trend-window filter.
-  const deltas = useWindowedDriverDeltas(rankData, prevRankData);
+  const deltas = useWindowedDriverDeltas(rankData);
 
   const [tab, setTab] = useState<RankingsTab>('overall');
   const [licenseTier, setLicenseTier] = useState<string>('All');
@@ -177,14 +175,12 @@ export default function Page() {
       setLoading(true);
       setError(null);
       try {
-        const [rank, prevRank, meta] = await Promise.all([
+        const [rank, meta] = await Promise.all([
           fetchJson<RankDriver[]>(DATA_FILES.rank),
-          fetchPrevRankData(),
           fetchJson<SiteMetadata>(DATA_FILES.metadata).catch(() => ({})),
         ]);
         if (!mounted) return;
         setRankData(rank);
-        setPrevRankData(prevRank);
         setMetadata(meta);
       } catch (e) {
         if (!mounted) return;

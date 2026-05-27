@@ -42,9 +42,8 @@ export function TrendWindowStats(props: TrendWindowStatsProps) {
   const { activeWindow, setActiveWindow, availableWindows, snapshot } = useTrendWindow();
 
   const windowLabel = HISTORY_WINDOWS.find((w) => w.key === activeWindow)?.label ?? activeWindow;
-  // 24h has the rank-24h.json fallback (always SR/pace-capable); other windows
-  // depend on the snapshot carrying sr/pace, which older 7d/30d ones don't yet.
-  const srPaceReady = activeWindow === '24h' || snapshotHasSrPace(snapshot);
+  // Some older rank_history snapshots predate SR/pace capture.
+  const srPaceReady = snapshotHasSrPace(snapshot);
 
   let line: React.ReactNode;
   if (variant === 'community') {

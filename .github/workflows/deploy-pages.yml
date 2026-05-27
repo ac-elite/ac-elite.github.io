@@ -6,13 +6,7 @@ env:
 on:
   push:
     branches: [main]
-    paths-ignore:
-      - 'public/data/**'
   workflow_dispatch:
-  workflow_run:
-    workflows: ["Sync KMR Data", "Daily Rank Snapshot (24h)"]
-    types: [completed]
-    branches: [main]
 
 permissions:
   contents: read
@@ -25,7 +19,6 @@ concurrency:
 
 jobs:
   build:
-    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     permissions:
       contents: read

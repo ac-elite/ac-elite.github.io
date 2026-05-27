@@ -6,10 +6,8 @@ const APP_BASE_URL = import.meta.env.BASE_URL;
 const KMR_BUCKET = 'kmr-data';
 
 /**
- * Static data paths that are also published to Supabase Storage by the
- * `sync-kmr-data` Edge Function. Mapped to their object name in the bucket.
- * For these, we try Supabase first (fresher — synced every ~15 min, no Pages
- * rebuild) and fall back to the static file the GitHub Action still commits.
+ * Live data paths published to Supabase Storage by the `sync-kmr-data` Edge
+ * Function. The old GitHub Actions JSON backups have been retired.
  */
 const SUPABASE_BACKED_FILES: Record<string, string> = {
   '/data/rank.json': 'rank.json',
@@ -45,22 +43,10 @@ export async function fetchJson<T>(url: string): Promise<T> {
   const backedObject = SUPABASE_BACKED_FILES[url];
   if (backedObject) {
     const storageUrl = supabaseStorageUrl(backedObject);
-    if (storageUrl) {
-      try {
-        return await fetchJsonAt<T>(storageUrl);
-      } catch {
-        // Supabase unreachable / bucket empty — fall back to the static file.
-      }
+    if (!storageUrl) {
+      throw new Error(`Supabase live data is not configured for ${url}`);
     }
+    return fetchJsonAt<T>(storageUrl);
   }
-  return fetchJsonAt<T>(resolveFetchUrl(url));
-}
-
-/**
- * Always fetch the static file committed to the repo (the GitHub Actions
- * backup), bypassing the Supabase Storage source. Used by the admin sync-status
- * panel to compare the live source against the backup.
- */
-export async function fetchStaticJson<T>(url: string): Promise<T> {
   return fetchJsonAt<T>(resolveFetchUrl(url));
 }

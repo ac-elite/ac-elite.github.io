@@ -1,10 +1,7 @@
 -- AC Elite — realtime KMR data via Supabase (Edge Function -> Storage + tables).
 -- Run this whole file once in the Supabase SQL Editor.
 --
--- It replaces the hourly "Sync KMR Data" + "Daily Rank Snapshot (24h)" GitHub
--- Actions. Those workflows stay enabled as a backup; the site prefers Supabase
--- and silently falls back to the committed public/data/*.json if Supabase is
--- unreachable or VITE_SUPABASE_KMR_DATA=0.
+-- It replaced the hourly GitHub Actions data sync and daily 24h snapshot. The site now reads live Supabase Storage and rank_history data.
 --
 -- Deploy steps (after running this SQL):
 --   1. supabase secrets set FTP_HOST=... FTP_USER=... FTP_PASS=...
@@ -70,7 +67,7 @@ $realtime$;
 
 -- ===========================================================================
 -- 3. rank_history — slim per-driver snapshots for arbitrary-window deltas
---    (replaces the single fixed rank-24h.json). Each row stores only scalar
+--    (replaced the single fixed 24h JSON snapshot). Each row stores only scalar
 --    fields, so a snapshot is a few tens of KB. The Edge Function inserts at
 --    most one snapshot per hour; prune_rank_history() keeps the table small.
 -- ===========================================================================

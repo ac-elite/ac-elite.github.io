@@ -26,7 +26,6 @@ import { DATA_FILES } from 'src/centralized/data-files';
 import { fetchJson } from 'src/lib/fetch-json';
 import { getDriverProfileHref } from 'src/lib/routes';
 import { getSiteUrl } from 'src/centralized/site-urls';
-import { fetchPrevRankData } from 'src/lib/delta';
 import { useWindowedDriverDeltas } from 'src/lib/trend-window/trend-window-context';
 import { getSyncHealth, type SiteMetadata, getEffectiveLastSync } from 'src/lib/sync-utils';
 import { subtleRowEnterSx, glassCardMotionSx } from 'src/lib/subtle-motion';
@@ -48,9 +47,6 @@ import {
   GLASS_SELECT_MENU_ITEM_SX,
 } from 'src/lib/glass-select';
 import {
-  pickNewerCurrentTrack,
-  toCurrentTrackPayload,
-  type CurrentTrackPayload,
   canAttemptLiveServerStatusFetch,
   fetchLiveServerStatusFromSupabase,
 } from 'src/lib/server-status';
@@ -83,8 +79,6 @@ import { useLicenseSafetyGuide } from 'src/components/license-safety-guide/licen
 
 const LEADERBOARD_PER_PAGE = 20;
 
-type CurrentTrackData = CurrentTrackPayload;
-
 /** Same canonical id set as the track dropdown (leaderboard keys ∪ catalog). */
 function buildCanonicalLeaderboardTrackIdSet(leaderboard: Record<string, any>): Set<string> {
   const idsFromData = Object.keys(leaderboard || {});
@@ -104,11 +98,10 @@ export default function Page() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [rankData, setRankData] = useState<RankDriver[]>([]);
-  const [prevRankData, setPrevRankData] = useState<RankDriver[]>([]);
   const [leaderboardData, setLeaderboardData] = useState<Record<string, any>>({});
   const [metadata, setMetadata] = useState<SiteMetadata>({});
   // Per-row SR/pace deltas follow the shared trend-window filter.
-  const deltas = useWindowedDriverDeltas(rankData, prevRankData);
+  const deltas = useWindowedDriverDeltas(rankData);
   const [preferredTrack, setPreferredTrack] = useState('');
   const [currentTrack, setCurrentTrack] = useState('');
   const [page, setPage] = useState(1);
@@ -119,11 +112,9 @@ export default function Page() {
       setLoading(true);
       setError(null);
       try {
-        const [rank, leaderboard, prevRank, trackJson, meta, liveStatus] = await Promise.all([
+        const [rank, leaderboard, meta, liveStatus] = await Promise.all([
           fetchJson<RankDriver[]>(DATA_FILES.rank),
           fetchJson<Record<string, any>>(DATA_FILES.leaderboard),
-          fetchPrevRankData(),
-          fetchJson<CurrentTrackData>(DATA_FILES.currentTrack).catch(() => null),
           fetchJson<SiteMetadata>(DATA_FILES.metadata).catch(() => ({})),
           canAttemptLiveServerStatusFetch()
             ? fetchLiveServerStatusFromSupabase()
@@ -131,12 +122,10 @@ export default function Page() {
         ]);
         if (!mounted) return;
         setRankData(rank);
-        setPrevRankData(prevRank);
         setLeaderboardData(leaderboard);
         setMetadata(meta);
         const canonicalSet = buildCanonicalLeaderboardTrackIdSet(leaderboard);
-        const merged = pickNewerCurrentTrack(toCurrentTrackPayload(trackJson), liveStatus);
-        const raw = merged?.track?.trim() ?? '';
+        const raw = liveStatus?.track?.trim() ?? '';
         const preferred =
           leaderboardTrackIdLookupCandidates(raw)
             .map((id) => getTrackInfo(id)?.id ?? id)
@@ -162,6 +151,7 @@ export default function Page() {
   // Deduped by the catalog's canonical id where known, so e.g. `imola` and
   // `imola_` collapse onto one entry.
   const tracks = useMemo(() => {
+    void catalogVersion;
     const canonical = buildCanonicalLeaderboardTrackIdSet(leaderboardData);
     return Array.from(canonical).sort((a, b) =>
       getTrackDisplayName(a).localeCompare(getTrackDisplayName(b))

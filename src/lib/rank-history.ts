@@ -2,10 +2,8 @@
  * Arbitrary-window community deltas, backed by the Supabase `rank_history`
  * table (slim hourly snapshots written by the `sync-kmr-data` Edge Function).
  *
- * This is the "better than 24h" upgrade: instead of one fixed daily snapshot
- * (`rank-24h.json`), the site can compare against 1h / 24h / 7d / 30d ago.
- * Falls back to no-baseline when Supabase is unavailable; callers can then keep
- * showing the legacy `rank-24h.json` comparison from `delta.ts`.
+ * The site compares against 1h / 24h / 7d / 30d ago from live Supabase history.
+ * Falls back to no-baseline when Supabase is unavailable.
  */
 import { supabaseBaseUrl, supabaseHeaders, supabaseReadConfigured } from 'src/centralized/supabase-rest';
 import {
@@ -126,12 +124,10 @@ export async function fetchRankHistoryOldest(): Promise<string | null> {
  * Window keys that already have a snapshot old enough to compare against.
  * Used to disable selector buttons until enough history has accumulated.
  *
- * `24h` is always included: the `rank-24h.json` baseline (maintained by the
- * GitHub Actions daily snapshot) covers it even before `rank_history` has a
- * full day of depth, so the proven 24h comparison is never greyed out.
+ * A window is available only after `rank_history` has a snapshot old enough for it.
  */
 export function availableHistoryWindows(oldestIso: string | null): Set<HistoryWindowKey> {
-  const set = new Set<HistoryWindowKey>(['24h']);
+  const set = new Set<HistoryWindowKey>();
   if (!oldestIso) return set;
   const oldestMs = new Date(oldestIso).getTime();
   if (!Number.isFinite(oldestMs)) return set;
@@ -229,8 +225,7 @@ const DELTA_EPSILON = 0.001;
 
 /**
  * Per-driver Safety Rating + license-pace deltas between `snapshot` and now.
- * Returns the same `Map<guid, DriverDelta>` shape as `computeDeltas` in
- * delta.ts, so the existing per-row DeltaChips can consume it directly.
+ * Returns the same `Map<guid, DriverDelta>` shape the per-row DeltaChips expect.
  *
  * Drivers whose baseline snapshot predates SR/pace capture (older snapshots)
  * are skipped — those windows fill in as newer snapshots accumulate.

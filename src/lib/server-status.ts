@@ -3,17 +3,12 @@
  * See `scripts/supabase-server-status.sql` for setup.
  *
  * Without `VITE_SUPABASE_LIVE_SERVER_STATUS`: if `VITE_SUPABASE_URL` + anon key are set,
- * one read (then periodic after success) from `server_status` is allowed so “time ago” follows
- * the cron, not only `public/data/current-track.json`.
+ * one read (then periodic after success) from `server_status` is allowed so "time ago" follows
+ * the cron.
  * Disable with `VITE_SUPABASE_LIVE_SERVER_STATUS=0` (or `false` / `off`).
  */
 
-import {
-  type AcServerInfo,
-  parseAcServerInfo,
-  mergeInfoStaticOverlayLive,
-  mergeInfoWhenPreferringLiveSnapshot,
-} from 'src/lib/server-info';
+import { type AcServerInfo, parseAcServerInfo } from 'src/lib/server-info';
 import { applyCurrentTrackMock } from 'src/centralized/current-track-mock';
 import { supabaseBaseUrl, supabaseHeaders, supabaseReadConfigured } from 'src/centralized/supabase-rest';
 import { getSupabaseClient } from 'src/lib/supabase-client';
@@ -148,7 +143,7 @@ export async function fetchLiveServerStatusFromSupabase(): Promise<CurrentTrackP
       });
     }
     liveServerFetchState = 'ok';
-    return { online, track, fetchedAt, info: info ?? null };
+    return applyCurrentTrackMock(applyServerOfflineDebug({ online, track, fetchedAt, info: info ?? null }));
   } catch (error) {
     if (isServerStatusDebugEnabled()) {
       console.warn('[server-status] Supabase fetch failed', { error });
@@ -159,76 +154,10 @@ export async function fetchLiveServerStatusFromSupabase(): Promise<CurrentTrackP
 }
 
 /**
- * Merges live server_status with static `current-track.json`.
- * Live wins for `online` and `fetchedAt`. Track + /INFO: live when online; when offline, prefer
- * static for last driven track and richer last-known lobby (static overlays live on same keys).
- */
-export function pickNewerCurrentTrack(
-  staticJson: CurrentTrackPayload | null,
-  live: CurrentTrackPayload | null
-): CurrentTrackPayload | null {
-  let result: CurrentTrackPayload | null;
-
-  if (!live) {
-    if (isServerStatusDebugEnabled()) {
-      console.info('[server-status] pickNewerCurrentTrack -> static (no live)', {
-        staticFetchedAt: staticJson?.fetchedAt,
-        staticClients: staticJson?.info?.clients,
-      });
-    }
-    result = staticJson;
-  } else if (!staticJson) {
-    if (isServerStatusDebugEnabled()) {
-      console.info('[server-status] pickNewerCurrentTrack -> live (no static)', {
-        liveFetchedAt: live.fetchedAt,
-        liveClients: live.info?.clients,
-      });
-    }
-    result = live;
-  } else {
-    const tLive = live.track?.trim() ?? '';
-    const tStatic = staticJson.track?.trim() ?? '';
-    const liveInfo = parseAcServerInfo(live.info);
-    const staticInfo = parseAcServerInfo(staticJson.info);
-    const online = live.online;
-
-    let track = tLive;
-    if (online && !tLive && tStatic) {
-      track = tStatic;
-    } else if (!online && (tStatic || tLive)) {
-      track = tStatic || tLive;
-    }
-
-    const info = online
-      ? mergeInfoWhenPreferringLiveSnapshot(liveInfo, staticInfo) ?? null
-      : mergeInfoStaticOverlayLive(liveInfo, staticInfo) ?? staticInfo ?? liveInfo ?? null;
-
-    result = {
-      ...live,
-      online,
-      fetchedAt: live.fetchedAt,
-      track,
-      info,
-    };
-
-    if (isServerStatusDebugEnabled()) {
-      console.info('[server-status] pickNewerCurrentTrack -> merged', {
-        online,
-        track,
-        staticFetchedAt: staticJson.fetchedAt,
-        liveFetchedAt: live.fetchedAt,
-      });
-    }
-  }
-
-  return applyCurrentTrackMock(applyServerOfflineDebug(result));
-}
-
-/**
  * Realtime push: calls `onChange` whenever the `server_status` row changes,
  * so the UI reflects a new track within ~1s instead of waiting for the next poll.
  * Returns an unsubscribe function; no-op when live reads are unavailable.
- * The periodic poll stays in place as a backup if the realtime socket drops.
+ * The periodic poll stays in place if the realtime socket drops.
  */
 export function subscribeLiveServerStatus(onChange: () => void): () => void {
   if (!canAttemptLiveServerStatusFetch()) return () => {};
@@ -252,19 +181,3 @@ export function subscribeLiveServerStatus(onChange: () => void): () => void {
   };
 }
 
-/** Normalize admin / loose JSON into the merge payload shape. */
-export function toCurrentTrackPayload(row: {
-  online?: boolean;
-  track?: string;
-  fetchedAt?: string;
-  info?: unknown;
-} | null): CurrentTrackPayload | null {
-  if (!row) return null;
-  const info = parseAcServerInfo(row.info);
-  return applyCurrentTrackMock({
-    online: Boolean(row.online),
-    track: typeof row.track === 'string' ? row.track : '',
-    fetchedAt: typeof row.fetchedAt === 'string' ? row.fetchedAt : '',
-    info: info ?? undefined,
-  });
-}

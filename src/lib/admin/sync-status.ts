@@ -1,16 +1,10 @@
 /**
  * Admin "Live data services" panel data.
  *
- * For each data feed it reports two sources side by side:
- *   - live   — the Supabase Edge Function path (kmr_sync / server_status)
- *   - backup — the static JSON the GitHub Actions still commit to the repo
- *
- * `siteOnBackup` is true when Supabase is unreachable, i.e. the site is
- * currently serving the GitHub Actions backup. Watch this before retiring the
- * workflows: a long stretch of all-green live means the backup is safe to drop.
+ * Reports the live Supabase paths the site depends on:
+ * - `kmr_sync` for rank / leaderboard / metadata updates
+ * - `server_status` for the live AC Elite lobby snapshot
  */
-import { DATA_FILES } from 'src/centralized/data-files';
-import { fetchStaticJson } from 'src/lib/fetch-json';
 import { supabaseBaseUrl, supabaseHeaders, supabaseReadConfigured } from 'src/centralized/supabase-rest';
 
 export type SyncProbe = {
@@ -29,10 +23,6 @@ export type SyncProbe = {
 export type SyncServiceStatus = {
   /** Supabase live source. */
   live: SyncProbe;
-  /** Last-updated time of the GitHub Actions static backup file, or null. */
-  backupAt: string | null;
-  /** True when the live source is unreachable — the site is on the backup. */
-  siteOnBackup: boolean;
 };
 
 export type AdminSyncStatus = {
@@ -76,15 +66,7 @@ async function fetchKmrSyncStatus(): Promise<SyncServiceStatus> {
       }
     : UNREACHABLE;
 
-  let backupAt: string | null = null;
-  try {
-    const meta = await fetchStaticJson<{ lastSync?: string }>(DATA_FILES.metadata);
-    backupAt = typeof meta.lastSync === 'string' ? meta.lastSync : null;
-  } catch {
-    backupAt = null;
-  }
-
-  return { live, backupAt, siteOnBackup: !live.reachable };
+  return { live };
 }
 
 async function fetchServerSyncStatus(): Promise<SyncServiceStatus> {
@@ -102,15 +84,7 @@ async function fetchServerSyncStatus(): Promise<SyncServiceStatus> {
       }
     : UNREACHABLE;
 
-  let backupAt: string | null = null;
-  try {
-    const track = await fetchStaticJson<{ fetchedAt?: string }>(DATA_FILES.currentTrack);
-    backupAt = typeof track.fetchedAt === 'string' ? track.fetchedAt : null;
-  } catch {
-    backupAt = null;
-  }
-
-  return { live, backupAt, siteOnBackup: !live.reachable };
+  return { live };
 }
 
 export async function fetchAdminSyncStatus(): Promise<AdminSyncStatus> {

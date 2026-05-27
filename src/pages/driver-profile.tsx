@@ -28,7 +28,6 @@ import { getDiscordRolesForGuid } from 'src/lib/team-roles';
 import { getHomeHref, getLeaderboardTrackSearch } from 'src/lib/routes';
 import { BRAND_ACCENT, brandAccentBorderSx } from 'src/lib/status-accent';
 import { liveriesAssetUrl, getTeamLiveryMeta } from 'src/lib/driver-liveries';
-import { fetchPrevRankData } from 'src/lib/delta';
 import { useWindowedDriverDeltas } from 'src/lib/trend-window/trend-window-context';
 import { getSyncHealth, type SiteMetadata, getEffectiveLastSync } from 'src/lib/sync-utils';
 import { GLASS_PANEL_SX, GLASS_INNER_PANEL_SX, GLASS_TABLE_WRAPPER_SX } from 'src/lib/glass';
@@ -174,7 +173,6 @@ export default function Page() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [rankData, setRankData] = useState<RankDriver[]>([]);
-  const [prevRankData, setPrevRankData] = useState<RankDriver[]>([]);
   const [leaderboardData, setLeaderboardData] = useState<Record<string, any>>({});
   const teamRoles = SITE_TEAM_ROLES;
   const [metadata, setMetadata] = useState<SiteMetadata>({});
@@ -182,7 +180,7 @@ export default function Page() {
     useState<LiveryShowcaseSectionsFile | null>(null);
 
   // SR/pace delta for this driver, following the shared trend-window filter.
-  const deltas = useWindowedDriverDeltas(rankData, prevRankData);
+  const deltas = useWindowedDriverDeltas(rankData);
   const delta = deltas.get(driverGuid) ?? null;
 
   useEffect(() => {
@@ -191,10 +189,9 @@ export default function Page() {
       setLoading(true);
       setError(null);
       try {
-        const [rank, leaderboard, prevRank, meta, liverySectionsRaw] = await Promise.all([
+        const [rank, leaderboard, meta, liverySectionsRaw] = await Promise.all([
           fetchJson<RankDriver[]>(DATA_FILES.rank),
           fetchJson<Record<string, any>>(DATA_FILES.leaderboard),
-          fetchPrevRankData(),
           fetchJson<SiteMetadata>(DATA_FILES.metadata).catch(() => ({})),
           fetchJson<LiveryShowcaseSectionsFile>(DATA_FILES.liveryShowcaseSections).catch(
             () => ({})
@@ -202,7 +199,6 @@ export default function Page() {
         ]);
         if (!mounted) return;
         setRankData(rank);
-        setPrevRankData(prevRank);
         setLeaderboardData(leaderboard);
         setMetadata(meta);
         setLiveryShowcaseSections(
