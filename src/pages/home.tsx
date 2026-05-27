@@ -41,6 +41,7 @@ import {
 } from 'src/lib/status-accent';
 import {
   getSyncHealth,
+  parseTimestamp,
   type SyncHealth,
   type SiteMetadata,
   getEffectiveLastSync,
@@ -106,6 +107,7 @@ import { useTrackCatalogVersion } from 'src/centralized/track-info';
 
 import { Reveal } from 'src/components/reveal';
 import { EmptyState } from 'src/components/data-state';
+import { Chart, CHART_COLORS } from 'src/components/chart';
 import { DeltaChip } from 'src/components/delta-chip/delta-chip';
 import { InfoNotesPanel } from 'src/components/info-notes/info-notes-panel';
 import { ServerJoinCard } from 'src/components/server-join-card';
@@ -215,21 +217,100 @@ const sectionKickerSx = {
   fontWeight: 700,
 };
 
-function RaceIntelligenceCard({
+const COMMUNITY_PULSE_DAYS = 7;
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+function getDriverTotalLaps(driver: RankDriver) {
+  return Object.values(driver.leaderboard || {}).reduce((sum, cars) => {
+    const laps = cars?.[CAR]?.laps || 0;
+    return sum + laps;
+  }, 0);
+}
+
+function buildCommunityPulse(rankData: RankDriver[]) {
+  const seenTimes = rankData
+    .map((driver) => parseTimestamp(driver.last_seen))
+    .filter((timestamp): timestamp is number => timestamp != null);
+
+  if (!seenTimes.length) {
+    return {
+      active7d: 0,
+      avgSafety7d: null as number | null,
+      buckets: [],
+      peakDrivers: 0,
+      totalLaps7d: 0,
+    };
+  }
+
+  const latestSeen = Math.max(...seenTimes);
+  const end = new Date(latestSeen);
+  end.setHours(24, 0, 0, 0);
+  const windowStart = end.getTime() - COMMUNITY_PULSE_DAYS * DAY_MS;
+
+  const buckets = Array.from({ length: COMMUNITY_PULSE_DAYS }, (_, index) => {
+    const start = windowStart + index * DAY_MS;
+    return {
+      activeDrivers: 0,
+      avgSafety: null as number | null,
+      label: new Intl.DateTimeFormat('en', { weekday: 'short' }).format(new Date(start)),
+      laps: 0,
+      safetySum: 0,
+    };
+  });
+
+  rankData.forEach((driver) => {
+    const seen = parseTimestamp(driver.last_seen);
+    if (seen == null || seen < windowStart || seen >= end.getTime()) return;
+
+    const bucketIndex = Math.min(
+      COMMUNITY_PULSE_DAYS - 1,
+      Math.max(0, Math.floor((seen - windowStart) / DAY_MS))
+    );
+    const bucket = buckets[bucketIndex];
+
+    bucket.activeDrivers += 1;
+    bucket.laps += getDriverTotalLaps(driver);
+    bucket.safetySum += safetyRating(driver);
+  });
+
+  const normalizedBuckets = buckets.map((bucket) => ({
+    ...bucket,
+    avgSafety:
+      bucket.activeDrivers > 0
+        ? Number((bucket.safetySum / bucket.activeDrivers).toFixed(2))
+        : null,
+  }));
+  const active7d = normalizedBuckets.reduce((sum, bucket) => sum + bucket.activeDrivers, 0);
+  const totalLaps7d = normalizedBuckets.reduce((sum, bucket) => sum + bucket.laps, 0);
+  const avgSafety7d =
+    active7d > 0
+      ? normalizedBuckets.reduce(
+          (sum, bucket) => sum + (bucket.avgSafety || 0) * bucket.activeDrivers,
+          0
+        ) / active7d
+      : null;
+
+  return {
+    active7d,
+    avgSafety7d,
+    buckets: normalizedBuckets,
+    peakDrivers: Math.max(...normalizedBuckets.map((bucket) => bucket.activeDrivers)),
+    totalLaps7d,
+  };
+}
+
+function CommunityPulseCard({
+  rankData,
   syncStatus,
-  totalDrivers,
-  totalLaps,
-  activeTracks,
-  currentTrack,
   motionSxIndex = 1,
 }: {
+  rankData: RankDriver[];
   syncStatus: SyncHealth;
-  totalDrivers: number;
-  totalLaps: number;
-  activeTracks: number;
-  currentTrack: CurrentTrackData | null;
   motionSxIndex?: number;
 }) {
+  const pulse = useMemo(() => buildCommunityPulse(rankData), [rankData]);
+  const hasPulseData = pulse.buckets.some((bucket) => bucket.activeDrivers > 0);
+
   return (
     <Box sx={softFloatWrapperSx({ alternatePhase: true })}>
       <Box
@@ -241,70 +322,158 @@ function RaceIntelligenceCard({
           ...glassCardMotionSx(motionSxIndex),
         }}
       >
-        <Stack spacing={2}>
+        <Stack spacing={2.25}>
           <Box>
             <Typography variant="overline" sx={sectionKickerSx}>
-              Race Intelligence
+              Community Pulse
             </Typography>
             <Typography variant="h6" sx={{ fontWeight: 800, mt: 0.4 }}>
-              One view. All key data.
+              Who is active lately.
             </Typography>
             <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5 }}>
-              Live KMR-powered insights for driver search, safety rating, and license progression.
+              A seven-day heartbeat of recent drivers, with the average Safety Rating riding along.
             </Typography>
           </Box>
 
-          <Typography
-            variant="body2"
-            sx={{
-              color: syncStatus.color,
-              fontWeight: 700,
-              textAlign: { xs: 'center', md: 'left' },
-            }}
+          <Stack
+            direction={{ xs: 'column', sm: 'row' }}
+            spacing={1}
+            sx={{ alignItems: 'stretch', justifyContent: { xs: 'center', md: 'flex-start' } }}
           >
-            {syncStatus.label} · {syncStatus.ageText}
-          </Typography>
-
-          <Grid container spacing={1}>
             {[
-              { label: 'Total drivers', value: formatNumber(totalDrivers) },
-              { label: 'Logged laps', value: formatNumber(totalLaps) },
-              { label: 'Active tracks', value: formatNumber(activeTracks) },
+              { label: 'Active 7d', value: formatNumber(pulse.active7d) },
+              { label: 'Peak day', value: formatNumber(pulse.peakDrivers) },
               {
-                label: 'Live server track',
-                value: currentTrack?.track ? getTrackDisplayName(currentTrack.track) : '—',
+                label: 'Avg SR',
+                value: pulse.avgSafety7d == null ? '-' : pulse.avgSafety7d.toFixed(2),
               },
             ].map((item, tileIndex) => (
-              <Grid key={item.label} size={{ xs: 6 }}>
-                <Box
-                  sx={{
-                    ...GLASS_INNER_PANEL_SX,
-                    ...glassCardEnterOnlySx(3 + tileIndex),
-                    minHeight: 78,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'center',
-                    alignItems: { xs: 'center', md: 'flex-start' },
-                  }}
+              <Box
+                key={item.label}
+                sx={{
+                  ...GLASS_INNER_PANEL_SX,
+                  ...glassCardEnterOnlySx(3 + tileIndex),
+                  flex: 1,
+                  minWidth: { xs: '100%', sm: 0 },
+                  py: 1.2,
+                  textAlign: 'center',
+                }}
+              >
+                <Typography
+                  variant="caption"
+                  sx={{ color: 'rgba(255,255,255,0.68)', fontWeight: 700, letterSpacing: 0 }}
                 >
-                  <Typography
-                    variant="caption"
-                    sx={{ color: 'rgba(255,255,255,0.72)', fontWeight: 600, letterSpacing: 0.2 }}
-                  >
-                    {item.label}
-                  </Typography>
-                  <Typography
-                    variant="subtitle2"
-                    sx={{ fontWeight: 800, lineHeight: 1.25, mt: 0.2 }}
-                    noWrap
-                    title={typeof item.value === 'string' ? item.value : undefined}
-                  >
-                    {item.value}
-                  </Typography>
-                </Box>
-              </Grid>
+                  {item.label}
+                </Typography>
+                <Typography variant="subtitle2" sx={{ fontWeight: 800, lineHeight: 1.2 }}>
+                  {item.value}
+                </Typography>
+              </Box>
             ))}
-          </Grid>
+          </Stack>
+
+          {hasPulseData ? (
+            <Box
+              sx={{
+                ...GLASS_INNER_PANEL_SX,
+                px: { xs: 0.5, sm: 1 },
+                py: 1.5,
+                overflow: 'hidden',
+              }}
+            >
+              <Chart
+                type="line"
+                height={238}
+                series={[
+                  {
+                    name: 'Active drivers',
+                    type: 'column',
+                    data: pulse.buckets.map((bucket) => bucket.activeDrivers),
+                  },
+                  {
+                    name: 'Avg SR',
+                    type: 'line',
+                    data: pulse.buckets.map((bucket) => bucket.avgSafety),
+                  },
+                ]}
+                options={{
+                  colors: [CHART_COLORS[0], '#22E07A'],
+                  fill: { opacity: [0.9, 1], type: ['gradient', 'solid'] },
+                  grid: {
+                    padding: { top: 10, right: 4, bottom: 0, left: 0 },
+                    xaxis: { lines: { show: false } },
+                    yaxis: { lines: { show: true } },
+                  },
+                  labels: pulse.buckets.map((bucket) => bucket.label),
+                  legend: {
+                    position: 'top',
+                    horizontalAlign: 'left',
+                    offsetX: -10,
+                    markers: { size: 7 },
+                  },
+                  markers: { size: [0, 4], strokeColors: '#0b1430', strokeWidth: 2 },
+                  plotOptions: {
+                    bar: {
+                      borderRadius: 6,
+                      borderRadiusApplication: 'end',
+                      columnWidth: '46%',
+                    },
+                  },
+                  stroke: { curve: 'smooth', width: [0, 3.5], lineCap: 'round' },
+                  tooltip: {
+                    shared: true,
+                    y: [
+                      { formatter: (value: number) => `${formatNumber(value)} drivers` },
+                      {
+                        formatter: (value: number) =>
+                          value == null ? 'No active drivers' : `${value.toFixed(2)} SR`,
+                      },
+                    ],
+                  },
+                  xaxis: {
+                    categories: pulse.buckets.map((bucket) => bucket.label),
+                  },
+                  yaxis: [
+                    {
+                      min: 0,
+                      labels: { formatter: (value: number) => formatNumber(Math.round(value)) },
+                    },
+                    {
+                      opposite: true,
+                      min: 1,
+                      max: 10,
+                      tickAmount: 3,
+                      labels: { formatter: (value: number) => value.toFixed(0) },
+                    },
+                  ],
+                }}
+              />
+            </Box>
+          ) : (
+            <Box sx={{ ...GLASS_INNER_PANEL_SX, py: 4 }}>
+              <Typography variant="body2" sx={{ color: 'text.secondary', textAlign: 'center' }}>
+                Activity pulse appears once driver sync data is available.
+              </Typography>
+            </Box>
+          )}
+
+          <Stack
+            direction={{ xs: 'column', sm: 'row' }}
+            spacing={1}
+            sx={{
+              alignItems: { xs: 'center', sm: 'center' },
+              justifyContent: 'space-between',
+              color: 'text.secondary',
+              textAlign: { xs: 'center', sm: 'left' },
+            }}
+          >
+            <Typography variant="caption" sx={{ fontWeight: 700 }}>
+              {formatNumber(pulse.totalLaps7d)} profile laps from recently active drivers
+            </Typography>
+            <Typography variant="caption" sx={{ color: syncStatus.color, fontWeight: 800 }}>
+              {syncStatus.label} · {syncStatus.ageText}
+            </Typography>
+          </Stack>
         </Stack>
       </Box>
     </Box>
@@ -788,22 +957,14 @@ function DriverSearchSection({
   rankData,
   loading,
   error,
-  currentTrack,
   syncStatus,
-  totalDrivers,
-  totalLaps,
-  activeTracks,
 }: {
   drivers: DriverView[];
   /** Raw rank rows (with wins/points/km) — DriverView drops those fields. */
   rankData: RankDriver[];
   loading: boolean;
   error: string | null;
-  currentTrack: CurrentTrackData | null;
   syncStatus: SyncHealth;
-  totalDrivers: number;
-  totalLaps: number;
-  activeTracks: number;
 }) {
   const [query, setQuery] = useState('');
 
@@ -994,14 +1155,7 @@ function DriverSearchSection({
 
           <Grid size={{ xs: 12, md: 5 }}>
             <Stack spacing={1.25} sx={{ height: 1, alignItems: { xs: 'center', md: 'stretch' } }}>
-              <RaceIntelligenceCard
-                syncStatus={syncStatus}
-                totalDrivers={totalDrivers}
-                totalLaps={totalLaps}
-                activeTracks={activeTracks}
-                currentTrack={currentTrack}
-                motionSxIndex={1}
-              />
+              <CommunityPulseCard rankData={rankData} syncStatus={syncStatus} motionSxIndex={1} />
             </Stack>
           </Grid>
         </Grid>
@@ -1236,21 +1390,6 @@ export default function Page() {
     });
   }, [rankData, teamRoles]);
 
-  const community = useMemo(() => {
-    const totalDrivers = drivers.length;
-    const totalLaps = drivers.reduce((sum, d) => sum + d.totalLaps, 0);
-    const trackIds = new Set<string>();
-
-    rankData.forEach((driver) => {
-      const leaderboard = driver.leaderboard || {};
-      Object.entries(leaderboard).forEach(([trackId, cars]) => {
-        const laptime = cars?.[CAR]?.laptime;
-        if (typeof laptime === 'number') trackIds.add(trackId);
-      });
-    });
-
-    return { totalDrivers, totalLaps, activeTracks: trackIds.size };
-  }, [drivers, rankData]);
   const syncStatus = getSyncHealth(getEffectiveLastSync(metadata.lastSync, rankData));
 
   return (
@@ -1273,11 +1412,7 @@ export default function Page() {
         rankData={rankData}
         loading={loading}
         error={error}
-        currentTrack={currentTrack}
         syncStatus={syncStatus}
-        totalDrivers={community.totalDrivers}
-        totalLaps={community.totalLaps}
-        activeTracks={community.activeTracks}
       />
       <CurrentTrackLeaderboardSection
         loading={loading}
