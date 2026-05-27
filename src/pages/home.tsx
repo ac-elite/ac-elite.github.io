@@ -107,7 +107,7 @@ import { useTrackCatalogVersion } from 'src/centralized/track-info';
 
 import { Reveal } from 'src/components/reveal';
 import { EmptyState } from 'src/components/data-state';
-import { Chart, CHART_COLORS } from 'src/components/chart';
+import { Chart } from 'src/components/chart';
 import { DeltaChip } from 'src/components/delta-chip/delta-chip';
 import { InfoNotesPanel } from 'src/components/info-notes/info-notes-panel';
 import { ServerJoinCard } from 'src/components/server-join-card';
@@ -379,6 +379,9 @@ function CommunityPulseCard({
                 px: { xs: 0.5, sm: 1 },
                 py: 1.5,
                 overflow: 'hidden',
+                '& .apexcharts-bar-area': {
+                  filter: 'drop-shadow(0 7px 12px rgba(96,165,250,0.34))',
+                },
               }}
             >
               <Chart
@@ -397,8 +400,8 @@ function CommunityPulseCard({
                   },
                 ]}
                 options={{
-                  colors: [CHART_COLORS[0], '#22E07A'],
-                  fill: { opacity: [0.9, 1], type: ['gradient', 'solid'] },
+                  colors: ['#7DB3FF', '#22E07A'],
+                  fill: { opacity: [1, 1], type: ['solid', 'solid'] },
                   grid: {
                     padding: { top: 10, right: 4, bottom: 0, left: 0 },
                     xaxis: { lines: { show: false } },
@@ -414,9 +417,14 @@ function CommunityPulseCard({
                   markers: { size: [0, 4], strokeColors: '#0b1430', strokeWidth: 2 },
                   plotOptions: {
                     bar: {
-                      borderRadius: 6,
+                      borderRadius: 7,
                       borderRadiusApplication: 'end',
-                      columnWidth: '46%',
+                      columnWidth: '62%',
+                      colors: {
+                        backgroundBarColors: ['rgba(255,255,255,0.06)'],
+                        backgroundBarOpacity: 1,
+                        backgroundBarRadius: 7,
+                      },
                     },
                   },
                   stroke: { curve: 'smooth', width: [0, 3.5], lineCap: 'round' },
