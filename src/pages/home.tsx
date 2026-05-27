@@ -34,8 +34,18 @@ import { type DriverDelta, fetchPrevRankData } from 'src/lib/delta';
 import { subscribeKmrSync } from 'src/lib/kmr-sync';
 import { useWindowedDriverDeltas } from 'src/lib/trend-window/trend-window-context';
 import { getTeamRole, type TeamRole, teamRoleToDiscordRole } from 'src/lib/team-roles';
-import { brandAccentBorderSx, statusAccentBorderSx, statusAccentSplitRimSx } from 'src/lib/status-accent';
-import { getSyncHealth, type SyncHealth, type SiteMetadata, getEffectiveLastSync } from 'src/lib/sync-utils';
+import {
+  brandAccentBorderSx,
+  statusAccentBorderSx,
+  statusAccentSplitRimSx,
+} from 'src/lib/status-accent';
+import {
+  getSyncHealth,
+  parseTimestamp,
+  type SyncHealth,
+  type SiteMetadata,
+  getEffectiveLastSync,
+} from 'src/lib/sync-utils';
 import {
   subtleEnterUpSx,
   subtleRowEnterSx,
@@ -97,6 +107,7 @@ import { useTrackCatalogVersion } from 'src/centralized/track-info';
 
 import { Reveal } from 'src/components/reveal';
 import { EmptyState } from 'src/components/data-state';
+import { Chart } from 'src/components/chart';
 import { DeltaChip } from 'src/components/delta-chip/delta-chip';
 import { InfoNotesPanel } from 'src/components/info-notes/info-notes-panel';
 import { ServerJoinCard } from 'src/components/server-join-card';
@@ -145,8 +156,7 @@ const heroKeywordSx = {
   lineHeight: 0.9,
   letterSpacing: 0,
   // On-brand electric-blue accent gradient (matches the CTA / accent blue).
-  backgroundImage:
-    'linear-gradient(180deg, #F5FBFF 0%, #A9D8FF 26%, #4F8DF6 62%, #173EA8 100%)',
+  backgroundImage: 'linear-gradient(180deg, #F5FBFF 0%, #A9D8FF 26%, #4F8DF6 62%, #173EA8 100%)',
   WebkitBackgroundClip: 'text',
   backgroundClip: 'text',
   color: 'transparent',
@@ -162,18 +172,27 @@ const heroKeywordSx = {
 
 const heroStatsKeywordSx = {
   ...heroKeywordSx,
-  fontSize: { xs: '1.18em', sm: '1.24em', md: '1.3em' },
+  fontSize: { xs: 'clamp(1.08em, 1em + 0.62vw, 1.18em)', sm: '1.24em', md: '1.3em' },
   top: { xs: 2, md: 4 },
 } as const;
 
 const heroLeaderboardKeywordSx = {
   ...heroKeywordSx,
+  mx: 0,
+  fontSize: { xs: 'clamp(1.04em, 0.98em + 0.5vw, 1.12em)', sm: '1.2em', md: '1.26em' },
+  animationDelay: '-1.8s',
+} as const;
+
+const heroLeaderboardLineSx = {
   display: { xs: 'inline-block', md: 'block' },
   width: 'fit-content',
   ml: { xs: 0.35, md: 5.5 },
   mt: { xs: 0, md: -0.4 },
-  fontSize: { xs: '1.12em', sm: '1.2em', md: '1.26em' },
-  animationDelay: '-1.8s',
+} as const;
+
+const heroStaticDotSx = {
+  color: '#fff',
+  textShadow: '0 2px 12px rgba(15,23,42,0.72)',
 } as const;
 
 /** Soft "live" pulse for the green dot in the hero kicker. */
@@ -198,21 +217,112 @@ const sectionKickerSx = {
   fontWeight: 700,
 };
 
-function RaceIntelligenceCard({
+const COMMUNITY_PULSE_DAYS = 7;
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+function getDriverTotalLaps(driver: RankDriver) {
+  return Object.values(driver.leaderboard || {}).reduce((sum, cars) => {
+    const laps = cars?.[CAR]?.laps || 0;
+    return sum + laps;
+  }, 0);
+}
+
+function buildCommunityPulse(rankData: RankDriver[]) {
+  const seenTimes = rankData
+    .map((driver) => parseTimestamp(driver.last_seen))
+    .filter((timestamp): timestamp is number => timestamp != null);
+
+  if (!seenTimes.length) {
+    return {
+      active7d: 0,
+      avgSafety7d: null as number | null,
+      buckets: [],
+      peakDrivers: 0,
+      srAxisMax: 3,
+      srAxisMin: 1,
+      totalLaps7d: 0,
+    };
+  }
+
+  const latestSeen = Math.max(...seenTimes);
+  const end = new Date(latestSeen);
+  end.setHours(24, 0, 0, 0);
+  const windowStart = end.getTime() - COMMUNITY_PULSE_DAYS * DAY_MS;
+
+  const buckets = Array.from({ length: COMMUNITY_PULSE_DAYS }, (_, index) => {
+    const start = windowStart + index * DAY_MS;
+    return {
+      activeDrivers: 0,
+      avgSafety: null as number | null,
+      label: new Intl.DateTimeFormat('en', { weekday: 'short' }).format(new Date(start)),
+      laps: 0,
+      safetySum: 0,
+    };
+  });
+
+  rankData.forEach((driver) => {
+    const seen = parseTimestamp(driver.last_seen);
+    if (seen == null || seen < windowStart || seen >= end.getTime()) return;
+
+    const bucketIndex = Math.min(
+      COMMUNITY_PULSE_DAYS - 1,
+      Math.max(0, Math.floor((seen - windowStart) / DAY_MS))
+    );
+    const bucket = buckets[bucketIndex];
+
+    bucket.activeDrivers += 1;
+    bucket.laps += getDriverTotalLaps(driver);
+    bucket.safetySum += safetyRating(driver);
+  });
+
+  const normalizedBuckets = buckets.map((bucket) => ({
+    ...bucket,
+    avgSafety:
+      bucket.activeDrivers > 0
+        ? Number((bucket.safetySum / bucket.activeDrivers).toFixed(2))
+        : null,
+  }));
+  const active7d = normalizedBuckets.reduce((sum, bucket) => sum + bucket.activeDrivers, 0);
+  const totalLaps7d = normalizedBuckets.reduce((sum, bucket) => sum + bucket.laps, 0);
+  const avgSafety7d =
+    active7d > 0
+      ? normalizedBuckets.reduce(
+          (sum, bucket) => sum + (bucket.avgSafety || 0) * bucket.activeDrivers,
+          0
+        ) / active7d
+      : null;
+  const safetyValues = normalizedBuckets
+    .map((bucket) => bucket.avgSafety)
+    .filter((value): value is number => value != null);
+  const safetyMin = safetyValues.length ? Math.min(...safetyValues) : 1;
+  const safetyMax = safetyValues.length ? Math.max(...safetyValues) : 3;
+  const safetyPadding = Math.max(0.08, (safetyMax - safetyMin) * 0.35);
+  const srAxisMin = Math.max(1, Math.floor((safetyMin - safetyPadding) * 10) / 10);
+  const srAxisMax = Math.min(10, Math.ceil((safetyMax + safetyPadding) * 10) / 10);
+
+  return {
+    active7d,
+    avgSafety7d,
+    buckets: normalizedBuckets,
+    peakDrivers: Math.max(...normalizedBuckets.map((bucket) => bucket.activeDrivers)),
+    srAxisMax: srAxisMax <= srAxisMin ? Math.min(10, srAxisMin + 0.3) : srAxisMax,
+    srAxisMin,
+    totalLaps7d,
+  };
+}
+
+function CommunityPulseCard({
+  rankData,
   syncStatus,
-  totalDrivers,
-  totalLaps,
-  activeTracks,
-  currentTrack,
   motionSxIndex = 1,
 }: {
+  rankData: RankDriver[];
   syncStatus: SyncHealth;
-  totalDrivers: number;
-  totalLaps: number;
-  activeTracks: number;
-  currentTrack: CurrentTrackData | null;
   motionSxIndex?: number;
 }) {
+  const pulse = useMemo(() => buildCommunityPulse(rankData), [rankData]);
+  const hasPulseData = pulse.buckets.some((bucket) => bucket.activeDrivers > 0);
+
   return (
     <Box sx={softFloatWrapperSx({ alternatePhase: true })}>
       <Box
@@ -224,63 +334,166 @@ function RaceIntelligenceCard({
           ...glassCardMotionSx(motionSxIndex),
         }}
       >
-        <Stack spacing={2}>
+        <Stack spacing={2.25}>
           <Box>
             <Typography variant="overline" sx={sectionKickerSx}>
-              Race Intelligence
+              Community Pulse
             </Typography>
             <Typography variant="h6" sx={{ fontWeight: 800, mt: 0.4 }}>
-              One view. All key data.
+              Who is active lately.
             </Typography>
             <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5 }}>
-              Live KMR-powered insights for driver search, safety rating, and license progression.
+              A seven-day heartbeat of recent drivers, with the average Safety Rating riding along.
             </Typography>
           </Box>
 
-          <Typography
-            variant="body2"
-            sx={{ color: syncStatus.color, fontWeight: 700, textAlign: { xs: 'center', md: 'left' } }}
+          <Stack
+            direction={{ xs: 'column', sm: 'row' }}
+            spacing={1}
+            sx={{ alignItems: 'stretch', justifyContent: { xs: 'center', md: 'flex-start' } }}
           >
-            {syncStatus.label} · {syncStatus.ageText}
-          </Typography>
-
-          <Grid container spacing={1}>
             {[
-              { label: 'Total drivers', value: formatNumber(totalDrivers) },
-              { label: 'Logged laps', value: formatNumber(totalLaps) },
-              { label: 'Active tracks', value: formatNumber(activeTracks) },
+              { label: 'Active 7d', value: formatNumber(pulse.active7d) },
+              { label: 'Peak day', value: formatNumber(pulse.peakDrivers) },
               {
-                label: 'Live server track',
-                value: currentTrack?.track ? getTrackDisplayName(currentTrack.track) : '—',
+                label: 'Avg SR',
+                value: pulse.avgSafety7d == null ? '-' : pulse.avgSafety7d.toFixed(2),
               },
             ].map((item, tileIndex) => (
-              <Grid key={item.label} size={{ xs: 6 }}>
-                <Box
-                  sx={{
-                    ...GLASS_INNER_PANEL_SX,
-                    ...glassCardEnterOnlySx(3 + tileIndex),
-                    minHeight: 78,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'center',
-                    alignItems: { xs: 'center', md: 'flex-start' },
-                  }}
+              <Box
+                key={item.label}
+                sx={{
+                  ...GLASS_INNER_PANEL_SX,
+                  ...glassCardEnterOnlySx(3 + tileIndex),
+                  flex: 1,
+                  minWidth: { xs: '100%', sm: 0 },
+                  py: 1.2,
+                  textAlign: 'center',
+                }}
+              >
+                <Typography
+                  variant="caption"
+                  sx={{ color: 'rgba(255,255,255,0.68)', fontWeight: 700, letterSpacing: 0 }}
                 >
-                  <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.72)', fontWeight: 600, letterSpacing: 0.2 }}>
-                    {item.label}
-                  </Typography>
-                  <Typography
-                    variant="subtitle2"
-                    sx={{ fontWeight: 800, lineHeight: 1.25, mt: 0.2 }}
-                    noWrap
-                    title={typeof item.value === 'string' ? item.value : undefined}
-                  >
-                    {item.value}
-                  </Typography>
-                </Box>
-              </Grid>
+                  {item.label}
+                </Typography>
+                <Typography variant="subtitle2" sx={{ fontWeight: 800, lineHeight: 1.2 }}>
+                  {item.value}
+                </Typography>
+              </Box>
             ))}
-          </Grid>
+          </Stack>
+
+          {hasPulseData ? (
+            <Box
+              sx={{
+                ...GLASS_INNER_PANEL_SX,
+                px: { xs: 0.5, sm: 1 },
+                py: 1.5,
+                overflow: 'hidden',
+                '& .apexcharts-bar-area': {
+                  filter: 'drop-shadow(0 7px 12px rgba(96,165,250,0.34))',
+                },
+              }}
+            >
+              <Chart
+                type="line"
+                height={238}
+                series={[
+                  {
+                    name: 'Active drivers',
+                    type: 'column',
+                    data: pulse.buckets.map((bucket) => bucket.activeDrivers),
+                  },
+                  {
+                    name: 'Avg SR',
+                    type: 'line',
+                    data: pulse.buckets.map((bucket) => bucket.avgSafety),
+                  },
+                ]}
+                options={{
+                  colors: ['#7DB3FF', '#22E07A'],
+                  fill: { opacity: [1, 1], type: ['solid', 'solid'] },
+                  grid: {
+                    padding: { top: 10, right: 4, bottom: 0, left: 0 },
+                    xaxis: { lines: { show: false } },
+                    yaxis: { lines: { show: true } },
+                  },
+                  labels: pulse.buckets.map((bucket) => bucket.label),
+                  legend: {
+                    position: 'top',
+                    horizontalAlign: 'left',
+                    offsetX: -10,
+                    markers: { size: 7 },
+                  },
+                  markers: { size: [0, 4], strokeColors: '#0b1430', strokeWidth: 2 },
+                  plotOptions: {
+                    bar: {
+                      borderRadius: 7,
+                      borderRadiusApplication: 'end',
+                      columnWidth: '62%',
+                      colors: {
+                        backgroundBarColors: ['rgba(255,255,255,0.06)'],
+                        backgroundBarOpacity: 1,
+                        backgroundBarRadius: 7,
+                      },
+                    },
+                  },
+                  stroke: { curve: 'smooth', width: [0, 3.5], lineCap: 'round' },
+                  tooltip: {
+                    shared: true,
+                    y: [
+                      { formatter: (value: number) => `${formatNumber(value)} drivers` },
+                      {
+                        formatter: (value: number) =>
+                          value == null ? 'No active drivers' : `${value.toFixed(2)} SR`,
+                      },
+                    ],
+                  },
+                  xaxis: {
+                    categories: pulse.buckets.map((bucket) => bucket.label),
+                  },
+                  yaxis: [
+                    {
+                      min: 0,
+                      labels: { formatter: (value: number) => formatNumber(Math.round(value)) },
+                    },
+                    {
+                      opposite: true,
+                      min: pulse.srAxisMin,
+                      max: pulse.srAxisMax,
+                      tickAmount: 4,
+                      labels: { formatter: (value: number) => value.toFixed(1) },
+                    },
+                  ],
+                }}
+              />
+            </Box>
+          ) : (
+            <Box sx={{ ...GLASS_INNER_PANEL_SX, py: 4 }}>
+              <Typography variant="body2" sx={{ color: 'text.secondary', textAlign: 'center' }}>
+                Activity pulse appears once driver sync data is available.
+              </Typography>
+            </Box>
+          )}
+
+          <Stack
+            direction={{ xs: 'column', sm: 'row' }}
+            spacing={1}
+            sx={{
+              alignItems: { xs: 'center', sm: 'center' },
+              justifyContent: 'space-between',
+              color: 'text.secondary',
+              textAlign: { xs: 'center', sm: 'left' },
+            }}
+          >
+            <Typography variant="caption" sx={{ fontWeight: 700 }}>
+              {formatNumber(pulse.totalLaps7d)} total laps by recently active drivers
+            </Typography>
+            <Typography variant="caption" sx={{ color: syncStatus.color, fontWeight: 800 }}>
+              {syncStatus.label} · {syncStatus.ageText}
+            </Typography>
+          </Stack>
         </Stack>
       </Box>
     </Box>
@@ -296,8 +509,8 @@ function HeroSection({ currentTrack }: { currentTrack: CurrentTrackData | null }
       component="section"
       sx={{
         position: 'relative',
-        pt: { xs: 8, md: 12 },
-        pb: { xs: 6, md: 6 },
+        pt: { xs: 'clamp(42px, 13vw, 64px)', md: 12 },
+        pb: { xs: 'clamp(32px, 10vw, 48px)', md: 6 },
         background: PAGE_BACKGROUND_GRADIENT,
         color: '#fff',
         overflow: 'hidden',
@@ -306,23 +519,29 @@ function HeroSection({ currentTrack }: { currentTrack: CurrentTrackData | null }
       <PageGridOverlay opacity={0.34} />
 
       <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1 }}>
-        <Grid container spacing={{ xs: 4, md: 6 }} alignItems="center">
+        <Grid container spacing={{ xs: 'clamp(22px, 7vw, 32px)', md: 6 }} alignItems="center">
           <Grid size={{ xs: 12, md: 7 }}>
             <Stack
-              spacing={3}
+              spacing={{ xs: 'clamp(18px, 5vw, 24px)', md: 3 }}
               alignItems={{ xs: 'center', md: 'flex-start' }}
               sx={{
                 ...subtleEnterUpSx(0),
               }}
             >
-              <Stack spacing={1} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: { xs: 'center', md: 'flex-start' } }}>
-                <Stack direction="row" spacing={1} alignItems="center">
+              <Stack
+                spacing={{ xs: 'clamp(7px, 2.5vw, 8px)', md: 1 }}
+                sx={{
+                  textAlign: { xs: 'center', md: 'left' },
+                  alignItems: { xs: 'center', md: 'flex-start' },
+                }}
+              >
+                <Stack direction="row" spacing={{ xs: 0.75, md: 1 }} alignItems="center">
                   {/* Live dot — subtle "we're alive and updating" cue. */}
                   <Box
                     aria-hidden
                     sx={{
-                      width: 8,
-                      height: 8,
+                      width: 'clamp(6px, 1.8vw, 8px)',
+                      height: 'clamp(6px, 1.8vw, 8px)',
                       borderRadius: '50%',
                       bgcolor: '#22c55e',
                       animation: `${heroLiveDotPulse} 2.4s ease-in-out infinite`,
@@ -355,8 +574,13 @@ function HeroSection({ currentTrack }: { currentTrack: CurrentTrackData | null }
                   .
                   <br />
                   Dominate the{' '}
-                  <Box component="span" sx={heroLeaderboardKeywordSx}>
-                    leaderboard.
+                  <Box component="span" sx={heroLeaderboardLineSx}>
+                    <Box component="span" sx={heroLeaderboardKeywordSx}>
+                      leaderboard
+                    </Box>
+                    <Box component="span" sx={heroStaticDotSx}>
+                      .
+                    </Box>
                   </Box>
                 </Typography>
 
@@ -365,19 +589,19 @@ function HeroSection({ currentTrack }: { currentTrack: CurrentTrackData | null }
                   sx={{
                     maxWidth: 610,
                     color: 'rgba(226,232,240,0.9)',
-                    fontSize: { xs: '1rem', md: '1.075rem' },
-                    lineHeight: 1.6,
+                    fontSize: { xs: 'clamp(0.875rem, 0.68rem + 0.9vw, 1rem)', md: '1.075rem' },
+                    lineHeight: { xs: 1.45, sm: 1.55, md: 1.6 },
                     textShadow: '0 1px 8px rgba(15,23,42,0.62)',
                   }}
                 >
-                  Real-time leaderboards, license rankings, and Safety Rating — every lap from
-                  the AC Elite server, updated as drivers cross the line.
+                  Real-time leaderboards, license rankings, and Safety Rating — every lap from the
+                  AC Elite server, updated as drivers cross the line.
                 </Typography>
               </Stack>
 
               <Stack
                 direction={{ xs: 'column', sm: 'row' }}
-                spacing={1.25}
+                spacing={{ xs: 'clamp(8px, 2.8vw, 10px)', sm: 1.25 }}
                 flexWrap="wrap"
                 alignItems={{ xs: 'center', md: 'flex-start' }}
                 justifyContent={{ xs: 'center', md: 'flex-start' }}
@@ -410,7 +634,6 @@ function HeroSection({ currentTrack }: { currentTrack: CurrentTrackData | null }
                   Download ACE skin pack
                 </Button>
               </Stack>
-
             </Stack>
           </Grid>
 
@@ -485,190 +708,218 @@ function CurrentTrackLeaderboardSection({
       <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1 }}>
         <Stack spacing={3}>
           <Reveal>
-          <Stack
-            spacing={0.7}
-            sx={{
-              textAlign: { xs: 'center', md: 'left' },
-              alignItems: { xs: 'center', md: 'flex-start' },
-            }}
-          >
-            <Typography variant="overline" sx={sectionKickerSx}>
-              Live track leaderboard
-            </Typography>
-            <Typography component="h2" variant="h4" fontWeight={800}>
-              Current track: {getTrackDisplayName(currentTrack.track)}
-            </Typography>
-            <Typography color="text.secondary">
-              Full leaderboard for {CAR} on the currently active server track.
-            </Typography>
-          </Stack>
+            <Stack
+              spacing={0.7}
+              sx={{
+                textAlign: { xs: 'center', md: 'left' },
+                alignItems: { xs: 'center', md: 'flex-start' },
+              }}
+            >
+              <Typography variant="overline" sx={sectionKickerSx}>
+                Live track leaderboard
+              </Typography>
+              <Typography component="h2" variant="h4" fontWeight={800}>
+                Current track: {getTrackDisplayName(currentTrack.track)}
+              </Typography>
+              <Typography color="text.secondary">
+                Full leaderboard for {CAR} on the currently active server track.
+              </Typography>
+            </Stack>
           </Reveal>
 
           <Reveal index={1}>
-          <Paper
-            sx={{
-              ...GLASS_TABLE_WRAPPER_SX,
-              ...brandAccentBorderSx(),
-              ...glassCardMotionSx(0, { baseDelayMs: 400 }),
-            }}
-          >
-            <TableContainer>
-              <Table
-                size="small"
-                sx={{
-                  '& .MuiTableBody-root .MuiTableRow-root:hover': {
-                    backgroundColor: 'rgba(255,255,255,0.028)',
-                  },
-                }}
-              >
-                <TableHead>
-                  <TableRow>
-                    <TableCell>#</TableCell>
-                    <TableCell>Driver</TableCell>
-                    <TableCell>License</TableCell>
-                    <TableCell>Safety Rating</TableCell>
-                    <TableCell>Lap Time</TableCell>
-                    <TableCell align="right">Gap</TableCell>
-                    <TableCell align="right">Laps</TableCell>
-                    <TableCell align="right">Total KM</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {loading && (
+            <Paper
+              sx={{
+                ...GLASS_TABLE_WRAPPER_SX,
+                ...brandAccentBorderSx(),
+                ...glassCardMotionSx(0, { baseDelayMs: 400 }),
+              }}
+            >
+              <TableContainer>
+                <Table
+                  size="small"
+                  sx={{
+                    '& .MuiTableBody-root .MuiTableRow-root:hover': {
+                      backgroundColor: 'rgba(255,255,255,0.028)',
+                    },
+                  }}
+                >
+                  <TableHead>
                     <TableRow>
-                      <TableCell colSpan={8} sx={{ py: 4, px: 2 }}>
-                        <EmptyState
-                          title="Loading leaderboard…"
-                          description="Pulling current-track lap times. This usually takes a second."
-                        />
-                      </TableCell>
+                      <TableCell>#</TableCell>
+                      <TableCell>Driver</TableCell>
+                      <TableCell>License</TableCell>
+                      <TableCell>Safety Rating</TableCell>
+                      <TableCell>Lap Time</TableCell>
+                      <TableCell align="right">Gap</TableCell>
+                      <TableCell align="right">Laps</TableCell>
+                      <TableCell align="right">Total KM</TableCell>
                     </TableRow>
-                  )}
-
-                  {!loading && error && (
-                    <TableRow>
-                      <TableCell colSpan={8} sx={{ py: 4, px: 2 }}>
-                        <EmptyState
-                          title="Couldn’t load leaderboard data"
-                          description={error}
-                        />
-                      </TableCell>
-                    </TableRow>
-                  )}
-
-                  {!loading && !error && rows.length === 0 && (
-                    <TableRow>
-                      <TableCell colSpan={8} sx={{ py: 4, px: 2 }}>
-                        <EmptyState
-                          title="No times yet"
-                          description="No laps have been recorded on this track. Times will appear automatically after the next sync."
-                        />
-                      </TableCell>
-                    </TableRow>
-                  )}
-
-                  {!loading && !error && pagedRows.map((entry, index) => {
-                    const absolutePos = start + index;
-                    const driver =
-                      driversByGuid.get(entry.guid) ||
-                      ({ guid: entry.guid, name: entry.name, kilometers: 0, collisions: 0 } as RankDriver);
-                    const license = getDriverLicense(driver, licenseMap);
-                    const sr = getDriverSR(driver);
-                    const delta = deltas.get(entry.guid);
-
-                    return (
-                      <TableRow
-                        key={`${entry.guid}-${entry.laptime}-${index}`}
-                        sx={{
-                          cursor: 'pointer',
-                          ...subtleRowEnterSx(index, { baseDelayMs: 340 }),
-                          ...(absolutePos < 3 ? getPodiumRowSx((absolutePos + 1) as 1 | 2 | 3) : {}),
-                        }}
-                        onClick={() => {
-                          window.location.href = getDriverProfileHref(entry.guid);
-                        }}
-                      >
-                        <TableCell>
-                          <Chip
-                            size="small"
-                            label={absolutePos + 1}
-                            sx={{
-                              minWidth: 38,
-                              fontWeight: 700,
-                              ...getPodiumChipSx(absolutePos, true),
-                            }}
+                  </TableHead>
+                  <TableBody>
+                    {loading && (
+                      <TableRow>
+                        <TableCell colSpan={8} sx={{ py: 4, px: 2 }}>
+                          <EmptyState
+                            title="Loading leaderboard…"
+                            description="Pulling current-track lap times. This usually takes a second."
                           />
                         </TableCell>
-                        <TableCell sx={{ fontWeight: 700 }}>
-                          <Link
-                            href={getDriverProfileHref(entry.guid)}
-                            onClick={(e) => e.stopPropagation()}
-                            underline="none"
-                            color="inherit"
-                            sx={{ fontWeight: 700 }}
-                          >
-                            {entry.name || driver.name || 'Unknown'}
-                          </Link>
-                        </TableCell>
-                        <TableCell>
-                          <Stack direction="row" spacing={1} alignItems="center">
-                            <Chip
-                              size="small"
-                              label={license.license}
-                              onClick={(e) => { e.stopPropagation(); onOpenGuide('license'); }}
-                              sx={{
-                                minWidth: LICENSE_CHIP_WIDTH,
-                                fontWeight: 700,
-                                justifyContent: 'center',
-                                cursor: 'pointer',
-                                ...getLicenseBadgeSx(license.license),
-                              }}
-                            />
-                            <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.secondary' }}>
-                              {Math.round(license.paceScore).toLocaleString()}
-                            </Typography>
-                            {delta ? <DeltaChip value={Math.round(delta.deltaPace)} /> : null}
-                          </Stack>
-                        </TableCell>
-                        <TableCell>
-                          <Stack direction="row" spacing={1} alignItems="center">
-                            <Chip
-                              size="small"
-                              label={sr.tier}
-                              onClick={(e) => { e.stopPropagation(); onOpenGuide('safety'); }}
-                              sx={{
-                                minWidth: SR_CHIP_WIDTH,
-                                fontWeight: 700,
-                                justifyContent: 'center',
-                                cursor: 'pointer',
-                                ...getSRBadgeSx(sr.tier),
-                              }}
-                            />
-                            <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.secondary' }}>
-                              {sr.sr.toFixed(2)}
-                            </Typography>
-                            {delta ? <DeltaChip value={delta.deltaSR} decimals={2} kind="sr" /> : null}
-                          </Stack>
-                        </TableCell>
-                        <TableCell sx={{ fontFamily: 'monospace', fontWeight: 700 }}>
-                          {formatLaptime(entry.laptime)}
-                        </TableCell>
-                        <TableCell align="right" sx={{ fontFamily: 'monospace' }}>
-                          {typeof entry.laptime === 'number' ? calculateGap(fastestLap, entry.laptime) : '—'}
-                        </TableCell>
-                        <TableCell align="right">{(entry.laps || 0).toLocaleString()}</TableCell>
-                        <TableCell align="right">{(driver.kilometers || 0).toLocaleString()}</TableCell>
                       </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </Paper>
+                    )}
+
+                    {!loading && error && (
+                      <TableRow>
+                        <TableCell colSpan={8} sx={{ py: 4, px: 2 }}>
+                          <EmptyState title="Couldn’t load leaderboard data" description={error} />
+                        </TableCell>
+                      </TableRow>
+                    )}
+
+                    {!loading && !error && rows.length === 0 && (
+                      <TableRow>
+                        <TableCell colSpan={8} sx={{ py: 4, px: 2 }}>
+                          <EmptyState
+                            title="No times yet"
+                            description="No laps have been recorded on this track. Times will appear automatically after the next sync."
+                          />
+                        </TableCell>
+                      </TableRow>
+                    )}
+
+                    {!loading &&
+                      !error &&
+                      pagedRows.map((entry, index) => {
+                        const absolutePos = start + index;
+                        const driver =
+                          driversByGuid.get(entry.guid) ||
+                          ({
+                            guid: entry.guid,
+                            name: entry.name,
+                            kilometers: 0,
+                            collisions: 0,
+                          } as RankDriver);
+                        const license = getDriverLicense(driver, licenseMap);
+                        const sr = getDriverSR(driver);
+                        const delta = deltas.get(entry.guid);
+
+                        return (
+                          <TableRow
+                            key={`${entry.guid}-${entry.laptime}-${index}`}
+                            sx={{
+                              cursor: 'pointer',
+                              ...subtleRowEnterSx(index, { baseDelayMs: 340 }),
+                              ...(absolutePos < 3
+                                ? getPodiumRowSx((absolutePos + 1) as 1 | 2 | 3)
+                                : {}),
+                            }}
+                            onClick={() => {
+                              window.location.href = getDriverProfileHref(entry.guid);
+                            }}
+                          >
+                            <TableCell>
+                              <Chip
+                                size="small"
+                                label={absolutePos + 1}
+                                sx={{
+                                  minWidth: 38,
+                                  fontWeight: 700,
+                                  ...getPodiumChipSx(absolutePos, true),
+                                }}
+                              />
+                            </TableCell>
+                            <TableCell sx={{ fontWeight: 700 }}>
+                              <Link
+                                href={getDriverProfileHref(entry.guid)}
+                                onClick={(e) => e.stopPropagation()}
+                                underline="none"
+                                color="inherit"
+                                sx={{ fontWeight: 700 }}
+                              >
+                                {entry.name || driver.name || 'Unknown'}
+                              </Link>
+                            </TableCell>
+                            <TableCell>
+                              <Stack direction="row" spacing={1} alignItems="center">
+                                <Chip
+                                  size="small"
+                                  label={license.license}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    onOpenGuide('license');
+                                  }}
+                                  sx={{
+                                    minWidth: LICENSE_CHIP_WIDTH,
+                                    fontWeight: 700,
+                                    justifyContent: 'center',
+                                    cursor: 'pointer',
+                                    ...getLicenseBadgeSx(license.license),
+                                  }}
+                                />
+                                <Typography
+                                  variant="body2"
+                                  sx={{ fontWeight: 700, color: 'text.secondary' }}
+                                >
+                                  {Math.round(license.paceScore).toLocaleString()}
+                                </Typography>
+                                {delta ? <DeltaChip value={Math.round(delta.deltaPace)} /> : null}
+                              </Stack>
+                            </TableCell>
+                            <TableCell>
+                              <Stack direction="row" spacing={1} alignItems="center">
+                                <Chip
+                                  size="small"
+                                  label={sr.tier}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    onOpenGuide('safety');
+                                  }}
+                                  sx={{
+                                    minWidth: SR_CHIP_WIDTH,
+                                    fontWeight: 700,
+                                    justifyContent: 'center',
+                                    cursor: 'pointer',
+                                    ...getSRBadgeSx(sr.tier),
+                                  }}
+                                />
+                                <Typography
+                                  variant="body2"
+                                  sx={{ fontWeight: 700, color: 'text.secondary' }}
+                                >
+                                  {sr.sr.toFixed(2)}
+                                </Typography>
+                                {delta ? (
+                                  <DeltaChip value={delta.deltaSR} decimals={2} kind="sr" />
+                                ) : null}
+                              </Stack>
+                            </TableCell>
+                            <TableCell sx={{ fontFamily: 'monospace', fontWeight: 700 }}>
+                              {formatLaptime(entry.laptime)}
+                            </TableCell>
+                            <TableCell align="right" sx={{ fontFamily: 'monospace' }}>
+                              {typeof entry.laptime === 'number'
+                                ? calculateGap(fastestLap, entry.laptime)
+                                : '—'}
+                            </TableCell>
+                            <TableCell align="right">
+                              {(entry.laps || 0).toLocaleString()}
+                            </TableCell>
+                            <TableCell align="right">
+                              {(driver.kilometers || 0).toLocaleString()}
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Paper>
           </Reveal>
 
           {!loading && !error && totalPages > 1 && (
-            <Paper sx={{ ...GLASS_TABLE_PAGINATION_SX, ...glassCardMotionSx(0, { baseDelayMs: 460 }) }}>
+            <Paper
+              sx={{ ...GLASS_TABLE_PAGINATION_SX, ...glassCardMotionSx(0, { baseDelayMs: 460 }) }}
+            >
               <Stack direction="row" spacing={1} justifyContent="center" flexWrap="wrap">
                 <Button
                   disabled={safePage <= 1}
@@ -681,11 +932,15 @@ function CurrentTrackLeaderboardSection({
                   Prev
                 </Button>
                 {Array.from({ length: totalPages }, (_, idx) => idx + 1)
-                  .filter((p) => p === 1 || p === totalPages || (p >= safePage - 1 && p <= safePage + 1))
+                  .filter(
+                    (p) => p === 1 || p === totalPages || (p >= safePage - 1 && p <= safePage + 1)
+                  )
                   .map((p, idx, arr) => (
                     <Box key={p} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                       {idx > 0 && p - arr[idx - 1] > 1 && (
-                        <Typography sx={{ px: 0.5, color: 'rgba(255,255,255,0.65)' }}>...</Typography>
+                        <Typography sx={{ px: 0.5, color: 'rgba(255,255,255,0.65)' }}>
+                          ...
+                        </Typography>
                       )}
                       <Button
                         onClick={() => onPageChange(p)}
@@ -722,22 +977,14 @@ function DriverSearchSection({
   rankData,
   loading,
   error,
-  currentTrack,
   syncStatus,
-  totalDrivers,
-  totalLaps,
-  activeTracks,
 }: {
   drivers: DriverView[];
   /** Raw rank rows (with wins/points/km) — DriverView drops those fields. */
   rankData: RankDriver[];
   loading: boolean;
   error: string | null;
-  currentTrack: CurrentTrackData | null;
   syncStatus: SyncHealth;
-  totalDrivers: number;
-  totalLaps: number;
-  activeTracks: number;
 }) {
   const [query, setQuery] = useState('');
 
@@ -775,7 +1022,14 @@ function DriverSearchSection({
       <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1 }}>
         <Grid container spacing={{ xs: 2, md: 4.5 }} alignItems="stretch">
           <Grid size={{ xs: 12, md: 7 }}>
-            <Stack spacing={1} sx={{ mb: 2, textAlign: { xs: 'center', md: 'left' }, alignItems: { xs: 'center', md: 'flex-start' } }}>
+            <Stack
+              spacing={1}
+              sx={{
+                mb: 2,
+                textAlign: { xs: 'center', md: 'left' },
+                alignItems: { xs: 'center', md: 'flex-start' },
+              }}
+            >
               <Typography variant="overline" sx={sectionKickerSx}>
                 Driver statistics
               </Typography>
@@ -802,7 +1056,10 @@ function DriverSearchSection({
               }}
             >
               <Stack spacing={1.5} sx={{ alignItems: 'stretch', width: '100%' }}>
-                <Typography variant="subtitle2" sx={{ color: 'text.secondary', textAlign: { xs: 'center', md: 'left' } }}>
+                <Typography
+                  variant="subtitle2"
+                  sx={{ color: 'text.secondary', textAlign: { xs: 'center', md: 'left' } }}
+                >
                   Search driver
                 </Typography>
 
@@ -855,7 +1112,13 @@ function DriverSearchSection({
                           <ListItemText
                             sx={{ width: '100%', m: 0 }}
                             primary={
-                              <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" sx={{ width: '100%' }}>
+                              <Stack
+                                direction="row"
+                                spacing={1}
+                                alignItems="center"
+                                flexWrap="wrap"
+                                sx={{ width: '100%' }}
+                              >
                                 <Link
                                   href={getDriverProfileHref(driver.guid)}
                                   onClick={(e) => e.stopPropagation()}
@@ -898,20 +1161,21 @@ function DriverSearchSection({
               </Stack>
             </Paper>
 
-            {loading && <Typography color="text.secondary" sx={{ mt: 1 }}>Loading drivers...</Typography>}
-            {error && <Typography color="error" sx={{ mt: 1 }}>Failed to load driver data: {error}</Typography>}
+            {loading && (
+              <Typography color="text.secondary" sx={{ mt: 1 }}>
+                Loading drivers...
+              </Typography>
+            )}
+            {error && (
+              <Typography color="error" sx={{ mt: 1 }}>
+                Failed to load driver data: {error}
+              </Typography>
+            )}
           </Grid>
 
           <Grid size={{ xs: 12, md: 5 }}>
             <Stack spacing={1.25} sx={{ height: 1, alignItems: { xs: 'center', md: 'stretch' } }}>
-              <RaceIntelligenceCard
-                syncStatus={syncStatus}
-                totalDrivers={totalDrivers}
-                totalLaps={totalLaps}
-                activeTracks={activeTracks}
-                currentTrack={currentTrack}
-                motionSxIndex={1}
-              />
+              <CommunityPulseCard rankData={rankData} syncStatus={syncStatus} motionSxIndex={1} />
             </Stack>
           </Grid>
         </Grid>
@@ -1010,7 +1274,9 @@ export default function Page() {
           staticCurrentTrackRef.current = trackJson;
           void fetchLiveServerStatusFromSupabase().then((live) => {
             if (!mounted) return;
-            setCurrentTrack(pickNewerCurrentTrack(toCurrentTrackPayload(staticCurrentTrackRef.current), live));
+            setCurrentTrack(
+              pickNewerCurrentTrack(toCurrentTrackPayload(staticCurrentTrackRef.current), live)
+            );
           });
         });
     };
@@ -1068,17 +1334,25 @@ export default function Page() {
   const currentTrackRows = useMemo<LeaderboardCarRow[]>(() => {
     const currentTrackId = currentTrack?.track;
     if (!currentTrackId?.trim()) return [];
-    const matchedTrackId = leaderboardTrackIdLookupCandidates(currentTrackId).find((id) => leaderboardData?.[id]);
+    const matchedTrackId = leaderboardTrackIdLookupCandidates(currentTrackId).find(
+      (id) => leaderboardData?.[id]
+    );
     const data = matchedTrackId ? leaderboardData[matchedTrackId]?.[CAR] : undefined;
     if (!Array.isArray(data)) return [];
     return [...data].sort((a, b) => (a.laptime || 0) - (b.laptime || 0));
   }, [currentTrack?.track, leaderboardData]);
 
   const currentTrackFastestLap = currentTrackRows[0]?.laptime || 0;
-  const currentTrackTotalPages = Math.max(1, Math.ceil(currentTrackRows.length / HOME_CURRENT_TRACK_PER_PAGE));
+  const currentTrackTotalPages = Math.max(
+    1,
+    Math.ceil(currentTrackRows.length / HOME_CURRENT_TRACK_PER_PAGE)
+  );
   const currentTrackSafePage = Math.min(Math.max(1, currentTrackPage), currentTrackTotalPages);
   const currentTrackStart = (currentTrackSafePage - 1) * HOME_CURRENT_TRACK_PER_PAGE;
-  const currentTrackPagedRows = currentTrackRows.slice(currentTrackStart, currentTrackStart + HOME_CURRENT_TRACK_PER_PAGE);
+  const currentTrackPagedRows = currentTrackRows.slice(
+    currentTrackStart,
+    currentTrackStart + HOME_CURRENT_TRACK_PER_PAGE
+  );
 
   const drivers = useMemo<DriverView[]>(() => {
     if (!rankData.length) return [];
@@ -1090,7 +1364,10 @@ export default function Page() {
       const collisions = driver.collisions || 0;
       const safety = safetyRating(driver);
       const safetyTier = getSRTier(safety, km);
-      const licenseInfo = km < 100 ? { license: 'Rookie', paceScore: 0 } : licenseMap.get(driver.guid) || { license: 'Bronze', paceScore: 0 };
+      const licenseInfo =
+        km < 100
+          ? { license: 'Rookie', paceScore: 0 }
+          : licenseMap.get(driver.guid) || { license: 'Bronze', paceScore: 0 };
       const role = getTeamRole(driver.guid, teamRoles);
 
       let totalLaps = 0;
@@ -1121,7 +1398,8 @@ export default function Page() {
         collisions,
         totalLaps,
         tracksDriven,
-        favoriteTrack: favoriteTrackLaps > 0 ? `${favoriteTrack} (${favoriteTrackLaps} laps)` : 'N/A',
+        favoriteTrack:
+          favoriteTrackLaps > 0 ? `${favoriteTrack} (${favoriteTrackLaps} laps)` : 'N/A',
         favoriteTrackLaps,
         license: licenseInfo.license,
         paceScore: licenseInfo.paceScore,
@@ -1132,21 +1410,6 @@ export default function Page() {
     });
   }, [rankData, teamRoles]);
 
-  const community = useMemo(() => {
-    const totalDrivers = drivers.length;
-    const totalLaps = drivers.reduce((sum, d) => sum + d.totalLaps, 0);
-    const trackIds = new Set<string>();
-
-    rankData.forEach((driver) => {
-      const leaderboard = driver.leaderboard || {};
-      Object.entries(leaderboard).forEach(([trackId, cars]) => {
-        const laptime = cars?.[CAR]?.laptime;
-        if (typeof laptime === 'number') trackIds.add(trackId);
-      });
-    });
-
-    return { totalDrivers, totalLaps, activeTracks: trackIds.size };
-  }, [drivers, rankData]);
   const syncStatus = getSyncHealth(getEffectiveLastSync(metadata.lastSync, rankData));
 
   return (
@@ -1169,11 +1432,7 @@ export default function Page() {
         rankData={rankData}
         loading={loading}
         error={error}
-        currentTrack={currentTrack}
         syncStatus={syncStatus}
-        totalDrivers={community.totalDrivers}
-        totalLaps={community.totalLaps}
-        activeTracks={community.activeTracks}
       />
       <CurrentTrackLeaderboardSection
         loading={loading}
@@ -1195,4 +1454,3 @@ export default function Page() {
     </>
   );
 }
-

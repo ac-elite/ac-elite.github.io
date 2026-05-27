@@ -27,9 +27,20 @@ export function EmptyState({ title, description, action }: EmptyStateProps) {
       }}
     >
       <Stack spacing={0.75} alignItems="flex-start">
-        <Typography sx={{ fontWeight: 800, fontSize: '0.875rem', color: 'rgba(255,255,255,0.9)' }}>{title}</Typography>
+        <Typography
+          sx={{
+            fontWeight: 800,
+            fontSize: 'clamp(0.8rem, 0.72rem + 0.34vw, 0.875rem)',
+            color: 'rgba(255,255,255,0.9)',
+          }}
+        >
+          {title}
+        </Typography>
         {description ? (
-          <Typography variant="body2" sx={{ ...DATA_STATE_HELP_TEXT_SX, color: 'rgba(255,255,255,0.58)' }}>
+          <Typography
+            variant="body2"
+            sx={{ ...DATA_STATE_HELP_TEXT_SX, color: 'rgba(255,255,255,0.58)' }}
+          >
             {description}
           </Typography>
         ) : null}

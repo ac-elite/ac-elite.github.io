@@ -18,7 +18,11 @@ import { getTrackDisplayName } from 'src/lib/ac-elite-data';
 import { useTrackCatalogVersion } from 'src/centralized/track-info';
 import { glassCardMotionSx } from 'src/lib/subtle-motion';
 import { brandAccentBorderSx } from 'src/lib/status-accent';
-import { GLASS_INNER_PANEL_SX, GLASS_PANEL_COMPACT_SX, GLASS_TABLE_CONTAINER_SX } from 'src/lib/glass';
+import {
+  GLASS_INNER_PANEL_SX,
+  GLASS_PANEL_COMPACT_SX,
+  GLASS_TABLE_CONTAINER_SX,
+} from 'src/lib/glass';
 import {
   acSessionTypeLabel,
   AC_SESSION_TYPE_RACE,
@@ -64,8 +68,7 @@ const SCHEDULE: readonly ScheduleEntry[] = [
     kind: 'recurring',
     workflow: 'Hourly server backup file',
     cron: '5 * * * *',
-    what:
-      'Once an hour, checks if the game lobby or track changed. If so, saves a backup copy the website can fall back on. Slower than the live check below.',
+    what: 'Once an hour, checks if the game lobby or track changed. If so, saves a backup copy the website can fall back on. Slower than the live check below.',
   },
   {
     agendaWhen: '≈1 min',
@@ -73,8 +76,7 @@ const SCHEDULE: readonly ScheduleEntry[] = [
     kind: 'recurring',
     workflow: 'Live server check',
     cron: 'Your external cron schedule (e.g. every minute)',
-    what:
-      'Checks the AC Elite server often so the site can show who is online, which track is running, and session info without waiting for the hourly backup.',
+    what: 'Checks the AC Elite server often so the site can show who is online, which track is running, and session info without waiting for the hourly backup.',
   },
   {
     agendaWhen: 'After sync',
@@ -82,8 +84,7 @@ const SCHEDULE: readonly ScheduleEntry[] = [
     kind: 'chained',
     workflow: 'Daily 24h ranking snapshot',
     cron: 'workflow_run (after Sync KMR)',
-    what:
-      'Saves a “yesterday style” copy of the rankings used for 24-hour stats. Waits until after 06:00 Amsterdam time and runs at most once per day.',
+    what: 'Saves a “yesterday style” copy of the rankings used for 24-hour stats. Waits until after 06:00 Amsterdam time and runs at most once per day.',
     chain: 'Then: publish website',
   },
   {
@@ -97,9 +98,30 @@ const SCHEDULE: readonly ScheduleEntry[] = [
 ];
 
 const ADMIN_SERVER_INFO_HANDLED = new Set([
-  'name', 'clients', 'maxclients', 'track', 'cars', 'cport', 'port', 'tport',
-  'session', 'sessiontypes', 'durations', 'timeleft', 'timeofday', 'pickup',
-  'timed', 'pass', 'inverted', 'ip', 'country', 'json', 'timestamp', 'l', 'extra', 'pit',
+  'name',
+  'clients',
+  'maxclients',
+  'track',
+  'cars',
+  'cport',
+  'port',
+  'tport',
+  'session',
+  'sessiontypes',
+  'durations',
+  'timeleft',
+  'timeofday',
+  'pickup',
+  'timed',
+  'pass',
+  'inverted',
+  'ip',
+  'country',
+  'json',
+  'timestamp',
+  'l',
+  'extra',
+  'pit',
 ]);
 
 function fmtAdminScalar(v: unknown): string {
@@ -109,7 +131,11 @@ function fmtAdminScalar(v: unknown): string {
   if (typeof v === 'string') return v.trim() === '' ? '(empty)' : v;
   if (Array.isArray(v)) return v.length ? JSON.stringify(v) : '[]';
   if (typeof v === 'object') {
-    try { return JSON.stringify(v); } catch { return String(v); }
+    try {
+      return JSON.stringify(v);
+    } catch {
+      return String(v);
+    }
   }
   return String(v);
 }
@@ -119,8 +145,13 @@ function formatAbsolute(iso?: string): string {
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return iso;
   return d.toLocaleString('en-GB', {
-    day: '2-digit', month: 'short', year: 'numeric',
-    hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false,
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
   });
 }
 
@@ -143,19 +174,28 @@ function formatAdminTimeleft(sec: number | undefined): string {
   return formatTimeLeftSeconds(sec);
 }
 
-function buildAdminServerInfoRows(ct: CurrentTrackPayload | null): { label: string; value: string }[] {
+function buildAdminServerInfoRows(
+  ct: CurrentTrackPayload | null
+): { label: string; value: string }[] {
   const rows: { label: string; value: string }[] = [];
   if (!ct) {
     rows.push({ label: 'Payload', value: 'No current track loaded yet.' });
     return rows;
   }
-  rows.push({ label: 'Snapshot (fetched_at)', value: ct.fetchedAt ? `${formatAbsolute(ct.fetchedAt)} · ${formatRelative(ct.fetchedAt)}` : '—' });
+  rows.push({
+    label: 'Snapshot (fetched_at)',
+    value: ct.fetchedAt ? `${formatAbsolute(ct.fetchedAt)} · ${formatRelative(ct.fetchedAt)}` : '—',
+  });
   rows.push({ label: 'Online (row)', value: ct.online ? 'Yes' : 'No' });
   rows.push({ label: 'Track ID (row)', value: ct.track?.trim() ? ct.track : '—' });
 
   const info = ct.info;
   if (!info || typeof info !== 'object') {
-    rows.push({ label: '/INFO', value: 'No lobby detail on this snapshot yet — try again shortly or open the live server link.' });
+    rows.push({
+      label: '/INFO',
+      value:
+        'No lobby detail on this snapshot yet — try again shortly or open the live server link.',
+    });
     return rows;
   }
 
@@ -164,20 +204,40 @@ function buildAdminServerInfoRows(ct: CurrentTrackPayload | null): { label: stri
     rows.push({ label: 'Lobby name (raw)', value: info.name });
   }
 
-  const clients = typeof info.clients === 'number' && Number.isFinite(info.clients) ? info.clients : null;
-  const maxc = typeof info.maxclients === 'number' && Number.isFinite(info.maxclients) ? info.maxclients : null;
+  const clients =
+    typeof info.clients === 'number' && Number.isFinite(info.clients) ? info.clients : null;
+  const maxc =
+    typeof info.maxclients === 'number' && Number.isFinite(info.maxclients)
+      ? info.maxclients
+      : null;
   rows.push({
     label: 'Clients / max',
-    value: clients != null && maxc != null ? `${clients} / ${maxc}` : `${fmtAdminScalar(info.clients)} / ${fmtAdminScalar(info.maxclients)}`,
+    value:
+      clients != null && maxc != null
+        ? `${clients} / ${maxc}`
+        : `${fmtAdminScalar(info.clients)} / ${fmtAdminScalar(info.maxclients)}`,
   });
 
-  if (typeof info.track === 'string' && info.track.trim() && info.track.trim() !== ct.track?.trim()) {
+  if (
+    typeof info.track === 'string' &&
+    info.track.trim() &&
+    info.track.trim() !== ct.track?.trim()
+  ) {
     rows.push({ label: 'Track ID (/INFO)', value: info.track });
   }
 
-  rows.push({ label: 'Cars', value: Array.isArray(info.cars) && info.cars.length ? info.cars.join(', ') : '—' });
-  rows.push({ label: 'Ports', value: `cport ${fmtAdminScalar(info.cport)} · game ${fmtAdminScalar(info.port)} · query ${fmtAdminScalar(info.tport)}` });
-  rows.push({ label: 'IP (server)', value: typeof info.ip === 'string' && info.ip.trim() ? info.ip : '(empty)' });
+  rows.push({
+    label: 'Cars',
+    value: Array.isArray(info.cars) && info.cars.length ? info.cars.join(', ') : '—',
+  });
+  rows.push({
+    label: 'Ports',
+    value: `cport ${fmtAdminScalar(info.cport)} · game ${fmtAdminScalar(info.port)} · query ${fmtAdminScalar(info.tport)}`,
+  });
+  rows.push({
+    label: 'IP (server)',
+    value: typeof info.ip === 'string' && info.ip.trim() ? info.ip : '(empty)',
+  });
 
   if (Array.isArray(info.sessiontypes) && info.sessiontypes.length > 0) {
     const seq = info.sessiontypes.map((id) => `${id} → ${acSessionTypeLabel(id)}`).join('; ');
@@ -194,13 +254,19 @@ function buildAdminServerInfoRows(ct: CurrentTrackPayload | null): { label: stri
   };
   rows.push({
     label: 'Schedule (short)',
-    value: formatSessionDurationsLine(info.sessiontypes, info.durations, info.timed, scheduleHints) ?? '—',
+    value:
+      formatSessionDurationsLine(info.sessiontypes, info.durations, info.timed, scheduleHints) ??
+      '—',
   });
 
   if (Array.isArray(info.sessiontypes) && Array.isArray(info.durations)) {
     const n = Math.min(info.sessiontypes.length, info.durations.length);
     const parts: string[] = [];
-    const doubleRevRace = shouldAppendReversedGridRaceHint(info.sessiontypes, info.timed, scheduleHints);
+    const doubleRevRace = shouldAppendReversedGridRaceHint(
+      info.sessiontypes,
+      info.timed,
+      scheduleHints
+    );
     for (let i = 0; i < n; i += 1) {
       const typeId = info.sessiontypes[i];
       const isRaceLaps = typeId === AC_SESSION_TYPE_RACE && info.timed === false;
@@ -219,7 +285,10 @@ function buildAdminServerInfoRows(ct: CurrentTrackPayload | null): { label: stri
 
   rows.push({ label: 'Time of day (slot)', value: fmtAdminScalar(info.timeofday) });
   rows.push({ label: 'Inverted grid', value: fmtAdminScalar(info.inverted) });
-  rows.push({ label: 'Country (geo)', value: Array.isArray(info.country) && info.country.length ? info.country.join(', ') : '—' });
+  rows.push({
+    label: 'Country (geo)',
+    value: Array.isArray(info.country) && info.country.length ? info.country.join(', ') : '—',
+  });
   rows.push({ label: 'Pickup', value: fmtAdminScalar(info.pickup) });
   rows.push({ label: 'Timed', value: fmtAdminScalar(info.timed) });
   rows.push({ label: 'Passworded', value: fmtAdminScalar(info.pass) });
@@ -231,20 +300,30 @@ function buildAdminServerInfoRows(ct: CurrentTrackPayload | null): { label: stri
 
   for (const key of Object.keys(info)) {
     if (ADMIN_SERVER_INFO_HANDLED.has(key)) continue;
-    rows.push({ label: `Other: ${key}`, value: fmtAdminScalar((info as Record<string, unknown>)[key]) });
+    rows.push({
+      label: `Other: ${key}`,
+      value: fmtAdminScalar((info as Record<string, unknown>)[key]),
+    });
   }
 
   return rows;
 }
 
 const FRESHNESS_ROW_BORDER = '1px solid rgba(148,163,184,0.1)';
-const freshnessBodyCellSx = { borderBottom: FRESHNESS_ROW_BORDER, py: 1.35, verticalAlign: 'top' as const };
+const freshnessBodyCellSx = {
+  borderBottom: FRESHNESS_ROW_BORDER,
+  py: { xs: 1.1, md: 0.8 },
+  verticalAlign: 'top' as const,
+};
 
 export default function Page() {
   useTrackCatalogVersion();
   const data = useAdminLiveData();
 
-  const adminServerDetailRows = useMemo(() => buildAdminServerInfoRows(data.currentTrack), [data.currentTrack]);
+  const adminServerDetailRows = useMemo(
+    () => buildAdminServerInfoRows(data.currentTrack),
+    [data.currentTrack]
+  );
 
   return (
     <AdminPageShell
@@ -256,14 +335,17 @@ export default function Page() {
         <Stack
           direction={{ xs: 'column', sm: 'row' }}
           justifyContent="space-between"
-          alignItems={{ xs: 'flex-start', sm: 'center' }}
+          alignItems={{ xs: 'center', sm: 'center' }}
           spacing={1}
-          sx={{ mb: 1.5 }}
+          sx={{ mb: 1.5, textAlign: { xs: 'center', sm: 'left' } }}
         >
           <Box>
-            <Typography variant="h6" sx={{ fontWeight: 800 }}>AC Elite server status</Typography>
+            <Typography variant="h6" sx={{ fontWeight: 800 }}>
+              AC Elite server status
+            </Typography>
             <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.4 }}>
-              Is the lobby up, which track is loaded, and how many drivers are connected — same idea players see on the homepage card.
+              Is the lobby up, which track is loaded, and how many drivers are connected — same idea
+              players see on the homepage card.
             </Typography>
           </Box>
           <Chip
@@ -273,30 +355,41 @@ export default function Page() {
               fontWeight: 800,
               color: data.currentTrack?.online ? '#22c55e' : '#f59e0b',
               bgcolor: data.currentTrack?.online ? 'rgba(34,197,94,0.12)' : 'rgba(245,158,11,0.12)',
-              border: data.currentTrack?.online ? '1px solid rgba(34,197,94,0.45)' : '1px solid rgba(245,158,11,0.45)',
+              border: data.currentTrack?.online
+                ? '1px solid rgba(34,197,94,0.45)'
+                : '1px solid rgba(245,158,11,0.45)',
             }}
           />
         </Stack>
         <Grid container spacing={1.25}>
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <Box sx={{ ...GLASS_INNER_PANEL_SX, py: 1.35 }}>
-              <Typography variant="caption" sx={{ color: 'text.secondary' }}>Track</Typography>
+              <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                Track
+              </Typography>
               <Typography sx={{ fontWeight: 800, mt: 0.25 }}>
-                {data.currentTrack?.track?.trim() ? getTrackDisplayName(data.currentTrack.track) : '—'}
+                {data.currentTrack?.track?.trim()
+                  ? getTrackDisplayName(data.currentTrack.track)
+                  : '—'}
               </Typography>
             </Box>
           </Grid>
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <Box sx={{ ...GLASS_INNER_PANEL_SX, py: 1.35 }}>
-              <Typography variant="caption" sx={{ color: 'text.secondary' }}>Drivers</Typography>
+              <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                Drivers
+              </Typography>
               <Typography sx={{ fontWeight: 800, mt: 0.25 }}>
-                {data.currentTrack?.info?.clients ?? '—'} / {data.currentTrack?.info?.maxclients ?? '—'}
+                {data.currentTrack?.info?.clients ?? '—'} /{' '}
+                {data.currentTrack?.info?.maxclients ?? '—'}
               </Typography>
             </Box>
           </Grid>
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <Box sx={{ ...GLASS_INNER_PANEL_SX, py: 1.35 }}>
-              <Typography variant="caption" sx={{ color: 'text.secondary' }}>Session</Typography>
+              <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                Session
+              </Typography>
               <Typography sx={{ fontWeight: 800, mt: 0.25 }}>
                 {data.currentTrack?.info ? acCurrentSessionLabel(data.currentTrack.info) : '—'}
               </Typography>
@@ -304,9 +397,13 @@ export default function Page() {
           </Grid>
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <Box sx={{ ...GLASS_INNER_PANEL_SX, py: 1.35 }}>
-              <Typography variant="caption" sx={{ color: 'text.secondary' }}>Updated</Typography>
+              <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                Updated
+              </Typography>
               <Typography sx={{ fontWeight: 800, mt: 0.25 }}>
-                {data.currentTrack?.fetchedAt ? formatRelative(data.currentTrack.fetchedAt) : 'Unknown'}
+                {data.currentTrack?.fetchedAt
+                  ? formatRelative(data.currentTrack.fetchedAt)
+                  : 'Unknown'}
               </Typography>
             </Box>
           </Grid>
@@ -315,24 +412,52 @@ export default function Page() {
 
       <Paper sx={{ ...GLASS_PANEL_COMPACT_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(2) }}>
         <Box sx={{ mb: 1.25 }}>
-          <Typography variant="h6" sx={{ fontWeight: 800 }}>Server lobby (raw fields)</Typography>
+          <Typography variant="h6" sx={{ fontWeight: 800 }}>
+            Server lobby (raw fields)
+          </Typography>
           <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.4 }}>
-            Every field the AC server reports. Useful when something looks off in the cards above and you want to see the raw value.
+            Every field the AC server reports. Useful when something looks off in the cards above
+            and you want to see the raw value.
           </Typography>
         </Box>
         <TableContainer sx={{ ...GLASS_TABLE_CONTAINER_SX, maxHeight: 400, borderRadius: 1 }}>
-          <Table size="small" stickyHeader>
+          <Table size="small" stickyHeader sx={{ minWidth: 680 }}>
             <TableHead>
               <TableRow>
-                <TableCell sx={{ fontWeight: 800, width: '32%', bgcolor: 'rgba(255,255,255,0.012)' }}>Field</TableCell>
-                <TableCell sx={{ fontWeight: 800, bgcolor: 'rgba(255,255,255,0.012)' }}>Value</TableCell>
+                <TableCell
+                  sx={{
+                    fontWeight: 800,
+                    width: { xs: 220, sm: 240 },
+                    bgcolor: 'rgba(255,255,255,0.012)',
+                  }}
+                >
+                  Field
+                </TableCell>
+                <TableCell sx={{ fontWeight: 800, bgcolor: 'rgba(255,255,255,0.012)' }}>
+                  Value
+                </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {adminServerDetailRows.map((row, idx) => (
                 <TableRow key={`${row.label}-${idx}`}>
-                  <TableCell sx={{ ...freshnessBodyCellSx, color: 'text.secondary', fontWeight: 700 }}>{row.label}</TableCell>
-                  <TableCell sx={{ ...freshnessBodyCellSx, fontFamily: row.value.length > 120 ? 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace' : 'inherit', fontSize: '0.8125rem', wordBreak: 'break-word' }}>
+                  <TableCell
+                    sx={{ ...freshnessBodyCellSx, color: 'text.secondary', fontWeight: 700 }}
+                  >
+                    {row.label}
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      ...freshnessBodyCellSx,
+                      fontFamily:
+                        row.value.length > 120
+                          ? 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace'
+                          : 'inherit',
+                      fontSize: '0.8125rem',
+                      wordBreak: 'break-word',
+                      minWidth: 0,
+                    }}
+                  >
                     {row.value}
                   </TableCell>
                 </TableRow>
@@ -344,23 +469,37 @@ export default function Page() {
 
       <Paper sx={{ ...GLASS_PANEL_COMPACT_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(3) }}>
         <Box sx={{ mb: 1.25 }}>
-          <Typography variant="h6" sx={{ fontWeight: 800 }}>Background schedule</Typography>
+          <Typography variant="h6" sx={{ fontWeight: 800 }}>
+            Background schedule
+          </Typography>
           <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.4 }}>
-            When automated jobs run, in plain language. Handy for figuring out why data on the site might still look old.
+            When automated jobs run, in plain language. Handy for figuring out why data on the site
+            might still look old.
           </Typography>
         </Box>
         <Stack spacing={1}>
           {SCHEDULE.map((entry) => (
             <Box key={entry.workflow} sx={{ ...GLASS_INNER_PANEL_SX, py: 1.2 }}>
-              <Typography variant="subtitle2" sx={{ fontWeight: 800 }}>{entry.workflow}</Typography>
-              <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mt: 0.25 }}>
+              <Typography variant="subtitle2" sx={{ fontWeight: 800 }}>
+                {entry.workflow}
+              </Typography>
+              <Typography
+                variant="caption"
+                sx={{ color: 'text.secondary', display: 'block', mt: 0.25 }}
+              >
                 {entry.agendaWhen} · {entry.agendaSub} · {entry.cron}
               </Typography>
-              <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.65, lineHeight: 1.5 }}>
+              <Typography
+                variant="body2"
+                sx={{ color: 'text.secondary', mt: 0.65, lineHeight: 1.5 }}
+              >
                 {entry.what}
               </Typography>
               {entry.chain && (
-                <Typography variant="caption" sx={{ color: 'rgba(191,219,254,0.95)', display: 'block', mt: 0.5 }}>
+                <Typography
+                  variant="caption"
+                  sx={{ color: 'rgba(191,219,254,0.95)', display: 'block', mt: 0.5 }}
+                >
                   {entry.chain}
                 </Typography>
               )}

@@ -33,10 +33,11 @@ const ACCENT = BRAND_ACCENT;
 const ACCENT_SOFT = 'rgba(147, 197, 253, 0.14)';
 const ACCENT_BORDER = 'rgba(147, 197, 253, 0.42)';
 const ACCENT_BORDER_STRONG = 'rgba(147, 197, 253, 0.58)';
+const HERO_BODY_BG = 'rgba(8,14,28,0.82)';
 
 const badgeSx = {
-  height: 20,
-  fontSize: '0.64rem',
+  height: 'clamp(18px, 5vw, 20px)',
+  fontSize: 'clamp(0.58rem, 0.52rem + 0.24vw, 0.64rem)',
   fontWeight: 800,
   borderRadius: 1,
   '& .MuiChip-label': { px: 0.8 },
@@ -63,7 +64,7 @@ const infoLabelSx = {
 const infoValueSx = {
   fontWeight: 800,
   lineHeight: 1.25,
-  fontSize: { xs: '0.875rem', md: '0.8125rem' },
+  fontSize: { xs: 'clamp(0.75rem, 0.66rem + 0.42vw, 0.875rem)', md: '0.8125rem' },
 } as const;
 
 function ServerInfoBlock({ label, children }: { label: string; children: ReactNode }) {
@@ -118,17 +119,23 @@ function JoinGlyphIcon() {
       component="svg"
       viewBox="0 0 24 24"
       aria-hidden
-      sx={{ width: 20, height: 20, display: 'block', color: ACCENT }}
+      sx={{
+        width: 'clamp(17px, 4.5vw, 20px)',
+        height: 'clamp(17px, 4.5vw, 20px)',
+        display: 'block',
+        color: ACCENT,
+      }}
     >
-      <path
-        fill="currentColor"
-        d="M14 4h6v16h-6v-2h4V6h-4V4zM4 12l6 5v-3h6v-4h-6V9L4 12z"
-      />
+      <path fill="currentColor" d="M14 4h6v16h-6v-2h4V6h-4V4zM4 12l6 5v-3h6v-4h-6V9L4 12z" />
     </Box>
   );
 }
 
-export function ServerJoinCard({ currentTrack, joinHref = AC_ELITE_SERVER_JOIN_HREF, sx }: ServerJoinCardProps) {
+export function ServerJoinCard({
+  currentTrack,
+  joinHref = AC_ELITE_SERVER_JOIN_HREF,
+  sx,
+}: ServerJoinCardProps) {
   useTrackCatalogVersion();
   const online = Boolean(currentTrack?.online);
   /** When offline, do not surface merged static fallback (last track / lobby) — card must read as down. */
@@ -179,9 +186,7 @@ export function ServerJoinCard({ currentTrack, joinHref = AC_ELITE_SERVER_JOIN_H
   const heroOffsetY = rawTrack ? getTrackHeroImageOffsetY(rawTrack) : 0;
   return (
     <Box sx={softFloatWrapperSx()}>
-      <Box
-        sx={[GLASS_PANEL_SX, { width: '100%', p: 0, overflow: 'hidden' }, sx] as SxProps<Theme>}
-      >
+      <Box sx={[GLASS_PANEL_SX, { width: '100%', p: 0, overflow: 'hidden' }, sx] as SxProps<Theme>}>
         <Box sx={{ position: 'relative', lineHeight: 0, overflow: 'hidden' }}>
           {heroSrc ? (
             <Box
@@ -192,9 +197,10 @@ export function ServerJoinCard({ currentTrack, joinHref = AC_ELITE_SERVER_JOIN_H
               height={450}
               sx={{
                 width: '100%',
-                height: { xs: 148, sm: 168 },
+                height: { xs: 'clamp(118px, 34vw, 148px)', sm: 168 },
                 objectFit: 'cover',
-                objectPosition: heroOffsetY === 0 ? 'center' : `center calc(50% + ${heroOffsetY}px)`,
+                objectPosition:
+                  heroOffsetY === 0 ? 'center' : `center calc(50% + ${heroOffsetY}px)`,
                 display: 'block',
               }}
             />
@@ -203,7 +209,7 @@ export function ServerJoinCard({ currentTrack, joinHref = AC_ELITE_SERVER_JOIN_H
               aria-hidden
               sx={{
                 width: '100%',
-                height: { xs: 148, sm: 168 },
+                height: { xs: 'clamp(118px, 34vw, 148px)', sm: 168 },
                 background:
                   'radial-gradient(circle at 85% 10%, rgba(147, 197, 253, 0.12), transparent 45%), linear-gradient(180deg, rgba(16,20,32,0.92) 0%, rgba(10,14,24,0.95) 100%), repeating-linear-gradient(0deg, rgba(148,163,184,0.08) 0px, rgba(148,163,184,0.08) 1px, transparent 1px, transparent 28px), repeating-linear-gradient(90deg, rgba(148,163,184,0.08) 0px, rgba(148,163,184,0.08) 1px, transparent 1px, transparent 28px)',
               }}
@@ -216,8 +222,7 @@ export function ServerJoinCard({ currentTrack, joinHref = AC_ELITE_SERVER_JOIN_H
               position: 'absolute',
               inset: 0,
               background:
-                'linear-gradient(180deg, rgba(6,10,20,0.06) 0%, rgba(7,12,24,0.56) 54%, rgba(9,15,29,0.94) 100%)',
-              boxShadow: 'inset 0 -1px 0 rgba(226,242,255,0.12)',
+                'linear-gradient(180deg, rgba(6,10,20,0.06) 0%, rgba(7,12,24,0.5) 52%, rgba(8,14,28,0.82) 86%, rgba(8,14,28,0.82) 100%)',
             }}
           />
         </Box>
@@ -227,130 +232,139 @@ export function ServerJoinCard({ currentTrack, joinHref = AC_ELITE_SERVER_JOIN_H
           sx={{
             /** Same gutter as {@link GLASS_PANEL_SX} / Race Intelligence — one token for all glass cards. */
             p: GLASS_PADDING.panel,
-            backgroundColor: heroSrc ? 'rgba(8,14,28,0.82)' : 'rgba(8,14,28,0.34)',
+            backgroundColor: heroSrc ? HERO_BODY_BG : 'rgba(8,14,28,0.34)',
             backdropFilter: heroSrc ? 'blur(20px) saturate(170%)' : undefined,
             WebkitBackdropFilter: heroSrc ? 'blur(20px) saturate(170%)' : undefined,
           }}
         >
-        <Stack direction="row" justifyContent="space-between" alignItems="center">
-          <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.72)', fontWeight: 700, letterSpacing: 0.5 }}>
-            AC ELITE SERVER
+          <Stack direction="row" justifyContent="space-between" alignItems="center">
+            <Typography
+              variant="caption"
+              sx={{ color: 'rgba(255,255,255,0.72)', fontWeight: 700, letterSpacing: 0.5 }}
+            >
+              AC ELITE SERVER
+            </Typography>
+            <Chip
+              size="small"
+              label={online ? 'ONLINE' : 'OFFLINE'}
+              sx={{
+                ...badgeSx,
+                bgcolor: online ? ACCENT_SOFT : 'rgba(148,163,184,0.18)',
+                color: online ? ACCENT : 'rgba(203,213,225,0.9)',
+                border: `1px solid ${online ? ACCENT_BORDER : 'rgba(148,163,184,0.35)'}`,
+              }}
+            />
+          </Stack>
+
+          <Typography variant="h6" sx={{ fontWeight: 800, lineHeight: 1.15 }}>
+            {trackTitle}
           </Typography>
-          <Chip
-            size="small"
-            label={online ? 'ONLINE' : 'OFFLINE'}
+          <Typography
+            variant="caption"
+            title={updatedTitle !== '-' ? updatedTitle : undefined}
+            sx={{ color: 'rgba(255,255,255,0.56)', fontWeight: 600, letterSpacing: 0.06 }}
+          >
+            {updatedLine}
+          </Typography>
+
+          <Typography
+            variant="body2"
             sx={{
-              ...badgeSx,
-              bgcolor: online ? ACCENT_SOFT : 'rgba(148,163,184,0.18)',
-              color: online ? ACCENT : 'rgba(203,213,225,0.9)',
-              border: `1px solid ${online ? ACCENT_BORDER : 'rgba(148,163,184,0.35)'}`,
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden',
+              color: 'rgba(255,255,255,0.88)',
+              fontWeight: 700,
+              fontSize: 'clamp(0.8125rem, 0.7rem + 0.5vw, 0.9375rem)',
+              lineHeight: 1.35,
+              minHeight: 'clamp(32px, 9vw, 38px)',
             }}
-          />
-        </Stack>
+            title={lobbyName || undefined}
+          >
+            {!online
+              ? 'No live lobby while the server is down.'
+              : lobbyName
+                ? lobbyName
+                : liveDataAvailable
+                  ? 'AC Elite official server'
+                  : 'Live data unavailable'}
+          </Typography>
 
-        <Typography variant="h6" sx={{ fontWeight: 800, lineHeight: 1.15 }}>
-          {trackTitle}
-        </Typography>
-        <Typography
-          variant="caption"
-          title={updatedTitle !== '-' ? updatedTitle : undefined}
-          sx={{ color: 'rgba(255,255,255,0.56)', fontWeight: 600, letterSpacing: 0.06 }}
-        >
-          {updatedLine}
-        </Typography>
+          <Grid container spacing={0.85}>
+            <Grid size={{ xs: 6, md: 2 }} sx={{ minWidth: 0 }}>
+              <ServerInfoBlock label="Players">
+                <Typography variant="body2" sx={infoValueSx} noWrap title={slotsLabel}>
+                  {slotsLabel}
+                </Typography>
+              </ServerInfoBlock>
+            </Grid>
+            <Grid size={{ xs: 6, md: 3 }} sx={{ minWidth: 0 }}>
+              <ServerInfoBlock label="Phase">
+                <Typography variant="body2" sx={infoValueSx} noWrap title={phaseSummary}>
+                  {phaseSummary}
+                </Typography>
+              </ServerInfoBlock>
+            </Grid>
+            <Grid size={{ xs: 6, md: 3 }} sx={{ minWidth: 0 }}>
+              <ServerInfoBlock label="Cars">
+                <Typography variant="body2" sx={infoValueSx} noWrap title={cars.join(', ')}>
+                  {!online
+                    ? '—'
+                    : liveDataAvailable
+                      ? cars.length
+                        ? cars.join(', ')
+                        : '-'
+                      : 'Data unavailable'}
+                </Typography>
+              </ServerInfoBlock>
+            </Grid>
+            <Grid size={{ xs: 12, md: 4 }} sx={{ minWidth: 0 }}>
+              <ServerInfoBlock label="Schedule">
+                <Typography variant="body2" sx={infoValueSx} noWrap title={schedule ?? '-'}>
+                  {!online ? '—' : liveDataAvailable ? (schedule ?? '-') : 'Data unavailable'}
+                </Typography>
+              </ServerInfoBlock>
+            </Grid>
+          </Grid>
 
-        <Typography
-          variant="body2"
-          sx={{
-            display: '-webkit-box',
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: 'vertical',
-            overflow: 'hidden',
-            color: 'rgba(255,255,255,0.88)',
-            fontWeight: 700,
-            fontSize: '0.9375rem',
-            lineHeight: 1.35,
-            minHeight: 38,
-          }}
-          title={lobbyName || undefined}
-        >
-          {!online
-            ? 'No live lobby while the server is down.'
-            : lobbyName
-              ? lobbyName
-              : liveDataAvailable
-                ? 'AC Elite official server'
-                : 'Live data unavailable'}
-        </Typography>
-
-        <Grid container spacing={0.85}>
-          <Grid size={{ xs: 6, md: 2 }} sx={{ minWidth: 0 }}>
-            <ServerInfoBlock label="Players">
-              <Typography variant="body2" sx={infoValueSx} noWrap title={slotsLabel}>
-                {slotsLabel}
-              </Typography>
-            </ServerInfoBlock>
-          </Grid>
-          <Grid size={{ xs: 6, md: 3 }} sx={{ minWidth: 0 }}>
-            <ServerInfoBlock label="Phase">
-              <Typography variant="body2" sx={infoValueSx} noWrap title={phaseSummary}>
-                {phaseSummary}
-              </Typography>
-            </ServerInfoBlock>
-          </Grid>
-          <Grid size={{ xs: 6, md: 3 }} sx={{ minWidth: 0 }}>
-            <ServerInfoBlock label="Cars">
-              <Typography variant="body2" sx={infoValueSx} noWrap title={cars.join(', ')}>
-                {!online ? '—' : liveDataAvailable ? (cars.length ? cars.join(', ') : '-') : 'Data unavailable'}
-              </Typography>
-            </ServerInfoBlock>
-          </Grid>
-          <Grid size={{ xs: 12, md: 4 }} sx={{ minWidth: 0 }}>
-            <ServerInfoBlock label="Schedule">
-              <Typography variant="body2" sx={infoValueSx} noWrap title={schedule ?? '-'}>
-                {!online ? '—' : liveDataAvailable ? (schedule ?? '-') : 'Data unavailable'}
-              </Typography>
-            </ServerInfoBlock>
-          </Grid>
-        </Grid>
-
-        <Button
-          component="a"
-          href={joinHref}
-          target="_blank"
-          rel="noreferrer"
-          variant="outlined"
-          color="primary"
-          fullWidth
-          size="small"
-          aria-label="Join official server in Content Manager"
-          startIcon={<JoinGlyphIcon />}
-          sx={{
-            minHeight: 40,
-            borderRadius: 1.35,
-            border: `1px solid ${ACCENT_BORDER_STRONG}`,
-            background:
-              'radial-gradient(120% 120% at 18% -30%, rgba(255,255,255,0.15), rgba(255,255,255,0.03) 40%, transparent 64%),' +
-              `linear-gradient(180deg, ${ACCENT_SOFT} 0%, rgba(59,130,246,0.07) 100%)`,
-            color: ACCENT,
-            fontWeight: 800,
-            backdropFilter: 'blur(18px) saturate(170%)',
-            WebkitBackdropFilter: 'blur(18px) saturate(170%)',
-            boxShadow:
-              'inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -1px 0 rgba(255,255,255,0.032)',
-            '& .MuiButton-startIcon': { mr: 0.75 },
-            '&:hover': {
-              borderColor: 'rgba(191, 225, 255, 0.74)',
+          <Button
+            component="a"
+            href={joinHref}
+            target="_blank"
+            rel="noreferrer"
+            variant="outlined"
+            color="primary"
+            fullWidth
+            size="small"
+            aria-label="Join official server in Content Manager"
+            startIcon={<JoinGlyphIcon />}
+            sx={{
+              minHeight: 'clamp(34px, 9vw, 40px)',
+              borderRadius: 1.35,
+              border: `1px solid ${ACCENT_BORDER_STRONG}`,
               background:
-                'radial-gradient(120% 120% at 18% -30%, rgba(255,255,255,0.22), rgba(255,255,255,0.045) 40%, transparent 64%),' +
-                'linear-gradient(180deg, rgba(147,197,253,0.22) 0%, rgba(59,130,246,0.1) 100%)',
+                'radial-gradient(120% 120% at 18% -30%, rgba(255,255,255,0.15), rgba(255,255,255,0.03) 40%, transparent 64%),' +
+                `linear-gradient(180deg, ${ACCENT_SOFT} 0%, rgba(59,130,246,0.07) 100%)`,
+              color: ACCENT,
+              fontWeight: 800,
+              backdropFilter: 'blur(18px) saturate(170%)',
+              WebkitBackdropFilter: 'blur(18px) saturate(170%)',
               boxShadow:
-                'inset 0 1px 0 rgba(255,255,255,0.22), inset 0 -1px 0 rgba(255,255,255,0.04)',
-            },
-          }}
-        >
-          Join in Content Manager
-        </Button>
+                'inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -1px 0 rgba(255,255,255,0.032)',
+              '& .MuiButton-startIcon': { mr: 0.75 },
+              '&:hover': {
+                borderColor: 'rgba(191, 225, 255, 0.74)',
+                background:
+                  'radial-gradient(120% 120% at 18% -30%, rgba(255,255,255,0.22), rgba(255,255,255,0.045) 40%, transparent 64%),' +
+                  'linear-gradient(180deg, rgba(147,197,253,0.22) 0%, rgba(59,130,246,0.1) 100%)',
+                boxShadow:
+                  'inset 0 1px 0 rgba(255,255,255,0.22), inset 0 -1px 0 rgba(255,255,255,0.04)',
+              },
+            }}
+          >
+            Join in Content Manager
+          </Button>
         </Stack>
       </Box>
     </Box>

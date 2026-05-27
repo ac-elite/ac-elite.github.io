@@ -83,7 +83,7 @@ function formatTimestamp(iso: string): string {
 
 const bodyCellSx = {
   borderBottom: '1px solid rgba(148,163,184,0.1)',
-  py: 1.35,
+  py: { xs: 1.1, md: 0.8 },
   verticalAlign: 'top' as const,
 };
 
@@ -180,9 +180,9 @@ export function DriverBansManager() {
       <Stack
         direction={{ xs: 'column', sm: 'row' }}
         justifyContent="space-between"
-        alignItems={{ xs: 'flex-start', sm: 'center' }}
+        alignItems={{ xs: 'center', sm: 'center' }}
         spacing={1}
-        sx={{ mb: 1.5 }}
+        sx={{ mb: 1.5, textAlign: { xs: 'center', sm: 'left' } }}
       >
         <Box>
           <Typography variant="h6" sx={{ fontWeight: 800 }}>
@@ -193,7 +193,14 @@ export function DriverBansManager() {
             next time the driver tries to join. Add a Steam GUID and an optional reason.
           </Typography>
         </Box>
-        <Stack direction="row" spacing={1}>
+        <Stack
+          direction="row"
+          spacing={1}
+          justifyContent={{ xs: 'center', sm: 'flex-end' }}
+          flexWrap="wrap"
+          useFlexGap
+          sx={{ width: { xs: '100%', sm: 'auto' } }}
+        >
           <Button
             variant="outlined"
             size="small"
@@ -204,7 +211,10 @@ export function DriverBansManager() {
               fontWeight: 700,
               borderColor: 'rgba(148,163,184,0.35)',
               color: 'text.primary',
-              '&:hover': { borderColor: 'rgba(148,163,184,0.6)', bgcolor: 'rgba(148,163,184,0.08)' },
+              '&:hover': {
+                borderColor: 'rgba(148,163,184,0.6)',
+                bgcolor: 'rgba(148,163,184,0.08)',
+              },
             }}
           >
             Refresh
@@ -238,7 +248,7 @@ export function DriverBansManager() {
           borderRadius: 1,
         }}
       >
-        <Table size="small" stickyHeader>
+        <Table size="small" stickyHeader sx={{ minWidth: showActionsColumn ? 920 : 760 }}>
           <TableHead>
             <TableRow
               sx={{
@@ -250,16 +260,16 @@ export function DriverBansManager() {
                   color: TABLE_HEAD_MUTED_COLOR,
                   bgcolor: 'rgba(255,255,255,0.012)',
                   borderBottom: '1px solid rgba(148,163,184,0.28)',
-                  py: 1.1,
+                  py: { xs: 0.95, md: 0.7 },
                   px: 1.25,
                 },
               }}
             >
-              <TableCell sx={{ width: '22%' }}>Driver</TableCell>
-              <TableCell sx={{ width: '28%' }}>GUID</TableCell>
-              <TableCell sx={{ width: showActionsColumn ? '36%' : '50%' }}>Context</TableCell>
+              <TableCell sx={{ width: 190 }}>Driver</TableCell>
+              <TableCell sx={{ width: 260 }}>GUID</TableCell>
+              <TableCell sx={{ width: showActionsColumn ? 340 : 420 }}>Context</TableCell>
               {showActionsColumn && (
-                <TableCell sx={{ width: '14%' }} align="right">
+                <TableCell sx={{ width: 130 }} align="right">
                   Actions
                 </TableCell>
               )}
@@ -274,7 +284,11 @@ export function DriverBansManager() {
                 <TableRow key={row.guid} hover>
                   <TableCell sx={{ ...bodyCellSx, fontWeight: 700 }}>
                     {name ?? (
-                      <Typography component="span" variant="body2" sx={{ color: 'text.disabled', fontStyle: 'italic' }}>
+                      <Typography
+                        component="span"
+                        variant="body2"
+                        sx={{ color: 'text.disabled', fontStyle: 'italic' }}
+                      >
                         {directory.loading ? '…' : 'Unknown'}
                       </Typography>
                     )}
@@ -387,7 +401,7 @@ export function DriverBansManager() {
                 borderRadius: 1,
               }}
             >
-              <Table size="small" stickyHeader>
+              <Table size="small" stickyHeader sx={{ minWidth: 1080 }}>
                 <TableHead>
                   <TableRow
                     sx={{
@@ -399,17 +413,17 @@ export function DriverBansManager() {
                         color: TABLE_HEAD_MUTED_COLOR,
                         bgcolor: 'rgba(255,255,255,0.012)',
                         borderBottom: '1px solid rgba(148,163,184,0.28)',
-                        py: 1.1,
+                        py: { xs: 0.95, md: 0.7 },
                         px: 1.25,
                       },
                     }}
                   >
-                    <TableCell sx={{ width: '16%' }}>When</TableCell>
-                    <TableCell sx={{ width: '10%' }}>Action</TableCell>
-                    <TableCell sx={{ width: '16%' }}>Driver</TableCell>
-                    <TableCell sx={{ width: '20%' }}>GUID</TableCell>
-                    <TableCell sx={{ width: '24%' }}>Context</TableCell>
-                    <TableCell sx={{ width: '14%' }}>By</TableCell>
+                    <TableCell sx={{ width: 160 }}>When</TableCell>
+                    <TableCell sx={{ width: 110 }}>Action</TableCell>
+                    <TableCell sx={{ width: 170 }}>Driver</TableCell>
+                    <TableCell sx={{ width: 260 }}>GUID</TableCell>
+                    <TableCell sx={{ width: 260 }}>Context</TableCell>
+                    <TableCell sx={{ width: 120 }}>By</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -418,7 +432,12 @@ export function DriverBansManager() {
                     return (
                       <TableRow key={row.id} hover>
                         <TableCell
-                          sx={{ ...bodyCellSx, color: 'text.secondary', whiteSpace: 'nowrap', fontVariantNumeric: 'tabular-nums' }}
+                          sx={{
+                            ...bodyCellSx,
+                            color: 'text.secondary',
+                            whiteSpace: 'nowrap',
+                            fontVariantNumeric: 'tabular-nums',
+                          }}
                         >
                           {formatTimestamp(row.createdAt)}
                         </TableCell>
@@ -431,7 +450,9 @@ export function DriverBansManager() {
                               fontWeight: 700,
                               color: row.action === 'ban' ? '#fca5a5' : '#86efac',
                               bgcolor:
-                                row.action === 'ban' ? 'rgba(252,165,165,0.12)' : 'rgba(134,239,172,0.12)',
+                                row.action === 'ban'
+                                  ? 'rgba(252,165,165,0.12)'
+                                  : 'rgba(134,239,172,0.12)',
                               border:
                                 row.action === 'ban'
                                   ? '1px solid rgba(252,165,165,0.35)'
@@ -441,7 +462,11 @@ export function DriverBansManager() {
                         </TableCell>
                         <TableCell sx={{ ...bodyCellSx, fontWeight: 700 }}>
                           {name ?? (
-                            <Typography component="span" variant="body2" sx={{ color: 'text.disabled', fontStyle: 'italic' }}>
+                            <Typography
+                              component="span"
+                              variant="body2"
+                              sx={{ color: 'text.disabled', fontStyle: 'italic' }}
+                            >
                               {directory.loading ? '…' : 'Unknown'}
                             </Typography>
                           )}
@@ -467,7 +492,10 @@ export function DriverBansManager() {
                           {row.context || '—'}
                         </TableCell>
                         <TableCell sx={{ ...bodyCellSx }}>
-                          {row.actorRole && (row.actorRole === 'owner' || row.actorRole === 'admin' || row.actorRole === 'moderator') ? (
+                          {row.actorRole &&
+                          (row.actorRole === 'owner' ||
+                            row.actorRole === 'admin' ||
+                            row.actorRole === 'moderator') ? (
                             <Chip
                               size="small"
                               label={ROLE_LABEL[row.actorRole as AppRole]}
@@ -479,7 +507,11 @@ export function DriverBansManager() {
                               }}
                             />
                           ) : (
-                            <Typography component="span" variant="body2" sx={{ color: 'text.disabled', fontStyle: 'italic' }}>
+                            <Typography
+                              component="span"
+                              variant="body2"
+                              sx={{ color: 'text.disabled', fontStyle: 'italic' }}
+                            >
                               —
                             </Typography>
                           )}
@@ -489,7 +521,11 @@ export function DriverBansManager() {
                   })}
                   {auditRows.length === 0 && (
                     <TableRow>
-                      <TableCell colSpan={6} sx={{ ...bodyCellSx, color: 'text.secondary' }} align="center">
+                      <TableCell
+                        colSpan={6}
+                        sx={{ ...bodyCellSx, color: 'text.secondary' }}
+                        align="center"
+                      >
                         No ban history yet.
                       </TableCell>
                     </TableRow>
@@ -527,7 +563,7 @@ export function DriverBansManager() {
         <DialogTitle
           sx={{
             fontWeight: 800,
-            fontSize: '1.05rem',
+            fontSize: 'clamp(0.95rem, 0.84rem + 0.46vw, 1.05rem)',
             display: 'flex',
             alignItems: 'center',
             gap: 1,
@@ -604,7 +640,7 @@ export function DriverBansManager() {
         <DialogTitle
           sx={{
             fontWeight: 800,
-            fontSize: '1.05rem',
+            fontSize: 'clamp(0.95rem, 0.84rem + 0.46vw, 1.05rem)',
             display: 'flex',
             alignItems: 'center',
             gap: 1,
@@ -616,9 +652,8 @@ export function DriverBansManager() {
         </DialogTitle>
         <DialogContent>
           <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-            Permanently delete <strong>all</strong> ban / unban audit rows. Active bans on the
-            AC server are not affected — only the accountability log is wiped. This cannot be
-            undone.
+            Permanently delete <strong>all</strong> ban / unban audit rows. Active bans on the AC
+            server are not affected — only the accountability log is wiped. This cannot be undone.
           </Typography>
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>
@@ -697,15 +732,23 @@ function BanFormDialog({ open, existingGuids, directory, onCancel, onSaved }: Ba
       }}
     >
       <Box component="form" onSubmit={onSubmit}>
-        <DialogTitle sx={{ fontWeight: 800, fontSize: '1.1rem', display: 'flex', alignItems: 'center', gap: 1 }}>
+        <DialogTitle
+          sx={{
+            fontWeight: 800,
+            fontSize: 'clamp(1rem, 0.88rem + 0.5vw, 1.1rem)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1,
+          }}
+        >
           <Icon icon="solar:hammer-bold-duotone" width={22} />
           Ban driver
         </DialogTitle>
         <DialogContent>
           <Stack spacing={2} sx={{ mt: 0.5 }}>
             <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-              Adds an entry to <code>blocklist.json</code> on the AC server. Find the
-              driver&rsquo;s Steam GUID in the KMR dashboard or on their Steam profile.
+              Adds an entry to <code>blocklist.json</code> on the AC server. Find the driver&rsquo;s
+              Steam GUID in the KMR dashboard or on their Steam profile.
             </Typography>
 
             <Autocomplete<DriverDirectoryEntry, false, false, true>
@@ -716,17 +759,13 @@ function BanFormDialog({ open, existingGuids, directory, onCancel, onSaved }: Ba
               loading={directory.loading}
               inputValue={guid}
               onInputChange={(_e, value) => setGuid(value)}
-              getOptionLabel={(option) =>
-                typeof option === 'string' ? option : option.guid
-              }
+              getOptionLabel={(option) => (typeof option === 'string' ? option : option.guid)}
               filterOptions={(opts, { inputValue }) => {
                 const q = inputValue.trim().toLowerCase();
                 if (!q) return opts.slice(0, 100);
                 return opts
                   .filter(
-                    (o) =>
-                      o.name.toLowerCase().includes(q) ||
-                      o.guid.toLowerCase().includes(q)
+                    (o) => o.name.toLowerCase().includes(q) || o.guid.toLowerCase().includes(q)
                   )
                   .slice(0, 100);
               }}
@@ -742,6 +781,7 @@ function BanFormDialog({ open, existingGuids, directory, onCancel, onSaved }: Ba
                         color: 'text.secondary',
                         fontFamily: 'ui-monospace, monospace',
                         fontSize: '0.72rem',
+                        wordBreak: 'break-all',
                       }}
                     >
                       {option.guid}
@@ -789,7 +829,11 @@ function BanFormDialog({ open, existingGuids, directory, onCancel, onSaved }: Ba
           </Stack>
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>
-          <Button onClick={onCancel} disabled={saving} sx={{ color: 'text.primary', fontWeight: 700 }}>
+          <Button
+            onClick={onCancel}
+            disabled={saving}
+            sx={{ color: 'text.primary', fontWeight: 700 }}
+          >
             Cancel
           </Button>
           <Button

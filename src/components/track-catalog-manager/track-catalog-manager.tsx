@@ -49,17 +49,11 @@ import {
 } from 'src/lib/glass';
 import { brandAccentBorderSx } from 'src/lib/status-accent';
 import { glassCardMotionSx } from 'src/lib/subtle-motion';
-import {
-  TABLE_HEAD_MUTED_COLOR,
-  ACTION_CONTAINED_PRIMARY_SMALL_SX,
-} from 'src/lib/page-shell';
+import { TABLE_HEAD_MUTED_COLOR, ACTION_CONTAINED_PRIMARY_SMALL_SX } from 'src/lib/page-shell';
 
 // ----------------------------------------------------------------------
 
-type DialogMode =
-  | { kind: 'closed' }
-  | { kind: 'add' }
-  | { kind: 'edit'; row: TrackRow };
+type DialogMode = { kind: 'closed' } | { kind: 'add' } | { kind: 'edit'; row: TrackRow };
 
 const EMPTY_INPUT: TrackInput = { id: '', name: '', imageUrl: null, imageOffsetY: 0, aliases: [] };
 
@@ -82,7 +76,7 @@ function formatError(err: unknown, fallback: string): string {
 
 const bodyCellSx = {
   borderBottom: '1px solid rgba(148,163,184,0.1)',
-  py: 1.35,
+  py: { xs: 1.1, md: 0.8 },
   verticalAlign: 'top' as const,
 };
 
@@ -115,9 +109,7 @@ export function TrackCatalogManager() {
       void refreshTrackCatalogFromDb();
       closeDialog();
       toast.success(
-        result.kind === 'add'
-          ? `Track "${result.name}" added.`
-          : `Track "${result.name}" saved.`
+        result.kind === 'add' ? `Track "${result.name}" added.` : `Track "${result.name}" saved.`
       );
     },
     [reload, closeDialog, toast]
@@ -150,17 +142,17 @@ export function TrackCatalogManager() {
       <Stack
         direction={{ xs: 'column', sm: 'row' }}
         justifyContent="space-between"
-        alignItems={{ xs: 'flex-start', sm: 'center' }}
+        alignItems={{ xs: 'center', sm: 'center' }}
         spacing={1}
-        sx={{ mb: 1.5 }}
+        sx={{ mb: 1.5, textAlign: { xs: 'center', sm: 'left' } }}
       >
         <Box>
           <Typography variant="h6" sx={{ fontWeight: 800 }}>
             Track catalog (database)
           </Typography>
           <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.4 }}>
-            Live list of tracks from the database. Look up new track IDs in the KMR dashboard
-            (e.g. <code>ks_brands_hatch_gp</code>) before adding them here.
+            Live list of tracks from the database. Look up new track IDs in the KMR dashboard (e.g.{' '}
+            <code>ks_brands_hatch_gp</code>) before adding them here.
           </Typography>
         </Box>
         {canEdit && (
@@ -191,7 +183,7 @@ export function TrackCatalogManager() {
           borderRadius: 1,
         }}
       >
-        <Table size="small" stickyHeader>
+        <Table size="small" stickyHeader sx={{ minWidth: showActionsColumn ? 1020 : 900 }}>
           <TableHead>
             <TableRow
               sx={{
@@ -203,18 +195,18 @@ export function TrackCatalogManager() {
                   color: TABLE_HEAD_MUTED_COLOR,
                   bgcolor: 'rgba(255,255,255,0.012)',
                   borderBottom: '1px solid rgba(148,163,184,0.28)',
-                  py: 1.1,
+                  py: { xs: 0.95, md: 0.7 },
                   px: 1.25,
                 },
               }}
             >
-              <TableCell sx={{ width: '24%' }}>Name</TableCell>
-              <TableCell sx={{ width: '26%' }}>Track ID</TableCell>
-              <TableCell sx={{ width: '22%' }}>Alias</TableCell>
-              <TableCell sx={{ width: '10%' }}>Image</TableCell>
-              <TableCell sx={{ width: '8%' }}>Offset Y</TableCell>
+              <TableCell sx={{ width: 220 }}>Name</TableCell>
+              <TableCell sx={{ width: 280 }}>Track ID</TableCell>
+              <TableCell sx={{ width: 220 }}>Alias</TableCell>
+              <TableCell sx={{ width: 120 }}>Image</TableCell>
+              <TableCell sx={{ width: 90 }}>Offset Y</TableCell>
               {showActionsColumn && (
-                <TableCell sx={{ width: '10%' }} align="right">
+                <TableCell sx={{ width: 90 }} align="right">
                   Actions
                 </TableCell>
               )}
@@ -353,8 +345,8 @@ export function TrackCatalogManager() {
         <Collapse in={bundledOpen} unmountOnExit>
           <Box sx={{ mt: 1 }}>
             <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mb: 1 }}>
-              Read-only snapshot of the bundled <code>track-catalog.json</code>. Used as the
-              instant fallback before the live DB load lands and when offline.
+              Read-only snapshot of the bundled <code>track-catalog.json</code>. Used as the instant
+              fallback before the live DB load lands and when offline.
             </Typography>
             <TableContainer
               sx={{
@@ -363,7 +355,7 @@ export function TrackCatalogManager() {
                 borderRadius: 1,
               }}
             >
-              <Table size="small" stickyHeader>
+              <Table size="small" stickyHeader sx={{ minWidth: 780 }}>
                 <TableHead>
                   <TableRow
                     sx={{
@@ -375,20 +367,22 @@ export function TrackCatalogManager() {
                         color: TABLE_HEAD_MUTED_COLOR,
                         bgcolor: 'rgba(255,255,255,0.012)',
                         borderBottom: '1px solid rgba(148,163,184,0.28)',
-                        py: 1.1,
+                        py: { xs: 0.95, md: 0.7 },
                         px: 1.25,
                       },
                     }}
                   >
-                    <TableCell sx={{ width: '45%' }}>Track name</TableCell>
-                    <TableCell sx={{ width: '40%' }}>Track ID</TableCell>
-                    <TableCell sx={{ width: '15%' }}>Alias</TableCell>
+                    <TableCell sx={{ width: 280 }}>Track name</TableCell>
+                    <TableCell sx={{ width: 300 }}>Track ID</TableCell>
+                    <TableCell sx={{ width: 200 }}>Alias</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {bundledTrackCatalog.map((track) => (
                     <TableRow key={track.id} hover>
-                      <TableCell sx={{ ...bodyCellSx, fontWeight: 700 }}>{track.name || '—'}</TableCell>
+                      <TableCell sx={{ ...bodyCellSx, fontWeight: 700 }}>
+                        {track.name || '—'}
+                      </TableCell>
                       <TableCell
                         sx={{
                           ...bodyCellSx,
@@ -444,7 +438,7 @@ export function TrackCatalogManager() {
         <DialogTitle
           sx={{
             fontWeight: 800,
-            fontSize: '1.05rem',
+            fontSize: 'clamp(0.95rem, 0.84rem + 0.46vw, 1.05rem)',
             display: 'flex',
             alignItems: 'center',
             gap: 1,
@@ -545,8 +539,7 @@ function TrackFormDialog({ mode, existingIds, onCancel, onSaved }: TrackFormDial
 
   if (mode.kind === 'closed') return null;
 
-  const idCollision =
-    !editing && form.id.trim() !== '' && existingIds.includes(form.id.trim());
+  const idCollision = !editing && form.id.trim() !== '' && existingIds.includes(form.id.trim());
   const idInvalid = !editing && form.id.trim() !== '' && !ID_PATTERN.test(form.id.trim());
 
   const canSubmit =
@@ -556,7 +549,9 @@ function TrackFormDialog({ mode, existingIds, onCancel, onSaved }: TrackFormDial
     setError(null);
     const validation = validateImageFile(file);
     if (validation === 'unsupported-type') {
-      setError(`Unsupported image type. Allowed: ${ALLOWED_IMAGE_EXTENSIONS.join(', ').toUpperCase()}.`);
+      setError(
+        `Unsupported image type. Allowed: ${ALLOWED_IMAGE_EXTENSIONS.join(', ').toUpperCase()}.`
+      );
       return;
     }
     if (validation === 'too-large') {
@@ -647,7 +642,7 @@ function TrackFormDialog({ mode, existingIds, onCancel, onSaved }: TrackFormDial
       <DialogTitle
         sx={{
           fontWeight: 800,
-          fontSize: '1.1rem',
+          fontSize: 'clamp(1rem, 0.88rem + 0.5vw, 1.1rem)',
           display: 'flex',
           alignItems: 'center',
           gap: 1.25,
@@ -671,7 +666,9 @@ function TrackFormDialog({ mode, existingIds, onCancel, onSaved }: TrackFormDial
           <Icon icon={editing ? 'solar:pen-bold' : 'solar:add-square-linear'} width={18} />
         </Box>
         <Box sx={{ minWidth: 0, flex: 1 }}>
-          <Box sx={{ fontWeight: 800, lineHeight: 1.2 }}>{editing ? 'Edit track' : 'Add track'}</Box>
+          <Box sx={{ fontWeight: 800, lineHeight: 1.2 }}>
+            {editing ? 'Edit track' : 'Add track'}
+          </Box>
           {editing && (
             <Typography
               variant="caption"
@@ -795,7 +792,13 @@ function TrackFormDialog({ mode, existingIds, onCancel, onSaved }: TrackFormDial
                     style={{ display: 'none' }}
                   />
 
-                  <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+                  <Stack
+                    direction="row"
+                    spacing={1}
+                    justifyContent={{ xs: 'center', sm: 'flex-start' }}
+                    flexWrap="wrap"
+                    useFlexGap
+                  >
                     <Button
                       type="button"
                       variant="outlined"
@@ -840,7 +843,14 @@ function TrackFormDialog({ mode, existingIds, onCancel, onSaved }: TrackFormDial
                   </Stack>
 
                   {imageAction.kind === 'replaced' && (
-                    <Stack direction="row" alignItems="center" spacing={1} sx={{ mt: 1.25 }} flexWrap="wrap" useFlexGap>
+                    <Stack
+                      direction="row"
+                      alignItems="center"
+                      spacing={1}
+                      sx={{ mt: 1.25 }}
+                      flexWrap="wrap"
+                      useFlexGap
+                    >
                       <Chip
                         size="small"
                         icon={<Icon icon="solar:check-circle-bold" width={14} />}
@@ -855,8 +865,12 @@ function TrackFormDialog({ mode, existingIds, onCancel, onSaved }: TrackFormDial
                           '& .MuiChip-icon': { color: '#fbbf24', ml: 0.5 },
                         }}
                       />
-                      <Typography variant="caption" sx={{ color: 'text.secondary', fontFamily: 'ui-monospace, monospace' }}>
-                        {imageAction.file.name} · {(imageAction.file.size / 1024 / 1024).toFixed(2)}&nbsp;MB
+                      <Typography
+                        variant="caption"
+                        sx={{ color: 'text.secondary', fontFamily: 'ui-monospace, monospace' }}
+                      >
+                        {imageAction.file.name} · {(imageAction.file.size / 1024 / 1024).toFixed(2)}
+                        &nbsp;MB
                       </Typography>
                     </Stack>
                   )}
@@ -892,7 +906,11 @@ function TrackFormDialog({ mode, existingIds, onCancel, onSaved }: TrackFormDial
             gap: 1,
           }}
         >
-          <Button onClick={onCancel} disabled={saving} sx={{ color: 'text.primary', fontWeight: 700 }}>
+          <Button
+            onClick={onCancel}
+            disabled={saving}
+            sx={{ color: 'text.primary', fontWeight: 700 }}
+          >
             Cancel
           </Button>
           <Button
@@ -902,7 +920,9 @@ function TrackFormDialog({ mode, existingIds, onCancel, onSaved }: TrackFormDial
             disabled={!canSubmit}
             sx={{ ...ACTION_CONTAINED_PRIMARY_SMALL_SX }}
             startIcon={
-              !saving ? <Icon icon={editing ? 'solar:diskette-bold' : 'solar:add-square-linear'} /> : null
+              !saving ? (
+                <Icon icon={editing ? 'solar:diskette-bold' : 'solar:add-square-linear'} />
+              ) : null
             }
           >
             {saving ? 'Saving…' : editing ? 'Save changes' : 'Add track'}

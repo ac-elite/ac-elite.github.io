@@ -40,7 +40,8 @@ const DEBUG_QUICK_TRIES = [
       'Copy the entire line in the grey box above, paste it at the end of the URL, then press Enter.',
       'Reload the homepage (or open it) to see the offline layout.',
     ],
-    turnOff: 'Delete the pasted part from the address bar, or open the site in a fresh tab without it.',
+    turnOff:
+      'Delete the pasted part from the address bar, or open the site in a fresh tab without it.',
   },
   {
     key: 'track',
@@ -75,13 +76,35 @@ const DEBUG_QUICK_TRIES = [
 ] as const;
 
 const DEBUG_TECH_REFERENCE = [
-  { title: 'Pretend server offline', env: '—', query: 'serverOfflineDebug', storageKey: '—', values: '1, true, yes, on' },
-  { title: 'Force current track in UI', env: '—', query: 'currentTrackMock', storageKey: '—', values: 'track id, e.g. spa / monza / ks_laguna_seca' },
-  { title: 'Verbose server-status logging', env: '—', query: 'serverStatusDebug', storageKey: '—', values: '1, true, yes' },
+  {
+    title: 'Pretend server offline',
+    env: '—',
+    query: 'serverOfflineDebug',
+    storageKey: '—',
+    values: '1, true, yes, on',
+  },
+  {
+    title: 'Force current track in UI',
+    env: '—',
+    query: 'currentTrackMock',
+    storageKey: '—',
+    values: 'track id, e.g. spa / monza / ks_laguna_seca',
+  },
+  {
+    title: 'Verbose server-status logging',
+    env: '—',
+    query: 'serverStatusDebug',
+    storageKey: '—',
+    values: '1, true, yes',
+  },
 ] as const;
 
 const FRESHNESS_ROW_BORDER = '1px solid rgba(148,163,184,0.1)';
-const freshnessBodyCellSx = { borderBottom: FRESHNESS_ROW_BORDER, py: 1.35, verticalAlign: 'top' as const };
+const freshnessBodyCellSx = {
+  borderBottom: FRESHNESS_ROW_BORDER,
+  py: { xs: 1.1, md: 0.8 },
+  verticalAlign: 'top' as const,
+};
 
 export default function Page() {
   const [debugTechOpen, setDebugTechOpen] = useState(false);
@@ -97,26 +120,48 @@ export default function Page() {
           Try things in your browser
         </Typography>
         <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5, mb: 2 }}>
-          You never have to use this section. It is only for checking how the site looks in special cases. Nothing here changes the real stuff.
+          You never have to use this section. It is only for checking how the site looks in special
+          cases. Nothing here changes the real stuff.
         </Typography>
         <Stack spacing={2}>
           {DEBUG_QUICK_TRIES.map((block) => (
             <Box key={block.key} sx={{ ...GLASS_INNER_PANEL_SX, py: 1.5 }}>
-              <Typography variant="subtitle1" sx={{ fontWeight: 800 }}>{block.title}</Typography>
-              <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.75, lineHeight: 1.5 }}>
+              <Typography variant="subtitle1" sx={{ fontWeight: 800 }}>
+                {block.title}
+              </Typography>
+              <Typography
+                variant="body2"
+                sx={{ color: 'text.secondary', mt: 0.75, lineHeight: 1.5 }}
+              >
                 {block.intro}
               </Typography>
-              <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700, display: 'block', mt: 1.25 }}>
+              <Typography
+                variant="caption"
+                sx={{ color: 'text.secondary', fontWeight: 700, display: 'block', mt: 1.25 }}
+              >
                 Steps
               </Typography>
-              <Box component="ol" sx={{ m: 0, mt: 0.5, pl: 2.25, color: 'text.secondary', fontSize: '0.875rem', lineHeight: 1.55 }}>
+              <Box
+                component="ol"
+                sx={{
+                  m: 0,
+                  mt: 0.5,
+                  pl: 2.25,
+                  color: 'text.secondary',
+                  fontSize: 'clamp(0.78rem, 0.7rem + 0.34vw, 0.875rem)',
+                  lineHeight: 1.55,
+                }}
+              >
                 {block.stepsBeforeSnippet.map((step, i) => (
                   <Box component="li" key={`${block.key}-before-${i}`} sx={{ mb: 0.35 }}>
                     {step}
                   </Box>
                 ))}
               </Box>
-              <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mt: 1.25, fontWeight: 700 }}>
+              <Typography
+                variant="caption"
+                sx={{ color: 'text.secondary', display: 'block', mt: 1.25, fontWeight: 700 }}
+              >
                 Copy this whole line:
               </Typography>
               <Box
@@ -139,7 +184,14 @@ export default function Page() {
               <Box
                 component="ol"
                 start={block.stepsBeforeSnippet.length + 1}
-                sx={{ m: 0, mt: 0.5, pl: 2.25, color: 'text.secondary', fontSize: '0.875rem', lineHeight: 1.55 }}
+                sx={{
+                  m: 0,
+                  mt: 0.5,
+                  pl: 2.25,
+                  color: 'text.secondary',
+                  fontSize: 'clamp(0.78rem, 0.7rem + 0.34vw, 0.875rem)',
+                  lineHeight: 1.55,
+                }}
               >
                 {block.stepsAfterSnippet.map((step, i) => (
                   <Box component="li" key={`${block.key}-after-${i}`} sx={{ mb: 0.35 }}>
@@ -147,7 +199,10 @@ export default function Page() {
                   </Box>
                 ))}
               </Box>
-              <Typography variant="caption" sx={{ color: 'rgba(191,219,254,0.95)', display: 'block', mt: 1 }}>
+              <Typography
+                variant="caption"
+                sx={{ color: 'rgba(191,219,254,0.95)', display: 'block', mt: 1 }}
+              >
                 When you are done: {block.turnOff}
               </Typography>
             </Box>
@@ -169,8 +224,12 @@ export default function Page() {
           {debugTechOpen ? '▲ Hide' : '▼ Show'} extra details (URL options)
         </Button>
         <Collapse in={debugTechOpen} timeout="auto" unmountOnExit>
-          <Typography variant="body2" sx={{ color: 'text.secondary', mt: 1.5, mb: 1, lineHeight: 1.55 }}>
-            These are the same switches as above in a compact developer reference. Everything here is query-param based, so you can toggle it directly from the address bar.
+          <Typography
+            variant="body2"
+            sx={{ color: 'text.secondary', mt: 1.5, mb: 1, lineHeight: 1.55 }}
+          >
+            These are the same switches as above in a compact developer reference. Everything here
+            is query-param based, so you can toggle it directly from the address bar.
           </Typography>
           <TableContainer
             sx={{
@@ -182,7 +241,10 @@ export default function Page() {
               borderRadius: 2,
             }}
           >
-            <Table size="small" sx={{ borderCollapse: 'separate', borderSpacing: 0, minWidth: 640 }}>
+            <Table
+              size="small"
+              sx={{ borderCollapse: 'separate', borderSpacing: 0, minWidth: 640 }}
+            >
               <TableHead>
                 <TableRow
                   sx={{
@@ -193,7 +255,7 @@ export default function Page() {
                       fontWeight: 800,
                       color: TABLE_HEAD_MUTED_COLOR,
                       borderBottom: '1px solid rgba(148,163,184,0.28)',
-                      py: 1.1,
+                      py: { xs: 0.95, md: 0.7 },
                       px: 1.25,
                     },
                   }}
@@ -214,17 +276,44 @@ export default function Page() {
                       '&:last-of-type td': { borderBottom: 'none' },
                     }}
                   >
-                    <TableCell sx={{ ...freshnessBodyCellSx, fontWeight: 700, maxWidth: 220 }}>{row.title}</TableCell>
-                    <TableCell sx={{ ...freshnessBodyCellSx, fontFamily: 'ui-monospace, monospace', fontSize: '0.75rem' }}>
+                    <TableCell sx={{ ...freshnessBodyCellSx, fontWeight: 700, maxWidth: 220 }}>
+                      {row.title}
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        ...freshnessBodyCellSx,
+                        fontFamily: 'ui-monospace, monospace',
+                        fontSize: '0.75rem',
+                      }}
+                    >
                       {row.env}
                     </TableCell>
-                    <TableCell sx={{ ...freshnessBodyCellSx, fontFamily: 'ui-monospace, monospace', fontSize: '0.75rem' }}>
+                    <TableCell
+                      sx={{
+                        ...freshnessBodyCellSx,
+                        fontFamily: 'ui-monospace, monospace',
+                        fontSize: '0.75rem',
+                      }}
+                    >
                       ?{row.query}=…
                     </TableCell>
-                    <TableCell sx={{ ...freshnessBodyCellSx, fontFamily: 'ui-monospace, monospace', fontSize: '0.75rem', wordBreak: 'break-all' }}>
+                    <TableCell
+                      sx={{
+                        ...freshnessBodyCellSx,
+                        fontFamily: 'ui-monospace, monospace',
+                        fontSize: '0.75rem',
+                        wordBreak: 'break-all',
+                      }}
+                    >
                       {row.storageKey}
                     </TableCell>
-                    <TableCell sx={{ ...freshnessBodyCellSx, color: 'text.secondary', fontSize: '0.8125rem' }}>
+                    <TableCell
+                      sx={{
+                        ...freshnessBodyCellSx,
+                        color: 'text.secondary',
+                        fontSize: '0.8125rem',
+                      }}
+                    >
                       {row.values} (case-insensitive)
                     </TableCell>
                   </TableRow>

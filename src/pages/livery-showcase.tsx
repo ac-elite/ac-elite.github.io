@@ -21,9 +21,17 @@ import { getSyncHealth, type SiteMetadata } from 'src/lib/sync-utils';
 import { ACE_SKIN_PACK_DOWNLOAD_URL } from 'src/lib/ace-skin-pack-download';
 import { glassCardMotionSx, softFloatWrapperSx } from 'src/lib/subtle-motion';
 import { GLASS_PANEL_SX, GLASS_INNER_PANEL_SX } from 'src/lib/glass';
-import { liveriesAssetUrl, promoLiveryAssetUrl, TEAM_LIVERY_ENTRIES } from 'src/lib/driver-liveries';
+import {
+  liveriesAssetUrl,
+  promoLiveryAssetUrl,
+  TEAM_LIVERY_ENTRIES,
+} from 'src/lib/driver-liveries';
 import { brandAccentBorderSx } from 'src/lib/status-accent';
-import { DATA_PAGE_SHELL_SX, OUTLINED_GLASS_WHITE_SX, HERO_FOOTNOTE_CAPTION_SX } from 'src/lib/page-shell';
+import {
+  DATA_PAGE_SHELL_SX,
+  OUTLINED_GLASS_WHITE_SX,
+  HERO_FOOTNOTE_CAPTION_SX,
+} from 'src/lib/page-shell';
 import {
   getAceSkinPackAuthorForEntryId,
   flattenAceSkinPackOrderedEntries,
@@ -267,9 +275,18 @@ export default function Page() {
       .then((data) => {
         if (!mounted || !data) return;
         setSectionsConfig({
-          officialPack: typeof data.officialPack === 'boolean' ? data.officialPack : DEFAULT_SECTIONS_CONFIG.officialPack,
-          aceSkinPack: typeof data.aceSkinPack === 'boolean' ? data.aceSkinPack : DEFAULT_SECTIONS_CONFIG.aceSkinPack,
-          teamLiveries: typeof data.teamLiveries === 'boolean' ? data.teamLiveries : DEFAULT_SECTIONS_CONFIG.teamLiveries,
+          officialPack:
+            typeof data.officialPack === 'boolean'
+              ? data.officialPack
+              : DEFAULT_SECTIONS_CONFIG.officialPack,
+          aceSkinPack:
+            typeof data.aceSkinPack === 'boolean'
+              ? data.aceSkinPack
+              : DEFAULT_SECTIONS_CONFIG.aceSkinPack,
+          teamLiveries:
+            typeof data.teamLiveries === 'boolean'
+              ? data.teamLiveries
+              : DEFAULT_SECTIONS_CONFIG.teamLiveries,
         });
       })
       .catch(() => {
@@ -312,86 +329,116 @@ export default function Page() {
 
             <Stack spacing={3}>
               {sectionsConfig?.officialPack && (
-                <Stack spacing={2} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: 'stretch' }}>
-                <Box sx={softFloatWrapperSx()}>
-                  <Box sx={{ ...GLASS_PANEL_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(0) }}>
-                    <Stack spacing={0.5} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: { xs: 'center', md: 'flex-start' } }}>
-                      <Typography variant="h6" sx={{ fontWeight: 800 }}>
-                        Official pack
-                      </Typography>
-                      <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                        Included with the standard AC Elite livery pack.
-                      </Typography>
-                    </Stack>
-                  </Box>
-                </Box>
-                <Grid container spacing={2} sx={{ width: 1 }}>
-                  {generalLiveries.map((livery, i) => (
-                    <Grid key={livery.name} size={{ xs: 12, sm: 6, md: 4 }}>
-                      <Paper
+                <Stack
+                  spacing={2}
+                  sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: 'stretch' }}
+                >
+                  <Box sx={softFloatWrapperSx()}>
+                    <Box
+                      sx={{ ...GLASS_PANEL_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(0) }}
+                    >
+                      <Stack
+                        spacing={0.5}
                         sx={{
-                          ...GLASS_PANEL_SX,
-                          ...brandAccentBorderSx(),
-                          ...glassCardMotionSx(1 + i),
-                          width: 1,
+                          textAlign: { xs: 'center', md: 'left' },
+                          alignItems: { xs: 'center', md: 'flex-start' },
                         }}
                       >
-                        <Stack spacing={1}>
-                          <Box
-                            sx={{
-                              ...GLASS_INNER_PANEL_SX,
-                              width: 1,
-                              height: LIVERY_THUMB_FRAME_HEIGHT,
-                              p: 0,
-                              position: 'relative',
-                              overflow: 'hidden',
-                            }}
-                          >
-                            <LiveryThumbButton
-                              preview={{
-                                src: livery.image,
-                                alt: livery.alt,
-                                title: livery.name,
-                                subtitle: livery.subtitle,
-                              }}
-                              onOpen={setImagePreview}
+                        <Typography variant="h6" sx={{ fontWeight: 800 }}>
+                          Official pack
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                          Included with the standard AC Elite livery pack.
+                        </Typography>
+                      </Stack>
+                    </Box>
+                  </Box>
+                  <Grid container spacing={2} sx={{ width: 1 }}>
+                    {generalLiveries.map((livery, i) => (
+                      <Grid key={livery.name} size={{ xs: 12, sm: 6, md: 4 }}>
+                        <Paper
+                          sx={{
+                            ...GLASS_PANEL_SX,
+                            ...brandAccentBorderSx(),
+                            ...glassCardMotionSx(1 + i),
+                            width: 1,
+                          }}
+                        >
+                          <Stack spacing={1}>
+                            <Box
                               sx={{
-                                position: 'relative',
-                                minHeight: 0,
+                                ...GLASS_INNER_PANEL_SX,
                                 width: 1,
-                                height: 1,
+                                height: LIVERY_THUMB_FRAME_HEIGHT,
+                                p: 0,
+                                position: 'relative',
+                                overflow: 'hidden',
                               }}
                             >
-                              <Box component="img" src={livery.image} alt={livery.alt} sx={liveryThumbImageSx} />
-                            </LiveryThumbButton>
-                          </Box>
-                          <Typography variant="subtitle2" sx={{ fontWeight: 800 }}>
-                            {livery.name}
-                          </Typography>
-                        </Stack>
-                      </Paper>
-                    </Grid>
-                  ))}
-                </Grid>
+                              <LiveryThumbButton
+                                preview={{
+                                  src: livery.image,
+                                  alt: livery.alt,
+                                  title: livery.name,
+                                  subtitle: livery.subtitle,
+                                }}
+                                onOpen={setImagePreview}
+                                sx={{
+                                  position: 'relative',
+                                  minHeight: 0,
+                                  width: 1,
+                                  height: 1,
+                                }}
+                              >
+                                <Box
+                                  component="img"
+                                  src={livery.image}
+                                  alt={livery.alt}
+                                  sx={liveryThumbImageSx}
+                                />
+                              </LiveryThumbButton>
+                            </Box>
+                            <Typography variant="subtitle2" sx={{ fontWeight: 800 }}>
+                              {livery.name}
+                            </Typography>
+                          </Stack>
+                        </Paper>
+                      </Grid>
+                    ))}
+                  </Grid>
                 </Stack>
               )}
 
               {sectionsConfig?.aceSkinPack && aceSkinPack && aceSkinPack.length > 0 && (
-                <Stack spacing={2} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: 'stretch' }}>
+                <Stack
+                  spacing={2}
+                  sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: 'stretch' }}
+                >
                   <Box sx={softFloatWrapperSx()}>
-                    <Box sx={{ ...GLASS_PANEL_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(0) }}>
+                    <Box
+                      sx={{ ...GLASS_PANEL_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(0) }}
+                    >
                       <Stack
                         direction={{ xs: 'column', md: 'row' }}
                         spacing={1.5}
-                        alignItems={{ xs: 'flex-start', md: 'center' }}
+                        alignItems={{ xs: 'center', md: 'center' }}
                         justifyContent="space-between"
                       >
-                        <Stack spacing={0.5} sx={{ flex: 1, textAlign: { xs: 'center', md: 'left' }, alignItems: { xs: 'center', md: 'flex-start' } }}>
+                        <Stack
+                          spacing={0.5}
+                          sx={{
+                            flex: 1,
+                            textAlign: { xs: 'center', md: 'left' },
+                            alignItems: { xs: 'center', md: 'flex-start' },
+                          }}
+                        >
                           <Typography variant="h6" sx={{ fontWeight: 800 }}>
                             ACE Skin Pack
                           </Typography>
                           <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                            The full ACE Skin Pack for Assetto Corsa: install it in your game to drive these liveries. Each card shows the author (linked to their driver profile).
+                            The full ACE Skin Pack for Assetto Corsa: install it in your game to
+                            drive these liveries. Each card shows the author (linked to their driver
+                            profile).
                           </Typography>
                         </Stack>
                         <Button
@@ -461,7 +508,10 @@ export default function Page() {
                               <Typography variant="subtitle2" sx={{ fontWeight: 800, px: 0.25 }}>
                                 {entry.title}
                               </Typography>
-                              <Typography variant="caption" sx={{ color: 'text.secondary', px: 0.25, display: 'block' }}>
+                              <Typography
+                                variant="caption"
+                                sx={{ color: 'text.secondary', px: 0.25, display: 'block' }}
+                              >
                                 Author:{' '}
                                 {author ? (
                                   <Link
@@ -494,87 +544,98 @@ export default function Page() {
               )}
 
               {sectionsConfig?.teamLiveries && (
-                <Stack spacing={2} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: 'stretch' }}>
-                <Box sx={softFloatWrapperSx()}>
-                  <Box sx={{ ...GLASS_PANEL_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(0) }}>
-                    <Stack spacing={0.5} sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: { xs: 'center', md: 'flex-start' } }}>
-                      <Typography variant="h6" sx={{ fontWeight: 800 }}>
-                        AC Elite Team
-                      </Typography>
-                      <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                        Team and collaborator liveries.
-                      </Typography>
-                    </Stack>
+                <Stack
+                  spacing={2}
+                  sx={{ textAlign: { xs: 'center', md: 'left' }, alignItems: 'stretch' }}
+                >
+                  <Box sx={softFloatWrapperSx()}>
+                    <Box
+                      sx={{ ...GLASS_PANEL_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(0) }}
+                    >
+                      <Stack
+                        spacing={0.5}
+                        sx={{
+                          textAlign: { xs: 'center', md: 'left' },
+                          alignItems: { xs: 'center', md: 'flex-start' },
+                        }}
+                      >
+                        <Typography variant="h6" sx={{ fontWeight: 800 }}>
+                          AC Elite Team
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                          Team and collaborator liveries.
+                        </Typography>
+                      </Stack>
+                    </Box>
                   </Box>
-                </Box>
-                <Grid container spacing={2} sx={{ width: 1 }}>
-                  {TEAM_LIVERY_ENTRIES.map((livery, i) => {
-                    const image = liveriesAssetUrl(livery.steamGuid);
-                    return (
-                      <Grid key={livery.steamGuid} size={{ xs: 12, sm: 6, md: 4 }}>
-                        <Paper
-                          sx={{
-                            ...GLASS_PANEL_SX,
-                            ...brandAccentBorderSx(),
-                            ...glassCardMotionSx(6 + aceSkinPackOrdered.length + i),
-                            width: 1,
-                          }}
-                        >
-                          <Stack spacing={1}>
-                            <Box
-                              sx={{
-                                ...GLASS_INNER_PANEL_SX,
-                                width: 1,
-                                height: LIVERY_THUMB_FRAME_HEIGHT,
-                                p: 0,
-                                position: 'relative',
-                                overflow: 'hidden',
-                              }}
-                            >
-                              <LiveryThumbButton
-                                preview={{
-                                  src: image,
-                                  alt: livery.alt,
-                                  title: livery.showcaseTitle,
-                                  subtitle: livery.owner,
-                                  profileGuid: livery.steamGuid,
-                                }}
-                                onOpen={setImagePreview}
+                  <Grid container spacing={2} sx={{ width: 1 }}>
+                    {TEAM_LIVERY_ENTRIES.map((livery, i) => {
+                      const image = liveriesAssetUrl(livery.steamGuid);
+                      return (
+                        <Grid key={livery.steamGuid} size={{ xs: 12, sm: 6, md: 4 }}>
+                          <Paper
+                            sx={{
+                              ...GLASS_PANEL_SX,
+                              ...brandAccentBorderSx(),
+                              ...glassCardMotionSx(6 + aceSkinPackOrdered.length + i),
+                              width: 1,
+                            }}
+                          >
+                            <Stack spacing={1}>
+                              <Box
                                 sx={{
-                                  position: 'relative',
-                                  minHeight: 0,
+                                  ...GLASS_INNER_PANEL_SX,
                                   width: 1,
-                                  height: 1,
+                                  height: LIVERY_THUMB_FRAME_HEIGHT,
+                                  p: 0,
+                                  position: 'relative',
+                                  overflow: 'hidden',
                                 }}
                               >
-                                <Box
-                                  component="img"
-                                  src={image}
-                                  alt={livery.alt}
-                                  loading="lazy"
-                                  sx={liveryThumbImageSx}
-                                />
-                              </LiveryThumbButton>
-                            </Box>
-                            <Typography variant="subtitle2" sx={{ fontWeight: 800, px: 0.25 }}>
-                              {livery.showcaseTitle}
-                            </Typography>
-                            <Link
-                              component={RouterLink}
-                              href={getDriverProfileHref(livery.steamGuid)}
-                              variant="body2"
-                              underline="none"
-                              color="text.secondary"
-                              sx={{ px: 0.25, display: 'block' }}
-                            >
-                              {livery.owner}
-                            </Link>
-                          </Stack>
-                        </Paper>
-                      </Grid>
-                    );
-                  })}
-                </Grid>
+                                <LiveryThumbButton
+                                  preview={{
+                                    src: image,
+                                    alt: livery.alt,
+                                    title: livery.showcaseTitle,
+                                    subtitle: livery.owner,
+                                    profileGuid: livery.steamGuid,
+                                  }}
+                                  onOpen={setImagePreview}
+                                  sx={{
+                                    position: 'relative',
+                                    minHeight: 0,
+                                    width: 1,
+                                    height: 1,
+                                  }}
+                                >
+                                  <Box
+                                    component="img"
+                                    src={image}
+                                    alt={livery.alt}
+                                    loading="lazy"
+                                    sx={liveryThumbImageSx}
+                                  />
+                                </LiveryThumbButton>
+                              </Box>
+                              <Typography variant="subtitle2" sx={{ fontWeight: 800, px: 0.25 }}>
+                                {livery.showcaseTitle}
+                              </Typography>
+                              <Link
+                                component={RouterLink}
+                                href={getDriverProfileHref(livery.steamGuid)}
+                                variant="body2"
+                                underline="none"
+                                color="text.secondary"
+                                sx={{ px: 0.25, display: 'block' }}
+                              >
+                                {livery.owner}
+                              </Link>
+                            </Stack>
+                          </Paper>
+                        </Grid>
+                      );
+                    })}
+                  </Grid>
                 </Stack>
               )}
             </Stack>

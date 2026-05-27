@@ -60,7 +60,11 @@ export function LicenseSafetyGuideProvider({ children }: { children: React.React
   return (
     <GuideContext.Provider value={{ openGuide }}>
       {children}
-      <LicenseSafetyGuideDialog open={open} onClose={() => setOpen(false)} initialTab={initialTab} />
+      <LicenseSafetyGuideDialog
+        open={open}
+        onClose={() => setOpen(false)}
+        initialTab={initialTab}
+      />
     </GuideContext.Provider>
   );
 }
@@ -81,6 +85,7 @@ const GUIDE_SR_TABLE_LICENSE_COL_PX = 128;
 const GUIDE_LICENSE_TABLE_TIER_COL_PX = 112;
 
 const LICENSE_TABLE_GRID = `${GUIDE_LICENSE_TABLE_TIER_COL_PX}px minmax(88px, 1fr) minmax(92px, 1fr) minmax(64px, 1fr)`;
+const SR_TABLE_GRID = `${GUIDE_SR_TABLE_LICENSE_COL_PX}px minmax(110px, 1fr) minmax(100px, 1fr)`;
 
 function formatLicenseTableKm(tier: { minKm: number }) {
   return `${formatNumber(tier.minKm)}+`;
@@ -118,7 +123,11 @@ export function LicenseSafetyGuideButton({ compact = false }: LicenseSafetyGuide
   );
 }
 
-function LicenseSafetyGuideDialog({ open, onClose, initialTab = 'license' }: LicenseSafetyGuideDialogProps) {
+function LicenseSafetyGuideDialog({
+  open,
+  onClose,
+  initialTab = 'license',
+}: LicenseSafetyGuideDialogProps) {
   const [activeTab, setActiveTab] = useState<GuideTab>(initialTab);
 
   useEffect(() => {
@@ -129,349 +138,388 @@ function LicenseSafetyGuideDialog({ open, onClose, initialTab = 'license' }: Lic
     <Dialog
       open={open}
       onClose={onClose}
-        fullWidth
-        maxWidth="sm"
-        PaperProps={{
-          sx: {
-            ...GLASS_DIALOG_SX,
-            width: { xs: 'calc(100% - 20px)', sm: 760 },
-            maxWidth: 'calc(100% - 20px)',
-            color: '#fff',
-          },
-        }}
+      fullWidth
+      maxWidth="sm"
+      PaperProps={{
+        sx: {
+          ...GLASS_DIALOG_SX,
+          width: { xs: 'calc(100% - 20px)', sm: 760 },
+          maxWidth: 'calc(100% - 20px)',
+          color: '#fff',
+        },
+      }}
+    >
+      <Stack
+        direction="row"
+        alignItems="flex-start"
+        justifyContent="space-between"
+        sx={{ px: { xs: 2, sm: 3 }, pt: { xs: 2, sm: 2.5 }, pb: 1.5, gap: 1.25 }}
       >
-        <Stack direction="row" alignItems="flex-start" justifyContent="space-between" sx={{ px: { xs: 2, sm: 3 }, pt: { xs: 2, sm: 2.5 }, pb: 1.5, gap: 1.25 }}>
-          <Typography
-            variant="h6"
-            sx={{
-              fontWeight: 800,
+        <Typography
+          variant="h6"
+          sx={{
+            fontWeight: 800,
+            color: '#fff',
+            letterSpacing: 0,
+            lineHeight: 1.25,
+            pr: 1,
+          }}
+        >
+          AC Elite License / Safety Rating
+        </Typography>
+        <IconButton
+          onClick={onClose}
+          sx={{
+            ...GLASS_CARD_INNER_HOVER_SX,
+            width: { xs: 34, sm: 36 },
+            height: { xs: 34, sm: 36 },
+            borderRadius: '50%',
+            color: 'rgba(255,255,255,0.72)',
+            '&:hover': {
               color: '#fff',
-              letterSpacing: 0,
-              lineHeight: 1.25,
-              pr: 1,
-            }}
+            },
+          }}
+        >
+          <Box
+            component="svg"
+            viewBox="0 0 24 24"
+            aria-hidden
+            sx={{ width: 16, height: 16, display: 'block' }}
           >
-            AC Elite License / Safety Rating
-          </Typography>
-          <IconButton
-            onClick={onClose}
-            sx={{
-              ...GLASS_CARD_INNER_HOVER_SX,
-              width: { xs: 34, sm: 36 },
-              height: { xs: 34, sm: 36 },
-              borderRadius: '50%',
-              color: 'rgba(255,255,255,0.72)',
-              '&:hover': {
-                color: '#fff',
-              },
-            }}
-          >
+            <path
+              d="M6 6L18 18M18 6L6 18"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2.4}
+              strokeLinecap="round"
+            />
+          </Box>
+        </IconButton>
+      </Stack>
+
+      <Box sx={{ px: { xs: 2, sm: 3 }, pb: 1 }}>
+        <Typography
+          variant="caption"
+          sx={{ display: 'block', mb: 1, color: 'rgba(255,255,255,0.72)' }}
+        >
+          How it works
+        </Typography>
+        <Tabs
+          value={activeTab}
+          onChange={(_, value: GuideTab) => setActiveTab(value)}
+          variant="fullWidth"
+          sx={{
+            ...GLASS_CARD_INNER_SX,
+            minHeight: 46,
+            p: 0.5,
+            borderRadius: 2.5,
+            '& .MuiTabs-indicator': { display: 'none' },
+            '& .MuiTabs-flexContainer': { gap: 0.5 },
+          }}
+        >
+          {(['license', 'safety'] as const).map((value) => (
+            <Tab
+              key={value}
+              value={value}
+              label={value === 'license' ? 'License' : 'Safety Rating'}
+              disableRipple
+              sx={{
+                minHeight: 38,
+                borderRadius: 1.8,
+                textTransform: 'none',
+                color: 'rgba(255,255,255,0.6)',
+                fontWeight: 700,
+                transition:
+                  'color 240ms cubic-bezier(0.32,0.72,0,1), background 240ms cubic-bezier(0.32,0.72,0,1), transform 240ms cubic-bezier(0.32,0.72,0,1), box-shadow 240ms cubic-bezier(0.32,0.72,0,1)',
+                '&.Mui-selected': {
+                  color: '#fff',
+                  background:
+                    'radial-gradient(120% 120% at 18% -20%, rgba(255,255,255,0.18), rgba(255,255,255,0.045) 42%, transparent 68%),' +
+                    'linear-gradient(180deg, rgba(96,165,250,0.24) 0%, rgba(59,130,246,0.12) 100%)',
+                  boxShadow:
+                    'inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -1px 0 rgba(15,23,42,0.2), 0 10px 24px -20px rgba(59,130,246,0.3)',
+                },
+                '&:hover': {
+                  color: '#fff',
+                  transform: 'translateY(-1px)',
+                },
+                '@media (prefers-reduced-motion: reduce)': {
+                  transition: 'none',
+                  '&:hover': { transform: 'none' },
+                },
+              }}
+            />
+          ))}
+        </Tabs>
+      </Box>
+
+      <DialogContent
+        sx={{ px: { xs: 2, sm: 3 }, pt: 1, pb: { xs: 2.25, sm: 3 }, maxHeight: '72vh' }}
+      >
+        {activeTab === 'license' && (
+          <Stack spacing={2.2}>
+            <Typography variant="h6" sx={{ fontWeight: 700, color: '#dbeafe' }}>
+              Your license (pace/skill) is based on your leaderboard pace and total distance driven.
+            </Typography>
+
+            <Typography variant="body2" sx={{ color: 'text.secondary', maxWidth: 880 }}>
+              We do not use race results (wins or podiums) for license progression. Pace is built
+              from leaderboard position per track, laps-based confidence (low laps = lower impact),
+              participation scaling by number of tracks, and a consistency factor that rewards
+              frequent top finishes.
+            </Typography>
+
+            <Typography variant="body2" sx={{ color: 'text.secondary', maxWidth: 880 }}>
+              Track requirement means unique circuits where you set a valid lap. You need to meet
+              both km and score, plus the required number of tracks where shown.
+            </Typography>
+
             <Box
-              component="svg"
-              viewBox="0 0 24 24"
-              aria-hidden
-              sx={{ width: 16, height: 16, display: 'block' }}
+              sx={{
+                ...GLASS_TABLE_CONTAINER_SX,
+                borderRadius: 2,
+                overflow: 'hidden',
+                maxWidth: '100%',
+                overflowX: 'auto',
+              }}
             >
-              <path
-                d="M6 6L18 18M18 6L6 18"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={2.4}
-                strokeLinecap="round"
-              />
-            </Box>
-          </IconButton>
-        </Stack>
-
-        <Box sx={{ px: { xs: 2, sm: 3 }, pb: 1 }}>
-          <Typography variant="caption" sx={{ display: 'block', mb: 1, color: 'rgba(255,255,255,0.72)' }}>
-            How it works
-          </Typography>
-          <Tabs
-            value={activeTab}
-            onChange={(_, value: GuideTab) => setActiveTab(value)}
-            variant="fullWidth"
-            sx={{
-              ...GLASS_CARD_INNER_SX,
-              minHeight: 46,
-              p: 0.5,
-              borderRadius: 2.5,
-              '& .MuiTabs-indicator': { display: 'none' },
-              '& .MuiTabs-flexContainer': { gap: 0.5 },
-            }}
-          >
-            {(['license', 'safety'] as const).map((value) => (
-              <Tab
-                key={value}
-                value={value}
-                label={value === 'license' ? 'License' : 'Safety Rating'}
-                disableRipple
-                sx={{
-                  minHeight: 38,
-                  borderRadius: 1.8,
-                  textTransform: 'none',
-                  color: 'rgba(255,255,255,0.6)',
-                  fontWeight: 700,
-                  transition:
-                    'color 240ms cubic-bezier(0.32,0.72,0,1), background 240ms cubic-bezier(0.32,0.72,0,1), transform 240ms cubic-bezier(0.32,0.72,0,1), box-shadow 240ms cubic-bezier(0.32,0.72,0,1)',
-                  '&.Mui-selected': {
-                    color: '#fff',
-                    background:
-                      'radial-gradient(120% 120% at 18% -20%, rgba(255,255,255,0.18), rgba(255,255,255,0.045) 42%, transparent 68%),' +
-                      'linear-gradient(180deg, rgba(96,165,250,0.24) 0%, rgba(59,130,246,0.12) 100%)',
-                    boxShadow:
-                      'inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -1px 0 rgba(15,23,42,0.2), 0 10px 24px -20px rgba(59,130,246,0.3)',
-                  },
-                  '&:hover': {
-                    color: '#fff',
-                    transform: 'translateY(-1px)',
-                  },
-                  '@media (prefers-reduced-motion: reduce)': {
-                    transition: 'none',
-                    '&:hover': { transform: 'none' },
-                  },
-                }}
-              />
-            ))}
-          </Tabs>
-        </Box>
-
-        <DialogContent sx={{ px: { xs: 2, sm: 3 }, pt: 1, pb: { xs: 2.25, sm: 3 }, maxHeight: '72vh' }}>
-          {activeTab === 'license' && (
-            <Stack spacing={2.2}>
-              <Typography variant="h6" sx={{ fontWeight: 700, color: '#dbeafe' }}>
-                Your license (pace/skill) is based on your leaderboard pace and total distance driven.
-              </Typography>
-
-              <Typography variant="body2" sx={{ color: 'text.secondary', maxWidth: 880 }}>
-                We do not use race results (wins or podiums) for license progression. Pace is built from leaderboard
-                position per track, laps-based confidence (low laps = lower impact), participation scaling by number of
-                tracks, and a consistency factor that rewards frequent top finishes.
-              </Typography>
-
-              <Typography variant="body2" sx={{ color: 'text.secondary', maxWidth: 880 }}>
-                Track requirement means unique circuits where you set a valid lap. You need to meet both km and score,
-                plus the required number of tracks where shown.
-              </Typography>
-
               <Box
                 sx={{
-                  ...GLASS_TABLE_CONTAINER_SX,
-                  borderRadius: 2,
-                  overflow: 'hidden',
-                  maxWidth: '100%',
-                  overflowX: 'auto',
+                  display: 'grid',
+                  gridTemplateColumns: LICENSE_TABLE_GRID,
+                  gap: 1,
+                  px: 2,
+                  py: 1.1,
+                  minWidth: { xs: 320, sm: 0 },
+                  bgcolor: 'rgba(255,255,255,0.012)',
                 }}
               >
+                <Typography
+                  variant="caption"
+                  sx={{ fontWeight: 800, color: 'rgba(255,255,255,0.78)', whiteSpace: 'nowrap' }}
+                >
+                  License
+                </Typography>
+                <Typography
+                  variant="caption"
+                  sx={{ fontWeight: 800, color: 'rgba(255,255,255,0.78)' }}
+                >
+                  Min km
+                </Typography>
+                <Typography
+                  variant="caption"
+                  sx={{ fontWeight: 800, color: 'rgba(255,255,255,0.78)' }}
+                >
+                  Min score
+                </Typography>
+                <Typography
+                  variant="caption"
+                  sx={{ fontWeight: 800, color: 'rgba(255,255,255,0.78)' }}
+                >
+                  Tracks
+                </Typography>
+              </Box>
+
+              <Stack divider={<Box sx={{ borderTop: '1px solid rgba(148,163,184,0.12)' }} />}>
+                {LICENSE_TIER_ORDER.map((name) => {
+                  const tier = LICENSE_TIERS[name];
+                  return (
+                    <Box
+                      key={name}
+                      sx={{
+                        display: 'grid',
+                        gridTemplateColumns: LICENSE_TABLE_GRID,
+                        gap: 1,
+                        px: 2,
+                        py: 1.2,
+                        alignItems: 'center',
+                        minWidth: { xs: 320, sm: 0 },
+                      }}
+                    >
+                      <Chip
+                        size="small"
+                        label={name}
+                        sx={{
+                          fontWeight: 800,
+                          width: GUIDE_LICENSE_CHIP_WIDTH,
+                          justifyContent: 'center',
+                          ...getLicenseBadgeSx(name),
+                        }}
+                      />
+                      <Typography variant="body1" sx={{ color: '#dbeafe', fontWeight: 700 }}>
+                        {formatLicenseTableKm(tier)}
+                      </Typography>
+                      <Typography variant="body1" sx={{ color: '#dbeafe', fontWeight: 700 }}>
+                        {formatLicenseTableScore(name, tier.minScore)}
+                      </Typography>
+                      <Typography variant="body1" sx={{ color: '#dbeafe', fontWeight: 700 }}>
+                        {formatLicenseTableTracks(tier.minTracks)}
+                      </Typography>
+                    </Box>
+                  );
+                })}
+
                 <Box
                   sx={{
                     display: 'grid',
                     gridTemplateColumns: LICENSE_TABLE_GRID,
                     gap: 1,
                     px: 2,
-                    py: 1.1,
+                    py: 1.2,
+                    alignItems: 'center',
                     minWidth: { xs: 320, sm: 0 },
-                    bgcolor: 'rgba(255,255,255,0.012)',
                   }}
                 >
-                  <Typography
-                    variant="caption"
-                    sx={{ fontWeight: 800, color: 'rgba(255,255,255,0.78)', whiteSpace: 'nowrap' }}
-                  >
-                    License
-                  </Typography>
-                  <Typography variant="caption" sx={{ fontWeight: 800, color: 'rgba(255,255,255,0.78)' }}>
-                    Min km
-                  </Typography>
-                  <Typography variant="caption" sx={{ fontWeight: 800, color: 'rgba(255,255,255,0.78)' }}>
-                    Min score
-                  </Typography>
-                  <Typography variant="caption" sx={{ fontWeight: 800, color: 'rgba(255,255,255,0.78)' }}>
-                    Tracks
-                  </Typography>
-                </Box>
-
-                <Stack divider={<Box sx={{ borderTop: '1px solid rgba(148,163,184,0.12)' }} />}>
-                  {LICENSE_TIER_ORDER.map((name) => {
-                    const tier = LICENSE_TIERS[name];
-                    return (
-                      <Box
-                        key={name}
-                        sx={{
-                          display: 'grid',
-                          gridTemplateColumns: LICENSE_TABLE_GRID,
-                          gap: 1,
-                          px: 2,
-                          py: 1.2,
-                          alignItems: 'center',
-                          minWidth: { xs: 320, sm: 0 },
-                        }}
-                      >
-                        <Chip
-                          size="small"
-                          label={name}
-                          sx={{
-                            fontWeight: 800,
-                            width: GUIDE_LICENSE_CHIP_WIDTH,
-                            justifyContent: 'center',
-                            ...getLicenseBadgeSx(name),
-                          }}
-                        />
-                        <Typography variant="body1" sx={{ color: '#dbeafe', fontWeight: 700 }}>
-                          {formatLicenseTableKm(tier)}
-                        </Typography>
-                        <Typography variant="body1" sx={{ color: '#dbeafe', fontWeight: 700 }}>
-                          {formatLicenseTableScore(name, tier.minScore)}
-                        </Typography>
-                        <Typography variant="body1" sx={{ color: '#dbeafe', fontWeight: 700 }}>
-                          {formatLicenseTableTracks(tier.minTracks)}
-                        </Typography>
-                      </Box>
-                    );
-                  })}
-
-                  <Box
+                  <Chip
+                    size="small"
+                    label="Rookie"
                     sx={{
-                      display: 'grid',
-                      gridTemplateColumns: LICENSE_TABLE_GRID,
-                      gap: 1,
-                      px: 2,
-                      py: 1.2,
-                      alignItems: 'center',
-                      minWidth: { xs: 320, sm: 0 },
+                      fontWeight: 800,
+                      width: GUIDE_LICENSE_CHIP_WIDTH,
+                      justifyContent: 'center',
+                      ...getLicenseBadgeSx('Rookie'),
+                    }}
+                  />
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      gridColumn: '2 / -1',
+                      color: 'rgba(219,234,254,0.92)',
+                      fontWeight: 600,
                     }}
                   >
-                    <Chip
-                      size="small"
-                      label="Rookie"
-                      sx={{
-                        fontWeight: 800,
-                        width: GUIDE_LICENSE_CHIP_WIDTH,
-                        justifyContent: 'center',
-                        ...getLicenseBadgeSx('Rookie'),
-                      }}
-                    />
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        gridColumn: '2 / -1',
-                        color: 'rgba(219,234,254,0.92)',
-                        fontWeight: 600,
-                      }}
-                    >
-                      Under 100 km driven — no formal tier until you reach the Bronze threshold.
-                    </Typography>
-                  </Box>
-                </Stack>
+                    Under 100 km driven — no formal tier until you reach the Bronze threshold.
+                  </Typography>
+                </Box>
+              </Stack>
+            </Box>
+          </Stack>
+        )}
+
+        {activeTab === 'safety' && (
+          <Stack spacing={2.2}>
+            <Typography variant="h6" sx={{ fontWeight: 700, color: '#dbeafe' }}>
+              Safety Rating is calculated from incidents per distance, not race finishing position.
+            </Typography>
+
+            <Typography variant="body2" sx={{ color: 'text.secondary', maxWidth: 880 }}>
+              Formula input uses collisions and infractions per 100 km. Lower incident density means
+              a higher raw rating. Drivers start at {SR_CONFIG.SR_START.toFixed(1)} and SR
+              confidence scales with total distance, so very low-km drivers stay closer to the start
+              value until enough clean km is logged.
+            </Typography>
+
+            <Typography variant="body2" sx={{ color: 'text.secondary', maxWidth: 880 }}>
+              To unlock a tier you need both the minimum SR value and minimum total km for that
+              tier.
+            </Typography>
+
+            <Box
+              sx={{
+                ...GLASS_TABLE_CONTAINER_SX,
+                borderRadius: 2,
+                overflow: 'hidden',
+                maxWidth: '100%',
+                overflowX: 'auto',
+              }}
+            >
+              <Box
+                sx={{
+                  display: 'grid',
+                  gridTemplateColumns: SR_TABLE_GRID,
+                  gap: 1,
+                  px: 2,
+                  py: 1.1,
+                  minWidth: { xs: 360, sm: 0 },
+                  bgcolor: 'rgba(255,255,255,0.012)',
+                }}
+              >
+                <Typography
+                  variant="caption"
+                  sx={{ fontWeight: 800, color: 'rgba(255,255,255,0.78)', whiteSpace: 'nowrap' }}
+                >
+                  SR License
+                </Typography>
+                <Typography
+                  variant="caption"
+                  sx={{ fontWeight: 800, color: 'rgba(255,255,255,0.78)' }}
+                >
+                  Min SR
+                </Typography>
+                <Typography
+                  variant="caption"
+                  sx={{ fontWeight: 800, color: 'rgba(255,255,255,0.78)' }}
+                >
+                  Min KM
+                </Typography>
               </Box>
-            </Stack>
-          )}
 
-          {activeTab === 'safety' && (
-            <Stack spacing={2.2}>
-              <Typography variant="h6" sx={{ fontWeight: 700, color: '#dbeafe' }}>
-                Safety Rating is calculated from incidents per distance, not race finishing position.
-              </Typography>
-
-              <Typography variant="body2" sx={{ color: 'text.secondary', maxWidth: 880 }}>
-                Formula input uses collisions and infractions per 100 km. Lower incident density means a higher raw
-                rating. Drivers start at {SR_CONFIG.SR_START.toFixed(1)} and SR confidence scales with total distance,
-                so very low-km drivers stay closer to the start value until enough clean km is logged.
-              </Typography>
-
-              <Typography variant="body2" sx={{ color: 'text.secondary', maxWidth: 880 }}>
-                To unlock a tier you need both the minimum SR value and minimum total km for that tier.
-              </Typography>
-
-              <Box sx={{ ...GLASS_TABLE_CONTAINER_SX, borderRadius: 2, overflow: 'hidden' }}>
-                <Box
-                  sx={{
-                    display: 'grid',
-                    gridTemplateColumns: `${GUIDE_SR_TABLE_LICENSE_COL_PX}px minmax(110px, 1fr) minmax(100px, 1fr)`,
-                    gap: 1,
-                    px: 2,
-                    py: 1.1,
-                    bgcolor: 'rgba(255,255,255,0.012)',
-                  }}
-                >
-                  <Typography
-                    variant="caption"
-                    sx={{ fontWeight: 800, color: 'rgba(255,255,255,0.78)', whiteSpace: 'nowrap' }}
-                  >
-                    SR License
-                  </Typography>
-                  <Typography variant="caption" sx={{ fontWeight: 800, color: 'rgba(255,255,255,0.78)' }}>
-                    Min SR
-                  </Typography>
-                  <Typography variant="caption" sx={{ fontWeight: 800, color: 'rgba(255,255,255,0.78)' }}>
-                    Min KM
-                  </Typography>
-                </Box>
-
-                <Stack divider={<Box sx={{ borderTop: '1px solid rgba(148,163,184,0.12)' }} />}>
-                  {SR_TIERS.map((tier) => (
-                    <Box
-                      key={tier.name}
-                      sx={{
-                        display: 'grid',
-                        gridTemplateColumns: `${GUIDE_SR_TABLE_LICENSE_COL_PX}px minmax(110px, 1fr) minmax(100px, 1fr)`,
-                        gap: 1,
-                        px: 2,
-                        py: 1.2,
-                        alignItems: 'center',
-                      }}
-                    >
-                      <Chip
-                        size="small"
-                        label={tier.name}
-                        sx={{
-                          width: GUIDE_SR_CHIP_WIDTH,
-                          justifyContent: 'center',
-                          fontWeight: 800,
-                          ...getSRBadgeSx(tier.name),
-                        }}
-                      />
-                      <Typography variant="body1" sx={{ color: '#dbeafe', fontWeight: 700 }}>
-                        {tier.minSR.toFixed(1)}+
-                      </Typography>
-                      <Typography variant="body1" sx={{ color: '#dbeafe', fontWeight: 700 }}>
-                        {formatNumber(tier.minKm)}
-                      </Typography>
-                    </Box>
-                  ))}
-
+              <Stack divider={<Box sx={{ borderTop: '1px solid rgba(148,163,184,0.12)' }} />}>
+                {SR_TIERS.map((tier) => (
                   <Box
+                    key={tier.name}
                     sx={{
                       display: 'grid',
-                      gridTemplateColumns: `${GUIDE_SR_TABLE_LICENSE_COL_PX}px minmax(110px, 1fr) minmax(100px, 1fr)`,
+                      gridTemplateColumns: SR_TABLE_GRID,
                       gap: 1,
                       px: 2,
                       py: 1.2,
                       alignItems: 'center',
+                      minWidth: { xs: 360, sm: 0 },
                     }}
                   >
                     <Chip
                       size="small"
-                      label="F"
+                      label={tier.name}
                       sx={{
                         width: GUIDE_SR_CHIP_WIDTH,
                         justifyContent: 'center',
                         fontWeight: 800,
-                        ...getSRBadgeSx('F'),
+                        ...getSRBadgeSx(tier.name),
                       }}
                     />
                     <Typography variant="body1" sx={{ color: '#dbeafe', fontWeight: 700 }}>
-                      &lt; {SR_TIERS[SR_TIERS.length - 1].minSR.toFixed(1)}
+                      {tier.minSR.toFixed(1)}+
                     </Typography>
                     <Typography variant="body1" sx={{ color: '#dbeafe', fontWeight: 700 }}>
-                      Under 100
+                      {formatNumber(tier.minKm)}
                     </Typography>
                   </Box>
-                </Stack>
-              </Box>
-            </Stack>
-          )}
-        </DialogContent>
-      </Dialog>
+                ))}
+
+                <Box
+                  sx={{
+                    display: 'grid',
+                    gridTemplateColumns: SR_TABLE_GRID,
+                    gap: 1,
+                    px: 2,
+                    py: 1.2,
+                    alignItems: 'center',
+                    minWidth: { xs: 360, sm: 0 },
+                  }}
+                >
+                  <Chip
+                    size="small"
+                    label="F"
+                    sx={{
+                      width: GUIDE_SR_CHIP_WIDTH,
+                      justifyContent: 'center',
+                      fontWeight: 800,
+                      ...getSRBadgeSx('F'),
+                    }}
+                  />
+                  <Typography variant="body1" sx={{ color: '#dbeafe', fontWeight: 700 }}>
+                    &lt; {SR_TIERS[SR_TIERS.length - 1].minSR.toFixed(1)}
+                  </Typography>
+                  <Typography variant="body1" sx={{ color: '#dbeafe', fontWeight: 700 }}>
+                    Under 100
+                  </Typography>
+                </Box>
+              </Stack>
+            </Box>
+          </Stack>
+        )}
+      </DialogContent>
+    </Dialog>
   );
 }

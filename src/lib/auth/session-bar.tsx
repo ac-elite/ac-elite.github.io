@@ -5,6 +5,7 @@ import Chip from '@mui/material/Chip';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
+import { alpha } from '@mui/material/styles';
 
 import { GLASS_CARD_INNER_SX } from 'src/lib/glass';
 import { ROLE_CHIP_SX } from 'src/lib/ac-elite-data';
@@ -19,8 +20,8 @@ import { useAuth, ROLE_LABEL, type AppRole, ROLE_TO_CHIP_STYLE } from './auth-co
  * tile. Picked to match the hue of `ROLE_CHIP_SX` without copying the gradient.
  */
 const ROLE_ACCENT: Record<AppRole, string> = {
-  owner: '#ED4245',     // red
-  admin: '#A855F7',     // purple
+  owner: '#ED4245', // red
+  admin: '#A855F7', // purple
   moderator: '#22C55E', // green
 };
 
@@ -29,6 +30,16 @@ const ROLE_ICON: Record<AppRole, string> = {
   admin: 'solar:shield-keyhole-bold',
   moderator: 'solar:user-id-bold',
 };
+
+function roleAccentEdgeSx(accent: string, width: number, opacity: number) {
+  return {
+    boxShadow: [
+      `inset ${width}px 0 0 ${alpha(accent, opacity)}`,
+      'inset 0 1px 0 rgba(255,255,255,0.09)',
+      'inset 0 -1px 0 rgba(0,0,0,0.1)',
+    ].join(', '),
+  } as const;
+}
 
 /**
  * Top-of-page status bar shown on protected routes. Surfaces the signed-in
@@ -58,6 +69,7 @@ export function SessionBar({ compact = false }: SessionBarProps = {}) {
       <Box
         sx={{
           ...GLASS_CARD_INNER_SX,
+          ...roleAccentEdgeSx(accent, 3, 0.9),
           overflow: 'hidden',
           // Sits in the sidebar's flex column — never let it shrink when the
           // viewport is short, or the content squishes out of centre.
@@ -67,14 +79,6 @@ export function SessionBar({ compact = false }: SessionBarProps = {}) {
           px: 1.25,
           py: 1,
           borderRadius: 1.25,
-          '&::before': {
-            content: '""',
-            position: 'absolute',
-            inset: '0 auto 0 0',
-            width: 3,
-            background: accent,
-            opacity: 0.9,
-          },
         }}
       >
         <Stack direction="row" spacing={1} alignItems="center">
@@ -87,8 +91,7 @@ export function SessionBar({ compact = false }: SessionBarProps = {}) {
                 display: 'inline-flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                background:
-                  `radial-gradient(120% 120% at 24% 0%, rgba(255,255,255,0.2), rgba(255,255,255,0.04) 46%, transparent 72%), ${accent}24`,
+                background: `radial-gradient(120% 120% at 24% 0%, rgba(255,255,255,0.2), rgba(255,255,255,0.04) 46%, transparent 72%), ${accent}24`,
                 border: `1px solid ${accent}66`,
                 color: '#fff',
                 flexShrink: 0,
@@ -143,7 +146,8 @@ export function SessionBar({ compact = false }: SessionBarProps = {}) {
               // Neutral white glass mini-control (mirrors the nav hover boxje); no
               // backdrop-filter — it sits in the already-blurred sidebar chrome.
               border: '1px solid rgba(226,242,255,0.2)',
-              background: 'linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.028) 100%)',
+              background:
+                'linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.028) 100%)',
               boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.14)',
               color: 'rgba(226,232,240,0.85)',
               cursor: 'pointer',
@@ -171,30 +175,30 @@ export function SessionBar({ compact = false }: SessionBarProps = {}) {
     <Box
       sx={{
         ...GLASS_CARD_INNER_SX,
+        ...roleAccentEdgeSx(accent, 4, 0.85),
         position: 'relative',
         overflow: 'hidden',
         flexShrink: 0,
         py: 1.5,
         pl: 2.5,
         pr: 2,
-        // Coloured stripe along the left edge so the role is unmissable.
-        '&::before': {
-          content: '""',
-          position: 'absolute',
-          inset: '0 auto 0 0',
-          width: 4,
-          background: accent,
-          opacity: 0.85,
-        },
       }}
     >
       <Stack
         direction={{ xs: 'column', sm: 'row' }}
         spacing={{ xs: 1.25, sm: 1.5 }}
-        alignItems={{ xs: 'flex-start', sm: 'center' }}
+        alignItems={{ xs: 'center', sm: 'center' }}
         justifyContent="space-between"
+        sx={{ textAlign: { xs: 'center', sm: 'left' } }}
       >
-        <Stack direction="row" spacing={1.5} alignItems="center" flexWrap="wrap" useFlexGap>
+        <Stack
+          direction="row"
+          spacing={1.5}
+          alignItems="center"
+          justifyContent={{ xs: 'center', sm: 'flex-start' }}
+          flexWrap="wrap"
+          useFlexGap
+        >
           {/* Role glyph — pulls the eye and reinforces the colour coding. */}
           {role && (
             <Box
@@ -205,8 +209,7 @@ export function SessionBar({ compact = false }: SessionBarProps = {}) {
                 display: 'inline-flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                background:
-                  `radial-gradient(120% 120% at 24% 0%, rgba(255,255,255,0.2), rgba(255,255,255,0.04) 46%, transparent 72%), ${accent}24`,
+                background: `radial-gradient(120% 120% at 24% 0%, rgba(255,255,255,0.2), rgba(255,255,255,0.04) 46%, transparent 72%), ${accent}24`,
                 border: `1px solid ${accent}66`,
                 color: '#fff',
                 flexShrink: 0,
@@ -219,7 +222,14 @@ export function SessionBar({ compact = false }: SessionBarProps = {}) {
             </Box>
           )}
 
-          <Stack direction="row" spacing={1} alignItems="center">
+          <Stack
+            direction="row"
+            spacing={1}
+            alignItems="center"
+            justifyContent={{ xs: 'center', sm: 'flex-start' }}
+            flexWrap="wrap"
+            useFlexGap
+          >
             <Typography
               component="span"
               variant="caption"
@@ -259,6 +269,7 @@ export function SessionBar({ compact = false }: SessionBarProps = {}) {
           startIcon={<Icon icon="solar:logout-3-linear" width={16} />}
           sx={{
             ...OUTLINED_GLASS_WHITE_SX,
+            alignSelf: { xs: 'center', sm: 'auto' },
             '&:hover': {
               borderColor: 'rgba(252,165,165,0.6)',
               color: '#fca5a5',

@@ -42,7 +42,11 @@ function siteSourceVerdict(service: SyncServiceStatus): Verdict {
 }
 
 const CELL_BORDER = '1px solid rgba(148,163,184,0.1)';
-const bodyCellSx = { borderBottom: CELL_BORDER, py: 1.35, verticalAlign: 'top' as const };
+const bodyCellSx = {
+  borderBottom: CELL_BORDER,
+  py: { xs: 1.1, md: 0.8 },
+  verticalAlign: 'top' as const,
+};
 
 function ServiceRow({ feed, service }: { feed: string; service: SyncServiceStatus }) {
   const health = getSyncHealth(service.live.at ?? undefined, 'liveFeed');
@@ -147,12 +151,19 @@ export function AdminSyncStatusPanel({ motionIndex = 2 }: { motionIndex?: number
   }, []);
 
   return (
-    <Paper sx={{ ...GLASS_PANEL_COMPACT_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(motionIndex) }}>
+    <Paper
+      sx={{
+        ...GLASS_PANEL_COMPACT_SX,
+        ...brandAccentBorderSx(),
+        ...glassCardMotionSx(motionIndex),
+      }}
+    >
       <Stack
         direction={{ xs: 'column', sm: 'row' }}
         justifyContent="space-between"
-        alignItems={{ xs: 'flex-start', sm: 'center' }}
+        alignItems={{ xs: 'center', sm: 'center' }}
         spacing={1}
+        sx={{ textAlign: { xs: 'center', sm: 'left' } }}
       >
         <Box>
           <Typography variant="h6" sx={{ fontWeight: 800 }}>
@@ -189,7 +200,7 @@ export function AdminSyncStatusPanel({ motionIndex = 2 }: { motionIndex?: number
                   fontWeight: 800,
                   color: TABLE_HEAD_MUTED_COLOR,
                   borderBottom: '1px solid rgba(148,163,184,0.28)',
-                  py: 1.35,
+                  py: { xs: 1, md: 0.75 },
                   px: 1.5,
                 },
               }}
