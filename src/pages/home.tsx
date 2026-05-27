@@ -500,117 +500,6 @@ function CommunityPulseCard({
   );
 }
 
-function LiveTargetCard({
-  currentTrack,
-  loading,
-  error,
-  rows,
-}: {
-  currentTrack: CurrentTrackData | null;
-  loading: boolean;
-  error: string | null;
-  rows: LeaderboardCarRow[];
-}) {
-  const fastest = rows.find((row) => typeof row.laptime === 'number');
-  const p10 = rows[9];
-  const totalLaps = rows.reduce((sum, row) => sum + (row.laps || 0), 0);
-  const trackName = currentTrack?.track ? getTrackDisplayName(currentTrack.track) : 'Live server';
-  const chaseGap =
-    fastest?.laptime && p10?.laptime ? calculateGap(fastest.laptime, p10.laptime) : 'Building';
-
-  const targetStats = [
-    { label: 'Pace setter', value: fastest?.name || 'Waiting' },
-    { label: 'Fastest lap', value: fastest?.laptime ? formatLaptime(fastest.laptime) : '-' },
-    { label: 'Drivers chasing', value: formatNumber(rows.length) },
-    { label: 'P10 window', value: chaseGap },
-  ];
-
-  return (
-    <Paper
-      elevation={0}
-      sx={{
-        ...GLASS_PANEL_SX,
-        ...brandAccentBorderSx(),
-        ...glassCardMotionSx(1, { baseDelayMs: 340 }),
-        mt: 2,
-        textAlign: { xs: 'center', md: 'left' },
-      }}
-    >
-      <Stack spacing={2}>
-        <Stack
-          direction={{ xs: 'column', sm: 'row' }}
-          spacing={1.5}
-          sx={{ alignItems: { xs: 'center', sm: 'flex-start' }, justifyContent: 'space-between' }}
-        >
-          <Box>
-            <Typography variant="overline" sx={sectionKickerSx}>
-              Live target
-            </Typography>
-            <Typography variant="h6" sx={{ fontWeight: 800, mt: 0.3 }}>
-              {trackName}
-            </Typography>
-            <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.45, maxWidth: 620 }}>
-              {loading
-                ? 'Syncing the current benchmark from the server.'
-                : error
-                  ? 'The live benchmark is temporarily unavailable.'
-                  : 'The lap everyone on the homepage can chase right now.'}
-            </Typography>
-          </Box>
-
-          <Button
-            href="#live-track-leaderboard"
-            variant="contained"
-            color="secondary"
-            size="small"
-            disabled={!currentTrack?.track}
-            sx={{ ...PAGINATION_NAV_BUTTON_SX, minWidth: 150 }}
-          >
-            View board
-          </Button>
-        </Stack>
-
-        <Grid container spacing={1}>
-          {targetStats.map((item) => (
-            <Grid key={item.label} size={{ xs: 12, sm: 6 }}>
-              <Box
-                sx={{
-                  ...GLASS_INNER_PANEL_SX,
-                  minHeight: 74,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'center',
-                  alignItems: { xs: 'center', md: 'flex-start' },
-                  py: 1,
-                }}
-              >
-                <Typography
-                  variant="caption"
-                  sx={{ color: 'rgba(255,255,255,0.66)', fontWeight: 700, letterSpacing: 0 }}
-                >
-                  {item.label}
-                </Typography>
-                <Typography
-                  variant="subtitle2"
-                  sx={{ fontWeight: 800, lineHeight: 1.2, maxWidth: 1 }}
-                  noWrap
-                  title={String(item.value)}
-                >
-                  {item.value}
-                </Typography>
-              </Box>
-            </Grid>
-          ))}
-        </Grid>
-
-        <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700 }}>
-          {formatNumber(totalLaps)} laps logged on this target
-        </Typography>
-      </Stack>
-    </Paper>
-  );
-}
-
 function HeroSection({ currentTrack }: { currentTrack: CurrentTrackData | null }) {
   const theme = useTheme();
   const isMdUp = useMediaQuery(theme.breakpoints.up('md'));
@@ -813,7 +702,7 @@ function CurrentTrackLeaderboardSection({
   if (!currentTrack?.track) return null;
 
   return (
-    <Box id="live-track-leaderboard" component="section" sx={{ ...DATA_PAGE_SHELL_SX }}>
+    <Box component="section" sx={{ ...DATA_PAGE_SHELL_SX }}>
       <PageGridOverlay />
 
       <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1 }}>
@@ -1088,8 +977,6 @@ function DriverSearchSection({
   rankData,
   loading,
   error,
-  currentTrack,
-  currentTrackRows,
   syncStatus,
 }: {
   drivers: DriverView[];
@@ -1097,8 +984,6 @@ function DriverSearchSection({
   rankData: RankDriver[];
   loading: boolean;
   error: string | null;
-  currentTrack: CurrentTrackData | null;
-  currentTrackRows: LeaderboardCarRow[];
   syncStatus: SyncHealth;
 }) {
   const [query, setQuery] = useState('');
@@ -1118,6 +1003,17 @@ function DriverSearchSection({
       .slice(0, 8);
   }, [drivers, query]);
   const hasSearchQuery = query.trim().length > 0;
+  const profileSignal = useMemo(() => {
+    const profiles = drivers.length;
+    const profilesWithLaps = drivers.filter((driver) => driver.totalLaps > 0).length;
+    const syncedLaps = drivers.reduce((sum, driver) => sum + driver.totalLaps, 0);
+
+    return [
+      { label: 'Profiles', value: formatNumber(profiles) },
+      { label: 'With laps', value: formatNumber(profilesWithLaps) },
+      { label: 'Synced laps', value: formatNumber(syncedLaps) },
+    ];
+  }, [drivers]);
 
   return (
     <Box
@@ -1274,15 +1170,82 @@ function DriverSearchSection({
                     </List>
                   </Paper>
                 )}
+
+                {!loading && !error && !hasSearchQuery && (
+                  <Box
+                    sx={{
+                      ...GLASS_INNER_PANEL_SX,
+                      mt: 1,
+                      minHeight: { xs: 190, md: 230 },
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'space-between',
+                      gap: 2,
+                      textAlign: { xs: 'center', md: 'left' },
+                    }}
+                  >
+                    <Stack spacing={1}>
+                      <Typography variant="overline" sx={sectionKickerSx}>
+                        Driver signal
+                      </Typography>
+                      <Typography
+                        variant="h6"
+                        sx={{
+                          fontWeight: 800,
+                          lineHeight: 1.2,
+                          maxWidth: 620,
+                          mx: { xs: 'auto', md: 0 },
+                        }}
+                      >
+                        Every lap leaves a fingerprint.
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          color: 'text.secondary',
+                          maxWidth: 650,
+                          mx: { xs: 'auto', md: 0 },
+                        }}
+                      >
+                        Profiles connect clean driving, pace, license progress, favorite tracks, and
+                        lap history into one searchable record.
+                      </Typography>
+                    </Stack>
+
+                    <Grid container spacing={1}>
+                      {profileSignal.map((item) => (
+                        <Grid key={item.label} size={{ xs: 12, sm: 4 }}>
+                          <Box
+                            sx={{
+                              borderRadius: 2,
+                              border: '1px solid rgba(255,255,255,0.1)',
+                              bgcolor: 'rgba(255,255,255,0.04)',
+                              px: 1.25,
+                              py: 1,
+                            }}
+                          >
+                            <Typography
+                              variant="caption"
+                              sx={{
+                                display: 'block',
+                                color: 'rgba(255,255,255,0.62)',
+                                fontWeight: 700,
+                                letterSpacing: 0,
+                              }}
+                            >
+                              {item.label}
+                            </Typography>
+                            <Typography variant="subtitle2" sx={{ fontWeight: 800 }}>
+                              {item.value}
+                            </Typography>
+                          </Box>
+                        </Grid>
+                      ))}
+                    </Grid>
+                  </Box>
+                )}
               </Stack>
             </Paper>
-
-            <LiveTargetCard
-              currentTrack={currentTrack}
-              loading={loading}
-              error={error}
-              rows={currentTrackRows}
-            />
 
             {loading && (
               <Typography color="text.secondary" sx={{ mt: 1 }}>
@@ -1555,8 +1518,6 @@ export default function Page() {
         rankData={rankData}
         loading={loading}
         error={error}
-        currentTrack={currentTrack}
-        currentTrackRows={currentTrackRows}
         syncStatus={syncStatus}
       />
       <CurrentTrackLeaderboardSection
