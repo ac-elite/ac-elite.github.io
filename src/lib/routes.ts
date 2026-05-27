@@ -22,6 +22,15 @@ export function getDriverProfileHref(guid: string) {
   return `${APP_BASE_URL}${APP_ROUTES.driverPattern.slice(1).replace(':driverGuid', encodeURIComponent(guid))}`;
 }
 
+export function getResultHref(sessionId: number | string) {
+  return `${APP_BASE_URL}${APP_ROUTES.resultPattern.slice(1).replace(':sessionId', encodeURIComponent(String(sessionId)))}`;
+}
+
+/** Results list page (same basename handling as the other page hrefs). */
+export function getResultsIndexHref() {
+  return `${APP_BASE_URL}${APP_ROUTES.results.slice(1)}`;
+}
+
 /** `?track=<id>` for the leaderboard page (internal path `/leaderboard`). */
 export function getLeaderboardTrackSearch(trackId: string) {
   return `?${new URLSearchParams({ track: trackId }).toString()}`;

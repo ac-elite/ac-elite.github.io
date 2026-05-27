@@ -1,0 +1,386 @@
+import { useMemo, useState, useEffect } from 'react';
+
+import Box from '@mui/material/Box';
+import Chip from '@mui/material/Chip';
+import Link from '@mui/material/Link';
+import Paper from '@mui/material/Paper';
+import Stack from '@mui/material/Stack';
+import Table from '@mui/material/Table';
+import Select from '@mui/material/Select';
+import Button from '@mui/material/Button';
+import Skeleton from '@mui/material/Skeleton';
+import MenuItem from '@mui/material/MenuItem';
+import TableRow from '@mui/material/TableRow';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableHead from '@mui/material/TableHead';
+import Container from '@mui/material/Container';
+import Typography from '@mui/material/Typography';
+import FormControl from '@mui/material/FormControl';
+import TableContainer from '@mui/material/TableContainer';
+
+import { CONFIG } from 'src/config-global';
+import { APP_ROUTES } from 'src/centralized/app-routes';
+import { getSiteUrl } from 'src/centralized/site-urls';
+import { formatLaptime, getTrackDisplayName } from 'src/lib/ac-elite-data';
+import { getResultHref, getDriverProfileHref } from 'src/lib/routes';
+import { getSyncHealth } from 'src/lib/sync-utils';
+import { subtleRowEnterSx, glassCardMotionSx } from 'src/lib/subtle-motion';
+import { brandAccentBorderSx } from 'src/lib/status-accent';
+import { GLASS_PANEL_SX, GLASS_TABLE_WRAPPER_SX, GLASS_TABLE_PAGINATION_SX } from 'src/lib/glass';
+import {
+  GLASS_SELECT_SX,
+  GLASS_SELECT_MENU_PROPS,
+  GLASS_SELECT_MENU_ITEM_SX,
+} from 'src/lib/glass-select';
+import {
+  DATA_PAGE_SHELL_SX,
+  PAGINATION_NAV_BUTTON_SX,
+  PAGINATION_PAGE_BUTTON_SX,
+  ACTION_OUTLINED_SMALL_DENSE_SX,
+  FORM_SECTION_KICKER_CAPTION_SX,
+} from 'src/lib/page-shell';
+import {
+  fetchSessions,
+  type SessionSummary,
+  fetchResultsSyncedAt,
+  type SessionTypeFilter,
+  fetchSessionTrackOptions,
+} from 'src/lib/results';
+
+import { Reveal } from 'src/components/reveal';
+import { EmptyState, ErrorPanel, LoadingPanel } from 'src/components/data-state';
+import { DataPageHeader } from 'src/components/data-page-header/data-page-header';
+import { PageGridOverlay } from 'src/components/page-background/page-grid-overlay';
+
+const RESULTS_PER_PAGE = 20;
+
+const TYPE_TABS: { key: SessionTypeFilter; label: string }[] = [
+  { key: 'ALL', label: 'All' },
+  { key: 'RACE', label: 'Race' },
+  { key: 'QUALIFY', label: 'Qualify' },
+  { key: 'PRACTICE', label: 'Practice' },
+];
+
+const TYPE_CHIP_SX: Record<string, object> = {
+  RACE: { bgcolor: 'rgba(34,197,94,0.14)', color: '#86efac', border: '1px solid rgba(34,197,94,0.32)' },
+  QUALIFY: { bgcolor: 'rgba(245,158,11,0.14)', color: '#fcd34d', border: '1px solid rgba(245,158,11,0.32)' },
+  PRACTICE: { bgcolor: 'rgba(148,163,184,0.14)', color: '#cbd5e1', border: '1px solid rgba(148,163,184,0.3)' },
+};
+
+function formatSessionDate(iso: string | null): string {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return '—';
+  return d.toLocaleString(undefined, {
+    year: 'numeric',
+    month: 'short',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
+
+function getVisiblePages(current: number, total: number) {
+  const pages: (number | '...')[] = [];
+  for (let i = 1; i <= total; i += 1) {
+    if (i === 1 || i === total || (i >= current - 1 && i <= current + 1)) {
+      pages.push(i);
+    } else if (i === current - 2 || i === current + 2) {
+      pages.push('...');
+    }
+  }
+  return pages;
+}
+
+function Paginate({
+  page,
+  totalPages,
+  onChange,
+}: {
+  page: number;
+  totalPages: number;
+  onChange: (newPage: number) => void;
+}) {
+  if (totalPages <= 1) return null;
+  const pages = getVisiblePages(page, totalPages);
+
+  return (
+    <Paper sx={{ ...GLASS_TABLE_PAGINATION_SX, ...glassCardMotionSx(3) }}>
+      <Stack direction="row" spacing={1} justifyContent="center" flexWrap="wrap">
+        <Button
+          disabled={page <= 1}
+          onClick={() => onChange(page - 1)}
+          variant="contained"
+          color="secondary"
+          size="small"
+          sx={{ ...PAGINATION_NAV_BUTTON_SX }}
+        >
+          Prev
+        </Button>
+        {pages.map((p, idx) =>
+          p === '...' ? (
+            <Typography key={`dots-${idx}`} sx={{ px: 1.25, py: 0.75 }}>
+              ...
+            </Typography>
+          ) : (
+            <Button
+              key={p}
+              onClick={() => onChange(p)}
+              size="small"
+              variant={p === page ? 'contained' : 'outlined'}
+              color={p === page ? 'primary' : 'secondary'}
+              sx={{ ...PAGINATION_PAGE_BUTTON_SX }}
+            >
+              {p}
+            </Button>
+          )
+        )}
+        <Button
+          disabled={page >= totalPages}
+          onClick={() => onChange(page + 1)}
+          variant="contained"
+          color="secondary"
+          size="small"
+          sx={{ ...PAGINATION_NAV_BUTTON_SX }}
+        >
+          Next
+        </Button>
+      </Stack>
+    </Paper>
+  );
+}
+
+export default function Page() {
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [rows, setRows] = useState<SessionSummary[]>([]);
+  const [total, setTotal] = useState(0);
+  const [syncedAt, setSyncedAt] = useState<string | null>(null);
+  const [trackOptions, setTrackOptions] = useState<string[]>([]);
+
+  const [type, setType] = useState<SessionTypeFilter>('ALL');
+  const [track, setTrack] = useState<string>('ALL');
+  const [page, setPage] = useState(1);
+
+  // Track filter options + freshness are fetched once.
+  useEffect(() => {
+    let mounted = true;
+    void fetchResultsSyncedAt().then((at) => mounted && setSyncedAt(at));
+    void fetchSessionTrackOptions().then((opts) => mounted && setTrackOptions(opts));
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    let mounted = true;
+    setLoading(true);
+    setError(null);
+    fetchSessions({ type, track, page, perPage: RESULTS_PER_PAGE })
+      .then((res) => {
+        if (!mounted) return;
+        setRows(res.rows);
+        setTotal(res.total);
+      })
+      .catch((e) => {
+        if (!mounted) return;
+        setError(e instanceof Error ? e.message : 'Unknown error');
+      })
+      .finally(() => {
+        if (mounted) setLoading(false);
+      });
+    return () => {
+      mounted = false;
+    };
+  }, [type, track, page]);
+
+  const totalPages = Math.max(1, Math.ceil(total / RESULTS_PER_PAGE));
+  const syncHealth = useMemo(() => getSyncHealth(syncedAt ?? undefined), [syncedAt]);
+
+  return (
+    <>
+      <title>{`Results - ${CONFIG.appName}`}</title>
+      <meta name="description" content="AC Elite session results: review every race, qualify and practice session." />
+      <meta property="og:title" content="Results - AC Elite" />
+      <meta property="og:description" content="AC Elite session results: review every race, qualify and practice session." />
+      <meta property="og:url" content={getSiteUrl(APP_ROUTES.results)} />
+
+      <Box sx={{ ...DATA_PAGE_SHELL_SX }}>
+        <PageGridOverlay />
+
+        <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1 }}>
+          <Stack spacing={3}>
+            <DataPageHeader
+              title="Results"
+              description="Every session driven on the AC Elite server — open any race, qualify or practice to see the full classification, laps and incidents."
+              syncHealth={syncHealth}
+            />
+
+            <Paper
+              sx={{
+                ...GLASS_PANEL_SX,
+                ...brandAccentBorderSx(),
+                ...glassCardMotionSx(1),
+                textAlign: { xs: 'center', md: 'left' },
+              }}
+            >
+              <Stack direction="row" gap={1} flexWrap="wrap" justifyContent={{ xs: 'center', md: 'flex-start' }}>
+                {TYPE_TABS.map((item) => (
+                  <Button
+                    key={item.key}
+                    size="small"
+                    variant={type === item.key ? 'contained' : 'outlined'}
+                    color={type === item.key ? 'primary' : 'secondary'}
+                    onClick={() => {
+                      setType(item.key);
+                      setPage(1);
+                    }}
+                    sx={{ ...ACTION_OUTLINED_SMALL_DENSE_SX }}
+                  >
+                    {item.label}
+                  </Button>
+                ))}
+              </Stack>
+
+              {trackOptions.length > 0 && (
+                <Stack spacing={1.25} sx={{ mt: 1.5 }}>
+                  <Typography variant="caption" sx={{ ...FORM_SECTION_KICKER_CAPTION_SX }}>
+                    Track
+                  </Typography>
+                  <FormControl size="small" sx={{ maxWidth: 360, width: '100%' }}>
+                    <Select
+                      value={track}
+                      onChange={(event) => {
+                        setTrack(event.target.value);
+                        setPage(1);
+                      }}
+                      sx={GLASS_SELECT_SX}
+                      MenuProps={GLASS_SELECT_MENU_PROPS}
+                    >
+                      <MenuItem value="ALL" sx={GLASS_SELECT_MENU_ITEM_SX}>
+                        All tracks
+                      </MenuItem>
+                      {trackOptions.map((t) => (
+                        <MenuItem key={t} value={t} sx={GLASS_SELECT_MENU_ITEM_SX}>
+                          {getTrackDisplayName(t)}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Stack>
+              )}
+            </Paper>
+
+            {loading && (
+              <LoadingPanel title="Loading results…" message="Fetching sessions from the server.">
+                <Stack spacing={2}>
+                  <Skeleton variant="rounded" height={56} sx={{ borderRadius: 2, bgcolor: 'rgba(255,255,255,0.06)' }} />
+                  <Skeleton variant="rounded" height={400} sx={{ borderRadius: 2, bgcolor: 'rgba(255,255,255,0.05)' }} />
+                </Stack>
+              </LoadingPanel>
+            )}
+
+            {!loading && error && <ErrorPanel error={error} />}
+
+            {!loading && !error && (
+              <>
+                <Reveal>
+                  <Paper
+                    sx={{
+                      ...GLASS_TABLE_WRAPPER_SX,
+                      ...brandAccentBorderSx(),
+                      ...glassCardMotionSx(2),
+                    }}
+                  >
+                    <TableContainer>
+                      <Table
+                        size="small"
+                        sx={{
+                          '& .MuiTableBody-root .MuiTableRow-root:hover': {
+                            backgroundColor: 'rgba(255,255,255,0.028)',
+                          },
+                        }}
+                      >
+                        <TableHead>
+                          <TableRow>
+                            <TableCell>Date</TableCell>
+                            <TableCell>Type</TableCell>
+                            <TableCell>Track</TableCell>
+                            <TableCell align="right">Drivers</TableCell>
+                            <TableCell>Winner / Pole</TableCell>
+                            <TableCell align="right">Fastest lap</TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {rows.length === 0 && (
+                            <TableRow>
+                              <TableCell colSpan={6} sx={{ py: 4, px: 2 }}>
+                                <EmptyState
+                                  title="No sessions yet."
+                                  description="Sessions appear here automatically after they're driven on the server. Try another filter."
+                                />
+                              </TableCell>
+                            </TableRow>
+                          )}
+
+                          {rows.map((row, idx) => (
+                            <TableRow
+                              key={row.id}
+                              onClick={() => {
+                                window.location.href = getResultHref(row.id);
+                              }}
+                              sx={{ cursor: 'pointer', ...subtleRowEnterSx(idx, { baseDelayMs: 340 }) }}
+                            >
+                              <TableCell sx={{ whiteSpace: 'nowrap' }}>{formatSessionDate(row.session_date)}</TableCell>
+                              <TableCell>
+                                <Chip
+                                  size="small"
+                                  label={row.type}
+                                  sx={{ fontWeight: 700, ...(TYPE_CHIP_SX[row.type] ?? {}) }}
+                                />
+                              </TableCell>
+                              <TableCell sx={{ fontWeight: 700 }}>
+                                {row.track_name ? getTrackDisplayName(row.track_name) : '—'}
+                                {row.event_name ? (
+                                  <Typography variant="caption" sx={{ display: 'block', color: 'text.secondary', fontWeight: 500 }}>
+                                    {row.event_name}
+                                  </Typography>
+                                ) : null}
+                              </TableCell>
+                              <TableCell align="right">{row.num_drivers}</TableCell>
+                              <TableCell>
+                                {row.winner_guid ? (
+                                  <Link
+                                    href={getDriverProfileHref(row.winner_guid)}
+                                    onClick={(e) => e.stopPropagation()}
+                                    underline="none"
+                                    color="inherit"
+                                    sx={{ fontWeight: 700 }}
+                                  >
+                                    {row.winner_name || 'Unknown'}
+                                  </Link>
+                                ) : (
+                                  '—'
+                                )}
+                              </TableCell>
+                              <TableCell align="right" sx={{ fontVariantNumeric: 'tabular-nums' }}>
+                                {formatLaptime(row.best_lap_ms)}
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
+                  </Paper>
+                </Reveal>
+
+                <Paginate page={page} totalPages={totalPages} onChange={setPage} />
+              </>
+            )}
+          </Stack>
+        </Container>
+      </Box>
+    </>
+  );
+}

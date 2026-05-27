@@ -22,6 +22,8 @@ export const HallOfFamePage = lazy(() => import('src/pages/hall-of-fame'));
 export const DriverProfilePage = lazy(() => import('src/pages/driver-profile'));
 export const SetupStorePage = lazy(() => import('src/pages/setup-store'));
 export const LiveryShowcasePage = lazy(() => import('src/pages/livery-showcase'));
+export const ResultsPage = lazy(() => import('src/pages/results'));
+export const ResultDetailPage = lazy(() => import('src/pages/result-detail'));
 export const LoginPage = lazy(() => import('src/pages/login'));
 export const Page404 = lazy(() => import('src/pages/page-not-found'));
 
@@ -72,6 +74,8 @@ export const routesSection: RouteObject[] = [
       { path: APP_ROUTES.driverPattern.slice(1), element: <DriverProfilePage /> },
       { path: APP_ROUTES.setupStore.slice(1), element: <SetupStorePage /> },
       { path: APP_ROUTES.liveryShowcase.slice(1), element: <LiveryShowcasePage /> },
+      { path: APP_ROUTES.results.slice(1), element: <ResultsPage /> },
+      { path: APP_ROUTES.resultPattern.slice(1), element: <ResultDetailPage /> },
       { path: APP_ROUTES.admin.slice(1), element: <AdminPage /> },
       { path: `${APP_ROUTES.admin.slice(1)}/server`, element: <AdminServerPage /> },
       { path: `${APP_ROUTES.admin.slice(1)}/tracks`, element: <AdminTracksPage /> },

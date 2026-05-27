@@ -50,6 +50,12 @@ const PAGES = [
     description:
       'AC Elite setup store: community Assetto Corsa car setups (preview). Browse qualy, race and wet baselines.',
   },
+  {
+    route: 'results',
+    title: 'Results - AC Elite',
+    description:
+      'AC Elite session results: review every race, qualify and practice with full classification, laps and incidents.',
+  },
 ];
 
 function replaceTag(html, attr, value) {

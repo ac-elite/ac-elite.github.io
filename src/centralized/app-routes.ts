@@ -6,6 +6,8 @@ export const APP_ROUTES = {
   hallOfFame: '/hall-of-fame',
   setupStore: '/setup-store',
   liveryShowcase: '/livery-showcase',
+  results: '/results',
+  resultPattern: '/results/:sessionId',
   admin: '/admin',
   login: '/login',
   driverPattern: '/driver/:driverGuid',
@@ -14,4 +16,8 @@ export const APP_ROUTES = {
 
 export function getDriverRoute(driverGuid: string): string {
   return `/driver/${encodeURIComponent(driverGuid)}`;
+}
+
+export function getResultRoute(sessionId: number | string): string {
+  return `/results/${encodeURIComponent(String(sessionId))}`;
 }

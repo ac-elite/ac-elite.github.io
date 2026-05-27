@@ -44,6 +44,7 @@ const baseNavData: NavItem[] = [
   { title: 'Stats', path: APP_ROUTES.dashboard, iconName: NAV_ICON_NAMES.stats },
   { title: 'Leaderboard', path: APP_ROUTES.leaderboard, iconName: NAV_ICON_NAMES.leaderboard },
   { title: 'Rankings', path: APP_ROUTES.rankings, iconName: NAV_ICON_NAMES.rankings },
+  { title: 'Results', path: APP_ROUTES.results, iconName: NAV_ICON_NAMES.results },
   { title: 'Hall of Fame', path: APP_ROUTES.hallOfFame, iconName: NAV_ICON_NAMES.trophy },
   { title: 'Livery Showcase', path: APP_ROUTES.liveryShowcase, iconName: NAV_ICON_NAMES.livery },
   {
