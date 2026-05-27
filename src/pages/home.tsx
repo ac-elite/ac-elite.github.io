@@ -129,6 +129,7 @@ type DriverView = {
   safety: number;
   safetyTier: string;
   teamRole: TeamRole;
+  lastSeenMs?: number;
 };
 
 type CurrentTrackData = CurrentTrackPayload;
@@ -309,6 +310,22 @@ function buildCommunityPulse(rankData: RankDriver[]) {
     srAxisMin,
     totalLaps7d,
   };
+}
+
+function formatDriverLastSeen(timestamp?: number) {
+  if (timestamp == null) return 'Unknown';
+
+  const deltaMs = Date.now() - timestamp;
+  if (deltaMs < 2 * 60 * 1000) return 'Just now';
+
+  const minutes = Math.floor(deltaMs / (60 * 1000));
+  if (minutes < 60) return `${minutes}m ago`;
+
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+
+  const days = Math.floor(hours / 24);
+  return `${days}d ago`;
 }
 
 function CommunityPulseCard({
@@ -1002,6 +1019,15 @@ function DriverSearchSection({
       })
       .slice(0, 8);
   }, [drivers, query]);
+  const recentDrivers = useMemo(
+    () =>
+      drivers
+        .filter((driver) => driver.lastSeenMs != null)
+        .sort((a, b) => (b.lastSeenMs || 0) - (a.lastSeenMs || 0))
+        .slice(0, 5),
+    [drivers]
+  );
+  const hasSearchQuery = query.trim().length > 0;
 
   return (
     <Box
@@ -1085,7 +1111,7 @@ function DriverSearchSection({
                   }}
                 />
 
-                {!loading && !error && matches.length > 0 && (
+                {!loading && !error && hasSearchQuery && matches.length > 0 && (
                   <Paper
                     sx={{
                       ...GLASS_CARD_INNER_SX,
@@ -1151,6 +1177,120 @@ function DriverSearchSection({
                                   sx={{ fontWeight: 700, ...getSRBadgeSx(driver.safetyTier) }}
                                 />
                               </Stack>
+                            }
+                          />
+                        </ListItemButton>
+                      ))}
+                    </List>
+                  </Paper>
+                )}
+
+                {!loading && !error && !hasSearchQuery && recentDrivers.length > 0 && (
+                  <Paper
+                    sx={{
+                      ...GLASS_CARD_INNER_SX,
+                      width: '100%',
+                      mt: 1,
+                      overflow: 'hidden',
+                    }}
+                  >
+                    <Stack
+                      direction="row"
+                      sx={{
+                        px: 1.75,
+                        py: 1.25,
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        borderBottom: '1px solid rgba(255,255,255,0.08)',
+                      }}
+                    >
+                      <Typography
+                        variant="subtitle2"
+                        sx={{ fontWeight: 800, color: 'rgba(255,255,255,0.88)' }}
+                      >
+                        Recently active
+                      </Typography>
+                      <Typography
+                        variant="caption"
+                        sx={{ color: syncStatus.color, fontWeight: 800 }}
+                      >
+                        Live
+                      </Typography>
+                    </Stack>
+                    <List dense disablePadding sx={{ width: '100%' }}>
+                      {recentDrivers.map((driver) => (
+                        <ListItemButton
+                          key={driver.guid}
+                          onClick={() => {
+                            window.location.href = getDriverProfileHref(driver.guid);
+                          }}
+                          sx={{
+                            width: '100%',
+                            px: 1.75,
+                            py: 1.15,
+                            borderBottom: '1px solid rgba(255,255,255,0.06)',
+                            '&:last-of-type': { borderBottom: 0 },
+                            '&:hover': { bgcolor: 'rgba(255,255,255,0.12)' },
+                          }}
+                        >
+                          <ListItemText
+                            sx={{ width: '100%', m: 0 }}
+                            primary={
+                              <Stack
+                                direction="row"
+                                spacing={1}
+                                alignItems="center"
+                                flexWrap="wrap"
+                                sx={{ width: '100%' }}
+                              >
+                                <Link
+                                  href={getDriverProfileHref(driver.guid)}
+                                  onClick={(e) => e.stopPropagation()}
+                                  underline="none"
+                                  color="inherit"
+                                  variant="body2"
+                                  sx={{ fontWeight: 700 }}
+                                >
+                                  {driver.name}
+                                </Link>
+                                {driver.teamRole && teamRoleToDiscordRole(driver.teamRole) && (
+                                  <Chip
+                                    size="small"
+                                    label={teamRoleToDiscordRole(driver.teamRole)}
+                                    sx={{
+                                      fontWeight: 700,
+                                      fontSize: '0.72rem',
+                                      ...ROLE_CHIP_SX[teamRoleToDiscordRole(driver.teamRole)!],
+                                    }}
+                                  />
+                                )}
+                                <Chip
+                                  size="small"
+                                  label={driver.license}
+                                  sx={{ fontWeight: 700, ...getLicenseBadgeSx(driver.license) }}
+                                />
+                                <Chip
+                                  size="small"
+                                  label={`${driver.safetyTier} | ${driver.safety.toFixed(2)}`}
+                                  sx={{ fontWeight: 700, ...getSRBadgeSx(driver.safetyTier) }}
+                                />
+                              </Stack>
+                            }
+                            secondary={
+                              <Typography
+                                component="span"
+                                variant="caption"
+                                sx={{
+                                  display: 'block',
+                                  mt: 0.45,
+                                  color: 'rgba(255,255,255,0.58)',
+                                  fontWeight: 600,
+                                }}
+                              >
+                                {formatDriverLastSeen(driver.lastSeenMs)} ·{' '}
+                                {formatNumber(driver.totalLaps)} laps ·{' '}
+                                {formatNumber(driver.tracksDriven)} tracks
+                              </Typography>
                             }
                           />
                         </ListItemButton>
@@ -1406,6 +1546,7 @@ export default function Page() {
         safety,
         safetyTier,
         teamRole: role,
+        lastSeenMs: parseTimestamp(driver.last_seen),
       };
     });
   }, [rankData, teamRoles]);
