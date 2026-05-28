@@ -16,6 +16,7 @@ export const NAV_ICON_NAMES = {
   trophy: 'solar:cup-star',
   livery: 'solar:palette-round',
   setup: 'solar:tuning-2',
+  results: 'solar:flag-2',
 } as const;
 
 const DEFAULT_NAV_ICON_SIZE = 25.5;
@@ -44,4 +45,5 @@ export const dataPageHeaderIcons: Record<string, React.ReactNode> = {
   Leaderboard: renderNavIcon(NAV_ICON_NAMES.leaderboard, true),
   'Hall of Fame': renderNavIcon(NAV_ICON_NAMES.trophy, true),
   'Livery Showcase': renderNavIcon(NAV_ICON_NAMES.livery, true),
+  Results: renderNavIcon(NAV_ICON_NAMES.results, true),
 };
