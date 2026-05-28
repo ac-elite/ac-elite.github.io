@@ -21,6 +21,8 @@
  *   FTP_SECURE           "true" for FTPS (default false)
  *   RESULTS_REMOTE_DIR   remote folder to read (default "results")
  *   RESULTS_MAX_PER_RUN  max new files to ingest per run (default 30)
+ *   RESULTS_SINCE        only ingest sessions on/after this date, e.g. "2026-05-27"
+ *                        (older files are skipped by filename date, never downloaded)
  */
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.1';
 import ftp from 'npm:basic-ftp@5.0.5';
@@ -321,8 +323,16 @@ Deno.serve(async (req) => {
     if (!data || data.length < 1000) break;
   }
 
+  // Optional cutoff: only ingest sessions on/after RESULTS_SINCE (e.g. "2026-05-27").
+  // The date is read straight from the filename (YYYY_M_D_H_MM_TYPE.json), so older
+  // files are skipped *before* any download — no backfill of ancient history, and
+  // they're never recorded (cheap to re-skip each run by date).
+  const sinceEnv = Deno.env.get('RESULTS_SINCE');
+  const sinceMs = sinceEnv ? Date.parse(sinceEnv) : NaN;
+
   const todo = remoteFiles
     .filter((name) => !existing.has(name))
+    .filter((name) => Number.isNaN(sinceMs) || fileSortKey(name) >= sinceMs)
     .sort((a, b) => fileSortKey(b) - fileSortKey(a)) // newest first
     .slice(0, maxPerRun);
 
