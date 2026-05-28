@@ -3,7 +3,6 @@ import { useParams } from 'react-router-dom';
 
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
-import Link from '@mui/material/Link';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import Table from '@mui/material/Table';
@@ -19,12 +18,28 @@ import Typography from '@mui/material/Typography';
 import TableContainer from '@mui/material/TableContainer';
 
 import { CONFIG } from 'src/config-global';
-import { formatLaptime, getPodiumChipSx, getTrackDisplayName } from 'src/lib/ac-elite-data';
+import { DATA_FILES } from 'src/centralized/data-files';
+import { fetchJson } from 'src/lib/fetch-json';
 import { getResultsIndexHref, getDriverProfileHref } from 'src/lib/routes';
 import { glassCardMotionSx } from 'src/lib/subtle-motion';
 import { brandAccentBorderSx } from 'src/lib/status-accent';
+import { useTrackCatalogVersion } from 'src/centralized/track-info';
+import { getTrackHeroImageSrc, getTrackHeroImageOffsetY } from 'src/lib/track-hero';
 import { GLASS_PANEL_SX, getPodiumRowSx, GLASS_TABLE_WRAPPER_SX } from 'src/lib/glass';
 import { DATA_PAGE_SHELL_SX } from 'src/lib/page-shell';
+import {
+  getDriverSR,
+  getSRBadgeSx,
+  formatLaptime,
+  SR_CHIP_WIDTH,
+  type RankDriver,
+  getPodiumChipSx,
+  getDriverLicense,
+  computeLicenseMap,
+  getLicenseBadgeSx,
+  LICENSE_CHIP_WIDTH,
+  getTrackDisplayName,
+} from 'src/lib/ac-elite-data';
 import {
   formatGap,
   type LapRow,
@@ -39,11 +54,18 @@ import { PageGridOverlay } from 'src/components/page-background/page-grid-overla
 
 const TYPE_LABEL: Record<string, string> = { RACE: 'Race', QUALIFY: 'Qualify', PRACTICE: 'Practice' };
 
+const TYPE_CHIP_SX: Record<string, object> = {
+  RACE: { bgcolor: 'rgba(34,197,94,0.18)', color: '#86efac', border: '1px solid rgba(34,197,94,0.36)' },
+  QUALIFY: { bgcolor: 'rgba(245,158,11,0.18)', color: '#fcd34d', border: '1px solid rgba(245,158,11,0.36)' },
+  PRACTICE: { bgcolor: 'rgba(148,163,184,0.18)', color: '#e2e8f0', border: '1px solid rgba(148,163,184,0.36)' },
+};
+
 function formatSessionDate(iso: string | null): string {
   if (!iso) return '';
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return '';
-  return d.toLocaleString(undefined, {
+  // Fixed en-GB locale so the date reads the same for everyone (was browser-locale).
+  return d.toLocaleString('en-GB', {
     weekday: 'short',
     year: 'numeric',
     month: 'short',
@@ -88,7 +110,15 @@ function classificationGap(
   return formatGap(leader.bestLapMs, row.bestLapMs);
 }
 
-function DriverLaps({ name, guid, laps, sessionBestMs }: { name: string; guid: string; laps: LapRow[]; sessionBestMs: number | null }) {
+function DriverLaps({
+  name,
+  laps,
+  sessionBestMs,
+}: {
+  name: string;
+  laps: LapRow[];
+  sessionBestMs: number | null;
+}) {
   const [open, setOpen] = useState(false);
   const driverBest = useMemo(
     () => laps.reduce((m, l) => (l.lapMs > 0 && (m === null || l.lapMs < m) ? l.lapMs : m), null as number | null),
@@ -100,24 +130,11 @@ function DriverLaps({ name, guid, laps, sessionBestMs }: { name: string; guid: s
       <Button
         fullWidth
         onClick={() => setOpen((v) => !v)}
-        sx={{
-          justifyContent: 'space-between',
-          px: 2,
-          py: 1.25,
-          color: 'text.primary',
-          textTransform: 'none',
-          fontWeight: 700,
-        }}
+        sx={{ justifyContent: 'space-between', px: 2, py: 1.25, color: 'text.primary', textTransform: 'none', fontWeight: 700 }}
       >
-        <Link
-          href={getDriverProfileHref(guid)}
-          onClick={(e) => e.stopPropagation()}
-          underline="none"
-          color="inherit"
-          sx={{ fontWeight: 700 }}
-        >
+        <Typography component="span" sx={{ fontWeight: 700 }}>
           {name || 'Unknown'}
-        </Link>
+        </Typography>
         <Typography component="span" variant="body2" sx={{ color: 'text.secondary' }}>
           {laps.length} lap{laps.length === 1 ? '' : 's'} · best {formatLaptime(driverBest)} {open ? '▲' : '▼'}
         </Typography>
@@ -133,7 +150,6 @@ function DriverLaps({ name, guid, laps, sessionBestMs }: { name: string; guid: s
                 <TableCell align="right">S2</TableCell>
                 <TableCell align="right">S3</TableCell>
                 <TableCell align="center">Tyre</TableCell>
-                <TableCell align="center">Cuts</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -149,7 +165,6 @@ function DriverLaps({ name, guid, laps, sessionBestMs }: { name: string; guid: s
                     <TableCell align="right" sx={{ fontVariantNumeric: 'tabular-nums' }}>{formatSector(l.sectors[1])}</TableCell>
                     <TableCell align="right" sx={{ fontVariantNumeric: 'tabular-nums' }}>{formatSector(l.sectors[2])}</TableCell>
                     <TableCell align="center">{l.tyre || '—'}</TableCell>
-                    <TableCell align="center" sx={{ color: l.cuts > 0 ? '#fca5a5' : 'text.secondary' }}>{l.cuts}</TableCell>
                   </TableRow>
                 );
               })}
@@ -162,10 +177,15 @@ function DriverLaps({ name, guid, laps, sessionBestMs }: { name: string; guid: s
 }
 
 export default function Page() {
+  useTrackCatalogVersion(); // re-render once the live track catalog (names + hero images) loads
   const { sessionId } = useParams<{ sessionId: string }>();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [session, setSession] = useState<SessionFull | null>(null);
+
+  // Live rank data → per-driver License + Safety Rating chips.
+  const [licenseMap, setLicenseMap] = useState<ReturnType<typeof computeLicenseMap> | null>(null);
+  const [rankByGuid, setRankByGuid] = useState<Map<string, RankDriver>>(new Map());
 
   useEffect(() => {
     let mounted = true;
@@ -189,6 +209,26 @@ export default function Page() {
     };
   }, [sessionId]);
 
+  useEffect(() => {
+    let mounted = true;
+    fetchJson<RankDriver[]>(DATA_FILES.rank)
+      .then((rank) => {
+        if (!mounted) return;
+        setLicenseMap(computeLicenseMap(rank));
+        setRankByGuid(new Map(rank.map((d) => [d.guid, d])));
+      })
+      .catch(() => {});
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const driverBadges = (guid: string): { license: string; srTier: string } | null => {
+    const d = rankByGuid.get(guid);
+    if (!d || !licenseMap) return null;
+    return { license: getDriverLicense(d, licenseMap).license, srTier: getDriverSR(d).tier };
+  };
+
   const isRace = session?.type === 'RACE';
   const classification = session?.detail?.classification ?? [];
   const leader = classification[0];
@@ -204,9 +244,10 @@ export default function Page() {
   }, [session]);
 
   const incidents = session?.detail?.incidents ?? [];
-  const title = session
-    ? `${session.track_name ? getTrackDisplayName(session.track_name) : 'Session'} — ${TYPE_LABEL[session.type] ?? session.type}`
-    : 'Session';
+  const trackName = session?.track_name ? getTrackDisplayName(session.track_name) : 'Session';
+  const heroSrc = session?.track_name ? getTrackHeroImageSrc(session.track_name) : null;
+  const heroOffsetY = session?.track_name ? getTrackHeroImageOffsetY(session.track_name) : 0;
+  const title = session ? `${trackName} — ${TYPE_LABEL[session.type] ?? session.type}` : 'Session';
 
   return (
     <>
@@ -217,10 +258,6 @@ export default function Page() {
 
         <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1 }}>
           <Stack spacing={3}>
-            <Link href={getResultsIndexHref()} underline="none" sx={{ fontWeight: 700, color: 'text.secondary' }}>
-              ← All results
-            </Link>
-
             {loading && (
               <LoadingPanel title="Loading session…" message="Fetching classification, laps and incidents.">
                 <Skeleton variant="rounded" height={400} sx={{ borderRadius: 2, bgcolor: 'rgba(255,255,255,0.05)' }} />
@@ -231,39 +268,108 @@ export default function Page() {
 
             {!loading && !error && session && (
               <>
-                <Paper sx={{ ...GLASS_PANEL_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(0) }}>
-                  <Stack spacing={1.5}>
-                    <Stack direction="row" spacing={1.5} alignItems="center" flexWrap="wrap">
-                      <Typography component="h1" variant="h4" fontWeight={800}>
-                        {session.track_name ? getTrackDisplayName(session.track_name) : 'Session'}
-                      </Typography>
-                      <Chip size="small" label={TYPE_LABEL[session.type] ?? session.type} sx={{ fontWeight: 700 }} />
-                    </Stack>
-                    {session.event_name ? (
-                      <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                        {session.event_name}
-                      </Typography>
-                    ) : null}
-                    <Stack direction="row" spacing={3} flexWrap="wrap" useFlexGap sx={{ pt: 0.5 }}>
-                      <HeaderStat label="Date" value={formatSessionDate(session.session_date) || '—'} />
-                      <HeaderStat label="Drivers" value={session.num_drivers} />
-                      {isRace ? <HeaderStat label="Laps" value={session.num_laps} /> : null}
-                      <HeaderStat
-                        label="Fastest lap"
-                        value={
-                          session.best_lap_ms
-                            ? `${formatLaptime(session.best_lap_ms)}${session.best_lap_name ? ` · ${session.best_lap_name}` : ''}`
-                            : '—'
-                        }
+                {/* Hero header */}
+                <Paper sx={{ ...GLASS_PANEL_SX, p: 0, overflow: 'hidden', ...brandAccentBorderSx(), ...glassCardMotionSx(0) }}>
+                  <Box sx={{ position: 'relative', lineHeight: 0 }}>
+                    {heroSrc ? (
+                      <Box
+                        component="img"
+                        src={heroSrc}
+                        alt=""
+                        sx={{
+                          width: '100%',
+                          height: { xs: 150, sm: 200 },
+                          objectFit: 'cover',
+                          objectPosition: heroOffsetY === 0 ? 'center' : `center calc(50% + ${heroOffsetY}px)`,
+                          display: 'block',
+                        }}
                       />
-                    </Stack>
+                    ) : (
+                      <Box
+                        aria-hidden
+                        sx={{
+                          width: '100%',
+                          height: { xs: 150, sm: 200 },
+                          background:
+                            'radial-gradient(circle at 85% 10%, rgba(147,197,253,0.14), transparent 45%), linear-gradient(180deg, rgba(16,20,32,0.92), rgba(10,14,24,0.95))',
+                        }}
+                      />
+                    )}
+                    {/* darkening overlay for legibility */}
+                    <Box
+                      aria-hidden
+                      sx={{
+                        position: 'absolute',
+                        inset: 0,
+                        background:
+                          'linear-gradient(180deg, rgba(6,10,20,0.15) 0%, rgba(7,12,24,0.45) 50%, rgba(8,14,28,0.9) 100%)',
+                      }}
+                    />
+                    {/* back button — top-left, inside the card */}
+                    <Box sx={{ position: 'absolute', top: 12, left: 12 }}>
+                      <Button
+                        size="small"
+                        onClick={() => {
+                          window.location.href = getResultsIndexHref();
+                        }}
+                        sx={{
+                          textTransform: 'none',
+                          fontWeight: 700,
+                          color: 'rgba(255,255,255,0.92)',
+                          bgcolor: 'rgba(8,14,28,0.5)',
+                          border: '1px solid rgba(255,255,255,0.18)',
+                          backdropFilter: 'blur(8px)',
+                          px: 1.25,
+                          '&:hover': { bgcolor: 'rgba(8,14,28,0.7)' },
+                        }}
+                      >
+                        ← All results
+                      </Button>
+                    </Box>
+                    {/* title block — bottom-left */}
+                    <Box sx={{ position: 'absolute', left: 16, right: 16, bottom: 12 }}>
+                      <Stack direction="row" spacing={1.25} alignItems="center" flexWrap="wrap">
+                        <Typography component="h1" variant="h4" fontWeight={800} sx={{ color: '#fff', lineHeight: 1.1 }}>
+                          {trackName}
+                        </Typography>
+                        <Chip size="small" label={TYPE_LABEL[session.type] ?? session.type} sx={{ fontWeight: 800, ...(TYPE_CHIP_SX[session.type] ?? {}) }} />
+                      </Stack>
+                      {session.event_name ? (
+                        <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.78)', mt: 0.5 }}>
+                          {session.event_name}
+                        </Typography>
+                      ) : null}
+                    </Box>
+                  </Box>
+                  {/* stats strip */}
+                  <Stack
+                    direction="row"
+                    spacing={4}
+                    flexWrap="wrap"
+                    useFlexGap
+                    sx={{ px: 2.5, py: 2, bgcolor: 'rgba(255,255,255,0.03)' }}
+                  >
+                    <HeaderStat label="Date" value={formatSessionDate(session.session_date) || '—'} />
+                    <HeaderStat label="Drivers" value={session.num_drivers} />
+                    {isRace ? <HeaderStat label="Laps" value={session.num_laps} /> : null}
+                    <HeaderStat
+                      label="Fastest lap"
+                      value={
+                        session.best_lap_ms
+                          ? `${formatLaptime(session.best_lap_ms)}${session.best_lap_name ? ` · ${session.best_lap_name}` : ''}`
+                          : '—'
+                      }
+                    />
                   </Stack>
                 </Paper>
 
                 {/* Classification */}
                 <Paper sx={{ ...GLASS_TABLE_WRAPPER_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(1) }}>
                   <TableContainer>
-                    <Table size="small">
+                    <Table
+                      size="small"
+                      sx={{ '& .MuiTableBody-root .MuiTableRow-root:hover': { backgroundColor: 'rgba(255,255,255,0.028)' } }}
+                    >
                       <TableHead>
                         <TableRow>
                           <TableCell>#</TableCell>
@@ -278,42 +384,68 @@ export default function Page() {
                         </TableRow>
                       </TableHead>
                       <TableBody>
-                        {classification.map((row) => (
-                          <TableRow
-                            key={`${row.guid}-${row.pos}`}
-                            sx={{ ...(row.pos >= 1 && row.pos <= 3 ? getPodiumRowSx(row.pos as 1 | 2 | 3) : {}) }}
-                          >
-                            <TableCell>
-                              <Chip size="small" label={row.pos} sx={{ minWidth: 38, fontWeight: 700, ...getPodiumChipSx(row.pos) }} />
-                            </TableCell>
-                            <TableCell sx={{ fontWeight: 700 }}>
-                              <Link
-                                href={getDriverProfileHref(row.guid)}
-                                underline="none"
-                                color="inherit"
-                                sx={{ fontWeight: 700 }}
-                              >
-                                {row.name || 'Unknown'}
-                              </Link>
-                              {row.disqualified ? (
-                                <Chip size="small" label="DSQ" sx={{ ml: 1, height: 18, fontSize: 10, fontWeight: 800, bgcolor: 'rgba(239,68,68,0.18)', color: '#fca5a5' }} />
+                        {classification.map((row) => {
+                          const badges = driverBadges(row.guid);
+                          return (
+                            <TableRow
+                              key={`${row.guid}-${row.pos}`}
+                              onClick={() => {
+                                window.location.href = getDriverProfileHref(row.guid);
+                              }}
+                              sx={{
+                                cursor: 'pointer',
+                                ...(row.pos >= 1 && row.pos <= 3 ? getPodiumRowSx(row.pos as 1 | 2 | 3) : {}),
+                              }}
+                            >
+                              <TableCell>
+                                <Chip size="small" label={row.pos} sx={{ minWidth: 38, fontWeight: 700, ...getPodiumChipSx(row.pos) }} />
+                              </TableCell>
+                              <TableCell>
+                                <Stack spacing={0.6}>
+                                  <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
+                                    <Typography component="span" sx={{ fontWeight: 700 }}>
+                                      {row.name || 'Unknown'}
+                                    </Typography>
+                                    {row.disqualified ? (
+                                      <Chip
+                                        size="small"
+                                        label="DSQ"
+                                        sx={{ height: 18, fontSize: 10, fontWeight: 800, bgcolor: 'rgba(239,68,68,0.18)', color: '#fca5a5' }}
+                                      />
+                                    ) : null}
+                                  </Stack>
+                                  {badges ? (
+                                    <Stack direction="row" spacing={0.75} alignItems="center">
+                                      <Chip
+                                        size="small"
+                                        label={badges.license}
+                                        sx={{ height: 20, minWidth: LICENSE_CHIP_WIDTH, fontWeight: 700, justifyContent: 'center', ...getLicenseBadgeSx(badges.license) }}
+                                      />
+                                      <Chip
+                                        size="small"
+                                        label={badges.srTier}
+                                        sx={{ height: 20, minWidth: SR_CHIP_WIDTH, fontWeight: 700, justifyContent: 'center', ...getSRBadgeSx(badges.srTier) }}
+                                      />
+                                    </Stack>
+                                  ) : null}
+                                </Stack>
+                              </TableCell>
+                              <TableCell sx={{ color: 'text.secondary' }}>{row.skin || row.carModel || '—'}</TableCell>
+                              <TableCell align="right" sx={{ fontVariantNumeric: 'tabular-nums' }}>{formatLaptime(row.bestLapMs)}</TableCell>
+                              {isRace ? (
+                                <TableCell align="right" sx={{ fontVariantNumeric: 'tabular-nums' }}>{formatTotalTime(row.totalTimeMs)}</TableCell>
                               ) : null}
-                            </TableCell>
-                            <TableCell sx={{ color: 'text.secondary' }}>{row.skin || row.carModel || '—'}</TableCell>
-                            <TableCell align="right" sx={{ fontVariantNumeric: 'tabular-nums' }}>{formatLaptime(row.bestLapMs)}</TableCell>
-                            {isRace ? (
-                              <TableCell align="right" sx={{ fontVariantNumeric: 'tabular-nums' }}>{formatTotalTime(row.totalTimeMs)}</TableCell>
-                            ) : null}
-                            <TableCell align="right" sx={{ fontVariantNumeric: 'tabular-nums', color: 'text.secondary' }}>
-                              {classificationGap(isRace, leader, row)}
-                            </TableCell>
-                            <TableCell align="right">{row.numLaps}</TableCell>
-                            <TableCell align="right" sx={{ color: 'text.secondary' }}>{row.gridPosition || '—'}</TableCell>
-                            <TableCell align="right" sx={{ color: row.penaltyTimeMs || row.lapPenalty ? '#fca5a5' : 'text.secondary' }}>
-                              {row.lapPenalty ? `${row.lapPenalty} lap` : row.penaltyTimeMs ? `+${(row.penaltyTimeMs / 1000).toFixed(0)}s` : '—'}
-                            </TableCell>
-                          </TableRow>
-                        ))}
+                              <TableCell align="right" sx={{ fontVariantNumeric: 'tabular-nums', color: 'text.secondary' }}>
+                                {classificationGap(isRace, leader, row)}
+                              </TableCell>
+                              <TableCell align="right">{row.numLaps}</TableCell>
+                              <TableCell align="right" sx={{ color: 'text.secondary' }}>{row.gridPosition || '—'}</TableCell>
+                              <TableCell align="right" sx={{ color: row.penaltyTimeMs || row.lapPenalty ? '#fca5a5' : 'text.secondary' }}>
+                                {row.lapPenalty ? `${row.lapPenalty} lap` : row.penaltyTimeMs ? `+${(row.penaltyTimeMs / 1000).toFixed(0)}s` : '—'}
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })}
                       </TableBody>
                     </Table>
                   </TableContainer>
@@ -327,15 +459,7 @@ export default function Page() {
                   {classification.map((row) => {
                     const driverLaps = lapsByGuid.get(row.guid) ?? [];
                     if (driverLaps.length === 0) return null;
-                    return (
-                      <DriverLaps
-                        key={row.guid}
-                        guid={row.guid}
-                        name={row.name}
-                        laps={driverLaps}
-                        sessionBestMs={session.best_lap_ms}
-                      />
-                    );
+                    return <DriverLaps key={row.guid} name={row.name} laps={driverLaps} sessionBestMs={session.best_lap_ms} />;
                   })}
                 </Paper>
 
@@ -369,23 +493,9 @@ export default function Page() {
                                   }}
                                 />
                               </TableCell>
-                              <TableCell sx={{ fontWeight: 600 }}>
-                                {inc.guid ? (
-                                  <Link href={getDriverProfileHref(inc.guid)} underline="none" color="inherit" sx={{ fontWeight: 600 }}>
-                                    {inc.name || 'Unknown'}
-                                  </Link>
-                                ) : (
-                                  inc.name || 'Unknown'
-                                )}
-                              </TableCell>
+                              <TableCell sx={{ fontWeight: 600 }}>{inc.name || 'Unknown'}</TableCell>
                               <TableCell sx={{ color: 'text.secondary' }}>
-                                {inc.type === 'CAR' && inc.otherGuid ? (
-                                  <Link href={getDriverProfileHref(inc.otherGuid)} underline="none" color="inherit">
-                                    {inc.otherName || 'Unknown'}
-                                  </Link>
-                                ) : (
-                                  '—'
-                                )}
+                                {inc.type === 'CAR' ? inc.otherName || 'Unknown' : '—'}
                               </TableCell>
                               <TableCell align="right" sx={{ fontVariantNumeric: 'tabular-nums' }}>{inc.impactSpeed.toFixed(1)}</TableCell>
                             </TableRow>

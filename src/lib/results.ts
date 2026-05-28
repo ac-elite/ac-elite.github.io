@@ -123,6 +123,24 @@ export async function fetchSessions(
   return { rows, total: parseTotal(res.headers.get('content-range')) };
 }
 
+/** Session types actually present (listed) — so the filter only offers real ones. */
+export async function fetchSessionTypeOptions(): Promise<SessionType[]> {
+  if (!supabaseReadConfigured()) return [];
+  const params = new URLSearchParams({ select: 'type', listed: 'eq.true' });
+  try {
+    const res = await fetch(restUrl('sessions', params), {
+      headers: { ...(supabaseHeaders() as Record<string, string>), 'Range-Unit': 'items', Range: '0-4999' },
+    });
+    if (!res.ok) return [];
+    const rows = (await res.json()) as { type: SessionType }[];
+    const present = new Set(rows.map((r) => r.type));
+    // Stable display order.
+    return (['RACE', 'QUALIFY', 'PRACTICE'] as SessionType[]).filter((t) => present.has(t));
+  } catch {
+    return [];
+  }
+}
+
 /** Distinct track ids present in the sessions table, for the track filter. */
 export async function fetchSessionTrackOptions(): Promise<string[]> {
   if (!supabaseReadConfigured()) return [];

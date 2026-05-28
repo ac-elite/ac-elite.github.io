@@ -25,6 +25,7 @@ import { getSiteUrl } from 'src/centralized/site-urls';
 import { formatLaptime, getTrackDisplayName } from 'src/lib/ac-elite-data';
 import { getResultHref, getDriverProfileHref } from 'src/lib/routes';
 import { getSyncHealth } from 'src/lib/sync-utils';
+import { useTrackCatalogVersion } from 'src/centralized/track-info';
 import { subtleRowEnterSx, glassCardMotionSx } from 'src/lib/subtle-motion';
 import { brandAccentBorderSx } from 'src/lib/status-accent';
 import { GLASS_PANEL_SX, GLASS_TABLE_WRAPPER_SX, GLASS_TABLE_PAGINATION_SX } from 'src/lib/glass';
@@ -42,9 +43,11 @@ import {
 } from 'src/lib/page-shell';
 import {
   fetchSessions,
+  type SessionType,
   type SessionSummary,
   fetchResultsSyncedAt,
   type SessionTypeFilter,
+  fetchSessionTypeOptions,
   fetchSessionTrackOptions,
 } from 'src/lib/results';
 
@@ -55,12 +58,12 @@ import { PageGridOverlay } from 'src/components/page-background/page-grid-overla
 
 const RESULTS_PER_PAGE = 20;
 
-const TYPE_TABS: { key: SessionTypeFilter; label: string }[] = [
-  { key: 'ALL', label: 'All' },
-  { key: 'RACE', label: 'Race' },
-  { key: 'QUALIFY', label: 'Qualify' },
-  { key: 'PRACTICE', label: 'Practice' },
-];
+const TYPE_LABEL: Record<SessionTypeFilter, string> = {
+  ALL: 'All',
+  RACE: 'Race',
+  QUALIFY: 'Qualify',
+  PRACTICE: 'Practice',
+};
 
 const TYPE_CHIP_SX: Record<string, object> = {
   RACE: { bgcolor: 'rgba(34,197,94,0.14)', color: '#86efac', border: '1px solid rgba(34,197,94,0.32)' },
@@ -72,7 +75,8 @@ function formatSessionDate(iso: string | null): string {
   if (!iso) return '—';
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return '—';
-  return d.toLocaleString(undefined, {
+  // Fixed en-GB locale so the date reads the same for everyone (was browser-locale).
+  return d.toLocaleString('en-GB', {
     year: 'numeric',
     month: 'short',
     day: '2-digit',
@@ -152,26 +156,32 @@ function Paginate({
 }
 
 export default function Page() {
+  useTrackCatalogVersion(); // re-render once the live track catalog (readable names) loads
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [rows, setRows] = useState<SessionSummary[]>([]);
   const [total, setTotal] = useState(0);
   const [syncedAt, setSyncedAt] = useState<string | null>(null);
   const [trackOptions, setTrackOptions] = useState<string[]>([]);
+  const [typeOptions, setTypeOptions] = useState<SessionType[]>([]);
 
   const [type, setType] = useState<SessionTypeFilter>('ALL');
   const [track, setTrack] = useState<string>('ALL');
   const [page, setPage] = useState(1);
 
-  // Track filter options + freshness are fetched once.
+  // Filter options + freshness are fetched once.
   useEffect(() => {
     let mounted = true;
     void fetchResultsSyncedAt().then((at) => mounted && setSyncedAt(at));
     void fetchSessionTrackOptions().then((opts) => mounted && setTrackOptions(opts));
+    void fetchSessionTypeOptions().then((opts) => mounted && setTypeOptions(opts));
     return () => {
       mounted = false;
     };
   }, []);
+
+  // Only offer "All" + the session types that actually exist.
+  const typeTabs: SessionTypeFilter[] = ['ALL', ...typeOptions];
 
   useEffect(() => {
     let mounted = true;
@@ -226,19 +236,19 @@ export default function Page() {
               }}
             >
               <Stack direction="row" gap={1} flexWrap="wrap" justifyContent={{ xs: 'center', md: 'flex-start' }}>
-                {TYPE_TABS.map((item) => (
+                {typeTabs.map((key) => (
                   <Button
-                    key={item.key}
+                    key={key}
                     size="small"
-                    variant={type === item.key ? 'contained' : 'outlined'}
-                    color={type === item.key ? 'primary' : 'secondary'}
+                    variant={type === key ? 'contained' : 'outlined'}
+                    color={type === key ? 'primary' : 'secondary'}
                     onClick={() => {
-                      setType(item.key);
+                      setType(key);
                       setPage(1);
                     }}
                     sx={{ ...ACTION_OUTLINED_SMALL_DENSE_SX }}
                   >
-                    {item.label}
+                    {TYPE_LABEL[key]}
                   </Button>
                 ))}
               </Stack>
@@ -342,11 +352,6 @@ export default function Page() {
                               </TableCell>
                               <TableCell sx={{ fontWeight: 700 }}>
                                 {row.track_name ? getTrackDisplayName(row.track_name) : '—'}
-                                {row.event_name ? (
-                                  <Typography variant="caption" sx={{ display: 'block', color: 'text.secondary', fontWeight: 500 }}>
-                                    {row.event_name}
-                                  </Typography>
-                                ) : null}
                               </TableCell>
                               <TableCell align="right">{row.num_drivers}</TableCell>
                               <TableCell>
