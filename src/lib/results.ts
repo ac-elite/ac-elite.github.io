@@ -93,6 +93,8 @@ function parseTotal(contentRange: string | null): number {
 export type SessionsQuery = {
   type?: SessionTypeFilter;
   track?: string | 'ALL';
+  /** Free-text search across track / event / winner / driver names + guids / date. */
+  search?: string;
   page: number;
   perPage: number;
 };
@@ -107,6 +109,10 @@ export async function fetchSessions(
   params.set('listed', 'eq.true');
   if (q.type && q.type !== 'ALL') params.set('type', `eq.${q.type}`);
   if (q.track && q.track !== 'ALL') params.set('track_name', `eq.${q.track}`);
+  // Free-text: substring match against the denormalized `search` blob. Strip
+  // characters that have meaning in PostgREST filter syntax.
+  const term = (q.search ?? '').trim().toLowerCase().replace(/[,()*%]/g, ' ').replace(/\s+/g, ' ').trim();
+  if (term) params.set('search', `ilike.*${term}*`);
 
   const from = Math.max(0, (q.page - 1) * q.perPage);
   const to = from + q.perPage - 1;

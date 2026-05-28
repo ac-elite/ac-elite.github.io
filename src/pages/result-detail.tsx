@@ -397,6 +397,8 @@ export default function Page() {
                         <TableRow>
                           <TableCell>#</TableCell>
                           <TableCell>Driver</TableCell>
+                          <TableCell>License</TableCell>
+                          <TableCell>SR</TableCell>
                           <TableCell>Car</TableCell>
                           <TableCell align="right">Best lap</TableCell>
                           {isRace ? <TableCell align="right">Total time</TableCell> : null}
@@ -429,20 +431,6 @@ export default function Page() {
                                   <Typography component="span" sx={{ fontWeight: 700 }}>
                                     {row.name || 'Unknown'}
                                   </Typography>
-                                  {badges ? (
-                                    <Chip
-                                      size="small"
-                                      label={badges.license}
-                                      sx={{ minWidth: LICENSE_CHIP_WIDTH, fontWeight: 700, justifyContent: 'center', ...getLicenseBadgeSx(badges.license) }}
-                                    />
-                                  ) : null}
-                                  {badges ? (
-                                    <Chip
-                                      size="small"
-                                      label={badges.srTier}
-                                      sx={{ minWidth: SR_CHIP_WIDTH, fontWeight: 700, justifyContent: 'center', ...getSRBadgeSx(badges.srTier) }}
-                                    />
-                                  ) : null}
                                   {row.disqualified ? (
                                     <Chip
                                       size="small"
@@ -451,6 +439,28 @@ export default function Page() {
                                     />
                                   ) : null}
                                 </Stack>
+                              </TableCell>
+                              <TableCell>
+                                {badges ? (
+                                  <Chip
+                                    size="small"
+                                    label={badges.license}
+                                    sx={{ minWidth: LICENSE_CHIP_WIDTH, fontWeight: 700, justifyContent: 'center', ...getLicenseBadgeSx(badges.license) }}
+                                  />
+                                ) : (
+                                  <Typography component="span" variant="body2" sx={{ color: 'text.secondary' }}>—</Typography>
+                                )}
+                              </TableCell>
+                              <TableCell>
+                                {badges ? (
+                                  <Chip
+                                    size="small"
+                                    label={badges.srTier}
+                                    sx={{ minWidth: SR_CHIP_WIDTH, fontWeight: 700, justifyContent: 'center', ...getSRBadgeSx(badges.srTier) }}
+                                  />
+                                ) : (
+                                  <Typography component="span" variant="body2" sx={{ color: 'text.secondary' }}>—</Typography>
+                                )}
                               </TableCell>
                               <TableCell sx={{ color: 'text.secondary' }}>{row.skin || row.carModel || '—'}</TableCell>
                               <TableCell align="right" sx={{ fontVariantNumeric: 'tabular-nums' }}>{formatLaptime(row.bestLapMs)}</TableCell>

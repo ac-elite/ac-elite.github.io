@@ -231,6 +231,21 @@ function parseSession(raw: RawSession, fileName: string) {
   const activeDrivers = lapsByGuid.size;
   const listed = activeDrivers >= 2;
 
+  // Denormalized free-text search blob (track / event / winner / fastest-lap
+  // driver / date / every participant name + guid), lowercased.
+  const search = listed
+    ? [
+        raw.TrackName ?? '',
+        raw.EventName ?? '',
+        winner?.name ?? '',
+        bestLapName,
+        raw.Date ? new Date(raw.Date).toISOString().slice(0, 10) : '',
+        ...classification.map((c) => `${c.name} ${c.guid}`),
+      ]
+        .join(' ')
+        .toLowerCase()
+    : null;
+
   return {
     session_file: raw.SessionFile || fileName,
     type,
@@ -246,6 +261,7 @@ function parseSession(raw: RawSession, fileName: string) {
     winner_guid: listed ? winner?.guid ?? null : null,
     winner_name: listed ? winner?.name ?? null : null,
     listed,
+    search,
     detail: listed ? { classification, laps, incidents } : { classification: [], laps: [], incidents: [] },
   };
 }

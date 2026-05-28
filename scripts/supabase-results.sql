@@ -37,6 +37,7 @@ create table if not exists public.sessions (
   -- sessions are kept as `listed = false` markers (no detail) so the sync dedupes
   -- them without re-downloading, but they never show on the site.
   listed        boolean not null default true,
+  search        text,                           -- denormalized free-text blob (track/event/winner/driver names+guids/date)
   detail        jsonb not null default '{}'::jsonb,
   created_at    timestamptz not null default now()
 );
@@ -44,6 +45,10 @@ create table if not exists public.sessions (
 create index if not exists sessions_listed_date_idx on public.sessions (listed, session_date desc);
 create index if not exists sessions_type_idx  on public.sessions (type);
 create index if not exists sessions_track_idx on public.sessions (track_name);
+
+-- Fast ILIKE on the search blob.
+create extension if not exists pg_trgm;
+create index if not exists sessions_search_trgm on public.sessions using gin (search gin_trgm_ops);
 
 alter table public.sessions enable row level security;
 

@@ -15,6 +15,7 @@ import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import Container from '@mui/material/Container';
+import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import FormControl from '@mui/material/FormControl';
 import TableContainer from '@mui/material/TableContainer';
@@ -169,7 +170,18 @@ export default function Page() {
 
   const [type, setType] = useState<SessionTypeFilter>('ALL');
   const [track, setTrack] = useState<string>('ALL');
+  const [searchInput, setSearchInput] = useState('');
+  const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
+
+  // Debounce the search box so we don't query on every keystroke.
+  useEffect(() => {
+    const id = setTimeout(() => {
+      setSearch(searchInput);
+      setPage(1);
+    }, 300);
+    return () => clearTimeout(id);
+  }, [searchInput]);
 
   // Filter options + freshness are fetched once.
   useEffect(() => {
@@ -189,7 +201,7 @@ export default function Page() {
     let mounted = true;
     setLoading(true);
     setError(null);
-    fetchSessions({ type, track, page, perPage: RESULTS_PER_PAGE })
+    fetchSessions({ type, track, search, page, perPage: RESULTS_PER_PAGE })
       .then((res) => {
         if (!mounted) return;
         setRows(res.rows);
@@ -205,7 +217,7 @@ export default function Page() {
     return () => {
       mounted = false;
     };
-  }, [type, track, page]);
+  }, [type, track, search, page]);
 
   const totalPages = Math.max(1, Math.ceil(total / RESULTS_PER_PAGE));
   const syncHealth = useMemo(() => getSyncHealth(syncedAt ?? undefined), [syncedAt]);
@@ -237,6 +249,25 @@ export default function Page() {
                 textAlign: { xs: 'center', md: 'left' },
               }}
             >
+              <TextField
+                size="small"
+                fullWidth
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                placeholder="Search driver, track, winner or date…"
+                sx={{
+                  maxWidth: 480,
+                  mb: 1.5,
+                  '& .MuiOutlinedInput-root': {
+                    bgcolor: 'rgba(255,255,255,0.04)',
+                    color: 'text.primary',
+                    '& fieldset': { borderColor: 'rgba(255,255,255,0.18)' },
+                    '&:hover fieldset': { borderColor: 'rgba(255,255,255,0.3)' },
+                  },
+                  '& .MuiInputBase-input::placeholder': { color: 'rgba(255,255,255,0.5)', opacity: 1 },
+                }}
+              />
+
               <Stack direction="row" gap={1} flexWrap="wrap" justifyContent={{ xs: 'center', md: 'flex-start' }}>
                 {typeTabs.map((key) => (
                   <Button
