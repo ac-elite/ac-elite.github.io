@@ -24,7 +24,6 @@ import { getResultsIndexHref, getDriverProfileHref } from 'src/lib/routes';
 import { glassCardMotionSx } from 'src/lib/subtle-motion';
 import { brandAccentBorderSx } from 'src/lib/status-accent';
 import { useTrackCatalogVersion } from 'src/centralized/track-info';
-import { getTrackHeroImageSrc, getTrackHeroImageOffsetY } from 'src/lib/track-hero';
 import { GLASS_PANEL_SX, getPodiumRowSx, GLASS_TABLE_WRAPPER_SX } from 'src/lib/glass';
 import { DATA_PAGE_SHELL_SX } from 'src/lib/page-shell';
 import {
@@ -38,11 +37,11 @@ import {
   computeLicenseMap,
   getLicenseBadgeSx,
   LICENSE_CHIP_WIDTH,
-  getTrackDisplayName,
 } from 'src/lib/ac-elite-data';
 import {
   formatGap,
   type LapRow,
+  resolveTrack,
   formatTotalTime,
   fetchSessionById,
   type SessionFull,
@@ -54,10 +53,12 @@ import { PageGridOverlay } from 'src/components/page-background/page-grid-overla
 
 const TYPE_LABEL: Record<string, string> = { RACE: 'Race', QUALIFY: 'Qualify', PRACTICE: 'Practice' };
 
+// Solid, high-contrast chips — they sit on the dark hero image, so a tint + light
+// text reads as an empty pill. Dark text on a bright fill is clearly legible.
 const TYPE_CHIP_SX: Record<string, object> = {
-  RACE: { bgcolor: 'rgba(34,197,94,0.18)', color: '#86efac', border: '1px solid rgba(34,197,94,0.36)' },
-  QUALIFY: { bgcolor: 'rgba(245,158,11,0.18)', color: '#fcd34d', border: '1px solid rgba(245,158,11,0.36)' },
-  PRACTICE: { bgcolor: 'rgba(148,163,184,0.18)', color: '#e2e8f0', border: '1px solid rgba(148,163,184,0.36)' },
+  RACE: { bgcolor: '#22c55e', color: '#04210f' },
+  QUALIFY: { bgcolor: '#f59e0b', color: '#2a1800' },
+  PRACTICE: { bgcolor: '#cbd5e1', color: '#0b1220' },
 };
 
 function formatSessionDate(iso: string | null): string {
@@ -244,9 +245,22 @@ export default function Page() {
   }, [session]);
 
   const incidents = session?.detail?.incidents ?? [];
-  const trackName = session?.track_name ? getTrackDisplayName(session.track_name) : 'Session';
-  const heroSrc = session?.track_name ? getTrackHeroImageSrc(session.track_name) : null;
-  const heroOffsetY = session?.track_name ? getTrackHeroImageOffsetY(session.track_name) : 0;
+  // Per-driver incident involvement (as instigator or other party).
+  const incidentCountByGuid = useMemo(() => {
+    const m = new Map<string, number>();
+    for (const inc of session?.detail?.incidents ?? []) {
+      if (inc.guid) m.set(inc.guid, (m.get(inc.guid) ?? 0) + 1);
+      if (inc.otherGuid) m.set(inc.otherGuid, (m.get(inc.otherGuid) ?? 0) + 1);
+    }
+    return m;
+  }, [session]);
+
+  const track = session
+    ? resolveTrack(session.track_name, session.track_config)
+    : { label: 'Session', hero: null, offset: 0 };
+  const trackName = track.label !== '—' ? track.label : 'Session';
+  const heroSrc = track.hero;
+  const heroOffsetY = track.offset;
   const title = session ? `${trackName} — ${TYPE_LABEL[session.type] ?? session.type}` : 'Session';
 
   return (
@@ -380,12 +394,13 @@ export default function Page() {
                           <TableCell align="right">Gap</TableCell>
                           <TableCell align="right">Laps</TableCell>
                           <TableCell align="right">Grid</TableCell>
-                          <TableCell align="right">Pen.</TableCell>
+                          <TableCell align="right">Inc.</TableCell>
                         </TableRow>
                       </TableHead>
                       <TableBody>
                         {classification.map((row) => {
                           const badges = driverBadges(row.guid);
+                          const incCount = incidentCountByGuid.get(row.guid) ?? 0;
                           return (
                             <TableRow
                               key={`${row.guid}-${row.pos}`}
@@ -401,32 +416,30 @@ export default function Page() {
                                 <Chip size="small" label={row.pos} sx={{ minWidth: 38, fontWeight: 700, ...getPodiumChipSx(row.pos) }} />
                               </TableCell>
                               <TableCell>
-                                <Stack spacing={0.6}>
-                                  <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
-                                    <Typography component="span" sx={{ fontWeight: 700 }}>
-                                      {row.name || 'Unknown'}
-                                    </Typography>
-                                    {row.disqualified ? (
-                                      <Chip
-                                        size="small"
-                                        label="DSQ"
-                                        sx={{ height: 18, fontSize: 10, fontWeight: 800, bgcolor: 'rgba(239,68,68,0.18)', color: '#fca5a5' }}
-                                      />
-                                    ) : null}
-                                  </Stack>
+                                <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
+                                  <Typography component="span" sx={{ fontWeight: 700 }}>
+                                    {row.name || 'Unknown'}
+                                  </Typography>
                                   {badges ? (
-                                    <Stack direction="row" spacing={0.75} alignItems="center">
-                                      <Chip
-                                        size="small"
-                                        label={badges.license}
-                                        sx={{ height: 20, minWidth: LICENSE_CHIP_WIDTH, fontWeight: 700, justifyContent: 'center', ...getLicenseBadgeSx(badges.license) }}
-                                      />
-                                      <Chip
-                                        size="small"
-                                        label={badges.srTier}
-                                        sx={{ height: 20, minWidth: SR_CHIP_WIDTH, fontWeight: 700, justifyContent: 'center', ...getSRBadgeSx(badges.srTier) }}
-                                      />
-                                    </Stack>
+                                    <Chip
+                                      size="small"
+                                      label={badges.license}
+                                      sx={{ minWidth: LICENSE_CHIP_WIDTH, fontWeight: 700, justifyContent: 'center', ...getLicenseBadgeSx(badges.license) }}
+                                    />
+                                  ) : null}
+                                  {badges ? (
+                                    <Chip
+                                      size="small"
+                                      label={badges.srTier}
+                                      sx={{ minWidth: SR_CHIP_WIDTH, fontWeight: 700, justifyContent: 'center', ...getSRBadgeSx(badges.srTier) }}
+                                    />
+                                  ) : null}
+                                  {row.disqualified ? (
+                                    <Chip
+                                      size="small"
+                                      label="DSQ"
+                                      sx={{ height: 18, fontSize: 10, fontWeight: 800, bgcolor: 'rgba(239,68,68,0.18)', color: '#fca5a5' }}
+                                    />
                                   ) : null}
                                 </Stack>
                               </TableCell>
@@ -440,8 +453,8 @@ export default function Page() {
                               </TableCell>
                               <TableCell align="right">{row.numLaps}</TableCell>
                               <TableCell align="right" sx={{ color: 'text.secondary' }}>{row.gridPosition || '—'}</TableCell>
-                              <TableCell align="right" sx={{ color: row.penaltyTimeMs || row.lapPenalty ? '#fca5a5' : 'text.secondary' }}>
-                                {row.lapPenalty ? `${row.lapPenalty} lap` : row.penaltyTimeMs ? `+${(row.penaltyTimeMs / 1000).toFixed(0)}s` : '—'}
+                              <TableCell align="right" sx={{ fontWeight: incCount > 0 ? 700 : 400, color: incCount > 0 ? '#fca5a5' : 'text.secondary' }}>
+                                {incCount || '—'}
                               </TableCell>
                             </TableRow>
                           );

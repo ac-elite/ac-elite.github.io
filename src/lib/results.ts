@@ -8,6 +8,7 @@
  * unavailable.
  */
 import { supabaseBaseUrl, supabaseHeaders, supabaseReadConfigured } from 'src/centralized/supabase-rest';
+import { getTrackInfo, getTrackDisplayName } from 'src/centralized/track-info';
 
 export type SessionType = 'RACE' | 'QUALIFY' | 'PRACTICE';
 export type SessionTypeFilter = SessionType | 'ALL';
@@ -141,20 +142,54 @@ export async function fetchSessionTypeOptions(): Promise<SessionType[]> {
   }
 }
 
-/** Distinct track ids present in the sessions table, for the track filter. */
-export async function fetchSessionTrackOptions(): Promise<string[]> {
+export type TrackOption = { trackName: string; trackConfig: string | null };
+
+/** Distinct tracks present (one per track_name), for the track filter. */
+export async function fetchSessionTrackOptions(): Promise<TrackOption[]> {
   if (!supabaseReadConfigured()) return [];
-  const params = new URLSearchParams({ select: 'track_name', order: 'track_name.asc', listed: 'eq.true' });
+  const params = new URLSearchParams({
+    select: 'track_name,track_config',
+    order: 'track_name.asc',
+    listed: 'eq.true',
+  });
   try {
     const res = await fetch(restUrl('sessions', params), {
       headers: { ...(supabaseHeaders() as Record<string, string>), 'Range-Unit': 'items', Range: '0-4999' },
     });
     if (!res.ok) return [];
-    const rows = (await res.json()) as { track_name: string | null }[];
-    return Array.from(new Set(rows.map((r) => r.track_name).filter((t): t is string => Boolean(t))));
+    const rows = (await res.json()) as { track_name: string | null; track_config: string | null }[];
+    const seen = new Set<string>();
+    const out: TrackOption[] = [];
+    for (const r of rows) {
+      const name = r.track_name?.trim();
+      if (!name || seen.has(name)) continue;
+      seen.add(name);
+      out.push({ trackName: name, trackConfig: r.track_config?.trim() || null });
+    }
+    return out;
   } catch {
     return [];
   }
+}
+
+/**
+ * Resolve a session's track to its catalog entry. AC reports `track_name` and
+ * `track_config` separately (e.g. `ks_barcelona` + `layout_moto`), but the
+ * catalog keys by the combined id (`ks_barcelona_layout_moto`). Falls back to
+ * the bare name (handles single-config tracks / aliases like `imola`).
+ */
+export type ResolvedTrack = { label: string; hero: string | null; offset: number };
+export function resolveTrack(trackName: string | null, trackConfig: string | null): ResolvedTrack {
+  const name = (trackName ?? '').trim();
+  if (!name) return { label: '—', hero: null, offset: 0 };
+  const config = (trackConfig ?? '').trim();
+  const combined = config ? `${name}_${config}` : name;
+  const info = getTrackInfo(combined) ?? getTrackInfo(name);
+  return {
+    label: info?.name ?? getTrackDisplayName(name),
+    hero: info?.image?.trim() ? info.image.trim() : null,
+    offset: typeof info?.imageOffsetY === 'number' && Number.isFinite(info.imageOffsetY) ? info.imageOffsetY : 0,
+  };
 }
 
 export async function fetchSessionById(id: number | string): Promise<SessionFull | null> {

@@ -22,7 +22,7 @@ import TableContainer from '@mui/material/TableContainer';
 import { CONFIG } from 'src/config-global';
 import { APP_ROUTES } from 'src/centralized/app-routes';
 import { getSiteUrl } from 'src/centralized/site-urls';
-import { formatLaptime, getTrackDisplayName } from 'src/lib/ac-elite-data';
+import { formatLaptime } from 'src/lib/ac-elite-data';
 import { getResultHref, getDriverProfileHref } from 'src/lib/routes';
 import { getSyncHealth } from 'src/lib/sync-utils';
 import { useTrackCatalogVersion } from 'src/centralized/track-info';
@@ -42,8 +42,10 @@ import {
   FORM_SECTION_KICKER_CAPTION_SX,
 } from 'src/lib/page-shell';
 import {
+  resolveTrack,
   fetchSessions,
   type SessionType,
+  type TrackOption,
   type SessionSummary,
   fetchResultsSyncedAt,
   type SessionTypeFilter,
@@ -162,7 +164,7 @@ export default function Page() {
   const [rows, setRows] = useState<SessionSummary[]>([]);
   const [total, setTotal] = useState(0);
   const [syncedAt, setSyncedAt] = useState<string | null>(null);
-  const [trackOptions, setTrackOptions] = useState<string[]>([]);
+  const [trackOptions, setTrackOptions] = useState<TrackOption[]>([]);
   const [typeOptions, setTypeOptions] = useState<SessionType[]>([]);
 
   const [type, setType] = useState<SessionTypeFilter>('ALL');
@@ -272,8 +274,8 @@ export default function Page() {
                         All tracks
                       </MenuItem>
                       {trackOptions.map((t) => (
-                        <MenuItem key={t} value={t} sx={GLASS_SELECT_MENU_ITEM_SX}>
-                          {getTrackDisplayName(t)}
+                        <MenuItem key={t.trackName} value={t.trackName} sx={GLASS_SELECT_MENU_ITEM_SX}>
+                          {resolveTrack(t.trackName, t.trackConfig).label}
                         </MenuItem>
                       ))}
                     </Select>
@@ -351,7 +353,7 @@ export default function Page() {
                                 />
                               </TableCell>
                               <TableCell sx={{ fontWeight: 700 }}>
-                                {row.track_name ? getTrackDisplayName(row.track_name) : '—'}
+                                {resolveTrack(row.track_name, row.track_config).label}
                               </TableCell>
                               <TableCell align="right">{row.num_drivers}</TableCell>
                               <TableCell>
