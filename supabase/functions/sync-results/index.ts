@@ -240,6 +240,7 @@ function parseSession(raw: RawSession, fileName: string) {
         winner?.name ?? '',
         bestLapName,
         raw.Date ? new Date(raw.Date).toISOString().slice(0, 10) : '',
+        raw.Date ? new Date(raw.Date).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' }) : '',
         ...classification.map((c) => `${c.name} ${c.guid}`),
       ]
         .join(' ')
