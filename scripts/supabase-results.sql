@@ -28,6 +28,7 @@ create table if not exists public.sessions (
   session_date  timestamptz,
   num_drivers   int not null default 0,
   num_laps      int not null default 0,
+  num_incidents int not null default 0,         -- collisions in session (detail.incidents length)
   best_lap_ms   int,                            -- session fastest lap (ms)
   best_lap_guid text,
   best_lap_name text,

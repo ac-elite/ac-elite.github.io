@@ -201,7 +201,8 @@ function parseSession(raw: RawSession, fileName: string) {
       otherName: e.OtherDriver?.Name ?? '',
       impactSpeed: Math.round((e.ImpactSpeed ?? 0) * 10) / 10,
       ts: e.Timestamp ?? 0,
-    }));
+    }))
+    .sort((a, b) => a.ts - b.ts);
 
   // Session fastest lap: prefer clean laps (no cuts), fall back to any valid lap.
   let bestLapMs: number | null = null;
@@ -256,6 +257,7 @@ function parseSession(raw: RawSession, fileName: string) {
     session_date: raw.Date ? new Date(raw.Date).toISOString() : null,
     num_drivers: listed ? classification.length : activeDrivers,
     num_laps: listed ? numLaps : 0,
+    num_incidents: listed ? incidents.length : 0,
     best_lap_ms: listed ? bestLapMs : null,
     best_lap_guid: listed ? bestLapGuid || null : null,
     best_lap_name: listed ? bestLapName || null : null,

@@ -41,6 +41,9 @@ import {
 import {
   formatGap,
   type LapRow,
+  impactSpeedToKmh,
+  formatIncidentElapsed,
+  incidentTimelineBaselineMs,
   resolveTrack,
   resolveLeaderboardTrackId,
   TYPE_CHIP_SX,
@@ -249,7 +252,14 @@ export default function Page() {
     return map;
   }, [session]);
 
-  const incidents = session?.detail?.incidents ?? [];
+  const incidents = useMemo(
+    () => [...(session?.detail?.incidents ?? [])].sort((a, b) => a.ts - b.ts),
+    [session]
+  );
+  const incidentBaselineMs = useMemo(
+    () => incidentTimelineBaselineMs(incidents),
+    [incidents]
+  );
   // Per-driver incident involvement (as instigator or other party).
   const incidentCountByGuid = useMemo(() => {
     const m = new Map<string, number>();
@@ -541,13 +551,20 @@ export default function Page() {
                 {/* Incidents */}
                 {incidents.length > 0 && (
                   <Paper sx={{ ...GLASS_TABLE_WRAPPER_SX, ...glassCardMotionSx(3) }}>
-                    <Typography variant="subtitle1" sx={{ fontWeight: 800, px: 2, pt: 2, pb: 1 }}>
+                    <Typography variant="subtitle1" sx={{ fontWeight: 800, px: 2, pt: 2, pb: 0.5 }}>
                       Incidents ({incidents.length})
+                    </Typography>
+                    <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', px: 2, pb: 1 }}>
+                      Sorted by time (#). Elapsed is since the first incident in this session.
                     </Typography>
                     <TableContainer>
                       <Table size="small">
                         <TableHead>
                           <TableRow>
+                            <TableCell align="right" sx={{ width: 44 }}>
+                              #
+                            </TableCell>
+                            <TableCell sx={{ whiteSpace: 'nowrap' }}>Elapsed</TableCell>
                             <TableCell>Type</TableCell>
                             <TableCell>Driver</TableCell>
                             <TableCell>Other</TableCell>
@@ -556,7 +573,13 @@ export default function Page() {
                         </TableHead>
                         <TableBody>
                           {incidents.map((inc, i) => (
-                            <TableRow key={i}>
+                            <TableRow key={`${inc.ts}-${inc.guid}-${inc.otherGuid}-${i}`}>
+                              <TableCell align="right" sx={{ color: 'text.secondary', fontVariantNumeric: 'tabular-nums' }}>
+                                {i + 1}
+                              </TableCell>
+                              <TableCell sx={{ fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>
+                                {formatIncidentElapsed(inc.ts, incidentBaselineMs)}
+                              </TableCell>
                               <TableCell>
                                 <Chip
                                   size="small"
@@ -572,7 +595,9 @@ export default function Page() {
                               <TableCell sx={{ color: 'text.secondary' }}>
                                 {inc.type === 'CAR' ? inc.otherName || 'Unknown' : '—'}
                               </TableCell>
-                              <TableCell align="right" sx={{ fontVariantNumeric: 'tabular-nums' }}>{inc.impactSpeed.toFixed(1)}</TableCell>
+                              <TableCell align="right" sx={{ fontVariantNumeric: 'tabular-nums' }}>
+                                {impactSpeedToKmh(inc.impactSpeed).toFixed(1)}
+                              </TableCell>
                             </TableRow>
                           ))}
                         </TableBody>

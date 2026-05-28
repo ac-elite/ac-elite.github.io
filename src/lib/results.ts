@@ -38,6 +38,7 @@ export type SessionSummary = {
   session_date: string | null;
   num_drivers: number;
   num_laps: number;
+  num_incidents: number;
   best_lap_ms: number | null;
   best_lap_guid: string | null;
   best_lap_name: string | null;
@@ -77,9 +78,49 @@ export type IncidentRow = {
   name: string;
   otherGuid: string;
   otherName: string;
+  /** Impact speed at contact in m/s (AC server `ImpactSpeed`; use {@link impactSpeedToKmh} to display). */
   impactSpeed: number;
   ts: number;
 };
+
+/** AC dedicated-server result JSON stores collision `ImpactSpeed` in m/s. */
+export function impactSpeedToKmh(speedMps: number): number {
+  if (!Number.isFinite(speedMps) || speedMps <= 0) return 0;
+  return Math.round(speedMps * 3.6 * 10) / 10;
+}
+
+/**
+ * Normalize AC `Timestamp` to epoch ms. Server result files use Unix **seconds**
+ * (e.g. 1_778_787_868); treating that as session-ms produced values like 494h+.
+ */
+export function normalizeAcEventTimestamp(ts: number): number | null {
+  if (!Number.isFinite(ts) || ts <= 0) return null;
+  if (ts >= 1e12) return ts;
+  if (ts >= 1e9) return Math.round(ts * 1000);
+  return ts;
+}
+
+/** Earliest incident time in a session — baseline for relative elapsed display. */
+export function incidentTimelineBaselineMs(incidents: readonly { ts: number }[]): number | null {
+  let min: number | null = null;
+  for (const inc of incidents) {
+    const ms = normalizeAcEventTimestamp(inc.ts);
+    if (ms == null) continue;
+    if (min == null || ms < min) min = ms;
+  }
+  return min;
+}
+
+/** Elapsed since the first incident (or session-relative ms when already small). */
+export function formatIncidentElapsed(ts: number, baselineMs: number | null): string {
+  const eventMs = normalizeAcEventTimestamp(ts);
+  if (eventMs == null) return '—';
+  const base = baselineMs ?? eventMs;
+  const delta = eventMs - base;
+  if (delta < 0) return '—';
+  if (delta === 0) return '0:00.000';
+  return formatTotalTime(delta);
+}
 
 export type SessionDetail = {
   classification: ClassificationRow[];
@@ -91,7 +132,7 @@ export type SessionFull = SessionSummary & { detail: SessionDetail };
 
 const SUMMARY_SELECT =
   'id,session_file,type,track_name,track_config,event_name,session_date,' +
-  'num_drivers,num_laps,best_lap_ms,best_lap_guid,best_lap_name,winner_guid,winner_name';
+  'num_drivers,num_laps,num_incidents,best_lap_ms,best_lap_guid,best_lap_name,winner_guid,winner_name';
 
 function restUrl(path: string, params: URLSearchParams): string {
   return `${supabaseBaseUrl()}/rest/v1/${path}?${params.toString()}`;

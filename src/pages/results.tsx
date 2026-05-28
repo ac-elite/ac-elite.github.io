@@ -356,6 +356,7 @@ export default function Page() {
                             <TableCell>Type</TableCell>
                             <TableCell>Track</TableCell>
                             <TableCell align="right">Drivers</TableCell>
+                            <TableCell align="right">Incidents</TableCell>
                             <TableCell>Winner / Pole</TableCell>
                             <TableCell align="right">Fastest lap</TableCell>
                           </TableRow>
@@ -363,7 +364,7 @@ export default function Page() {
                         <TableBody>
                           {rows.length === 0 && (
                             <TableRow>
-                              <TableCell colSpan={6} sx={{ py: 4, px: 2 }}>
+                              <TableCell colSpan={7} sx={{ py: 4, px: 2 }}>
                                 <EmptyState
                                   title="No sessions yet."
                                   description="Sessions appear here automatically after they're driven on the server. Try another filter."
@@ -388,6 +389,16 @@ export default function Page() {
                                 {resolveTrack(row.track_name, row.track_config).label}
                               </TableCell>
                               <TableCell align="right">{row.num_drivers}</TableCell>
+                              <TableCell
+                                align="right"
+                                sx={{
+                                  fontVariantNumeric: 'tabular-nums',
+                                  fontWeight: (row.num_incidents ?? 0) > 0 ? 700 : 400,
+                                  color: (row.num_incidents ?? 0) > 0 ? '#fca5a5' : 'text.secondary',
+                                }}
+                              >
+                                {row.num_incidents ?? 0}
+                              </TableCell>
                               <TableCell>
                                 {row.winner_guid ? (
                                   <Link

@@ -525,7 +525,7 @@ export default function Page() {
                         <Chart
                           type="bar"
                           height={Math.max(300, trackActivityChart.categories.length * 40)}
-                          series={[{ name: 'Entries', data: trackActivityChart.data }]}
+                          series={[{ name: 'Laps', data: trackActivityChart.data }]}
                           sx={{ cursor: 'pointer' }}
                           options={{
                             colors: CHART_COLORS,
@@ -574,7 +574,7 @@ export default function Page() {
                               yaxis: { lines: { show: false } },
                             },
                             tooltip: {
-                              y: { formatter: (v: number) => `${formatNumber(v)} entries` },
+                              y: { formatter: (v: number) => formatNumber(v) },
                             },
                           }}
                         />
