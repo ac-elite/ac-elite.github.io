@@ -348,7 +348,7 @@ export default function Page() {
                         <Typography component="h1" variant="h4" fontWeight={800} sx={{ color: '#fff', lineHeight: 1.1 }}>
                           {trackName}
                         </Typography>
-                        <Chip size="small" label={TYPE_LABEL[session.type] ?? session.type} sx={TYPE_CHIP_SX[session.type] ?? {}} />
+                        <Chip size="small" label={session.type} sx={TYPE_CHIP_SX[session.type] ?? {}} />
                       </Stack>
                       {session.event_name ? (
                         <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.78)', mt: 0.5 }}>
