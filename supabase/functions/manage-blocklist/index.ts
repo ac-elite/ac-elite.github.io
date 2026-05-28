@@ -31,7 +31,7 @@
  *   FTP_SECURE               default: "false" — set to "true" to use FTPS.
  */
 import { createClient, type SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2.49.1';
-import ftp from 'npm:basic-ftp@5.0.5';
+import ftp, { type Client as FtpClient } from 'npm:basic-ftp@5.0.5';
 import { Buffer } from 'node:buffer';
 import { Readable } from 'node:stream';
 
@@ -188,7 +188,7 @@ function readFtpEnv(): FtpEnv | { error: Response } {
   return { host, user, password, secure, remotePath };
 }
 
-async function withFtpClient<T>(env: FtpEnv, fn: (client: ftp.Client) => Promise<T>): Promise<T> {
+async function withFtpClient<T>(env: FtpEnv, fn: (client: FtpClient) => Promise<T>): Promise<T> {
   const client = new ftp.Client(15_000);
   client.ftp.verbose = false;
   try {
@@ -204,7 +204,7 @@ async function withFtpClient<T>(env: FtpEnv, fn: (client: ftp.Client) => Promise
   }
 }
 
-async function downloadBlocklist(client: ftp.Client, remotePath: string): Promise<BlocklistEntry[]> {
+async function downloadBlocklist(client: FtpClient, remotePath: string): Promise<BlocklistEntry[]> {
   // basic-ftp's downloadTo accepts a Writable. Collect into a Buffer in memory.
   const chunks: Buffer[] = [];
   const sink = new (await import('node:stream')).Writable({
@@ -230,7 +230,7 @@ async function downloadBlocklist(client: ftp.Client, remotePath: string): Promis
 }
 
 async function uploadBlocklistAtomic(
-  client: ftp.Client,
+  client: FtpClient,
   remotePath: string,
   entries: BlocklistEntry[]
 ): Promise<void> {

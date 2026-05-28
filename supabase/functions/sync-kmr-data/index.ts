@@ -28,7 +28,7 @@
  *   KMR_REMOTE_DIR  remote folder to try first (default "kissmyrank")
  */
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.1';
-import ftp from 'npm:basic-ftp@5.0.5';
+import ftp, { type Client as FtpClient } from 'npm:basic-ftp@5.0.5';
 import { Buffer } from 'node:buffer';
 import { Writable } from 'node:stream';
 // Pure scoring module (no MUI/DOM deps) — shared with the React app so the
@@ -61,7 +61,7 @@ function candidateRemotePaths(dir: string, fileName: string): string[] {
   return [`${d}/${fileName}`, `/${d}/${fileName}`, fileName, `/${fileName}`];
 }
 
-async function downloadToBuffer(client: ftp.Client, remotePath: string): Promise<Buffer> {
+async function downloadToBuffer(client: FtpClient, remotePath: string): Promise<Buffer> {
   const chunks: Buffer[] = [];
   const sink = new Writable({
     write(chunk, _enc, cb) {
@@ -75,7 +75,7 @@ async function downloadToBuffer(client: ftp.Client, remotePath: string): Promise
 
 /** Try each candidate path; return the first that downloads + parses as JSON. */
 async function downloadJsonWithFallback(
-  client: ftp.Client,
+  client: FtpClient,
   dir: string,
   fileName: string
 ): Promise<unknown> {
@@ -185,6 +185,9 @@ Deno.serve(async (req) => {
     const { error } = await supabase.storage.from(BUCKET).upload(name, body, {
       contentType: 'application/json',
       upsert: true,
+      // Must revalidate on every client fetch; default max-age=3600 left browsers
+      // serving hour-old rank/metadata after the cached-egress client change.
+      cacheControl: '0',
     });
     if (error) {
       await supabase

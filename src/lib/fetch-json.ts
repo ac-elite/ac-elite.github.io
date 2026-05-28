@@ -36,13 +36,11 @@ function resolveFetchUrl(url: string): string {
 }
 
 async function fetchJsonAt<T>(requestUrl: string): Promise<T> {
-  // Default cache mode (NOT `no-store`): the Supabase Storage objects send
-  // `Cache-Control: no-cache` + an `ETag`, so the browser revalidates with a
-  // conditional request and gets a ~300-byte `304 Not Modified` whenever the
-  // data is unchanged — instead of re-downloading the multi-MB rank/leaderboard
-  // JSON on every page view, navigation and realtime refetch. Freshness is
-  // unchanged (always revalidated); this just stops the cached-egress bleed.
-  const res = await fetch(requestUrl);
+  // `no-cache` (not default): always revalidate with the origin (If-None-Match)
+  // so realtime sync refetches see fresh metadata/rank after each ~15-min publish.
+  // Default fetch + Supabase Storage’s default `max-age=3600` served stale JSON for
+  // up to an hour. Unlike `no-store`, unchanged files can still answer `304` (~300 B).
+  const res = await fetch(requestUrl, { cache: 'no-cache' });
   if (!res.ok) throw new Error(`Failed to fetch ${requestUrl}: ${res.status} ${res.statusText}`);
   return (await res.json()) as T;
 }
