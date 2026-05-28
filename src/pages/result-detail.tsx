@@ -147,6 +147,7 @@ function DriverLaps({
               <TableRow>
                 <TableCell>Lap</TableCell>
                 <TableCell align="right">Time</TableCell>
+                <TableCell align="right">Δ</TableCell>
                 <TableCell align="right">S1</TableCell>
                 <TableCell align="right">S2</TableCell>
                 <TableCell align="right">S3</TableCell>
@@ -154,13 +155,21 @@ function DriverLaps({
               </TableRow>
             </TableHead>
             <TableBody>
-              {laps.map((l) => {
+              {laps.map((l, i) => {
                 const isBest = l.lapMs > 0 && l.lapMs === sessionBestMs;
+                const prev = i > 0 ? laps[i - 1] : null;
+                const gapMs = prev && prev.lapMs > 0 && l.lapMs > 0 ? l.lapMs - prev.lapMs : null;
                 return (
                   <TableRow key={l.lap} sx={isBest ? { bgcolor: 'rgba(168,85,247,0.12)' } : undefined}>
                     <TableCell>{l.lap}</TableCell>
                     <TableCell align="right" sx={{ fontVariantNumeric: 'tabular-nums', fontWeight: isBest ? 800 : 500 }}>
                       {formatLaptime(l.lapMs)}
+                    </TableCell>
+                    <TableCell
+                      align="right"
+                      sx={{ fontVariantNumeric: 'tabular-nums', color: gapMs == null ? 'text.secondary' : gapMs <= 0 ? '#86efac' : '#fca5a5' }}
+                    >
+                      {gapMs == null ? '—' : `${gapMs > 0 ? '+' : ''}${(gapMs / 1000).toFixed(3)}`}
                     </TableCell>
                     <TableCell align="right" sx={{ fontVariantNumeric: 'tabular-nums' }}>{formatSector(l.sectors[0])}</TableCell>
                     <TableCell align="right" sx={{ fontVariantNumeric: 'tabular-nums' }}>{formatSector(l.sectors[1])}</TableCell>
