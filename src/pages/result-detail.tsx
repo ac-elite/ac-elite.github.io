@@ -293,7 +293,7 @@ export default function Page() {
               <>
                 {/* Hero header */}
                 <Paper sx={{ ...GLASS_PANEL_SX, p: 0, overflow: 'hidden', ...brandAccentBorderSx(), ...glassCardMotionSx(0) }}>
-                  <Box sx={{ position: 'relative', lineHeight: 0 }}>
+                  <Box sx={{ position: 'relative' }}>
                     {heroSrc ? (
                       <Box
                         component="img"
