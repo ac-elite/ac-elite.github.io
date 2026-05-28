@@ -7,8 +7,19 @@
  * (classification + laps + incidents). Falls back to empty when Supabase is
  * unavailable.
  */
+import type { Theme, SxProps } from '@mui/material/styles';
+
+import { GLASS_CHIP_SHEEN_SX } from 'src/lib/glass';
 import { supabaseBaseUrl, supabaseHeaders, supabaseReadConfigured } from 'src/centralized/supabase-rest';
 import { getTrackInfo, getTrackDisplayName } from 'src/centralized/track-info';
+
+/** Liquid-glass session-type chip styling, shared by the list table + detail hero. */
+const chipSheen = GLASS_CHIP_SHEEN_SX as Record<string, unknown>;
+export const TYPE_CHIP_SX: Record<string, SxProps<Theme>> = {
+  RACE: { ...chipSheen, fontWeight: 700, bgcolor: 'rgba(34,197,94,0.16)', color: '#86efac', border: '1px solid rgba(34,197,94,0.42)' },
+  QUALIFY: { ...chipSheen, fontWeight: 700, bgcolor: 'rgba(245,158,11,0.16)', color: '#fcd34d', border: '1px solid rgba(245,158,11,0.42)' },
+  PRACTICE: { ...chipSheen, fontWeight: 700, bgcolor: 'rgba(148,163,184,0.16)', color: '#cbd5e1', border: '1px solid rgba(148,163,184,0.42)' },
+};
 
 export type SessionType = 'RACE' | 'QUALIFY' | 'PRACTICE';
 export type SessionTypeFilter = SessionType | 'ALL';

@@ -44,6 +44,7 @@ import {
 } from 'src/lib/page-shell';
 import {
   resolveTrack,
+  TYPE_CHIP_SX,
   fetchSessions,
   type SessionType,
   type TrackOption,
@@ -66,12 +67,6 @@ const TYPE_LABEL: Record<SessionTypeFilter, string> = {
   RACE: 'Race',
   QUALIFY: 'Qualify',
   PRACTICE: 'Practice',
-};
-
-const TYPE_CHIP_SX: Record<string, object> = {
-  RACE: { bgcolor: 'rgba(34,197,94,0.14)', color: '#86efac', border: '1px solid rgba(34,197,94,0.32)' },
-  QUALIFY: { bgcolor: 'rgba(245,158,11,0.14)', color: '#fcd34d', border: '1px solid rgba(245,158,11,0.32)' },
-  PRACTICE: { bgcolor: 'rgba(148,163,184,0.14)', color: '#cbd5e1', border: '1px solid rgba(148,163,184,0.3)' },
 };
 
 function formatSessionDate(iso: string | null): string {
@@ -249,25 +244,6 @@ export default function Page() {
                 textAlign: { xs: 'center', md: 'left' },
               }}
             >
-              <TextField
-                size="small"
-                fullWidth
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
-                placeholder="Search driver, track, winner or date…"
-                sx={{
-                  maxWidth: 480,
-                  mb: 1.5,
-                  '& .MuiOutlinedInput-root': {
-                    bgcolor: 'rgba(255,255,255,0.04)',
-                    color: 'text.primary',
-                    '& fieldset': { borderColor: 'rgba(255,255,255,0.18)' },
-                    '&:hover fieldset': { borderColor: 'rgba(255,255,255,0.3)' },
-                  },
-                  '& .MuiInputBase-input::placeholder': { color: 'rgba(255,255,255,0.5)', opacity: 1 },
-                }}
-              />
-
               <Stack direction="row" gap={1} flexWrap="wrap" justifyContent={{ xs: 'center', md: 'flex-start' }}>
                 {typeTabs.map((key) => (
                   <Button
@@ -286,33 +262,62 @@ export default function Page() {
                 ))}
               </Stack>
 
-              {trackOptions.length > 0 && (
-                <Stack spacing={1.25} sx={{ mt: 1.5 }}>
-                  <Typography variant="caption" sx={{ ...FORM_SECTION_KICKER_CAPTION_SX }}>
-                    Track
-                  </Typography>
-                  <FormControl size="small" sx={{ maxWidth: 360, width: '100%' }}>
-                    <Select
-                      value={track}
-                      onChange={(event) => {
-                        setTrack(event.target.value);
-                        setPage(1);
-                      }}
-                      sx={GLASS_SELECT_SX}
-                      MenuProps={GLASS_SELECT_MENU_PROPS}
-                    >
-                      <MenuItem value="ALL" sx={GLASS_SELECT_MENU_ITEM_SX}>
-                        All tracks
-                      </MenuItem>
-                      {trackOptions.map((t) => (
-                        <MenuItem key={t.trackName} value={t.trackName} sx={GLASS_SELECT_MENU_ITEM_SX}>
-                          {resolveTrack(t.trackName, t.trackConfig).label}
+              <Stack
+                direction={{ xs: 'column', sm: 'row' }}
+                spacing={1.5}
+                alignItems={{ sm: 'flex-end' }}
+                sx={{ mt: 1.5, textAlign: 'left' }}
+              >
+                {trackOptions.length > 0 && (
+                  <Stack spacing={1.25} sx={{ width: { xs: '100%', sm: 'auto' } }}>
+                    <Typography variant="caption" sx={{ ...FORM_SECTION_KICKER_CAPTION_SX }}>
+                      Track
+                    </Typography>
+                    <FormControl size="small" sx={{ minWidth: { sm: 240 }, width: '100%' }}>
+                      <Select
+                        value={track}
+                        onChange={(event) => {
+                          setTrack(event.target.value);
+                          setPage(1);
+                        }}
+                        sx={GLASS_SELECT_SX}
+                        MenuProps={GLASS_SELECT_MENU_PROPS}
+                      >
+                        <MenuItem value="ALL" sx={GLASS_SELECT_MENU_ITEM_SX}>
+                          All tracks
                         </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
+                        {trackOptions.map((t) => (
+                          <MenuItem key={t.trackName} value={t.trackName} sx={GLASS_SELECT_MENU_ITEM_SX}>
+                            {resolveTrack(t.trackName, t.trackConfig).label}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </Stack>
+                )}
+
+                <Stack spacing={1.25} sx={{ flex: 1, width: '100%', maxWidth: 480 }}>
+                  <Typography variant="caption" sx={{ ...FORM_SECTION_KICKER_CAPTION_SX }}>
+                    Search
+                  </Typography>
+                  <TextField
+                    size="small"
+                    fullWidth
+                    value={searchInput}
+                    onChange={(e) => setSearchInput(e.target.value)}
+                    placeholder="Driver, track, winner or date…"
+                    sx={{
+                      '& .MuiOutlinedInput-root': {
+                        bgcolor: 'rgba(255,255,255,0.04)',
+                        color: 'text.primary',
+                        '& fieldset': { borderColor: 'rgba(255,255,255,0.18)' },
+                        '&:hover fieldset': { borderColor: 'rgba(255,255,255,0.3)' },
+                      },
+                      '& .MuiInputBase-input::placeholder': { color: 'rgba(255,255,255,0.5)', opacity: 1 },
+                    }}
+                  />
                 </Stack>
-              )}
+              </Stack>
             </Paper>
 
             {loading && (
@@ -377,11 +382,7 @@ export default function Page() {
                             >
                               <TableCell sx={{ whiteSpace: 'nowrap' }}>{formatSessionDate(row.session_date)}</TableCell>
                               <TableCell>
-                                <Chip
-                                  size="small"
-                                  label={row.type}
-                                  sx={{ fontWeight: 700, ...(TYPE_CHIP_SX[row.type] ?? {}) }}
-                                />
+                                <Chip size="small" label={row.type} sx={TYPE_CHIP_SX[row.type] ?? {}} />
                               </TableCell>
                               <TableCell sx={{ fontWeight: 700 }}>
                                 {resolveTrack(row.track_name, row.track_config).label}

@@ -42,6 +42,7 @@ import {
   formatGap,
   type LapRow,
   resolveTrack,
+  TYPE_CHIP_SX,
   formatTotalTime,
   fetchSessionById,
   type SessionFull,
@@ -52,14 +53,6 @@ import { ErrorPanel, LoadingPanel } from 'src/components/data-state';
 import { PageGridOverlay } from 'src/components/page-background/page-grid-overlay';
 
 const TYPE_LABEL: Record<string, string> = { RACE: 'Race', QUALIFY: 'Qualify', PRACTICE: 'Practice' };
-
-// Solid, high-contrast chips — they sit on the dark hero image, so a tint + light
-// text reads as an empty pill. Dark text on a bright fill is clearly legible.
-const TYPE_CHIP_SX: Record<string, object> = {
-  RACE: { bgcolor: '#22c55e', color: '#04210f' },
-  QUALIFY: { bgcolor: '#f59e0b', color: '#2a1800' },
-  PRACTICE: { bgcolor: '#cbd5e1', color: '#0b1220' },
-};
 
 function formatSessionDate(iso: string | null): string {
   if (!iso) return '';
@@ -355,7 +348,7 @@ export default function Page() {
                         <Typography component="h1" variant="h4" fontWeight={800} sx={{ color: '#fff', lineHeight: 1.1 }}>
                           {trackName}
                         </Typography>
-                        <Chip size="small" label={TYPE_LABEL[session.type] ?? session.type} sx={{ fontWeight: 800, ...(TYPE_CHIP_SX[session.type] ?? {}) }} />
+                        <Chip size="small" label={TYPE_LABEL[session.type] ?? session.type} sx={TYPE_CHIP_SX[session.type] ?? {}} />
                       </Stack>
                       {session.event_name ? (
                         <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.78)', mt: 0.5 }}>
