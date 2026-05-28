@@ -79,6 +79,14 @@ const SCHEDULE: readonly ScheduleEntry[] = [
     what: 'Checks the AC Elite server often so the site can show who is online, which track is running, and session info without waiting for the hourly backup.',
   },
   {
+    agendaWhen: ':00, :15, :30, :45',
+    agendaSub: 'Every 15 minutes · Supabase cron',
+    kind: 'recurring',
+    workflow: 'Session results sync',
+    cron: '*/15 * * * *',
+    what: 'Reads new result files from the AC server and adds sessions to the Results page (Supabase `sessions` table).',
+  },
+  {
     agendaWhen: 'After sync',
     agendaSub: 'Not before 06:00 Amsterdam · once per day',
     kind: 'chained',

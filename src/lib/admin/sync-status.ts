@@ -33,11 +33,14 @@ export type SyncServiceStatus = {
   backupAt: string | null;
   /** True when the live source is unreachable — the site is on the backup. */
   siteOnBackup: boolean;
+  /** When false, no GitHub Actions JSON backup exists for this feed. */
+  hasStaticBackup?: boolean;
 };
 
 export type AdminSyncStatus = {
   kmr: SyncServiceStatus;
   server: SyncServiceStatus;
+  results: SyncServiceStatus;
 };
 
 const UNREACHABLE: SyncProbe = { reachable: false, at: null, status: 'unknown', error: null };
@@ -84,7 +87,7 @@ async function fetchKmrSyncStatus(): Promise<SyncServiceStatus> {
     backupAt = null;
   }
 
-  return { live, backupAt, siteOnBackup: !live.reachable };
+  return { live, backupAt, siteOnBackup: !live.reachable, hasStaticBackup: true };
 }
 
 async function fetchServerSyncStatus(): Promise<SyncServiceStatus> {
@@ -110,10 +113,47 @@ async function fetchServerSyncStatus(): Promise<SyncServiceStatus> {
     backupAt = null;
   }
 
-  return { live, backupAt, siteOnBackup: !live.reachable };
+  return { live, backupAt, siteOnBackup: !live.reachable, hasStaticBackup: true };
+}
+
+async function fetchResultsSyncStatus(): Promise<SyncServiceStatus> {
+  const row = await readSupabaseRow<{
+    synced_at?: string;
+    status?: string;
+    error?: string | null;
+    ingested_count?: number | null;
+    session_count?: number | null;
+  }>(
+    '/rest/v1/results_sync?id=eq.1&select=synced_at,status,error,ingested_count,session_count'
+  );
+
+  const live: SyncProbe = row
+    ? {
+        reachable: true,
+        at: typeof row.synced_at === 'string' ? row.synced_at : null,
+        status: row.status ?? 'unknown',
+        error: row.error ?? null,
+        detail: [
+          typeof row.session_count === 'number'
+            ? `${row.session_count.toLocaleString()} sessions`
+            : null,
+          typeof row.ingested_count === 'number' && row.ingested_count > 0
+            ? `+${row.ingested_count} last run`
+            : null,
+        ]
+          .filter(Boolean)
+          .join(' · ') || undefined,
+      }
+    : UNREACHABLE;
+
+  return { live, backupAt: null, siteOnBackup: !live.reachable, hasStaticBackup: false };
 }
 
 export async function fetchAdminSyncStatus(): Promise<AdminSyncStatus> {
-  const [kmr, server] = await Promise.all([fetchKmrSyncStatus(), fetchServerSyncStatus()]);
-  return { kmr, server };
+  const [kmr, server, results] = await Promise.all([
+    fetchKmrSyncStatus(),
+    fetchServerSyncStatus(),
+    fetchResultsSyncStatus(),
+  ]);
+  return { kmr, server, results };
 }

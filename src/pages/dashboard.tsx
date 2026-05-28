@@ -2,7 +2,6 @@ import { useMemo, useState, useEffect } from 'react';
 
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
-import Link from '@mui/material/Link';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import Skeleton from '@mui/material/Skeleton';
@@ -18,12 +17,11 @@ import { getLeaderboardHref, getDriverProfileHref } from 'src/lib/routes';
 import { getSiteUrl } from 'src/centralized/site-urls';
 import {
   GLASS_PANEL_SX,
-  GLASS_INNER_ROW_SX,
   GLASS_INNER_PANEL_SX,
   GLASS_PANEL_SPACIOUS_SX,
 } from 'src/lib/glass';
 import { getSyncHealth, type SiteMetadata, getEffectiveLastSync } from 'src/lib/sync-utils';
-import { subtleEnterUpSx, glassCardMotionSx } from 'src/lib/subtle-motion';
+import { glassCardMotionSx } from 'src/lib/subtle-motion';
 import { brandAccentBorderSx } from 'src/lib/status-accent';
 import {
   CAR,
@@ -31,7 +29,6 @@ import {
   getSrTierRgb,
   formatNumber,
   safetyRating,
-  formatLaptime,
   type RankDriver,
   LICENSE_TIER_RGB,
   getDriverLicense,
@@ -317,20 +314,25 @@ export default function Page() {
     };
   }, [leaderboardData, rankData]);
 
-  const topDistanceDrivers = useMemo(
-    () =>
-      [...rankData]
-        .sort((a, b) => (b.kilometers || 0) - (a.kilometers || 0))
-        .slice(0, 5)
-        .map((driver) => ({
-          guid: driver.guid,
-          name: driver.name || 'Unknown',
-          km: Math.round(driver.kilometers || 0),
-        })),
-    [rankData]
-  );
+  const driverActivityChart = useMemo(() => {
+    const rows = [...rankData]
+      .filter((d) => (d.kilometers || 0) > 0)
+      .sort((a, b) => (b.kilometers || 0) - (a.kilometers || 0))
+      .slice(0, 20)
+      .map((driver) => ({
+        guid: driver.guid,
+        name: driver.name || 'Unknown',
+        km: Math.round(driver.kilometers || 0),
+      }));
+    return {
+      categories: rows.map((r) => r.name),
+      data: rows.map((r) => r.km),
+      guids: rows.map((r) => r.guid),
+      driverCount: rows.length,
+    };
+  }, [rankData]);
 
-  const topTracksByEntries = useMemo(
+  const tracksWithEntries = useMemo(
     () =>
       Object.entries(leaderboardData || {})
         .map(([trackId, trackData]) => ({
@@ -338,30 +340,20 @@ export default function Page() {
           entries: Array.isArray((trackData as Record<string, any>)?.[CAR])
             ? ((trackData as Record<string, any>)[CAR] as any[]).length
             : 0,
-          bestLap:
-            Array.isArray((trackData as Record<string, any>)?.[CAR]) &&
-            typeof (trackData as Record<string, any>)[CAR]?.[0]?.laptime === 'number'
-              ? (trackData as Record<string, any>)[CAR][0].laptime
-              : undefined,
         }))
-        .sort((a, b) => b.entries - a.entries)
-        .slice(0, 5),
+        .filter((t) => t.entries > 0),
     [leaderboardData]
   );
 
   const trackActivityChart = useMemo(() => {
-    const rows = Object.entries(leaderboardData || {})
-      .map(([trackId, trackData]) => ({
-        name: getTrackDisplayName(trackId),
-        entries: Array.isArray((trackData as Record<string, any>)?.[CAR])
-          ? ((trackData as Record<string, any>)[CAR] as any[]).length
-          : 0,
-      }))
-      .filter((r) => r.entries > 0)
-      .sort((a, b) => b.entries - a.entries)
-      .slice(0, 10);
-    return { categories: rows.map((r) => r.name), data: rows.map((r) => r.entries) };
-  }, [leaderboardData]);
+    const rows = [...tracksWithEntries].sort((a, b) => b.entries - a.entries);
+    return {
+      categories: rows.map((r) => getTrackDisplayName(r.trackId)),
+      data: rows.map((r) => r.entries),
+      trackIds: rows.map((r) => r.trackId),
+      trackCount: rows.length,
+    };
+  }, [tracksWithEntries]);
 
   const effectiveLastSync = getEffectiveLastSync(metadata?.lastSync, rankData);
   const syncHealth = getSyncHealth(effectiveLastSync);
@@ -426,20 +418,15 @@ export default function Page() {
                       sx={{ borderRadius: 2, bgcolor: 'rgba(255,255,255,0.05)' }}
                     />
                   </Grid>
-                  <Grid size={{ xs: 12, md: 6 }}>
-                    <Skeleton
-                      variant="rounded"
-                      height={280}
-                      sx={{ borderRadius: 2, bgcolor: 'rgba(255,255,255,0.05)' }}
-                    />
-                  </Grid>
-                  <Grid size={{ xs: 12, md: 6 }}>
-                    <Skeleton
-                      variant="rounded"
-                      height={280}
-                      sx={{ borderRadius: 2, bgcolor: 'rgba(255,255,255,0.05)' }}
-                    />
-                  </Grid>
+                  {[400, 400].map((h, i) => (
+                    <Grid key={`chart-${i}`} size={{ xs: 12 }}>
+                      <Skeleton
+                        variant="rounded"
+                        height={h}
+                        sx={{ borderRadius: 2, bgcolor: 'rgba(255,255,255,0.05)' }}
+                      />
+                    </Grid>
+                  ))}
                 </Grid>
               </LoadingPanel>
             )}
@@ -528,17 +515,36 @@ export default function Page() {
                         <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.78)' }}>
                           Track activity
                         </Typography>
-                        <Typography variant="h6" sx={{ fontWeight: 800, mt: 0.3, mb: 1 }}>
+                        <Typography variant="h6" sx={{ fontWeight: 800, mt: 0.3 }}>
                           Laps logged by track
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: 'text.secondary', mb: 1 }}>
+                          All {formatNumber(trackActivityChart.trackCount)} tracks with at least one
+                          logged lap, sorted by activity.
                         </Typography>
                         <Chart
                           type="bar"
                           height={Math.max(300, trackActivityChart.categories.length * 40)}
                           series={[{ name: 'Entries', data: trackActivityChart.data }]}
+                          sx={{ cursor: 'pointer' }}
                           options={{
                             colors: CHART_COLORS,
                             fill: { type: 'solid' },
                             legend: { show: false },
+                            chart: {
+                              events: {
+                                dataPointSelection: (
+                                  _e: unknown,
+                                  _ctx: unknown,
+                                  opts: { dataPointIndex: number }
+                                ) => {
+                                  const trackId = trackActivityChart.trackIds[opts.dataPointIndex];
+                                  if (trackId) {
+                                    window.location.href = getLeaderboardHref(trackId);
+                                  }
+                                },
+                              },
+                            },
                             plotOptions: {
                               bar: {
                                 horizontal: true,
@@ -572,106 +578,103 @@ export default function Page() {
                             },
                           }}
                         />
+                        <Typography
+                          variant="caption"
+                          sx={{ color: 'rgba(255,255,255,0.5)', display: 'block', mt: 0.5 }}
+                        >
+                          Tap a bar to open that track&apos;s leaderboard.
+                        </Typography>
                       </Paper>
                     </Reveal>
                   </Grid>
                 )}
 
-                <Grid size={{ xs: 12, md: 6 }}>
-                  <Paper
-                    sx={{
-                      ...GLASS_PANEL_SPACIOUS_SX,
-                      ...brandAccentBorderSx(),
-                      ...glassCardMotionSx(9),
-                    }}
-                  >
-                    <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.78)' }}>
-                      Top Distance Drivers
-                    </Typography>
-                    <Stack spacing={1.25} sx={{ mt: 1.25 }}>
-                      {topDistanceDrivers.map((driver, idx) => (
-                        <Stack
-                          key={driver.guid}
-                          direction="row"
-                          justifyContent="space-between"
-                          alignItems="center"
-                          onClick={() => {
-                            window.location.href = getDriverProfileHref(driver.guid);
+                {driverActivityChart.categories.length > 0 && (
+                  <Grid size={{ xs: 12 }}>
+                    <Reveal>
+                      <Paper
+                        sx={{
+                          ...GLASS_PANEL_SPACIOUS_SX,
+                          ...brandAccentBorderSx(),
+                          ...glassCardMotionSx(9),
+                        }}
+                      >
+                        <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.78)' }}>
+                          Driver activity
+                        </Typography>
+                        <Typography variant="h6" sx={{ fontWeight: 800, mt: 0.3 }}>
+                          Distance driven
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: 'text.secondary', mb: 1 }}>
+                          Top {formatNumber(driverActivityChart.driverCount)} drivers by kilometers
+                          logged.
+                        </Typography>
+                        <Chart
+                          type="bar"
+                          height={Math.max(300, driverActivityChart.categories.length * 40)}
+                          series={[{ name: 'KM', data: driverActivityChart.data }]}
+                          sx={{ cursor: 'pointer' }}
+                          options={{
+                            colors: CHART_COLORS,
+                            fill: { type: 'solid' },
+                            legend: { show: false },
+                            chart: {
+                              events: {
+                                dataPointSelection: (
+                                  _e: unknown,
+                                  _ctx: unknown,
+                                  opts: { dataPointIndex: number }
+                                ) => {
+                                  const guid = driverActivityChart.guids[opts.dataPointIndex];
+                                  if (guid) {
+                                    window.location.href = getDriverProfileHref(guid);
+                                  }
+                                },
+                              },
+                            },
+                            plotOptions: {
+                              bar: {
+                                horizontal: true,
+                                distributed: true,
+                                borderRadius: 7,
+                                borderRadiusApplication: 'end',
+                                barHeight: '64%',
+                              },
+                            },
+                            dataLabels: {
+                              enabled: true,
+                              textAnchor: 'start',
+                              offsetX: 4,
+                              formatter: (v: number) => formatNumber(Number(v)),
+                              style: {
+                                colors: ['rgba(255,255,255,0.92)'],
+                                fontWeight: 700,
+                                fontSize: 'clamp(10px, 2.7vw, 12px)',
+                              },
+                            },
+                            xaxis: {
+                              categories: driverActivityChart.categories,
+                              labels: { show: false },
+                            },
+                            grid: {
+                              xaxis: { lines: { show: true } },
+                              yaxis: { lines: { show: false } },
+                            },
+                            tooltip: {
+                              y: { formatter: (v: number) => `${formatNumber(v)} km` },
+                            },
                           }}
-                          sx={{
-                            ...GLASS_INNER_ROW_SX,
-                            ...subtleEnterUpSx(idx, { baseDelayMs: 520 }),
-                          }}
+                        />
+                        <Typography
+                          variant="caption"
+                          sx={{ color: 'rgba(255,255,255,0.5)', display: 'block', mt: 0.5 }}
                         >
-                          <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                            #{idx + 1} {driver.name}
-                          </Typography>
-                          <Typography
-                            variant="body2"
-                            sx={{ color: 'text.secondary', fontFamily: 'monospace' }}
-                          >
-                            {formatNumber(driver.km)} km
-                          </Typography>
-                        </Stack>
-                      ))}
-                    </Stack>
-                  </Paper>
-                </Grid>
-
-                <Grid size={{ xs: 12, md: 6 }}>
-                  <Paper
-                    sx={{
-                      ...GLASS_PANEL_SPACIOUS_SX,
-                      ...brandAccentBorderSx(),
-                      ...glassCardMotionSx(10),
-                    }}
-                  >
-                    <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.78)' }}>
-                      Most Active Tracks
-                    </Typography>
-                    <Stack spacing={1.25} sx={{ mt: 1.25 }}>
-                      {topTracksByEntries.map((track, idx) => (
-                        <Stack
-                          key={track.trackId}
-                          direction="row"
-                          justifyContent="space-between"
-                          alignItems="center"
-                          onClick={() => {
-                            window.location.href = getLeaderboardHref(track.trackId);
-                          }}
-                          sx={{
-                            ...GLASS_INNER_ROW_SX,
-                            ...subtleEnterUpSx(idx, { baseDelayMs: 520 }),
-                          }}
-                        >
-                          <Box>
-                            <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                              #{idx + 1}{' '}
-                              <Link
-                                href={getLeaderboardHref(track.trackId)}
-                                onClick={(e) => e.stopPropagation()}
-                                underline="none"
-                                color="inherit"
-                                sx={{ fontWeight: 600 }}
-                              >
-                                {getTrackDisplayName(track.trackId)}
-                              </Link>
-                            </Typography>
-                            <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                              Best lap: {formatLaptime(track.bestLap)}
-                            </Typography>
-                          </Box>
-                          <Typography
-                            variant="body2"
-                            sx={{ color: 'text.secondary', fontFamily: 'monospace' }}
-                          >
-                            {formatNumber(track.entries)} entries
-                          </Typography>
-                        </Stack>
-                      ))}
-                    </Stack>
-                  </Paper>
-                </Grid>
+                          Tap a bar to open the driver profile.
+                        </Typography>
+                      </Paper>
+                    </Reveal>
+                  </Grid>
+                )}
               </Grid>
             )}
           </Stack>

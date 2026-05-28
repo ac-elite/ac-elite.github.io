@@ -14,6 +14,7 @@ import Typography from '@mui/material/Typography';
 import TableContainer from '@mui/material/TableContainer';
 
 import { useAdminLiveData } from 'src/lib/admin/use-admin-live-data';
+import { useAdminSyncStatus } from 'src/lib/admin/use-admin-sync-status';
 import { getSyncHealth, type SyncHealthProfile } from 'src/lib/sync-utils';
 import { SERVER_ENDPOINTS } from 'src/centralized/server-endpoints';
 import { SITE_REPO_URL } from 'src/centralized/site-urls';
@@ -126,6 +127,8 @@ const freshnessBodyCellSx = {
 export default function Page() {
   useTrackCatalogVersion();
   const data = useAdminLiveData();
+  const { status: syncStatus, loading: syncLoading, refresh: refreshSyncStatus } =
+    useAdminSyncStatus();
 
   const siteVisitsConfigured = isSiteVisitsConfigured();
   const [visitPhase, setVisitPhase] = useState<'off' | 'loading' | 'ready' | 'error'>(() =>
@@ -174,16 +177,40 @@ export default function Page() {
     };
   }, [siteVisitsConfigured, applyVisitStatsResult]);
 
-  const dataStatusRows = useMemo(
-    () =>
-      DATA_FILES.map((df) => {
-        const ts = df.getTimestamp(data);
-        const note = df.getNote?.(data) ?? '';
-        const health = getSyncHealth(ts, df.syncHealthProfile ?? 'default');
-        return { df, ts, note, health };
-      }),
-    [data]
-  );
+  const dataStatusRows = useMemo(() => {
+    const rows = DATA_FILES.map((df) => {
+      const ts = df.getTimestamp(data);
+      const note = df.getNote?.(data) ?? '';
+      const health = getSyncHealth(ts, df.syncHealthProfile ?? 'default');
+      return { df, ts, note, health };
+    });
+
+    const results = syncStatus?.results;
+    if (results) {
+      const ts = results.live.at ?? undefined;
+      const noteParts: string[] = [];
+      if (results.live.detail) noteParts.push(results.live.detail);
+      if (results.live.status === 'success') {
+        noteParts.push('Last run reported success');
+      } else if (results.live.status) {
+        noteParts.push(`Status: ${results.live.status}`);
+      }
+      if (results.live.error) noteParts.push(results.live.error);
+      rows.push({
+        df: {
+          file: 'sessions (Supabase)',
+          updatedBy: 'Results sync (AC server files)',
+          getTimestamp: () => ts,
+          syncHealthProfile: 'liveFeed' as const,
+        },
+        ts,
+        note: noteParts.join(' · ') || '—',
+        health: getSyncHealth(ts, 'liveFeed'),
+      });
+    }
+
+    return rows;
+  }, [data, syncStatus]);
 
   return (
     <AdminPageShell
@@ -200,7 +227,12 @@ export default function Page() {
         />
       </Box>
 
-      <AdminSyncStatusPanel motionIndex={2} />
+      <AdminSyncStatusPanel
+        motionIndex={2}
+        status={syncStatus}
+        loading={syncLoading}
+        onRefresh={() => void refreshSyncStatus()}
+      />
 
       <Paper sx={{ ...GLASS_PANEL_COMPACT_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(3) }}>
         <Typography variant="h6" sx={{ fontWeight: 800 }}>

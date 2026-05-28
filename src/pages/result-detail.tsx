@@ -20,7 +20,7 @@ import TableContainer from '@mui/material/TableContainer';
 import { CONFIG } from 'src/config-global';
 import { DATA_FILES } from 'src/centralized/data-files';
 import { fetchJson } from 'src/lib/fetch-json';
-import { getResultsIndexHref, getDriverProfileHref } from 'src/lib/routes';
+import { getResultsIndexHref, getDriverProfileHref, getLeaderboardHref } from 'src/lib/routes';
 import { glassCardMotionSx } from 'src/lib/subtle-motion';
 import { brandAccentBorderSx } from 'src/lib/status-accent';
 import { useTrackCatalogVersion } from 'src/centralized/track-info';
@@ -42,6 +42,7 @@ import {
   formatGap,
   type LapRow,
   resolveTrack,
+  resolveLeaderboardTrackId,
   TYPE_CHIP_SX,
   formatTotalTime,
   fetchSessionById,
@@ -51,6 +52,7 @@ import {
 
 import { ErrorPanel, LoadingPanel } from 'src/components/data-state';
 import { PageGridOverlay } from 'src/components/page-background/page-grid-overlay';
+import { useLicenseSafetyGuide } from 'src/components/license-safety-guide/license-safety-guide';
 
 const TYPE_LABEL: Record<string, string> = { RACE: 'Race', QUALIFY: 'Qualify', PRACTICE: 'Practice' };
 
@@ -181,6 +183,7 @@ function DriverLaps({
 
 export default function Page() {
   useTrackCatalogVersion(); // re-render once the live track catalog (names + hero images) loads
+  const { openGuide } = useLicenseSafetyGuide();
   const { sessionId } = useParams<{ sessionId: string }>();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -261,6 +264,9 @@ export default function Page() {
     ? resolveTrack(session.track_name, session.track_config)
     : { label: 'Session', hero: null, offset: 0 };
   const trackName = track.label !== '—' ? track.label : 'Session';
+  const leaderboardTrackId = session
+    ? resolveLeaderboardTrackId(session.track_name, session.track_config)
+    : null;
   const heroSrc = track.hero;
   const heroOffsetY = track.offset;
   const title = session ? `${trackName} — ${TYPE_LABEL[session.type] ?? session.type}` : 'Session';
@@ -321,8 +327,12 @@ export default function Page() {
                           'linear-gradient(180deg, rgba(6,10,20,0.15) 0%, rgba(7,12,24,0.45) 50%, rgba(8,14,28,0.9) 100%)',
                       }}
                     />
-                    {/* back button — top-left, inside the card */}
-                    <Box sx={{ position: 'absolute', top: 12, left: 12 }}>
+                    {/* back / leaderboard — top-left, inside the card */}
+                    <Stack
+                      direction="row"
+                      spacing={1}
+                      sx={{ position: 'absolute', top: 12, left: 12 }}
+                    >
                       <Button
                         size="small"
                         onClick={() => {
@@ -341,7 +351,27 @@ export default function Page() {
                       >
                         ← All results
                       </Button>
-                    </Box>
+                      {leaderboardTrackId ? (
+                        <Button
+                          size="small"
+                          onClick={() => {
+                            window.location.href = getLeaderboardHref(leaderboardTrackId);
+                          }}
+                          sx={{
+                            textTransform: 'none',
+                            fontWeight: 700,
+                            color: 'rgba(255,255,255,0.92)',
+                            bgcolor: 'rgba(8,14,28,0.5)',
+                            border: '1px solid rgba(255,255,255,0.18)',
+                            backdropFilter: 'blur(8px)',
+                            px: 1.25,
+                            '&:hover': { bgcolor: 'rgba(8,14,28,0.7)' },
+                          }}
+                        >
+                          Go to leaderboard
+                        </Button>
+                      ) : null}
+                    </Stack>
                     {/* title block — bottom-left */}
                     <Box sx={{ position: 'absolute', left: 16, right: 16, bottom: 12 }}>
                       <Stack direction="row" spacing={1.25} alignItems="center" flexWrap="wrap">
@@ -438,7 +468,17 @@ export default function Page() {
                                   <Chip
                                     size="small"
                                     label={badges.license}
-                                    sx={{ minWidth: LICENSE_CHIP_WIDTH, fontWeight: 700, justifyContent: 'center', ...getLicenseBadgeSx(badges.license) }}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      openGuide('license');
+                                    }}
+                                    sx={{
+                                      minWidth: LICENSE_CHIP_WIDTH,
+                                      fontWeight: 700,
+                                      justifyContent: 'center',
+                                      cursor: 'pointer',
+                                      ...getLicenseBadgeSx(badges.license),
+                                    }}
                                   />
                                 ) : (
                                   <Typography component="span" variant="body2" sx={{ color: 'text.secondary' }}>—</Typography>
@@ -449,7 +489,17 @@ export default function Page() {
                                   <Chip
                                     size="small"
                                     label={badges.srTier}
-                                    sx={{ minWidth: SR_CHIP_WIDTH, fontWeight: 700, justifyContent: 'center', ...getSRBadgeSx(badges.srTier) }}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      openGuide('safety');
+                                    }}
+                                    sx={{
+                                      minWidth: SR_CHIP_WIDTH,
+                                      fontWeight: 700,
+                                      justifyContent: 'center',
+                                      cursor: 'pointer',
+                                      ...getSRBadgeSx(badges.srTier),
+                                    }}
                                   />
                                 ) : (
                                   <Typography component="span" variant="body2" sx={{ color: 'text.secondary' }}>—</Typography>

@@ -11,7 +11,11 @@ import type { Theme, SxProps } from '@mui/material/styles';
 
 import { GLASS_CHIP_SHEEN_SX } from 'src/lib/glass';
 import { supabaseBaseUrl, supabaseHeaders, supabaseReadConfigured } from 'src/centralized/supabase-rest';
-import { getTrackInfo, getTrackDisplayName } from 'src/centralized/track-info';
+import {
+  getTrackInfo,
+  getTrackDisplayName,
+  normalizeServerTrackId,
+} from 'src/centralized/track-info';
 
 /** Liquid-glass session-type chip styling, shared by the list table + detail hero. */
 const chipSheen = GLASS_CHIP_SHEEN_SX as Record<string, unknown>;
@@ -207,6 +211,19 @@ export function resolveTrack(trackName: string | null, trackConfig: string | nul
     hero: info?.image?.trim() ? info.image.trim() : null,
     offset: typeof info?.imageOffsetY === 'number' && Number.isFinite(info.imageOffsetY) ? info.imageOffsetY : 0,
   };
+}
+
+/** Canonical catalog id for `?track=` on the leaderboard page. */
+export function resolveLeaderboardTrackId(
+  trackName: string | null,
+  trackConfig: string | null
+): string | null {
+  const name = (trackName ?? '').trim();
+  if (!name) return null;
+  const config = (trackConfig ?? '').trim();
+  const combined = config ? `${name}_${config}` : name;
+  const info = getTrackInfo(combined) ?? getTrackInfo(name);
+  return info?.id ?? normalizeServerTrackId(combined);
 }
 
 export async function fetchSessionById(id: number | string): Promise<SessionFull | null> {

@@ -1,5 +1,3 @@
-import { useState, useEffect, useCallback } from 'react';
-
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
 import Paper from '@mui/material/Paper';
@@ -18,17 +16,16 @@ import { glassCardMotionSx } from 'src/lib/subtle-motion';
 import { brandAccentBorderSx } from 'src/lib/status-accent';
 import { TABLE_HEAD_MUTED_COLOR } from 'src/lib/page-shell';
 import { getSyncHealth, formatTimeAgo } from 'src/lib/sync-utils';
-import {
-  fetchAdminSyncStatus,
-  type AdminSyncStatus,
-  type SyncServiceStatus,
-} from 'src/lib/admin/sync-status';
+import type { AdminSyncStatus, SyncServiceStatus } from 'src/lib/admin/sync-status';
 
 type Verdict = { label: string; color: string };
 
 /** What the *site* is actually serving right now for this feed. */
 function siteSourceVerdict(service: SyncServiceStatus): Verdict {
   if (service.siteOnBackup) {
+    if (service.hasStaticBackup === false) {
+      return { label: 'UNAVAILABLE', color: '#ef4444' };
+    }
     return { label: 'ON BACKUP', color: '#ef4444' };
   }
   if (service.live.status === 'error') {
@@ -104,7 +101,9 @@ function ServiceRow({ feed, service }: { feed: string; service: SyncServiceStatu
       </TableCell>
 
       <TableCell sx={{ ...bodyCellSx, color: 'text.secondary' }}>
-        <Typography variant="caption">{formatTimeAgo(service.backupAt ?? undefined)}</Typography>
+        <Typography variant="caption">
+          {service.hasStaticBackup === false ? '—' : formatTimeAgo(service.backupAt ?? undefined)}
+        </Typography>
       </TableCell>
 
       <TableCell sx={{ ...bodyCellSx }}>
@@ -126,29 +125,19 @@ function ServiceRow({ feed, service }: { feed: string; service: SyncServiceStatu
   );
 }
 
-export function AdminSyncStatusPanel({ motionIndex = 2 }: { motionIndex?: number }) {
-  const [status, setStatus] = useState<AdminSyncStatus | null>(null);
-  const [loading, setLoading] = useState(true);
+export type AdminSyncStatusPanelProps = {
+  motionIndex?: number;
+  status: AdminSyncStatus | null;
+  loading: boolean;
+  onRefresh: () => void;
+};
 
-  const load = useCallback(async () => {
-    setLoading(true);
-    const result = await fetchAdminSyncStatus();
-    setStatus(result);
-    setLoading(false);
-  }, []);
-
-  useEffect(() => {
-    let mounted = true;
-    void fetchAdminSyncStatus().then((result) => {
-      if (mounted) {
-        setStatus(result);
-        setLoading(false);
-      }
-    });
-    return () => {
-      mounted = false;
-    };
-  }, []);
+export function AdminSyncStatusPanel({
+  motionIndex = 2,
+  status,
+  loading,
+  onRefresh: refresh,
+}: AdminSyncStatusPanelProps) {
 
   return (
     <Paper
@@ -170,12 +159,13 @@ export function AdminSyncStatusPanel({ motionIndex = 2 }: { motionIndex?: number
             Live data services
           </Typography>
           <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.4 }}>
-            Realtime Supabase sync vs the GitHub Actions backup. When &ldquo;Site source&rdquo;
-            shows <strong>ON BACKUP</strong>, the live sync is down and the site is serving the
-            Actions data. A long all-green streak means the Actions are safe to retire.
+            Realtime Supabase sync vs the GitHub Actions backup (rankings and server status).
+            Session results are <strong>Supabase only</strong> — no static JSON backup. When
+            &ldquo;Site source&rdquo; shows <strong>ON BACKUP</strong>, rankings or server cards may
+            be serving Actions data.
           </Typography>
         </Box>
-        <Button variant="outlined" size="small" onClick={() => void load()} disabled={loading}>
+        <Button variant="outlined" size="small" onClick={() => void refresh()} disabled={loading}>
           {loading ? 'Refreshing…' : 'Refresh'}
         </Button>
       </Stack>
@@ -216,6 +206,7 @@ export function AdminSyncStatusPanel({ motionIndex = 2 }: { motionIndex?: number
               <>
                 <ServiceRow feed="KMR rank & leaderboard" service={status.kmr} />
                 <ServiceRow feed="Live server status" service={status.server} />
+                <ServiceRow feed="Session results" service={status.results} />
               </>
             )}
           </TableBody>
