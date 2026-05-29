@@ -372,7 +372,10 @@ export default function Page() {
             if (typeof entry?.laptime !== 'number') return false;
             if (entry.guid === driver.guid) return true;
             const rankedDriver = driverByGuid.get(entry.guid);
-            return Boolean(rankedDriver && (rankedDriver.kilometers || 0) >= 100);
+            if (!rankedDriver) return false;
+            // Field comparison excludes only the F safety grade (the unranked entry
+            // grade — also covers every sub-100km Rookie). E and above are included.
+            return getDriverSR(rankedDriver).tier !== 'F';
           })
           .sort((a, b) => (a.laptime || 0) - (b.laptime || 0));
 
@@ -401,9 +404,14 @@ export default function Page() {
     const avgPercentile = radarData.length
       ? Math.round(radarData.reduce((s, v) => s + v, 0) / radarData.length)
       : 0;
+    // Radar floor capped at 40 (outer ring = 100%). This keeps the scale gentle —
+    // a 10-point gap (85 vs 95%) shows a visible but not exaggerated difference —
+    // while still lifting top drivers off a featureless maxed-out polygon. Weaker
+    // drivers drop the floor below 40 so their sub-average tracks aren't clipped.
+    const radarMin = Math.min(40, Math.max(0, Math.floor((Math.min(...radarData) - 8) / 5) * 5));
     return {
       laps: { categories: byLaps.map((r) => r.trackName), data: byLaps.map((r) => r.laps) },
-      radar: { categories: qualifiedPaceRows.map((r) => r.trackName), data: radarData },
+      radar: { categories: qualifiedPaceRows.map((r) => r.trackName), data: radarData, min: radarMin },
       avgPercentile,
     };
   }, [driver, leaderboardData, rankData, trackRows]);
@@ -974,7 +982,8 @@ export default function Page() {
                             variant="caption"
                             sx={{ display: 'block', color: 'text.secondary', mb: 1 }}
                           >
-                            Qualified field you beat on each track · outer ring = fastest
+                            Qualified field you beat on each track · outer ring = fastest ·
+                            scaled to highlight differences
                           </Typography>
                           {performanceCharts.radar ? (
                             <Chart
@@ -987,7 +996,7 @@ export default function Page() {
                                 stroke: { width: 2.5 },
                                 fill: { type: 'solid', opacity: 0.32 },
                                 markers: { size: 4, strokeWidth: 0 },
-                                yaxis: { show: false, min: 0, max: 100 },
+                                yaxis: { show: false, min: performanceCharts.radar.min, max: 100 },
                                 tooltip: {
                                   y: { formatter: (v: number) => `Faster than ${v}% of the grid` },
                                 },
