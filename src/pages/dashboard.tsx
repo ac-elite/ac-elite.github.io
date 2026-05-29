@@ -70,9 +70,17 @@ function GridCompositionSection({ rankData }: { rankData: RankDriver[] }) {
       return b[1] - a[1];
     });
 
+    const series = entries.map((e) => e[1]);
+    // Display-only angular sizes: a gentle power compression (exp 0.7) widens the
+    // tiny top tiers (Elite/Diamond+) enough to be visible and trims the dominant
+    // Bronze wedge — slight, deliberate disproportion. Legend %, tooltip counts and
+    // the center total all stay sourced from the real `series`/`total` below.
+    const displaySeries = series.map((v) => Math.round(Math.pow(v, 0.7) * 100) / 100);
+
     return {
       labels: entries.map((e) => e[0]),
-      series: entries.map((e) => e[1]),
+      series,
+      displaySeries,
       colors: entries.map((e) => `rgb(${LICENSE_TIER_RGB[e[0]] ?? LICENSE_TIER_RGB.Bronze})`),
       total: entries.reduce((sum, e) => sum + e[1], 0),
     };
@@ -120,7 +128,7 @@ function GridCompositionSection({ rankData }: { rankData: RankDriver[] }) {
             </Typography>
             <Typography color="text.secondary">
               How the field breaks down across earned license tiers and Safety Rating —{' '}
-              {formatNumber(dist.total)} ranked drivers (starting Rookie &amp; F tiers excluded).
+              {formatNumber(dist.total)} ranked drivers (Rookie &amp; F tiers excluded).
             </Typography>
           </Stack>
 
@@ -134,15 +142,36 @@ function GridCompositionSection({ rankData }: { rankData: RankDriver[] }) {
                   <Chart
                     type="donut"
                     height={360}
-                    series={dist.series}
+                    series={dist.displaySeries}
                     options={{
+                      // Disable ApexCharts' default pie/donut drop shadow so the chart
+                      // sits flat like the bar chart and the rest of the site's charts.
+                      chart: { dropShadow: { enabled: false } },
                       labels: dist.labels,
                       colors: dist.colors,
                       stroke: { width: 0 },
                       fill: { type: 'solid' },
-                      legend: { position: 'bottom', horizontalAlign: 'center' },
+                      // Append each tier's share so the small slivers stay quantifiable.
+                      legend: {
+                        position: 'bottom',
+                        horizontalAlign: 'center',
+                        formatter: (name: string, opts: { seriesIndex: number }) => {
+                          const value = dist.series[opts.seriesIndex] ?? 0;
+                          const pct = dist.total > 0 ? (value / dist.total) * 100 : 0;
+                          return `${name} · ${pct < 1 ? '<1' : pct.toFixed(0)}%`;
+                        },
+                      },
                       dataLabels: { enabled: false },
-                      tooltip: { y: { formatter: (v: number) => `${formatNumber(v)} drivers` } },
+                      tooltip: {
+                        // Pie/donut otherwise fills the tooltip row with the slice color,
+                        // which leaves white text unreadable on light tiers (Platinum/Silver).
+                        fillSeriesColor: false,
+                        y: {
+                          // Map the compressed display value back to the real count.
+                          formatter: (_v: number, opts: { seriesIndex: number }) =>
+                            `${formatNumber(dist.series[opts.seriesIndex] ?? 0)} drivers`,
+                        },
+                      },
                       plotOptions: {
                         pie: {
                           donut: {
@@ -154,7 +183,10 @@ function GridCompositionSection({ rankData }: { rankData: RankDriver[] }) {
                                 color: '#fff',
                                 fontSize: 'clamp(22px, 6.5vw, 30px)',
                                 fontWeight: 800,
-                                formatter: (v: string) => formatNumber(Number(v)),
+                                // Show the real count for the hovered slice, not the
+                                // compressed display value.
+                                formatter: (_v: string, opts?: { seriesIndex: number }) =>
+                                  formatNumber(dist.series[opts?.seriesIndex ?? 0] ?? 0),
                               },
                               total: {
                                 show: true,
@@ -206,7 +238,13 @@ function GridCompositionSection({ rankData }: { rankData: RankDriver[] }) {
                         },
                       },
                       xaxis: { categories: grades.categories },
-                      yaxis: { labels: { formatter: (v: number) => formatNumber(Math.round(v)) } },
+                      // Log scale so the small grades (S/A/B…) stay legible next to the
+                      // dominant entry grade instead of collapsing into invisible stubs.
+                      yaxis: {
+                        logarithmic: true,
+                        logBase: 10,
+                        labels: { formatter: (v: number) => formatNumber(Math.round(v)) },
+                      },
                       grid: { xaxis: { lines: { show: false } }, yaxis: { lines: { show: true } } },
                       tooltip: { y: { formatter: (v: number) => `${formatNumber(v)} drivers` } },
                     }}
