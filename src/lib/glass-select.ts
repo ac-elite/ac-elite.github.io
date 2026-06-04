@@ -48,6 +48,31 @@ export const GLASS_SELECT_SX: SxProps<Theme> = {
   },
 };
 
+/**
+ * Glass filter button — matches {@link GLASS_SELECT_SX} so a row of toggle
+ * buttons (e.g. the Results session-type filter) reads as the same control
+ * family as the adjacent track Select. `active` lights the focused accent rim.
+ */
+export const glassFilterButtonSx = (active: boolean): SxProps<Theme> => ({
+  height: 40,
+  px: 2,
+  borderRadius: 2,
+  fontWeight: 700,
+  textTransform: 'none',
+  color: '#fff',
+  border: '1px solid',
+  bgcolor: active ? 'rgba(255,255,255,0.04)' : 'rgba(255,255,255,0.012)',
+  backgroundImage: 'linear-gradient(180deg, rgba(255,255,255,0.026) 0%, rgba(255,255,255,0.003) 100%)',
+  borderColor: active ? 'rgba(191,225,255,0.95)' : 'rgba(226,242,255,0.12)',
+  boxShadow: active
+    ? 'inset 0 1px 0 rgba(255,255,255,0.09), inset 0 0 0 1px rgba(147,197,253,0.32)'
+    : 'inset 0 1px 0 rgba(255,255,255,0.09), inset 0 -1px 0 rgba(0,0,0,0.1)',
+  '&:hover': {
+    bgcolor: active ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.032)',
+    borderColor: active ? 'rgba(191,225,255,0.95)' : 'rgba(226,242,255,0.18)',
+  },
+});
+
 export const GLASS_SELECT_MENU_PROPS = {
   PaperProps: {
     sx: {
