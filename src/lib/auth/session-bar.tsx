@@ -78,7 +78,10 @@ export function SessionBar({ compact = false }: SessionBarProps = {}) {
   // the raw Steam persona so it matches the rest of the site.
   const steamId = auth.profile?.steamId ?? null;
   const siteName = steamId ? driverDir.byGuid.get(steamId)?.trim() : undefined;
-  const steamName = auth.profile?.displayName?.trim();
+  // Only Steam accounts have a real name. The legacy admin accounts store the
+  // synthetic email (e.g. `owner@ac-elite.local`) as their display_name, so for
+  // those we show the role label instead — never the email.
+  const steamName = steamId ? auth.profile?.displayName?.trim() : undefined;
   const chipLabel = siteName || steamName || (role ? ROLE_LABEL[role] : 'Account');
   const chipStyleKey = role ? ROLE_TO_CHIP_STYLE[role] : 'Driver';
   const driverHref = steamId ? getDriverRoute(steamId) : null;
