@@ -40,6 +40,7 @@ import {
 } from 'src/lib/ac-elite-data';
 import {
   formatGap,
+  windCompass,
   type LapRow,
   impactSpeedToKmh,
   formatIncidentElapsed,
@@ -416,6 +417,18 @@ export default function Page() {
                           : '—'
                       }
                     />
+                    {session.ambient_temp != null || session.road_temp != null ? (
+                      <HeaderStat
+                        label="Temp (air / track)"
+                        value={`${session.ambient_temp != null ? `${Math.round(session.ambient_temp)}°` : '—'} / ${session.road_temp != null ? `${Math.round(session.road_temp)}°` : '—'}`}
+                      />
+                    ) : null}
+                    {session.wind_speed != null ? (
+                      <HeaderStat
+                        label="Wind"
+                        value={`${Math.round(session.wind_speed)} km/h${session.wind_dir != null ? ` ${windCompass(session.wind_dir)} (${Math.round(session.wind_dir)}°)` : ''}`}
+                      />
+                    ) : null}
                   </Stack>
                 </Paper>
 

@@ -128,7 +128,27 @@ export type SessionDetail = {
   incidents: IncidentRow[];
 };
 
-export type SessionFull = SessionSummary & { detail: SessionDetail };
+/**
+ * Session weather, read from each lap's AC `Conditions` at ingest. AC Elite runs
+ * no rain, so these are effectively constant per session. Only populated for
+ * sessions ingested after the weather columns were added (no backfill), so always
+ * guard for null. Detail page only — not part of the list `SUMMARY_SELECT`.
+ */
+export type SessionWeather = {
+  ambient_temp: number | null;
+  road_temp: number | null;
+  wind_speed: number | null;
+  wind_dir: number | null;
+};
+
+export type SessionFull = SessionSummary & SessionWeather & { detail: SessionDetail };
+
+/** Compass label for a wind direction in degrees (0 = N, clockwise). */
+export function windCompass(deg: number | null): string {
+  if (deg == null || !Number.isFinite(deg)) return '';
+  const dirs = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+  return dirs[Math.round(((deg % 360) + 360) % 360 / 45) % 8];
+}
 
 const SUMMARY_SELECT =
   'id,session_file,type,track_name,track_config,event_name,session_date,' +
