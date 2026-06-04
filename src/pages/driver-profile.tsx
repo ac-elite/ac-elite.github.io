@@ -83,6 +83,10 @@ import { useLicenseSafetyGuide } from 'src/components/license-safety-guide/licen
 /** Stagger inner stat cards after the hero panel starts animating */
 const INNER_CARD_MOTION = { baseDelayMs: 380 } as const;
 
+/** KMR money tile accent — matches the +/- colours used by {@link DeltaChip}. */
+const MONEY_POSITIVE = '#4ADE80';
+const MONEY_NEGATIVE = '#FB7185';
+
 /** Top row: License + SR span half the grid each; below: 6 + 6 compact stats (14 cells). */
 const DRIVER_STAT_GRID_SX = {
   display: 'grid',
@@ -744,10 +748,48 @@ export default function Page() {
                             ) : null}
                           </Stack>
                         </Paper>
+                        {(() => {
+                          const money =
+                            typeof driver.points === 'number' && Number.isFinite(driver.points)
+                              ? driver.points
+                              : null;
+                          const accent =
+                            money == null
+                              ? null
+                              : money < 0
+                                ? MONEY_NEGATIVE
+                                : money > 0
+                                  ? MONEY_POSITIVE
+                                  : null;
+                          return (
+                            <Paper
+                              sx={{
+                                ...DRIVER_STAT_COMPACT_SX,
+                                ...glassCardEnterOnlySx(2, INNER_CARD_MOTION),
+                              }}
+                            >
+                              <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                                KMR Money
+                              </Typography>
+                              <Typography
+                                variant="subtitle1"
+                                sx={{
+                                  fontWeight: 800,
+                                  mt: 0.35,
+                                  color: accent ?? undefined,
+                                }}
+                              >
+                                {money != null
+                                  ? `$${Math.round(money * 1000).toLocaleString('en-GB')}`
+                                  : '—'}
+                              </Typography>
+                            </Paper>
+                          );
+                        })()}
                         <Paper
                           sx={{
                             ...DRIVER_STAT_COMPACT_SX,
-                            ...glassCardEnterOnlySx(2, INNER_CARD_MOTION),
+                            ...glassCardEnterOnlySx(3, INNER_CARD_MOTION),
                           }}
                         >
                           <Typography variant="caption" sx={{ color: 'text.secondary' }}>
@@ -760,7 +802,7 @@ export default function Page() {
                         <Paper
                           sx={{
                             ...DRIVER_STAT_COMPACT_SX,
-                            ...glassCardEnterOnlySx(3, INNER_CARD_MOTION),
+                            ...glassCardEnterOnlySx(4, INNER_CARD_MOTION),
                           }}
                         >
                           <Typography variant="caption" sx={{ color: 'text.secondary' }}>
@@ -773,7 +815,7 @@ export default function Page() {
                         <Paper
                           sx={{
                             ...DRIVER_STAT_COMPACT_SX,
-                            ...glassCardEnterOnlySx(4, INNER_CARD_MOTION),
+                            ...glassCardEnterOnlySx(5, INNER_CARD_MOTION),
                           }}
                         >
                           <Typography variant="caption" sx={{ color: 'text.secondary' }}>
@@ -781,21 +823,6 @@ export default function Page() {
                           </Typography>
                           <Typography variant="subtitle1" sx={{ fontWeight: 800, mt: 0.35 }}>
                             {formatNumber(totalLaps)}
-                          </Typography>
-                        </Paper>
-                        <Paper
-                          sx={{
-                            ...DRIVER_STAT_COMPACT_SX,
-                            ...glassCardEnterOnlySx(5, INNER_CARD_MOTION),
-                          }}
-                        >
-                          <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                            Rank points
-                          </Typography>
-                          <Typography variant="subtitle1" sx={{ fontWeight: 800, mt: 0.35 }}>
-                            {driver.points != null && Number.isFinite(driver.points)
-                              ? driver.points.toLocaleString('en-GB', { maximumFractionDigits: 1 })
-                              : '—'}
                           </Typography>
                         </Paper>
                         <Paper
