@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { Icon } from '@iconify/react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
@@ -7,14 +7,20 @@ import Alert from '@mui/material/Alert';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
+import Divider from '@mui/material/Divider';
 import Container from '@mui/material/Container';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import InputAdornment from '@mui/material/InputAdornment';
 
 import { CONFIG } from 'src/config-global';
-import { useAuth } from 'src/lib/auth/auth-context';
-import { APP_ROUTES } from 'src/centralized/app-routes';
+import {
+  useAuth,
+  getSteamLoginUrl,
+  hasSteamOpenIdParams,
+  readSteamOpenIdParams,
+} from 'src/lib/auth/auth-context';
+import { APP_ROUTES, getDriverRoute } from 'src/centralized/app-routes';
 import { GLASS_PANEL_SX } from 'src/lib/glass';
 import { brandAccentBorderSx } from 'src/lib/status-accent';
 import { glassCardMotionSx, softFloatWrapperSx } from 'src/lib/subtle-motion';
@@ -51,14 +57,48 @@ export default function Page() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [steamBusy, setSteamBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Already signed in? Bounce straight to where they were heading.
+  // Already signed in? Bounce straight to where they were heading. Drivers have
+  // no admin area, so send them to their own driver page instead.
   useEffect(() => {
     if (!auth.loading && auth.user && auth.profile) {
-      navigate(redirectTo, { replace: true });
+      const target =
+        auth.profile.role === 'driver' && auth.profile.steamId
+          ? getDriverRoute(auth.profile.steamId)
+          : redirectTo;
+      navigate(target, { replace: true });
     }
   }, [auth.loading, auth.user, auth.profile, redirectTo, navigate]);
+
+  // Returning from Steam? The redirect lands here with `openid.*` params —
+  // verify them server-side and establish a session. On success the effect
+  // above handles the redirect once the profile arrives.
+  //
+  // The ref guard makes this run exactly once: a Steam assertion is single-use,
+  // and React StrictMode invokes mount effects twice in dev — without the guard
+  // the second run re-sends the (now spent) assertion and Steam rejects it.
+  const steamHandledRef = useRef(false);
+  useEffect(() => {
+    if (!auth.configured) return;
+    if (!hasSteamOpenIdParams(window.location.search)) return;
+    if (steamHandledRef.current) return;
+    steamHandledRef.current = true;
+    setSteamBusy(true);
+    setError(null);
+    void (async () => {
+      const result = await auth.completeSteamLogin(readSteamOpenIdParams(window.location.search));
+      setSteamBusy(false);
+      if (!result.ok) {
+        setError(result.error ?? 'Steam sign-in failed.');
+        // Strip the consumed assertion so a refresh doesn't retry it.
+        navigate(APP_ROUTES.login, { replace: true });
+      }
+    })();
+    // Run once on mount — the openid params are read straight off the URL.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const onSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -116,7 +156,7 @@ export default function Page() {
                     variant="body2"
                     sx={{ color: 'text.secondary', mt: 0.75, maxWidth: 320 }}
                   >
-                    Sign in to your AC Elite account to continue. Driver accounts are coming soon.
+                    Sign in with your account to continue, or use Steam to sign in as a driver.
                   </Typography>
                 </Box>
               </Stack>
@@ -237,6 +277,41 @@ export default function Page() {
                   }}
                 >
                   {submitting ? 'Signing in…' : 'Sign in'}
+                </Button>
+
+                <Divider sx={{ '&::before, &::after': { borderColor: 'rgba(148,163,184,0.22)' } }}>
+                  <Typography
+                    variant="caption"
+                    sx={{ color: 'text.secondary', px: 1, fontWeight: 700, letterSpacing: '0.06em' }}
+                  >
+                    OR
+                  </Typography>
+                </Divider>
+
+                <Button
+                  type="button"
+                  variant="outlined"
+                  size="large"
+                  onClick={() => {
+                    window.location.href = getSteamLoginUrl();
+                  }}
+                  disabled={!auth.configured || steamBusy}
+                  startIcon={<Icon icon="mdi:steam" width={22} />}
+                  sx={{
+                    minHeight: 'clamp(38px, 10vw, 44px)',
+                    fontSize: 'clamp(0.85rem, 0.76rem + 0.4vw, 0.95rem)',
+                    fontWeight: 700,
+                    color: '#e2e8f0',
+                    borderColor: 'rgba(148,163,184,0.4)',
+                    background:
+                      'linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)',
+                    '&:hover': {
+                      borderColor: 'rgba(191,219,254,0.7)',
+                      background: 'rgba(191,219,254,0.08)',
+                    },
+                  }}
+                >
+                  {steamBusy ? 'Completing Steam sign-in…' : 'Sign in with Steam'}
                 </Button>
 
                 <Stack

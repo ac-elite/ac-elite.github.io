@@ -68,6 +68,8 @@ export const ROLE_CHIP_SX = {
   Creator: roleGlassChipSx('237,66,69', '#fff'),
   Admin: roleGlassChipSx('168,85,247', '#fff'),
   Moderator: roleGlassChipSx('74,222,128', '#0a2e14'),
+  // Neutral slate — used for signed-in drivers (no staff role).
+  Driver: roleGlassChipSx('148,163,184', '#e2e8f0'),
 } as const satisfies Record<string, SxProps<Theme>>;
 
 export type DiscordRole = keyof typeof ROLE_CHIP_SX;
