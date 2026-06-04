@@ -134,22 +134,9 @@ export type SoftFloatWrapperOptions = {
   alternatePhase?: boolean;
 };
 
-const softAmbientFloat = keyframes`
-  0%, 100% {
-    transform: translate3d(0, 0, 0);
-  }
-  50% {
-    transform: translate3d(0, -1.5px, 0);
-  }
-`;
-
 export function softFloatWrapperSx(_options?: SoftFloatWrapperOptions): SxProps<Theme> {
   return {
     width: '100%',
-    animation: `${softAmbientFloat} 9s ease-in-out ${_options?.alternatePhase ? '-3.8s' : '0s'} infinite`,
-    '@media (prefers-reduced-motion: reduce)': {
-      animation: 'none',
-    },
   };
 }
 
