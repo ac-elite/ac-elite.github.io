@@ -7,10 +7,14 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import { alpha } from '@mui/material/styles';
 
+import { RouterLink } from 'src/routes/components';
+
 import { GLASS_CARD_INNER_SX } from 'src/lib/glass';
 import { ROLE_CHIP_SX } from 'src/lib/ac-elite-data';
 import { OUTLINED_GLASS_WHITE_SX } from 'src/lib/page-shell';
+import { getDriverRoute } from 'src/centralized/app-routes';
 
+import { useDriverDirectory } from './bans-db';
 import { useAuth, ROLE_LABEL, type AppRole, ROLE_TO_CHIP_STYLE } from './auth-context';
 
 // ----------------------------------------------------------------------
@@ -23,12 +27,14 @@ const ROLE_ACCENT: Record<AppRole, string> = {
   owner: '#ED4245', // red
   admin: '#A855F7', // purple
   moderator: '#22C55E', // green
+  driver: '#94A3B8', // slate (neutral)
 };
 
 const ROLE_ICON: Record<AppRole, string> = {
   owner: 'solar:crown-bold',
   admin: 'solar:shield-keyhole-bold',
   moderator: 'solar:user-id-bold',
+  driver: 'solar:user-bold',
 };
 
 function roleAccentEdgeSx(accent: string, width: number, opacity: number) {
@@ -58,11 +64,71 @@ export type SessionBarProps = {
 
 export function SessionBar({ compact = false }: SessionBarProps = {}) {
   const auth = useAuth();
+  // Driver name as known on the site (rank.json, keyed by SteamID) — must be
+  // called unconditionally, before the early return below.
+  const driverDir = useDriverDirectory();
 
   if (auth.loading || !auth.user) return null;
 
   const role = auth.profile?.role;
   const accent = role ? ROLE_ACCENT[role] : 'rgba(148,163,184,0.6)';
+
+  // Chip shows the name, coloured by role; clickable through to the user's own
+  // driver page when we know their SteamID. Prefer the site's driver name over
+  // the raw Steam persona so it matches the rest of the site.
+  const steamId = auth.profile?.steamId ?? null;
+  const siteName = steamId ? driverDir.byGuid.get(steamId)?.trim() : undefined;
+  const steamName = auth.profile?.displayName?.trim();
+  const chipLabel = siteName || steamName || (role ? ROLE_LABEL[role] : 'Account');
+  const chipStyleKey = role ? ROLE_TO_CHIP_STYLE[role] : 'Driver';
+  const driverHref = steamId ? getDriverRoute(steamId) : null;
+
+  const renderNameChip = (extraSx: object) => (
+    <Chip
+      size="small"
+      label={
+        driverHref ? (
+          <Box
+            component="span"
+            sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.4, minWidth: 0, maxWidth: '100%' }}
+          >
+            <Box
+              component="span"
+              sx={{
+                minWidth: 0,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {chipLabel}
+            </Box>
+            <Icon icon="solar:arrow-right-up-linear" width={13} style={{ flexShrink: 0, opacity: 0.85 }} />
+          </Box>
+        ) : (
+          chipLabel
+        )
+      }
+      {...(driverHref
+        ? { component: RouterLink, href: driverHref, clickable: true, title: 'View your driver page' }
+        : {})}
+      sx={{
+        fontWeight: 800,
+        ...ROLE_CHIP_SX[chipStyleKey],
+        ...(driverHref
+          ? {
+              cursor: 'pointer',
+              transition: 'transform 0.15s ease, filter 0.15s ease, box-shadow 0.15s ease',
+              '&:hover': {
+                filter: 'brightness(1.12)',
+                transform: 'translateY(-1px)',
+              },
+            }
+          : {}),
+        ...extraSx,
+      }}
+    />
+  );
 
   if (compact) {
     return (
@@ -76,18 +142,18 @@ export function SessionBar({ compact = false }: SessionBarProps = {}) {
           flexShrink: 0,
           mx: 1,
           my: 1,
-          px: 1.25,
-          py: 1,
-          borderRadius: 1.25,
+          px: 1.5,
+          py: 1.25,
+          borderRadius: 1.5,
         }}
       >
-        <Stack direction="row" spacing={1} alignItems="center">
+        <Stack direction="row" spacing={1.1} alignItems="center">
           {role && (
             <Box
               sx={{
-                width: 30,
-                height: 30,
-                borderRadius: 1,
+                width: 36,
+                height: 36,
+                borderRadius: 1.25,
                 display: 'inline-flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -100,42 +166,22 @@ export function SessionBar({ compact = false }: SessionBarProps = {}) {
                 boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.16)',
               }}
             >
-              <Icon icon={ROLE_ICON[role]} width={16} />
+              <Icon icon={ROLE_ICON[role]} width={20} />
             </Box>
           )}
-          <Stack direction="row" spacing={0.75} alignItems="center" sx={{ minWidth: 0, flex: 1 }}>
-            <Typography
-              component="span"
-              variant="caption"
-              sx={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                height: 18,
-                color: 'text.secondary',
-                textTransform: 'uppercase',
-                letterSpacing: '0.08em',
-                fontWeight: 700,
-                fontSize: '0.6rem',
-                lineHeight: 1,
-                whiteSpace: 'nowrap',
-              }}
-            >
-              Signed in as
-            </Typography>
-            {role && (
-              <Chip
-                size="small"
-                label={ROLE_LABEL[role]}
-                sx={{
-                  fontWeight: 800,
-                  fontSize: '0.62rem',
-                  height: 18,
-                  '& .MuiChip-label': { px: 0.6 },
-                  ...ROLE_CHIP_SX[ROLE_TO_CHIP_STYLE[role]],
-                }}
-              />
-            )}
-          </Stack>
+          <Box sx={{ minWidth: 0, flex: 1, display: 'flex' }}>
+            {renderNameChip({
+              fontSize: '0.82rem',
+              height: 28,
+              minWidth: 0,
+              maxWidth: '100%',
+              '& .MuiChip-label': {
+                px: 1.15,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+              },
+            })}
+          </Box>
           <Box
             component="button"
             type="button"
@@ -151,8 +197,10 @@ export function SessionBar({ compact = false }: SessionBarProps = {}) {
               boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.14)',
               color: 'rgba(226,232,240,0.85)',
               cursor: 'pointer',
-              p: 0.65,
-              borderRadius: 1,
+              p: 0.85,
+              borderRadius: 1.1,
+              flexShrink: 0,
+              alignSelf: 'center',
               display: 'inline-flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -164,7 +212,7 @@ export function SessionBar({ compact = false }: SessionBarProps = {}) {
               },
             }}
           >
-            <Icon icon="solar:logout-3-linear" width={15} />
+            <Icon icon="solar:logout-3-linear" width={17} />
           </Box>
         </Stack>
       </Box>
@@ -247,18 +295,7 @@ export function SessionBar({ compact = false }: SessionBarProps = {}) {
             >
               Signed in as
             </Typography>
-            {role && (
-              <Chip
-                size="small"
-                label={ROLE_LABEL[role]}
-                sx={{
-                  fontWeight: 800,
-                  fontSize: '0.72rem',
-                  height: 24,
-                  ...ROLE_CHIP_SX[ROLE_TO_CHIP_STYLE[role]],
-                }}
-              />
-            )}
+            {renderNameChip({ fontSize: '0.72rem', height: 24 })}
           </Stack>
         </Stack>
 

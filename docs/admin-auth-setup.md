@@ -96,11 +96,72 @@ Wat je verwacht te zien:
 
 ---
 
-## 5. Wat staat er nog op de planning
+## 5. Steam-login (iedere driver z'n eigen account)
+
+Naast de drie backup-accounts hierboven kan **iedereen inloggen via Steam**.
+Je SteamID64 ís je account; je rol komt uit de staff-mapping (anders ben je
+`driver`). De drie username/wachtwoord-accounts blijven bestaan als backup.
+
+### 5.1 Migratie draaien
+
+Plak en **Run** in de SQL Editor:
+[`supabase/migrations/20260604_steam_auth.sql`](../supabase/migrations/20260604_steam_auth.sql).
+
+Dit voegt toe: de rol `driver`, de kolommen `steam_id` / `avatar_url` op
+`profiles`, en de tabel `staff_roles` (SteamID64 → rol), geseed uit
+`SITE_TEAM_ROLES`.
+
+### 5.2 Edge function + secret
+
+```bash
+supabase functions deploy steam-auth
+supabase secrets set STEAM_API_KEY=<jouw-steam-web-api-key>
+```
+
+De Steam Web API key haal je (gratis) op via
+<https://steamcommunity.com/dev/apikey> — vul als domein je site-domein in
+(bv. `ac-elite.github.io`). **Zet de key alleen als secret, nooit in de repo.**
+
+> De functie gebruikt bewust `auth.admin.generateLink` (mint alleen een token,
+> verstuurt géén mail) i.p.v. `signInWithOtp` — dat laatste is op de Supabase
+> free plan hard gerate-limit.
+
+### 5.3 Rollen koppelen aan SteamID's
+
+De server-side bron is de tabel `public.staff_roles`. Die is geseed uit
+`src/site-manual-config.ts` (`SITE_TEAM_ROLES`: creator→`owner`, admin→`admin`,
+moderator→`moderator`). **Belangrijk:** dat zijn twee plekken die je
+synchroon houdt:
+
+- `SITE_TEAM_ROLES` (TS) → de gekleurde rol-chips op de publieke driver-pages.
+- `staff_roles` (DB) → de rol die je krijgt bij het inloggen (RLS / edge-checks).
+
+Wijzig je iemands rol, werk dan beide bij. Voor de DB:
+
+```sql
+insert into public.staff_roles (steam_id, role, note)
+values ('7656119xxxxxxxxxx', 'admin', 'Naam')
+on conflict (steam_id) do update set role = excluded.role, note = excluded.note;
+```
+
+Je eigen SteamID64 vind je via <https://steamid.io> of in `rank.json` — het is
+dezelfde 17-cijferige GUID die ook op je driver-page in de URL staat
+(`/driver/<steamid>`).
+
+### 5.4 Wat je verwacht te zien
+
+- **Staff** (in `staff_roles`): chip met je Steam-naam in je rolkleur; admin
+  panel toegankelijk.
+- **Driver** (niet in `staff_roles`): neutrale (grijze) chip met je Steam-naam;
+  admin panel blokkeert.
+- De chip is klikbaar → je eigen driver-page.
+
+---
+
+## 6. Wat staat er nog op de planning
 
 - **Image upload voor tracks** (admin + owner). Komt in een volgende stap;
   rol-afhankelijke knoppen worden in de UI verstopt voor moderator en
   Storage-policies dwingen het server-side af.
 - **User management UI** voor de owner (rollen wijzigen, accounts
   toevoegen/verwijderen) — voor nu via Supabase dashboard.
-- **Steam-registratie** als iedere driver later z'n eigen account krijgt.
