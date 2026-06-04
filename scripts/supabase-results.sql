@@ -34,6 +34,10 @@ create table if not exists public.sessions (
   best_lap_name text,
   winner_guid   text,                           -- P1 (race) / pole (qualify/practice)
   winner_name   text,
+  ambient_temp  real,                            -- °C, AC Conditions.Ambient (no rain → constant per session)
+  road_temp     real,                            -- °C, AC Conditions.Road
+  wind_speed    real,                            -- km/h, AC Conditions.WindSpeed
+  wind_dir      int,                             -- degrees, AC Conditions.WindDirection
   -- Only sessions with >= 2 drivers who actually drove are `listed`. Idle/empty
   -- sessions are kept as `listed = false` markers (no detail) so the sync dedupes
   -- them without re-downloading, but they never show on the site.

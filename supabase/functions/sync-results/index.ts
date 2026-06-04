@@ -48,6 +48,12 @@ function json(body: unknown, status = 200): Response {
 // --- AC result file shapes (only the fields we keep) -------------------------
 type RawDriver = { Guid?: string; Name?: string; Nation?: string };
 type RawCar = { CarId: number; Driver?: RawDriver; Model?: string; Skin?: string };
+type RawConditions = {
+  Ambient?: number;
+  Road?: number;
+  WindSpeed?: number;
+  WindDirection?: number;
+};
 type RawLap = {
   CarId: number;
   DriverGuid?: string;
@@ -57,6 +63,7 @@ type RawLap = {
   Cuts?: number;
   Tyre?: string;
   Timestamp?: number;
+  Conditions?: RawConditions;
 };
 type RawResult = {
   CarId: number;
@@ -105,6 +112,25 @@ function downloadToBuffer(client: ftp.Client, remotePath: string): Promise<Buffe
 
 function validLap(ms: number | undefined): number | null {
   return typeof ms === 'number' && ms > 0 && ms < NO_TIME ? ms : null;
+}
+
+function num(v: number | undefined): number | null {
+  return typeof v === 'number' && Number.isFinite(v) ? v : null;
+}
+
+/**
+ * One representative weather reading for the session. AC Elite runs no rain, so
+ * `Conditions` is effectively constant across laps — take the first lap that has
+ * a `Conditions` block. Returns all-null when no lap carried conditions.
+ */
+function sessionWeather(laps: RawLap[]) {
+  const c = laps.find((l) => l.Conditions)?.Conditions;
+  return {
+    ambient_temp: num(c?.Ambient),
+    road_temp: num(c?.Road),
+    wind_speed: num(c?.WindSpeed),
+    wind_dir: num(c?.WindDirection),
+  };
 }
 
 /** Newest-first sort key parsed from the filename (fields are not zero-padded). */
@@ -223,6 +249,7 @@ function parseSession(raw: RawSession, fileName: string) {
 
   const numLaps = classification.reduce((m, c) => Math.max(m, c.numLaps), 0);
   const winner = classification[0];
+  const weather = sessionWeather(raw.Laps ?? []);
 
   // "Active" drivers = those who completed at least one lap (i.e. actually drove).
   // Only sessions with >= 2 active drivers are shown on the site. The rest (empty
@@ -263,6 +290,10 @@ function parseSession(raw: RawSession, fileName: string) {
     best_lap_name: listed ? bestLapName || null : null,
     winner_guid: listed ? winner?.guid ?? null : null,
     winner_name: listed ? winner?.name ?? null : null,
+    ambient_temp: listed ? weather.ambient_temp : null,
+    road_temp: listed ? weather.road_temp : null,
+    wind_speed: listed ? weather.wind_speed : null,
+    wind_dir: listed ? weather.wind_dir : null,
     listed,
     search,
     detail: listed ? { classification, laps, incidents } : { classification: [], laps: [], incidents: [] },
