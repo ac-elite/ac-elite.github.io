@@ -29,25 +29,21 @@ import { getSyncHealth } from 'src/lib/sync-utils';
 import { useTrackCatalogVersion } from 'src/centralized/track-info';
 import { subtleRowEnterSx, glassCardMotionSx } from 'src/lib/subtle-motion';
 import { brandAccentBorderSx } from 'src/lib/status-accent';
-import { GLASS_PANEL_SX, GLASS_TABLE_WRAPPER_SX, GLASS_TABLE_PAGINATION_SX } from 'src/lib/glass';
+import { GLASS_PANEL_SX, GLASS_TABLE_WRAPPER_SX } from 'src/lib/glass';
 import {
   GLASS_SELECT_SX,
   GLASS_SELECT_MENU_PROPS,
   GLASS_SELECT_MENU_ITEM_SX,
+  glassFilterButtonSx,
 } from 'src/lib/glass-select';
-import {
-  DATA_PAGE_SHELL_SX,
-  PAGINATION_NAV_BUTTON_SX,
-  PAGINATION_PAGE_BUTTON_SX,
-  ACTION_OUTLINED_SMALL_DENSE_SX,
-  FORM_SECTION_KICKER_CAPTION_SX,
-} from 'src/lib/page-shell';
+import { DATA_PAGE_SHELL_SX, FORM_SECTION_KICKER_CAPTION_SX } from 'src/lib/page-shell';
 import {
   resolveTrack,
   TYPE_CHIP_SX,
   fetchSessions,
   type SessionType,
   type TrackOption,
+  formatSessionDate,
   type SessionSummary,
   fetchResultsSyncedAt,
   type SessionTypeFilter,
@@ -58,6 +54,7 @@ import {
 import { Reveal } from 'src/components/reveal';
 import { EmptyState, ErrorPanel, LoadingPanel } from 'src/components/data-state';
 import { DataPageHeader } from 'src/components/data-page-header/data-page-header';
+import { SessionPaginate } from 'src/components/sessions-table/session-paginate';
 import { PageGridOverlay } from 'src/components/page-background/page-grid-overlay';
 
 const RESULTS_PER_PAGE = 20;
@@ -68,90 +65,6 @@ const TYPE_LABEL: Record<SessionTypeFilter, string> = {
   QUALIFY: 'Qualify',
   PRACTICE: 'Practice',
 };
-
-function formatSessionDate(iso: string | null): string {
-  if (!iso) return '—';
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return '—';
-  // Fixed en-GB locale so the date reads the same for everyone (was browser-locale).
-  return d.toLocaleString('en-GB', {
-    year: 'numeric',
-    month: 'short',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
-}
-
-function getVisiblePages(current: number, total: number) {
-  const pages: (number | '...')[] = [];
-  for (let i = 1; i <= total; i += 1) {
-    if (i === 1 || i === total || (i >= current - 1 && i <= current + 1)) {
-      pages.push(i);
-    } else if (i === current - 2 || i === current + 2) {
-      pages.push('...');
-    }
-  }
-  return pages;
-}
-
-function Paginate({
-  page,
-  totalPages,
-  onChange,
-}: {
-  page: number;
-  totalPages: number;
-  onChange: (newPage: number) => void;
-}) {
-  if (totalPages <= 1) return null;
-  const pages = getVisiblePages(page, totalPages);
-
-  return (
-    <Paper sx={{ ...GLASS_TABLE_PAGINATION_SX, ...glassCardMotionSx(3) }}>
-      <Stack direction="row" spacing={1} justifyContent="center" flexWrap="wrap">
-        <Button
-          disabled={page <= 1}
-          onClick={() => onChange(page - 1)}
-          variant="contained"
-          color="secondary"
-          size="small"
-          sx={{ ...PAGINATION_NAV_BUTTON_SX }}
-        >
-          Prev
-        </Button>
-        {pages.map((p, idx) =>
-          p === '...' ? (
-            <Typography key={`dots-${idx}`} sx={{ px: 1.25, py: 0.75 }}>
-              ...
-            </Typography>
-          ) : (
-            <Button
-              key={p}
-              onClick={() => onChange(p)}
-              size="small"
-              variant={p === page ? 'contained' : 'outlined'}
-              color={p === page ? 'primary' : 'secondary'}
-              sx={{ ...PAGINATION_PAGE_BUTTON_SX }}
-            >
-              {p}
-            </Button>
-          )
-        )}
-        <Button
-          disabled={page >= totalPages}
-          onClick={() => onChange(page + 1)}
-          variant="contained"
-          color="secondary"
-          size="small"
-          sx={{ ...PAGINATION_NAV_BUTTON_SX }}
-        >
-          Next
-        </Button>
-      </Stack>
-    </Paper>
-  );
-}
 
 export default function Page() {
   useTrackCatalogVersion(); // re-render once the live track catalog (readable names) loads
@@ -244,30 +157,39 @@ export default function Page() {
                 textAlign: { xs: 'center', md: 'left' },
               }}
             >
-              <Stack direction="row" gap={1} flexWrap="wrap" justifyContent={{ xs: 'center', md: 'flex-start' }}>
-                {typeTabs.map((key) => (
-                  <Button
-                    key={key}
-                    size="small"
-                    variant={type === key ? 'contained' : 'outlined'}
-                    color={type === key ? 'primary' : 'secondary'}
-                    onClick={() => {
-                      setType(key);
-                      setPage(1);
-                    }}
-                    sx={{ ...ACTION_OUTLINED_SMALL_DENSE_SX }}
-                  >
-                    {TYPE_LABEL[key]}
-                  </Button>
-                ))}
-              </Stack>
-
               <Stack
                 direction={{ xs: 'column', sm: 'row' }}
                 spacing={1.5}
                 alignItems={{ sm: 'flex-end' }}
-                sx={{ mt: 1.5, textAlign: 'left' }}
+                sx={{ textAlign: 'left' }}
               >
+                <Stack spacing={1.25} sx={{ width: { xs: '100%', sm: 'auto' } }}>
+                  <Typography variant="caption" sx={{ ...FORM_SECTION_KICKER_CAPTION_SX }}>
+                    Sessions
+                  </Typography>
+                  <Stack
+                    direction="row"
+                    gap={1}
+                    flexWrap="wrap"
+                    justifyContent={{ xs: 'center', sm: 'flex-start' }}
+                  >
+                    {typeTabs.map((key) => (
+                      <Button
+                        key={key}
+                        size="small"
+                        variant="outlined"
+                        onClick={() => {
+                          setType(key);
+                          setPage(1);
+                        }}
+                        sx={glassFilterButtonSx(type === key)}
+                      >
+                        {TYPE_LABEL[key]}
+                      </Button>
+                    ))}
+                  </Stack>
+                </Stack>
+
                 {trackOptions.length > 0 && (
                   <Stack spacing={1.25} sx={{ width: { xs: '100%', sm: 'auto' } }}>
                     <Typography variant="caption" sx={{ ...FORM_SECTION_KICKER_CAPTION_SX }}>
@@ -425,7 +347,7 @@ export default function Page() {
                   </Paper>
                 </Reveal>
 
-                <Paginate page={page} totalPages={totalPages} onChange={setPage} />
+                <SessionPaginate page={page} totalPages={totalPages} onChange={setPage} />
               </>
             )}
           </Stack>

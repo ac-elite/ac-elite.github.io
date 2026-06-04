@@ -151,9 +151,19 @@ export type SessionsQuery = {
   track?: string | 'ALL';
   /** Free-text search across track / event / winner / driver names + guids / date. */
   search?: string;
+  /**
+   * Extra blob filter ANDed with `search` — e.g. a driver guid to scope the list
+   * to one driver's sessions, so their search box still searches *within* them.
+   */
+  scope?: string;
   page: number;
   perPage: number;
 };
+
+/** Sanitize a term for a PostgREST `ilike` filter on the `search` blob. */
+function sanitizeSearchTerm(raw: string | undefined): string {
+  return (raw ?? '').trim().toLowerCase().replace(/[,()*%]/g, ' ').replace(/\s+/g, ' ').trim();
+}
 
 export async function fetchSessions(
   q: SessionsQuery
@@ -165,10 +175,13 @@ export async function fetchSessions(
   params.set('listed', 'eq.true');
   if (q.type && q.type !== 'ALL') params.set('type', `eq.${q.type}`);
   if (q.track && q.track !== 'ALL') params.set('track_name', `eq.${q.track}`);
-  // Free-text: substring match against the denormalized `search` blob. Strip
-  // characters that have meaning in PostgREST filter syntax.
-  const term = (q.search ?? '').trim().toLowerCase().replace(/[,()*%]/g, ' ').replace(/\s+/g, ' ').trim();
-  if (term) params.set('search', `ilike.*${term}*`);
+  // Substring match(es) against the denormalized `search` blob. Repeating the
+  // same column param ANDs them in PostgREST, so `scope` (e.g. a driver guid)
+  // and the free-text `search` both have to match the same row.
+  const scope = sanitizeSearchTerm(q.scope);
+  if (scope) params.append('search', `ilike.*${scope}*`);
+  const term = sanitizeSearchTerm(q.search);
+  if (term) params.append('search', `ilike.*${term}*`);
 
   const from = Math.max(0, (q.page - 1) * q.perPage);
   const to = from + q.perPage - 1;
@@ -186,10 +199,16 @@ export async function fetchSessions(
   return { rows, total: parseTotal(res.headers.get('content-range')) };
 }
 
-/** Session types actually present (listed) — so the filter only offers real ones. */
-export async function fetchSessionTypeOptions(): Promise<SessionType[]> {
+/**
+ * Session types actually present (listed) — so the filter only offers real ones.
+ * Pass `search` (e.g. a driver guid) to scope the result to sessions matching the
+ * denormalized search blob, so a driver's tabs only show types they actually have.
+ */
+export async function fetchSessionTypeOptions(search?: string): Promise<SessionType[]> {
   if (!supabaseReadConfigured()) return [];
   const params = new URLSearchParams({ select: 'type', listed: 'eq.true' });
+  const term = sanitizeSearchTerm(search);
+  if (term) params.set('search', `ilike.*${term}*`);
   try {
     const res = await fetch(restUrl('sessions', params), {
       headers: { ...(supabaseHeaders() as Record<string, string>), 'Range-Unit': 'items', Range: '0-4999' },
@@ -206,14 +225,20 @@ export async function fetchSessionTypeOptions(): Promise<SessionType[]> {
 
 export type TrackOption = { trackName: string; trackConfig: string | null };
 
-/** Distinct tracks present (one per track_name), for the track filter. */
-export async function fetchSessionTrackOptions(): Promise<TrackOption[]> {
+/**
+ * Distinct tracks present (one per track_name), for the track filter.
+ * Pass `search` (e.g. a driver guid) to scope to sessions matching the
+ * denormalized search blob, so a driver only sees tracks they've raced on.
+ */
+export async function fetchSessionTrackOptions(search?: string): Promise<TrackOption[]> {
   if (!supabaseReadConfigured()) return [];
   const params = new URLSearchParams({
     select: 'track_name,track_config',
     order: 'track_name.asc',
     listed: 'eq.true',
   });
+  const term = sanitizeSearchTerm(search);
+  if (term) params.set('search', `ilike.*${term}*`);
   try {
     const res = await fetch(restUrl('sessions', params), {
       headers: { ...(supabaseHeaders() as Record<string, string>), 'Range-Unit': 'items', Range: '0-4999' },
@@ -290,6 +315,21 @@ export async function fetchResultsSyncedAt(): Promise<string | null> {
   } catch {
     return null;
   }
+}
+
+/** AC session ISO timestamp → "04 Jun 2026, 23:54" (fixed en-GB locale). */
+export function formatSessionDate(iso: string | null): string {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return '—';
+  // Fixed en-GB locale so the date reads the same for everyone (was browser-locale).
+  return d.toLocaleString('en-GB', {
+    year: 'numeric',
+    month: 'short',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
 }
 
 /** ms → "+1.234" gap vs a reference time, or "—" when not comparable. */

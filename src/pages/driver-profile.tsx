@@ -75,6 +75,7 @@ import { Reveal } from 'src/components/reveal';
 import { DeltaChip } from 'src/components/delta-chip/delta-chip';
 import { EmptyState, ErrorPanel, LoadingPanel } from 'src/components/data-state';
 import { LiveryEnlargeDialog } from 'src/components/livery/livery-enlarge-dialog';
+import { DriverSessionsTable } from 'src/components/driver-sessions/driver-sessions-table';
 import { TrendWindowStats } from 'src/components/trend-window/trend-window-stats';
 import { PageGridOverlay } from 'src/components/page-background/page-grid-overlay';
 import { useLicenseSafetyGuide } from 'src/components/license-safety-guide/license-safety-guide';
@@ -1146,6 +1147,8 @@ export default function Page() {
                     </TableContainer>
                   </Paper>
                 </Reveal>
+
+                <DriverSessionsTable driverGuid={driver.guid} driverName={driver.name} />
 
                 {teamLiveryMeta && showTeamLiveryBlock ? (
                   <>
