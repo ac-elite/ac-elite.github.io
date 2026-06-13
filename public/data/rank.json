@@ -809,8 +809,8 @@
  {
   "guid": "76561198328304798",
   "name": "CarterReza",
-  "points": 3302.35,
-  "kilometers": 25716.9,
+  "points": 3303.61,
+  "kilometers": 25743,
   "collisions": 318,
   "leaderboard": {
    "ks_zandvoort_": {
@@ -912,8 +912,8 @@
    "ks_nurburgring_layout_gp_a": {
     "tatuusfa1": {
      "laptime": 113711,
-     "laps": 37,
-     "ts": 1781316463313
+     "laps": 40,
+     "ts": 1781317248199
     }
    },
    "ks_vallelunga_classic_circuit": {
@@ -952,7 +952,7 @@
     }
    }
   },
-  "last_seen": 1781316604005,
+  "last_seen": 1781317263663,
   "wins": 119,
   "podiums": 189,
   "poles": 299,
@@ -9236,8 +9236,8 @@
  {
   "guid": "76561199067031859",
   "name": "Saba",
-  "points": 287.281,
-  "kilometers": 27312.5,
+  "points": 287.2,
+  "kilometers": 27321,
   "collisions": 2437,
   "leaderboard": {
    "ks_zandvoort_": {
@@ -9365,7 +9365,7 @@
     }
    }
   },
-  "last_seen": 1781308963828,
+  "last_seen": 1781359849572,
   "wins": 69,
   "podiums": 161,
   "poles": 89,
@@ -10564,7 +10564,7 @@
   "guid": "76561198101135819",
   "name": "BicycleSid",
   "points": 237.804,
-  "kilometers": 2321.4,
+  "kilometers": 2331.1,
   "collisions": 350,
   "leaderboard": {
    "ks_zandvoort_": {
@@ -10652,7 +10652,7 @@
     }
    }
   },
-  "last_seen": 1781216368203,
+  "last_seen": 1781356122330,
   "wins": 3,
   "podiums": 7,
   "poles": 1,
@@ -33781,7 +33781,7 @@
   "guid": "76561198140335510",
   "name": "Space",
   "points": 78.968,
-  "kilometers": 595.9,
+  "kilometers": 596.6,
   "collisions": 50,
   "leaderboard": {
    "ks_zandvoort_": {
@@ -33834,7 +33834,7 @@
     }
    }
   },
-  "last_seen": 1781118858472,
+  "last_seen": 1781338274722,
   "wins": 0,
   "podiums": 3,
   "poles": 0,
@@ -50334,42 +50334,6 @@
   "infr": 0
  },
  {
-  "guid": "76561199050230275",
-  "name": "Gabriel Goulart",
-  "points": 67.311,
-  "kilometers": 149.4,
-  "collisions": 24,
-  "leaderboard": {
-   "ks_laguna_seca_": {
-    "tatuusfa1": {
-     "laptime": 82990,
-     "laps": 4,
-     "ts": 1772656404543
-    }
-   },
-   "ks_nurburgring_layout_gp_b": {
-    "tatuusfa1": {
-     "laptime": 115831,
-     "laps": 5,
-     "ts": 1775324707534
-    }
-   },
-   "ks_nurburgring_layout_gp_a": {
-    "tatuusfa1": {
-     "laptime": 121308,
-     "laps": 4,
-     "ts": 1781291428907
-    }
-   }
-  },
-  "last_seen": 1781291721267,
-  "wins": 0,
-  "podiums": 0,
-  "poles": 0,
-  "flaps": 0,
-  "infr": 1
- },
- {
   "guid": "76561199104624941",
   "name": "Simone Pagnin",
   "points": 67.287,
@@ -50528,6 +50492,42 @@
   "poles": 0,
   "flaps": 0,
   "infr": 0
+ },
+ {
+  "guid": "76561199050230275",
+  "name": "Gabriel Goulart",
+  "points": 67.223,
+  "kilometers": 152.9,
+  "collisions": 24,
+  "leaderboard": {
+   "ks_laguna_seca_": {
+    "tatuusfa1": {
+     "laptime": 82990,
+     "laps": 4,
+     "ts": 1772656404543
+    }
+   },
+   "ks_nurburgring_layout_gp_b": {
+    "tatuusfa1": {
+     "laptime": 115831,
+     "laps": 5,
+     "ts": 1775324707534
+    }
+   },
+   "ks_nurburgring_layout_gp_a": {
+    "tatuusfa1": {
+     "laptime": 121308,
+     "laps": 4,
+     "ts": 1781291428907
+    }
+   }
+  },
+  "last_seen": 1781357522754,
+  "wins": 0,
+  "podiums": 0,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 1
  },
  {
   "guid": "76561199710315624",
@@ -146466,6 +146466,28 @@
   "infr": 0
  },
  {
+  "guid": "76561199407017453",
+  "name": "christiaanklaassebos",
+  "points": 50.269000000000005,
+  "kilometers": 27.8,
+  "collisions": 5,
+  "leaderboard": {
+   "ks_nurburgring_layout_gp_a": {
+    "tatuusfa1": {
+     "laptime": 135299,
+     "laps": 1,
+     "ts": 1781352487845
+    }
+   }
+  },
+  "last_seen": 1781352558175,
+  "wins": 0,
+  "podiums": 0,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 0
+ },
+ {
   "guid": "76561198850791222",
   "name": "HiHat",
   "points": 50.268,
@@ -194258,6 +194280,21 @@
   "leaderboard": {
   },
   "last_seen": 1767560876180,
+  "wins": 0,
+  "podiums": 0,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 0
+ },
+ {
+  "guid": "76561199638974036",
+  "name": "Owargnl",
+  "points": 48.207,
+  "kilometers": 23.3,
+  "collisions": 7,
+  "leaderboard": {
+  },
+  "last_seen": 1781352594361,
   "wins": 0,
   "podiums": 0,
   "poles": 0,
