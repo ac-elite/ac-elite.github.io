@@ -4645,9 +4645,9 @@
  {
   "guid": "76561198065243121",
   "name": "Jannick T",
-  "points": 895.8040000000001,
-  "kilometers": 12348.9,
-  "collisions": 713,
+  "points": 901.9789999999999,
+  "kilometers": 12397.9,
+  "collisions": 715,
   "leaderboard": {
    "mugello_": {
     "tatuusfa1": {
@@ -4740,9 +4740,9 @@
    },
    "ks_nurburgring_layout_gp_a": {
     "tatuusfa1": {
-     "laptime": 118125,
-     "laps": 63,
-     "ts": 1781437308567
+     "laptime": 117713,
+     "laps": 68,
+     "ts": 1781439236974
     }
    },
    "ks_vallelunga_classic_circuit": {
@@ -4760,9 +4760,9 @@
     }
    }
   },
-  "last_seen": 1781438354496,
-  "wins": 47,
-  "podiums": 111,
+  "last_seen": 1781439635761,
+  "wins": 48,
+  "podiums": 112,
   "poles": 11,
   "flaps": 31,
   "infr": 28
@@ -8233,7 +8233,7 @@
     }
    }
   },
-  "last_seen": 1781281050732,
+  "last_seen": 1781449014298,
   "wins": 6,
   "podiums": 28,
   "poles": 0,
@@ -9400,9 +9400,9 @@
  {
   "guid": "76561199067031859",
   "name": "Saba",
-  "points": 268.83299999999997,
-  "kilometers": 27724.1,
-  "collisions": 2474,
+  "points": 268.578,
+  "kilometers": 27756.2,
+  "collisions": 2476,
   "leaderboard": {
    "ks_zandvoort_": {
     "tatuusfa1": {
@@ -9503,8 +9503,8 @@
    "ks_nurburgring_layout_gp_a": {
     "tatuusfa1": {
      "laptime": 115019,
-     "laps": 50,
-     "ts": 1781437540744
+     "laps": 51,
+     "ts": 1781438811419
     }
    },
    "ks_vallelunga_classic_circuit": {
@@ -9529,7 +9529,7 @@
     }
    }
   },
-  "last_seen": 1781438354496,
+  "last_seen": 1781449546312,
   "wins": 69,
   "podiums": 161,
   "poles": 89,
@@ -129356,6 +129356,28 @@
   "infr": 0
  },
  {
+  "guid": "76561199168423617",
+  "name": "ser-pave",
+  "points": 52.325,
+  "kilometers": 165.5,
+  "collisions": 18,
+  "leaderboard": {
+   "ks_nurburgring_layout_gp_a": {
+    "tatuusfa1": {
+     "laptime": 118296,
+     "laps": 7,
+     "ts": 1781438874375
+    }
+   }
+  },
+  "last_seen": 1781439090270,
+  "wins": 1,
+  "podiums": 1,
+  "poles": 0,
+  "flaps": 1,
+  "infr": 1
+ },
+ {
   "guid": "76561198294698081",
   "name": "M. Taylor",
   "points": 52.321999999999996,
@@ -140874,28 +140896,6 @@
   "poles": 0,
   "flaps": 0,
   "infr": 0
- },
- {
-  "guid": "76561199168423617",
-  "name": "ser-pave",
-  "points": 51.163000000000004,
-  "kilometers": 135.1,
-  "collisions": 17,
-  "leaderboard": {
-   "ks_nurburgring_layout_gp_a": {
-    "tatuusfa1": {
-     "laptime": 118296,
-     "laps": 4,
-     "ts": 1781437982892
-    }
-   }
-  },
-  "last_seen": 1781438354496,
-  "wins": 1,
-  "podiums": 1,
-  "poles": 0,
-  "flaps": 1,
-  "infr": 1
  },
  {
   "guid": "76561198164601000",
@@ -173531,6 +173531,21 @@
   "leaderboard": {
   },
   "last_seen": 1763497434110,
+  "wins": 0,
+  "podiums": 0,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 0
+ },
+ {
+  "guid": "76561199778365337",
+  "name": "Seppiale",
+  "points": 49.509,
+  "kilometers": 1.3,
+  "collisions": 1,
+  "leaderboard": {
+  },
+  "last_seen": 1781441413583,
   "wins": 0,
   "podiums": 0,
   "poles": 0,
@@ -280803,28 +280818,6 @@
   "infr": 2
  },
  {
-  "guid": "76561199529449303",
-  "name": "ToGoR",
-  "points": 35.02300000000001,
-  "kilometers": 52.7,
-  "collisions": 10,
-  "leaderboard": {
-   "ks_nurburgring_layout_gp_a": {
-    "tatuusfa1": {
-     "laptime": 127254,
-     "laps": 1,
-     "ts": 1781286687931
-    }
-   }
-  },
-  "last_seen": 1781290483800,
-  "wins": 0,
-  "podiums": 0,
-  "poles": 0,
-  "flaps": 0,
-  "infr": 3
- },
- {
   "guid": "76561199129513796",
   "name": "Philipp Schumacher",
   "points": 35.022999999999996,
@@ -280845,6 +280838,28 @@
   "poles": 0,
   "flaps": 0,
   "infr": 0
+ },
+ {
+  "guid": "76561199529449303",
+  "name": "ToGoR",
+  "points": 34.99800000000001,
+  "kilometers": 57.9,
+  "collisions": 11,
+  "leaderboard": {
+   "ks_nurburgring_layout_gp_a": {
+    "tatuusfa1": {
+     "laptime": 127254,
+     "laps": 1,
+     "ts": 1781286687931
+    }
+   }
+  },
+  "last_seen": 1781448246118,
+  "wins": 0,
+  "podiums": 0,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 3
  },
  {
   "guid": "76561199216455488",
