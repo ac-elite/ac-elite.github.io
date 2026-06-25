@@ -10,7 +10,7 @@
 import type { Theme, SxProps } from '@mui/material/styles';
 
 import { GLASS_CHIP_SHEEN_SX } from 'src/lib/glass';
-import { supabaseBaseUrl, supabaseHeaders, supabaseReadConfigured } from 'src/centralized/supabase-rest';
+import { supabaseFetch, supabaseBaseUrl, supabaseReadConfigured } from 'src/centralized/supabase-rest';
 import {
   getTrackInfo,
   getTrackDisplayName,
@@ -206,10 +206,9 @@ export async function fetchSessions(
   const from = Math.max(0, (q.page - 1) * q.perPage);
   const to = from + q.perPage - 1;
 
-  const res = await fetch(restUrl('sessions', params), {
+  const res = await supabaseFetch(restUrl('sessions', params), {
     headers: {
-      ...(supabaseHeaders() as Record<string, string>),
-      Prefer: 'count=exact',
+      Prefer: 'count=planned',
       'Range-Unit': 'items',
       Range: `${from}-${to}`,
     },
@@ -230,8 +229,8 @@ export async function fetchSessionTypeOptions(search?: string): Promise<SessionT
   const term = sanitizeSearchTerm(search);
   if (term) params.set('search', `ilike.*${term}*`);
   try {
-    const res = await fetch(restUrl('sessions', params), {
-      headers: { ...(supabaseHeaders() as Record<string, string>), 'Range-Unit': 'items', Range: '0-4999' },
+    const res = await supabaseFetch(restUrl('sessions', params), {
+      headers: { 'Range-Unit': 'items', Range: '0-4999' },
     });
     if (!res.ok) return [];
     const rows = (await res.json()) as { type: SessionType }[];
@@ -260,8 +259,8 @@ export async function fetchSessionTrackOptions(search?: string): Promise<TrackOp
   const term = sanitizeSearchTerm(search);
   if (term) params.set('search', `ilike.*${term}*`);
   try {
-    const res = await fetch(restUrl('sessions', params), {
-      headers: { ...(supabaseHeaders() as Record<string, string>), 'Range-Unit': 'items', Range: '0-4999' },
+    const res = await supabaseFetch(restUrl('sessions', params), {
+      headers: { 'Range-Unit': 'items', Range: '0-4999' },
     });
     if (!res.ok) return [];
     const rows = (await res.json()) as { track_name: string | null; track_config: string | null }[];
@@ -315,9 +314,7 @@ export function resolveLeaderboardTrackId(
 export async function fetchSessionById(id: number | string): Promise<SessionFull | null> {
   if (!supabaseReadConfigured()) return null;
   const params = new URLSearchParams({ select: '*', id: `eq.${id}`, limit: '1' });
-  const res = await fetch(restUrl('sessions', params), {
-    headers: supabaseHeaders(),
-  });
+  const res = await supabaseFetch(restUrl('sessions', params));
   if (!res.ok) throw new Error(`Failed to load session: ${res.status} ${res.statusText}`);
   const rows = (await res.json()) as SessionFull[];
   return rows?.[0] ?? null;
@@ -328,7 +325,7 @@ export async function fetchResultsSyncedAt(): Promise<string | null> {
   if (!supabaseReadConfigured()) return null;
   const params = new URLSearchParams({ select: 'synced_at', limit: '1' });
   try {
-    const res = await fetch(restUrl('results_sync', params), { headers: supabaseHeaders() });
+    const res = await supabaseFetch(restUrl('results_sync', params));
     if (!res.ok) return null;
     const rows = (await res.json()) as { synced_at?: string }[];
     return typeof rows?.[0]?.synced_at === 'string' ? rows[0].synced_at : null;

@@ -1,5 +1,5 @@
 import { APP_ROUTES } from 'src/centralized/app-routes';
-import { supabaseBaseUrl, supabaseHeaders } from 'src/centralized/supabase-rest';
+import { supabaseFetch, supabaseBaseUrl } from 'src/centralized/supabase-rest';
 
 /** localStorage: epoch ms of last successful increment (same browser, any tab). */
 const LAST_COUNTED_AT_KEY = 'ace:site-visit-last-counted-at';
@@ -87,6 +87,10 @@ export function normalizePathForVisitStats(pathname: string): string {
 export type SitePageVisitRow = { path: string; visit_count: number };
 
 export function isSiteVisitsConfigured(): boolean {
+  const analytics = import.meta.env.VITE_SUPABASE_ANALYTICS?.trim().toLowerCase();
+  if (analytics === '0' || analytics === 'false' || analytics === 'no' || analytics === 'off') {
+    return false;
+  }
   const url = import.meta.env.VITE_SUPABASE_URL?.trim();
   const key = import.meta.env.VITE_SUPABASE_ANON_KEY?.trim();
   return Boolean(url && key);
@@ -107,45 +111,48 @@ function parseFiniteNumber(raw: unknown): number | null {
 /** Per-route totals from `site_page_stats` (read-only), highest first. */
 export async function fetchSitePageVisitCounts(limit = 40): Promise<SitePageVisitRow[] | null> {
   if (!isSiteVisitsConfigured()) return null;
-  const res = await fetch(
-    `${supabaseBaseUrl()}/rest/v1/site_page_stats?select=path,visit_count&order=visit_count.desc&limit=${limit}`,
-    { headers: supabaseHeaders() }
-  );
-  if (!res.ok) return null;
-  const data: unknown = await res.json();
-  if (!Array.isArray(data)) return null;
-  const rows: SitePageVisitRow[] = [];
-  for (const row of data) {
-    if (!row || typeof row !== 'object') continue;
-    const r = row as { path?: unknown; visit_count?: unknown };
-    if (typeof r.path !== 'string') continue;
-    const c = parseFiniteNumber(r.visit_count);
-    if (c === null) continue;
-    rows.push({ path: r.path, visit_count: c });
+  try {
+    const res = await supabaseFetch(
+      `${supabaseBaseUrl()}/rest/v1/site_page_stats?select=path,visit_count&order=visit_count.desc&limit=${limit}`
+    );
+    if (!res.ok) return null;
+    const data: unknown = await res.json();
+    if (!Array.isArray(data)) return null;
+    const rows: SitePageVisitRow[] = [];
+    for (const row of data) {
+      if (!row || typeof row !== 'object') continue;
+      const r = row as { path?: unknown; visit_count?: unknown };
+      if (typeof r.path !== 'string') continue;
+      const c = parseFiniteNumber(r.visit_count);
+      if (c === null) continue;
+      rows.push({ path: r.path, visit_count: c });
+    }
+    return rows;
+  } catch {
+    return null;
   }
-  return rows;
 }
 
 /** Current total from `site_stats` (read-only). */
 export async function fetchSiteVisitCount(): Promise<number | null> {
   if (!isSiteVisitsConfigured()) return null;
-  const res = await fetch(
-    `${supabaseBaseUrl()}/rest/v1/site_stats?id=eq.1&select=visit_count`,
-    { headers: supabaseHeaders() }
-  );
-  if (!res.ok) return null;
-  const data: unknown = await res.json();
-  if (!Array.isArray(data) || !data[0] || typeof data[0] !== 'object') return null;
-  const raw = (data[0] as { visit_count?: unknown }).visit_count;
-  return parseFiniteNumber(raw);
+  try {
+    const res = await supabaseFetch(`${supabaseBaseUrl()}/rest/v1/site_stats?id=eq.1&select=visit_count`);
+    if (!res.ok) return null;
+    const data: unknown = await res.json();
+    if (!Array.isArray(data) || !data[0] || typeof data[0] !== 'object') return null;
+    const raw = (data[0] as { visit_count?: unknown }).visit_count;
+    return parseFiniteNumber(raw);
+  } catch {
+    return null;
+  }
 }
 
 /** Increments global visit total only (per-route uses {@link incrementSitePageOnly}). */
 async function incrementSiteVisit(): Promise<number | null> {
   // Named arg must match SQL (`p_path`); explicit value avoids PostgREST/default-arg edge cases vs `{}`.
-  const res = await fetch(`${supabaseBaseUrl()}/rest/v1/rpc/increment_site_visits`, {
+  const res = await supabaseFetch(`${supabaseBaseUrl()}/rest/v1/rpc/increment_site_visits`, {
     method: 'POST',
-    headers: supabaseHeaders(),
     body: JSON.stringify({ p_path: '/' }),
   });
   if (!res.ok) return null;
@@ -159,12 +166,15 @@ async function incrementSiteVisit(): Promise<number | null> {
 }
 
 async function incrementSitePageOnly(statsPath: string): Promise<boolean> {
-  const res = await fetch(`${supabaseBaseUrl()}/rest/v1/rpc/increment_site_page_only`, {
-    method: 'POST',
-    headers: supabaseHeaders(),
-    body: JSON.stringify({ p_path: statsPath }),
-  });
-  return res.ok;
+  try {
+    const res = await supabaseFetch(`${supabaseBaseUrl()}/rest/v1/rpc/increment_site_page_only`, {
+      method: 'POST',
+      body: JSON.stringify({ p_path: statsPath }),
+    });
+    return res.ok;
+  } catch {
+    return false;
+  }
 }
 
 function pageStatStorageKey(statsPath: string): string {

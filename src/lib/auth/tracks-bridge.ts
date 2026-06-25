@@ -1,4 +1,5 @@
 import { setTrackCatalog, type TrackInfo } from 'src/centralized/track-info';
+import { supabaseTemporarilyUnavailable } from 'src/centralized/supabase-rest';
 
 import { fetchAllTracks, type TrackRow } from './tracks-db';
 
@@ -26,6 +27,7 @@ function toTrackInfo(row: TrackRow): TrackInfo {
  *     on public pages immediately
  */
 export async function refreshTrackCatalogFromDb(): Promise<void> {
+  if (supabaseTemporarilyUnavailable()) return;
   try {
     const rows = await fetchAllTracks();
     if (rows.length === 0) return;

@@ -15,7 +15,11 @@ import {
   mergeInfoWhenPreferringLiveSnapshot,
 } from 'src/lib/server-info';
 import { applyCurrentTrackMock } from 'src/centralized/current-track-mock';
-import { supabaseBaseUrl, supabaseHeaders, supabaseReadConfigured } from 'src/centralized/supabase-rest';
+import {
+  supabaseFetch,
+  supabaseReadConfigured,
+  supabaseTemporarilyUnavailable,
+} from 'src/centralized/supabase-rest';
 import { getSupabaseClient } from 'src/lib/supabase-client';
 
 /** Browser poll interval once live `server_status` reads succeed (or when forced on). */
@@ -81,6 +85,7 @@ function explicitLiveServerEnabled(): boolean {
 /** One REST read to `server_status` is allowed (keys present, not explicitly disabled). */
 export function canAttemptLiveServerStatusFetch(): boolean {
   if (!supabaseReadConfigured()) return false;
+  if (supabaseTemporarilyUnavailable()) return false;
   if (explicitLiveServerDisabled()) return false;
   if (explicitLiveServerEnabled()) return true;
   return liveServerFetchState !== 'missing';
@@ -101,9 +106,8 @@ export function isSupabaseLiveServerStatusEnabled(): boolean {
 export async function fetchLiveServerStatusFromSupabase(): Promise<CurrentTrackPayload | null> {
   if (!canAttemptLiveServerStatusFetch()) return null;
   try {
-    const res = await fetch(
-      `${supabaseBaseUrl()}/rest/v1/server_status?id=eq.1&select=online,track,fetched_at,info`,
-      { headers: supabaseHeaders() }
+    const res = await supabaseFetch(
+      '/rest/v1/server_status?id=eq.1&select=online,track,fetched_at,info'
     );
     if (!res.ok) {
       if (isServerStatusDebugEnabled()) {
@@ -232,6 +236,7 @@ export function pickNewerCurrentTrack(
  */
 export function subscribeLiveServerStatus(onChange: () => void): () => void {
   if (!canAttemptLiveServerStatusFetch()) return () => {};
+  if (supabaseTemporarilyUnavailable()) return () => {};
   const client = getSupabaseClient();
   if (!client) return () => {};
   const channel = client

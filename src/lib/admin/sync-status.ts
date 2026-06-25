@@ -11,7 +11,7 @@
  */
 import { DATA_FILES } from 'src/centralized/data-files';
 import { fetchStaticJson } from 'src/lib/fetch-json';
-import { supabaseBaseUrl, supabaseHeaders, supabaseReadConfigured } from 'src/centralized/supabase-rest';
+import { supabaseFetch, supabaseReadConfigured } from 'src/centralized/supabase-rest';
 
 export type SyncProbe = {
   /** Supabase reachable and a sync row was returned. */
@@ -48,7 +48,7 @@ const UNREACHABLE: SyncProbe = { reachable: false, at: null, status: 'unknown', 
 async function readSupabaseRow<T>(path: string): Promise<T | null> {
   if (!supabaseReadConfigured()) return null;
   try {
-    const res = await fetch(`${supabaseBaseUrl()}${path}`, { headers: supabaseHeaders() });
+    const res = await supabaseFetch(path);
     if (!res.ok) return null;
     const rows = (await res.json()) as unknown;
     if (!Array.isArray(rows) || !rows[0]) return null;

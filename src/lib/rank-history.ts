@@ -7,7 +7,7 @@
  * Falls back to no-baseline when Supabase is unavailable; callers can then keep
  * showing the legacy `rank-24h.json` comparison from `delta.ts`.
  */
-import { supabaseBaseUrl, supabaseHeaders, supabaseReadConfigured } from 'src/centralized/supabase-rest';
+import { supabaseFetch, supabaseBaseUrl, supabaseReadConfigured } from 'src/centralized/supabase-rest';
 import {
   getDriverSR,
   type RankDriver,
@@ -64,9 +64,7 @@ const SR_PRESENT_FILTER = 'drivers->0->>sr=not.is.null';
 
 async function queryOneSnapshot(query: string): Promise<RankHistorySnapshot | null> {
   try {
-    const res = await fetch(`${supabaseBaseUrl()}/rest/v1/rank_history?${query}`, {
-      headers: supabaseHeaders(),
-    });
+    const res = await supabaseFetch(`${supabaseBaseUrl()}/rest/v1/rank_history?${query}`);
     if (!res.ok) return null;
     const rows = (await res.json()) as { captured_at?: string; drivers?: SlimDriver[] }[];
     const row = rows?.[0];
@@ -110,9 +108,8 @@ export async function fetchRankHistorySnapshot(
 export async function fetchRankHistoryOldest(): Promise<string | null> {
   if (kmrSupabaseDisabled() || !supabaseReadConfigured()) return null;
   try {
-    const res = await fetch(
-      `${supabaseBaseUrl()}/rest/v1/rank_history?select=captured_at&order=captured_at.asc&limit=1`,
-      { headers: supabaseHeaders() }
+    const res = await supabaseFetch(
+      `${supabaseBaseUrl()}/rest/v1/rank_history?select=captured_at&order=captured_at.asc&limit=1`
     );
     if (!res.ok) return null;
     const rows = (await res.json()) as { captured_at?: string }[];
