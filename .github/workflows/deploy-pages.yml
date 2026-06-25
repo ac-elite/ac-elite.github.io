@@ -10,7 +10,7 @@ on:
       - 'public/data/**'
   workflow_dispatch:
   workflow_run:
-    workflows: ["Sync KMR Data", "Daily Rank Snapshot (24h)"]
+    workflows: ["Sync KMR Data", "Daily Rank Snapshot (24h)", "Current Track Snapshot (GitHub)"]
     types: [completed]
     branches: [main]
 
@@ -50,6 +50,13 @@ jobs:
           # Optional: site visit counter (see scripts/supabase-site-stats.sql)
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+          # Serve the large rank/leaderboard JSON from GitHub Pages by default.
+          # Supabase Storage remains a manual opt-in source, not the public CDN.
+          VITE_SUPABASE_KMR_DATA: "0"
+          # Keep the public site responsive if Supabase starts returning 522/544.
+          VITE_SUPABASE_FETCH_TIMEOUT_MS: "2000"
+          VITE_SUPABASE_STORAGE_TIMEOUT_MS: "1500"
+          VITE_SUPABASE_UNHEALTHY_COOLDOWN_MS: "300000"
         run: |
           BASE_PATH="/${{ github.event.repository.name }}/"
           if [[ "${{ github.event.repository.name }}" == *.github.io ]]; then

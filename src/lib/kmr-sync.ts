@@ -1,5 +1,5 @@
 import { getSupabaseClient } from 'src/lib/supabase-client';
-import { supabaseReadConfigured } from 'src/centralized/supabase-rest';
+import { supabaseReadConfigured, supabaseTemporarilyUnavailable } from 'src/centralized/supabase-rest';
 
 /** Opt out of the Supabase data source with VITE_SUPABASE_KMR_DATA=0/false/off. */
 function kmrSupabaseDisabled(): boolean {
@@ -15,6 +15,7 @@ function kmrSupabaseDisabled(): boolean {
  */
 export function subscribeKmrSync(onSync: () => void): () => void {
   if (kmrSupabaseDisabled() || !supabaseReadConfigured()) return () => {};
+  if (supabaseTemporarilyUnavailable()) return () => {};
   const client = getSupabaseClient();
   if (!client) return () => {};
 

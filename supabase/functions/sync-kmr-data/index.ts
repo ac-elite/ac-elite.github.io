@@ -182,12 +182,14 @@ Deno.serve(async (req) => {
     ['metadata.json', JSON.stringify(metadata)],
   ];
   for (const [name, body] of uploads) {
+    const cacheControl = name === 'metadata.json' ? '0' : '900';
     const { error } = await supabase.storage.from(BUCKET).upload(name, body, {
       contentType: 'application/json',
       upsert: true,
-      // Must revalidate on every client fetch; default max-age=3600 left browsers
-      // serving hour-old rank/metadata after the cached-egress client change.
-      cacheControl: '0',
+      // Metadata stays no-cache so clients discover a new version quickly.
+      // Large JSON blobs are fetched with ?v=<metadata.lastSync>, so they can
+      // be browser/CDN cached until the next sync publishes a new URL.
+      cacheControl,
     });
     if (error) {
       await supabase
