@@ -31,14 +31,17 @@ let kmrVersionCache: { value: string | null; expiresAt: number } = {
 };
 let kmrVersionPromise: Promise<string | null> | null = null;
 
-/** Opt out of the Supabase data source with VITE_SUPABASE_KMR_DATA=0/false/off. */
-function kmrSupabaseDisabled(): boolean {
-  const v = import.meta.env.VITE_SUPABASE_KMR_DATA?.trim().toLowerCase();
+/** Opt out of Supabase Storage for the large KMR JSON blobs. */
+function kmrStorageDisabled(): boolean {
+  const v = (
+    import.meta.env.VITE_SUPABASE_KMR_STORAGE ??
+    import.meta.env.VITE_SUPABASE_KMR_DATA
+  )?.trim().toLowerCase();
   return v === '0' || v === 'false' || v === 'no' || v === 'off';
 }
 
 function supabaseStorageUrl(objectName: string): string | null {
-  if (kmrSupabaseDisabled() || !supabaseReadConfigured()) return null;
+  if (kmrStorageDisabled() || !supabaseReadConfigured()) return null;
   return `${supabaseBaseUrl()}/storage/v1/object/public/${KMR_BUCKET}/${objectName}`;
 }
 

@@ -52,7 +52,7 @@ jobs:
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
           # Serve the large rank/leaderboard JSON from GitHub Pages by default.
           # Supabase Storage remains a manual opt-in source, not the public CDN.
-          VITE_SUPABASE_KMR_DATA: "0"
+          VITE_SUPABASE_KMR_STORAGE: "0"
           # Keep the public site responsive if Supabase starts returning 522/544.
           VITE_SUPABASE_FETCH_TIMEOUT_MS: "2000"
           VITE_SUPABASE_STORAGE_TIMEOUT_MS: "1500"

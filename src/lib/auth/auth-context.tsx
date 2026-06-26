@@ -3,6 +3,7 @@ import type { User, Session } from '@supabase/supabase-js';
 import { useMemo, useState, useEffect, useContext, useCallback, createContext } from 'react';
 
 import { getSupabaseClient, isSupabaseAuthConfigured } from 'src/lib/supabase-client';
+import { fetchWithTimeout, supabaseBaseUrl, supabaseHeaders } from 'src/centralized/supabase-rest';
 
 // ----------------------------------------------------------------------
 
@@ -53,6 +54,7 @@ const INITIAL: AuthState = {
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
+const AUTH_REQUEST_TIMEOUT_MS = 10_000;
 
 // ----------------------------------------------------------------------
 
@@ -62,14 +64,31 @@ function isAppRole(value: unknown): value is AppRole {
   );
 }
 
+function withAuthTimeout<T>(promise: PromiseLike<T>, message: string): Promise<T> {
+  let timeout: ReturnType<typeof globalThis.setTimeout> | null = null;
+  const timeoutPromise = new Promise<never>((_, reject) => {
+    timeout = globalThis.setTimeout(() => reject(new Error(message)), AUTH_REQUEST_TIMEOUT_MS);
+  });
+  return Promise.race([Promise.resolve(promise), timeoutPromise]).finally(() => {
+    if (timeout) globalThis.clearTimeout(timeout);
+  });
+}
+
+function authErrorMessage(error: unknown, fallback: string): string {
+  return error instanceof Error ? error.message : fallback;
+}
+
 async function fetchProfile(userId: string): Promise<AuthProfile | null> {
   const client = getSupabaseClient();
   if (!client) return null;
-  const { data, error } = await client
-    .from('profiles')
-    .select('id, role, display_name, steam_id, avatar_url')
-    .eq('id', userId)
-    .maybeSingle();
+  const { data, error } = await withAuthTimeout(
+    client
+      .from('profiles')
+      .select('id, role, display_name, steam_id, avatar_url')
+      .eq('id', userId)
+      .maybeSingle(),
+    'Profile lookup timed out. Supabase may still be recovering.'
+  );
   if (error || !data) return null;
   if (!isAppRole(data.role)) return null;
   return {
@@ -136,7 +155,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setState((prev) => ({ ...prev, loading: false, session: null, user: null, profile: null }));
       return;
     }
-    const profile = await fetchProfile(session.user.id);
+    let profile: AuthProfile | null = null;
+    let profileError: string | null = null;
+    try {
+      profile = await fetchProfile(session.user.id);
+    } catch (error) {
+      profileError = authErrorMessage(error, 'Could not load your profile.');
+    }
     setState((prev) => ({
       ...prev,
       loading: false,
@@ -146,7 +171,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // No matching profile = the account exists in auth.users but the trigger
       // failed or the row was deleted. Surface it so the user is not silently
       // locked out of every page.
-      error: profile ? null : 'No profile found for this account. Ask an owner to fix it.',
+      error: profile ? null : profileError ?? 'No profile found for this account. Ask an owner to fix it.',
     }));
   }, []);
 
@@ -159,10 +184,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     let cancelled = false;
 
-    void client.auth.getSession().then(({ data }) => {
-      if (cancelled) return;
-      void applySession(data.session ?? null);
-    });
+    void withAuthTimeout(
+      client.auth.getSession(),
+      'Auth session lookup timed out. Supabase may still be recovering.'
+    ).then(
+      ({ data }) => {
+        if (cancelled) return;
+        void applySession(data.session ?? null);
+      },
+      (error) => {
+        if (cancelled) return;
+        setState((prev) => ({
+          ...prev,
+          loading: false,
+          error: authErrorMessage(error, 'Could not load your session.'),
+        }));
+      }
+    );
 
     const { data: sub } = client.auth.onAuthStateChange((_event, session) => {
       if (cancelled) return;
@@ -179,7 +217,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     async (email: string, password: string) => {
       const client = getSupabaseClient();
       if (!client) return { ok: false, error: 'Authentication is not configured.' };
-      const { data, error } = await client.auth.signInWithPassword({ email, password });
+      let response: Awaited<ReturnType<typeof client.auth.signInWithPassword>>;
+      try {
+        response = await withAuthTimeout(
+          client.auth.signInWithPassword({ email, password }),
+          'Sign-in timed out. Supabase may still be recovering.'
+        );
+      } catch (error) {
+        return { ok: false, error: authErrorMessage(error, 'Sign-in failed.') };
+      }
+      const { data, error } = response;
       if (error) return { ok: false, error: error.message };
       await applySession(data.session ?? null);
       return { ok: true };
@@ -193,14 +240,41 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (!client) return { ok: false, error: 'Authentication is not configured.' };
 
       // Server-side: verify the assertion with Steam and mint a one-time OTP.
-      const { data, error } = await client.functions.invoke('steam-auth', {
-        body: openidParams,
-      });
-      if (error) {
+      const steamAuthResult = await fetchWithTimeout(
+        `${supabaseBaseUrl()}/functions/v1/steam-auth`,
+        {
+          method: 'POST',
+          headers: supabaseHeaders(),
+          body: JSON.stringify(openidParams),
+        },
+        AUTH_REQUEST_TIMEOUT_MS
+      )
+        .then(async (res) => ({
+          res,
+          body: (await res.clone().json().catch(() => null)) as { error?: string } | null,
+        }))
+        .catch((error) => ({ error }));
+      if ('error' in steamAuthResult) {
+        const timedOut = steamAuthResult.error instanceof DOMException && steamAuthResult.error.name === 'AbortError';
+        return {
+          ok: false,
+          error: timedOut
+            ? 'Steam sign-in timed out. Supabase may still be recovering.'
+            : authErrorMessage(steamAuthResult.error, 'Steam sign-in failed.'),
+        };
+      }
+      const data = steamAuthResult.body;
+      if (!steamAuthResult.res.ok) {
+        return {
+          ok: false,
+          error: steamAuthResult.body?.error ?? `Steam sign-in failed (${steamAuthResult.res.status}).`,
+        };
+      }
+      if (false as boolean) {
         // `functions.invoke` only gives a generic "non-2xx" message; the real
         // reason lives in the response body (FunctionsHttpError.context).
-        let detail = error.message;
-        const ctx = (error as { context?: unknown }).context;
+        let detail = 'Steam sign-in failed.';
+        const ctx: unknown = null;
         if (ctx instanceof Response) {
           try {
             const body = (await ctx.clone().json()) as { error?: string };
@@ -224,9 +298,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       // Exchange the OTP for a real session. Prefer the 6-digit OTP; fall back
       // to the hashed token if the OTP is unavailable.
-      const verify = payload.otp
-        ? await client.auth.verifyOtp({ email: payload.email, token: payload.otp, type: 'email' })
-        : await client.auth.verifyOtp({ token_hash: payload.token_hash as string, type: 'email' });
+      let verify: Awaited<ReturnType<typeof client.auth.verifyOtp>>;
+      try {
+        verify = payload.otp
+          ? await withAuthTimeout(
+              client.auth.verifyOtp({ email: payload.email, token: payload.otp, type: 'email' }),
+              'Steam session verification timed out. Supabase may still be recovering.'
+            )
+          : await withAuthTimeout(
+              client.auth.verifyOtp({ token_hash: payload.token_hash as string, type: 'email' }),
+              'Steam session verification timed out. Supabase may still be recovering.'
+            );
+      } catch (error) {
+        return { ok: false, error: authErrorMessage(error, 'Steam session verification failed.') };
+      }
       if (verify.error) return { ok: false, error: verify.error.message };
 
       await applySession(verify.data.session ?? null);

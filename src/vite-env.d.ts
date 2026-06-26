@@ -6,6 +6,8 @@ interface ImportMetaEnv {
   /** Supabase legacy anon JWT or new publishable key (sb_publishable_…) — site visit counter */
   readonly VITE_SUPABASE_ANON_KEY?: string;
   readonly VITE_SUPABASE_KMR_DATA?: string;
+  readonly VITE_SUPABASE_KMR_STORAGE?: string;
+  readonly VITE_SUPABASE_RANK_HISTORY?: string;
   readonly VITE_SUPABASE_LIVE_SERVER_STATUS?: string;
   readonly VITE_SUPABASE_ANALYTICS?: string;
   readonly VITE_SUPABASE_FETCH_TIMEOUT_MS?: string;
