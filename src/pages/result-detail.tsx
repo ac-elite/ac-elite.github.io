@@ -20,7 +20,10 @@ import TableContainer from '@mui/material/TableContainer';
 import { CONFIG } from 'src/config-global';
 import { DATA_FILES } from 'src/centralized/data-files';
 import { fetchJson } from 'src/lib/fetch-json';
-import { getResultsIndexHref, getDriverProfileHref, getLeaderboardHref } from 'src/lib/routes';
+import { fetchRatingV2Map } from 'src/lib/rating-v2-data';
+import type { DriverRatingV2 } from 'src/lib/ac-elite-rating-v2';
+import { ratingV2Enabled } from 'src/lib/rating-mode';
+import { getResultsIndexHref, getDriverProfileHref } from 'src/lib/routes';
 import { glassCardMotionSx } from 'src/lib/subtle-motion';
 import { brandAccentBorderSx } from 'src/lib/status-accent';
 import { useTrackCatalogVersion } from 'src/centralized/track-info';
@@ -42,11 +45,7 @@ import {
   formatGap,
   windCompass,
   type LapRow,
-  impactSpeedToKmh,
-  formatIncidentElapsed,
-  incidentTimelineBaselineMs,
   resolveTrack,
-  resolveLeaderboardTrackId,
   TYPE_CHIP_SX,
   formatTotalTime,
   fetchSessionById,
@@ -196,6 +195,7 @@ export default function Page() {
   // Live rank data → per-driver License + Safety Rating chips.
   const [licenseMap, setLicenseMap] = useState<ReturnType<typeof computeLicenseMap> | null>(null);
   const [rankByGuid, setRankByGuid] = useState<Map<string, RankDriver>>(new Map());
+  const [ratingV2Map, setRatingV2Map] = useState<Map<string, DriverRatingV2>>(new Map());
 
   useEffect(() => {
     let mounted = true;
@@ -221,11 +221,12 @@ export default function Page() {
 
   useEffect(() => {
     let mounted = true;
-    fetchJson<RankDriver[]>(DATA_FILES.rank)
-      .then((rank) => {
+    Promise.all([fetchJson<RankDriver[]>(DATA_FILES.rank), fetchRatingV2Map()])
+      .then(([rank, ratingsV2]) => {
         if (!mounted) return;
         setLicenseMap(computeLicenseMap(rank));
         setRankByGuid(new Map(rank.map((d) => [d.guid, d])));
+        setRatingV2Map(ratingsV2);
       })
       .catch(() => {});
     return () => {
@@ -234,6 +235,8 @@ export default function Page() {
   }, []);
 
   const driverBadges = (guid: string): { license: string; srTier: string } | null => {
+    const ratingV2 = ratingV2Enabled() ? ratingV2Map.get(guid) : undefined;
+    if (ratingV2) return { license: ratingV2.licenseTier, srTier: ratingV2.safetyTier };
     const d = rankByGuid.get(guid);
     if (!d || !licenseMap) return null;
     return { license: getDriverLicense(d, licenseMap).license, srTier: getDriverSR(d).tier };
@@ -253,14 +256,7 @@ export default function Page() {
     return map;
   }, [session]);
 
-  const incidents = useMemo(
-    () => [...(session?.detail?.incidents ?? [])].sort((a, b) => a.ts - b.ts),
-    [session]
-  );
-  const incidentBaselineMs = useMemo(
-    () => incidentTimelineBaselineMs(incidents),
-    [incidents]
-  );
+  const incidents = session?.detail?.incidents ?? [];
   // Per-driver incident involvement (as instigator or other party).
   const incidentCountByGuid = useMemo(() => {
     const m = new Map<string, number>();
@@ -275,9 +271,6 @@ export default function Page() {
     ? resolveTrack(session.track_name, session.track_config)
     : { label: 'Session', hero: null, offset: 0 };
   const trackName = track.label !== '—' ? track.label : 'Session';
-  const leaderboardTrackId = session
-    ? resolveLeaderboardTrackId(session.track_name, session.track_config)
-    : null;
   const heroSrc = track.hero;
   const heroOffsetY = track.offset;
   const title = session ? `${trackName} — ${TYPE_LABEL[session.type] ?? session.type}` : 'Session';
@@ -338,12 +331,8 @@ export default function Page() {
                           'linear-gradient(180deg, rgba(6,10,20,0.15) 0%, rgba(7,12,24,0.45) 50%, rgba(8,14,28,0.9) 100%)',
                       }}
                     />
-                    {/* back / leaderboard — top-left, inside the card */}
-                    <Stack
-                      direction="row"
-                      spacing={1}
-                      sx={{ position: 'absolute', top: 12, left: 12 }}
-                    >
+                    {/* back button — top-left, inside the card */}
+                    <Box sx={{ position: 'absolute', top: 12, left: 12 }}>
                       <Button
                         size="small"
                         onClick={() => {
@@ -362,27 +351,7 @@ export default function Page() {
                       >
                         ← All results
                       </Button>
-                      {leaderboardTrackId ? (
-                        <Button
-                          size="small"
-                          onClick={() => {
-                            window.location.href = getLeaderboardHref(leaderboardTrackId);
-                          }}
-                          sx={{
-                            textTransform: 'none',
-                            fontWeight: 700,
-                            color: 'rgba(255,255,255,0.92)',
-                            bgcolor: 'rgba(8,14,28,0.5)',
-                            border: '1px solid rgba(255,255,255,0.18)',
-                            backdropFilter: 'blur(8px)',
-                            px: 1.25,
-                            '&:hover': { bgcolor: 'rgba(8,14,28,0.7)' },
-                          }}
-                        >
-                          Go to leaderboard
-                        </Button>
-                      ) : null}
-                    </Stack>
+                    </Box>
                     {/* title block — bottom-left */}
                     <Box sx={{ position: 'absolute', left: 16, right: 16, bottom: 12 }}>
                       <Stack direction="row" spacing={1.25} alignItems="center" flexWrap="wrap">
@@ -564,20 +533,13 @@ export default function Page() {
                 {/* Incidents */}
                 {incidents.length > 0 && (
                   <Paper sx={{ ...GLASS_TABLE_WRAPPER_SX, ...glassCardMotionSx(3) }}>
-                    <Typography variant="subtitle1" sx={{ fontWeight: 800, px: 2, pt: 2, pb: 0.5 }}>
+                    <Typography variant="subtitle1" sx={{ fontWeight: 800, px: 2, pt: 2, pb: 1 }}>
                       Incidents ({incidents.length})
-                    </Typography>
-                    <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', px: 2, pb: 1 }}>
-                      Sorted by time (#). Elapsed is since the first incident in this session.
                     </Typography>
                     <TableContainer>
                       <Table size="small">
                         <TableHead>
                           <TableRow>
-                            <TableCell align="right" sx={{ width: 44 }}>
-                              #
-                            </TableCell>
-                            <TableCell sx={{ whiteSpace: 'nowrap' }}>Elapsed</TableCell>
                             <TableCell>Type</TableCell>
                             <TableCell>Driver</TableCell>
                             <TableCell>Other</TableCell>
@@ -586,13 +548,7 @@ export default function Page() {
                         </TableHead>
                         <TableBody>
                           {incidents.map((inc, i) => (
-                            <TableRow key={`${inc.ts}-${inc.guid}-${inc.otherGuid}-${i}`}>
-                              <TableCell align="right" sx={{ color: 'text.secondary', fontVariantNumeric: 'tabular-nums' }}>
-                                {i + 1}
-                              </TableCell>
-                              <TableCell sx={{ fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>
-                                {formatIncidentElapsed(inc.ts, incidentBaselineMs)}
-                              </TableCell>
+                            <TableRow key={i}>
                               <TableCell>
                                 <Chip
                                   size="small"
@@ -608,9 +564,7 @@ export default function Page() {
                               <TableCell sx={{ color: 'text.secondary' }}>
                                 {inc.type === 'CAR' ? inc.otherName || 'Unknown' : '—'}
                               </TableCell>
-                              <TableCell align="right" sx={{ fontVariantNumeric: 'tabular-nums' }}>
-                                {impactSpeedToKmh(inc.impactSpeed).toFixed(1)}
-                              </TableCell>
+                              <TableCell align="right" sx={{ fontVariantNumeric: 'tabular-nums' }}>{inc.impactSpeed.toFixed(1)}</TableCell>
                             </TableRow>
                           ))}
                         </TableBody>

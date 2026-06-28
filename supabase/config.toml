@@ -10,6 +10,9 @@ verify_jwt = false
 [functions.sync-results]
 verify_jwt = false
 
+[functions.sync-ratings-v2]
+verify_jwt = false
+
 [functions.manage-blocklist]
 verify_jwt = true
 

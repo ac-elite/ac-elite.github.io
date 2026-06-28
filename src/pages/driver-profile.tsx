@@ -29,6 +29,9 @@ import { getHomeHref, getLeaderboardTrackSearch } from 'src/lib/routes';
 import { BRAND_ACCENT, brandAccentBorderSx } from 'src/lib/status-accent';
 import { liveriesAssetUrl, getTeamLiveryMeta } from 'src/lib/driver-liveries';
 import { fetchPrevRankData } from 'src/lib/delta';
+import { fetchRatingV2ForDriver, fetchRatingV2Map } from 'src/lib/rating-v2-data';
+import type { DriverRatingV2 } from 'src/lib/ac-elite-rating-v2';
+import { ratingV2Enabled } from 'src/lib/rating-mode';
 import { useWindowedDriverDeltas } from 'src/lib/trend-window/trend-window-context';
 import { getSyncHealth, type SiteMetadata, getEffectiveLastSync } from 'src/lib/sync-utils';
 import { GLASS_PANEL_SX, GLASS_INNER_PANEL_SX, GLASS_TABLE_WRAPPER_SX } from 'src/lib/glass';
@@ -78,6 +81,7 @@ import { LiveryEnlargeDialog } from 'src/components/livery/livery-enlarge-dialog
 import { DriverSessionsTable } from 'src/components/driver-sessions/driver-sessions-table';
 import { TrendWindowStats } from 'src/components/trend-window/trend-window-stats';
 import { PageGridOverlay } from 'src/components/page-background/page-grid-overlay';
+import { RatingV2Badge, RatingV2Breakdown } from 'src/components/rating-v2/rating-v2-breakdown';
 import { useLicenseSafetyGuide } from 'src/components/license-safety-guide/license-safety-guide';
 
 /** Stagger inner stat cards after the hero panel starts animating */
@@ -180,6 +184,7 @@ export default function Page() {
   const [error, setError] = useState<string | null>(null);
   const [rankData, setRankData] = useState<RankDriver[]>([]);
   const [prevRankData, setPrevRankData] = useState<RankDriver[]>([]);
+  const [ratingV2Map, setRatingV2Map] = useState<Map<string, DriverRatingV2>>(new Map());
   const [leaderboardData, setLeaderboardData] = useState<Record<string, any>>({});
   const teamRoles = SITE_TEAM_ROLES;
   const [metadata, setMetadata] = useState<SiteMetadata>({});
@@ -196,7 +201,15 @@ export default function Page() {
       setLoading(true);
       setError(null);
       try {
-        const [rank, leaderboard, prevRank, meta, liverySectionsRaw] = await Promise.all([
+        const [
+          rank,
+          leaderboard,
+          prevRank,
+          meta,
+          liverySectionsRaw,
+          ratingsV2,
+          driverRatingV2,
+        ] = await Promise.all([
           fetchJson<RankDriver[]>(DATA_FILES.rank),
           fetchJson<Record<string, any>>(DATA_FILES.leaderboard),
           fetchPrevRankData(),
@@ -204,10 +217,14 @@ export default function Page() {
           fetchJson<LiveryShowcaseSectionsFile>(DATA_FILES.liveryShowcaseSections).catch(
             () => ({})
           ),
+          fetchRatingV2Map(),
+          fetchRatingV2ForDriver(driverGuid),
         ]);
         if (!mounted) return;
+        if (driverRatingV2) ratingsV2.set(driverRatingV2.guid, driverRatingV2);
         setRankData(rank);
         setPrevRankData(prevRank);
+        setRatingV2Map(ratingsV2);
         setLeaderboardData(leaderboard);
         setMetadata(meta);
         setLiveryShowcaseSections(
@@ -281,6 +298,24 @@ export default function Page() {
     [driver, licenseMap]
   );
   const sr = useMemo(() => (driver ? getDriverSR(driver) : null), [driver]);
+  const ratingV2 = useMemo(
+    () => (ratingV2Enabled() && driver ? ratingV2Map.get(driver.guid) ?? null : null),
+    [driver, ratingV2Map]
+  );
+  const displayLicense = useMemo(
+    () =>
+      ratingV2 && license
+        ? { license: ratingV2.licenseTier, paceScore: ratingV2.licenseScore }
+        : license,
+    [license, ratingV2]
+  );
+  const displaySR = useMemo(
+    () =>
+      ratingV2 && sr
+        ? { tier: ratingV2.safetyTier, sr: ratingV2.safetyRating }
+        : sr,
+    [ratingV2, sr]
+  );
 
   useEffect(() => {
     const baseTitle = `Driver Profile - ${CONFIG.appName}`;
@@ -298,8 +333,8 @@ export default function Page() {
       resetHead();
       return undefined;
     }
-    const lic = license?.license ?? '—';
-    const srPart = sr != null ? sr.sr.toFixed(2) : '—';
+    const lic = displayLicense?.license ?? '—';
+    const srPart = displaySR != null ? displaySR.sr.toFixed(2) : '—';
     document.title = `${driver.name} · ${lic} · SR ${srPart} | ${CONFIG.appName}`;
     document
       .querySelector('meta[property="og:title"]')
@@ -310,7 +345,7 @@ export default function Page() {
     return () => {
       resetHead();
     };
-  }, [driver, license, sr]);
+  }, [displayLicense, displaySR, driver]);
 
   const trackRows = useMemo<TrackStatRow[]>(() => {
     if (!driver) return [];
@@ -528,7 +563,7 @@ export default function Page() {
               </Box>
             )}
 
-            {!loading && !error && driver && license && sr && (
+            {!loading && !error && driver && displayLicense && displaySR && (
               <>
                 <Box sx={softFloatWrapperSx()}>
                   <Paper
@@ -572,6 +607,7 @@ export default function Page() {
                               >
                                 {syncHealth.label} · {syncHealth.ageText}
                               </Typography>
+                              <RatingV2Badge rating={ratingV2} />
                             </Stack>
                             {overallRank != null ? (
                               <Chip
@@ -637,7 +673,7 @@ export default function Page() {
                             [
                               DRIVER_STAT_HERO_SX,
                               subtleEnterUpSx(0, INNER_CARD_MOTION),
-                              getLicensePanelSx(license.license),
+                              getLicensePanelSx(displayLicense.license),
                               DRIVER_STAT_HERO_GLASS_HOVER_SX,
                             ] as any
                           }
@@ -663,7 +699,7 @@ export default function Page() {
                           >
                             <Chip
                               size="medium"
-                              label={license.license}
+                              label={displayLicense.license}
                               onClick={() => openGuide('license')}
                               sx={{
                                 minWidth: LICENSE_CHIP_WIDTH + 8,
@@ -672,7 +708,7 @@ export default function Page() {
                                 fontSize: '0.85rem',
                                 cursor: 'pointer',
                                 py: 0.25,
-                                ...getLicenseBadgeSx(license.license),
+                                ...getLicenseBadgeSx(displayLicense.license),
                               }}
                             />
                             <Typography
@@ -684,7 +720,9 @@ export default function Page() {
                                 lineHeight: 1.15,
                               }}
                             >
-                              {Math.round(license.paceScore).toLocaleString()}
+                              {ratingV2
+                                ? displayLicense.paceScore.toFixed(1)
+                                : Math.round(displayLicense.paceScore).toLocaleString()}
                             </Typography>
                             {delta ? <DeltaChip value={Math.round(delta.deltaPace)} /> : null}
                           </Stack>
@@ -694,7 +732,7 @@ export default function Page() {
                             [
                               DRIVER_STAT_HERO_SX,
                               subtleEnterUpSx(1, INNER_CARD_MOTION),
-                              getSRPanelSx(sr.tier),
+                              getSRPanelSx(displaySR.tier),
                               DRIVER_STAT_HERO_GLASS_HOVER_SX,
                             ] as any
                           }
@@ -720,7 +758,7 @@ export default function Page() {
                           >
                             <Chip
                               size="medium"
-                              label={sr.tier}
+                              label={displaySR.tier}
                               onClick={() => openGuide('safety')}
                               sx={{
                                 minWidth: SR_CHIP_WIDTH + 8,
@@ -729,7 +767,7 @@ export default function Page() {
                                 fontSize: '0.85rem',
                                 cursor: 'pointer',
                                 py: 0.25,
-                                ...getSRBadgeSx(sr.tier),
+                                ...getSRBadgeSx(displaySR.tier),
                               }}
                             />
                             <Typography
@@ -741,13 +779,18 @@ export default function Page() {
                                 lineHeight: 1.15,
                               }}
                             >
-                              {sr.sr.toFixed(2)}
+                              {displaySR.sr.toFixed(2)}
                             </Typography>
                             {delta ? (
                               <DeltaChip value={delta.deltaSR} decimals={2} kind="sr" />
                             ) : null}
                           </Stack>
                         </Paper>
+                        {ratingV2 ? (
+                          <Box sx={{ gridColumn: { xs: 'span 2', sm: 'span 3', md: 'span 6' } }}>
+                            <RatingV2Breakdown rating={ratingV2} />
+                          </Box>
+                        ) : null}
                         {(() => {
                           const money =
                             typeof driver.points === 'number' && Number.isFinite(driver.points)

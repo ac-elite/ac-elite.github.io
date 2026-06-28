@@ -18,6 +18,8 @@ export type TrackInfo = {
   id: string;
   name: string;
   image?: string;
+  /** Approximate circuit length in km, used by rating v2 for session exposure. */
+  lengthKm?: number;
   /** Vertical image shift in pixels; negative moves image up, positive moves image down. */
   imageOffsetY?: number;
   aliases: string[];

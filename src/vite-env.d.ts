@@ -13,8 +13,8 @@ interface ImportMetaEnv {
   readonly VITE_SUPABASE_FETCH_TIMEOUT_MS?: string;
   readonly VITE_SUPABASE_STORAGE_TIMEOUT_MS?: string;
   readonly VITE_SUPABASE_UNHEALTHY_COOLDOWN_MS?: string;
-  /** Rating source: production defaults to v1; local dev defaults to v2 unless overridden. */
-  readonly VITE_RATING_SYSTEM?: 'v1' | 'v2' | 'legacy' | 'preview';
+  /** Rating source: production/default builds use v2; v1 is an explicit fallback. */
+  readonly VITE_RATING_SYSTEM?: 'v1' | 'v2' | 'legacy';
 }
 
 interface ImportMeta {

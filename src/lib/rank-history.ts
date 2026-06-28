@@ -44,6 +44,13 @@ export const HISTORY_WINDOWS: { key: HistoryWindowKey; label: string; ms: number
   { key: '30d', label: '30d', ms: 30 * 24 * 60 * 60 * 1000 },
 ];
 
+const SNAPSHOT_STALENESS_LIMIT_MS: Record<HistoryWindowKey, number> = {
+  '1h': 2 * 60 * 60 * 1000,
+  '24h': 8 * 60 * 60 * 1000,
+  '7d': 36 * 60 * 60 * 1000,
+  '30d': 72 * 60 * 60 * 1000,
+};
+
 export type RankHistorySnapshot = {
   capturedAt: string;
   byGuid: Map<string, SlimDriver>;
@@ -80,12 +87,11 @@ async function queryOneSnapshot(query: string): Promise<RankHistorySnapshot | nu
 }
 
 /**
- * Snapshot to compare "now" against for the given window. We pick the newest
- * **SR-bearing** snapshot at or before (now - window), so Safety Rating & license
- * deltas always have a real baseline. When the window reaches further back than
- * our SR history goes, we fall back to the oldest SR-bearing snapshot — a
- * best-effort "as far back as we have SR data" comparison rather than nothing.
- * Returns null only when Supabase is unavailable or no SR snapshot exists yet.
+ * Snapshot to compare "now" against for the given window. We prefer the newest
+ * **SR-bearing** snapshot at or before (now - window), but can use the first
+ * snapshot just after the target when it is close enough. After sync outages we
+ * prefer "still building" over showing a stale multi-day baseline as a 1h/24h
+ * comparison.
  */
 export async function fetchRankHistorySnapshot(
   window: HistoryWindowKey
@@ -93,15 +99,25 @@ export async function fetchRankHistorySnapshot(
   if (rankHistoryDisabled() || !supabaseReadConfigured()) return null;
   const win = HISTORY_WINDOWS.find((w) => w.key === window);
   if (!win) return null;
-  const target = new Date(Date.now() - win.ms).toISOString();
+  const targetMs = Date.now() - win.ms;
+  const target = new Date(targetMs).toISOString();
   const windowed = await queryOneSnapshot(
     `select=captured_at,drivers&captured_at=lte.${encodeURIComponent(target)}` +
       `&${SR_PRESENT_FILTER}&order=captured_at.desc&limit=1`
   );
-  if (windowed) return windowed;
-  return queryOneSnapshot(
-    `select=captured_at,drivers&${SR_PRESENT_FILTER}&order=captured_at.asc&limit=1`
+  const limitMs = SNAPSHOT_STALENESS_LIMIT_MS[window];
+  const isFreshEnough = (snapshot: RankHistorySnapshot | null) => {
+    if (!snapshot) return false;
+    const capturedMs = new Date(snapshot.capturedAt).getTime();
+    return Number.isFinite(capturedMs) && Math.abs(targetMs - capturedMs) <= limitMs;
+  };
+  if (isFreshEnough(windowed)) return windowed;
+
+  const shortlyAfter = await queryOneSnapshot(
+    `select=captured_at,drivers&captured_at=gte.${encodeURIComponent(target)}` +
+      `&${SR_PRESENT_FILTER}&order=captured_at.asc&limit=1`
   );
+  return isFreshEnough(shortlyAfter) ? shortlyAfter : null;
 }
 
 /** Oldest snapshot timestamp in `rank_history`, or null when none / unavailable. */
