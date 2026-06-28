@@ -2,14 +2,13 @@ import type { RouteObject } from 'react-router';
 
 import { lazy, Suspense } from 'react';
 import { Outlet } from 'react-router-dom';
-import { varAlpha } from 'minimal-shared/utils';
 
 import Box from '@mui/material/Box';
-import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgress';
 
 import { APP_ROUTES } from 'src/centralized/app-routes';
 import { DashboardLayout } from 'src/layouts/dashboard';
 
+import { RaceLoader } from 'src/components/race-loader';
 import { LicenseSafetyGuideProvider } from 'src/components/license-safety-guide/license-safety-guide';
 
 // ----------------------------------------------------------------------
@@ -29,6 +28,7 @@ export const Page404 = lazy(() => import('src/pages/page-not-found'));
 
 const AdminPage = lazy(() => import('src/pages/admin'));
 const AdminServerPage = lazy(() => import('src/pages/admin-server'));
+const AdminRatingPlaygroundPage = lazy(() => import('src/pages/admin-rating-playground'));
 const AdminTracksPage = lazy(() => import('src/pages/admin-tracks'));
 const AdminBansPage = lazy(() => import('src/pages/admin-bans'));
 const AdminDebugPage = lazy(() => import('src/pages/admin-debug'));
@@ -42,14 +42,7 @@ const renderFallback = () => (
       justifyContent: 'center',
     }}
   >
-    <LinearProgress
-      sx={{
-        width: 1,
-        maxWidth: 320,
-        bgcolor: (theme) => varAlpha(theme.vars.palette.text.primaryChannel, 0.16),
-        [`& .${linearProgressClasses.bar}`]: { bgcolor: 'text.primary' },
-      }}
-    />
+    <RaceLoader compact title="Loading page..." message="Warming tyres and opening the next screen." />
   </Box>
 );
 
@@ -78,6 +71,7 @@ export const routesSection: RouteObject[] = [
       { path: APP_ROUTES.resultPattern.slice(1), element: <ResultDetailPage /> },
       { path: APP_ROUTES.admin.slice(1), element: <AdminPage /> },
       { path: `${APP_ROUTES.admin.slice(1)}/server`, element: <AdminServerPage /> },
+      { path: `${APP_ROUTES.admin.slice(1)}/rating-playground`, element: <AdminRatingPlaygroundPage /> },
       { path: `${APP_ROUTES.admin.slice(1)}/tracks`, element: <AdminTracksPage /> },
       { path: `${APP_ROUTES.admin.slice(1)}/bans`, element: <AdminBansPage /> },
       { path: `${APP_ROUTES.admin.slice(1)}/debug`, element: <AdminDebugPage /> },

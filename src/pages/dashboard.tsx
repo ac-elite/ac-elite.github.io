@@ -4,7 +4,6 @@ import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
-import Skeleton from '@mui/material/Skeleton';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 
@@ -15,11 +14,7 @@ import { fetchJson } from 'src/lib/fetch-json';
 import { DATA_PAGE_SHELL_SX } from 'src/lib/page-shell';
 import { getLeaderboardHref, getDriverProfileHref } from 'src/lib/routes';
 import { getSiteUrl } from 'src/centralized/site-urls';
-import {
-  GLASS_PANEL_SX,
-  GLASS_INNER_PANEL_SX,
-  GLASS_PANEL_SPACIOUS_SX,
-} from 'src/lib/glass';
+import { GLASS_PANEL_SX, GLASS_INNER_PANEL_SX, GLASS_PANEL_SPACIOUS_SX } from 'src/lib/glass';
 import { getSyncHealth, type SiteMetadata, getEffectiveLastSync } from 'src/lib/sync-utils';
 import { glassCardMotionSx } from 'src/lib/subtle-motion';
 import { brandAccentBorderSx } from 'src/lib/status-accent';
@@ -429,44 +424,8 @@ export default function Page() {
               <LoadingPanel
                 title="Loading dashboard…"
                 message="Aggregating community totals and track coverage from the latest sync."
-              >
-                <Grid container spacing={2.5}>
-                  {[0, 1, 2, 3].map((k) => (
-                    <Grid key={k} size={{ xs: 12, sm: 6, md: 3 }}>
-                      <Skeleton
-                        variant="rounded"
-                        height={152}
-                        sx={{ borderRadius: 2, bgcolor: 'rgba(255,255,255,0.06)' }}
-                      />
-                    </Grid>
-                  ))}
-                  {[0, 1, 2].map((k) => (
-                    <Grid key={`s-${k}`} size={{ xs: 12, sm: 6, md: 4 }}>
-                      <Skeleton
-                        variant="rounded"
-                        height={124}
-                        sx={{ borderRadius: 2, bgcolor: 'rgba(255,255,255,0.05)' }}
-                      />
-                    </Grid>
-                  ))}
-                  <Grid size={{ xs: 12 }}>
-                    <Skeleton
-                      variant="rounded"
-                      height={100}
-                      sx={{ borderRadius: 2, bgcolor: 'rgba(255,255,255,0.05)' }}
-                    />
-                  </Grid>
-                  {[400, 400].map((h, i) => (
-                    <Grid key={`chart-${i}`} size={{ xs: 12 }}>
-                      <Skeleton
-                        variant="rounded"
-                        height={h}
-                        sx={{ borderRadius: 2, bgcolor: 'rgba(255,255,255,0.05)' }}
-                      />
-                    </Grid>
-                  ))}
-                </Grid>
-              </LoadingPanel>
+                variant="page"
+              />
             )}
 
             {!loading && error && (

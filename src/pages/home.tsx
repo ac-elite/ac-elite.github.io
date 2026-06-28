@@ -112,6 +112,7 @@ import { Reveal } from 'src/components/reveal';
 import { EmptyState } from 'src/components/data-state';
 import { Chart } from 'src/components/chart';
 import { DeltaChip } from 'src/components/delta-chip/delta-chip';
+import { RaceLoader } from 'src/components/race-loader';
 import { InfoNotesPanel } from 'src/components/info-notes/info-notes-panel';
 import { ServerJoinCard } from 'src/components/server-join-card';
 import { TrendWindowStats } from 'src/components/trend-window/trend-window-stats';
@@ -318,13 +319,16 @@ function buildCommunityPulse(rankData: RankDriver[]) {
 function CommunityPulseCard({
   rankData,
   syncStatus,
+  loading,
   motionSxIndex = 1,
 }: {
   rankData: RankDriver[];
   syncStatus: SyncHealth;
+  loading: boolean;
   motionSxIndex?: number;
 }) {
   const pulse = useMemo(() => buildCommunityPulse(rankData), [rankData]);
+  const isLoading = loading && rankData.length === 0;
   const hasPulseData = pulse.buckets.some((bucket) => bucket.activeDrivers > 0);
 
   return (
@@ -351,44 +355,56 @@ function CommunityPulseCard({
             </Typography>
           </Box>
 
-          <Stack
-            direction={{ xs: 'column', sm: 'row' }}
-            spacing={1}
-            sx={{ alignItems: 'stretch', justifyContent: { xs: 'center', md: 'flex-start' } }}
-          >
-            {[
-              { label: 'Active 7d', value: formatNumber(pulse.active7d) },
-              { label: 'Peak day', value: formatNumber(pulse.peakDrivers) },
-              {
-                label: 'Avg SR',
-                value: pulse.avgSafety7d == null ? '-' : pulse.avgSafety7d.toFixed(2),
-              },
-            ].map((item, tileIndex) => (
-              <Box
-                key={item.label}
-                sx={{
-                  ...GLASS_INNER_PANEL_SX,
-                  ...glassCardEnterOnlySx(3 + tileIndex),
-                  flex: 1,
-                  minWidth: { xs: '100%', sm: 0 },
-                  py: 1.2,
-                  textAlign: 'center',
-                }}
-              >
-                <Typography
-                  variant="caption"
-                  sx={{ color: 'rgba(255,255,255,0.68)', fontWeight: 700, letterSpacing: 0 }}
+          {!isLoading && (
+            <Stack
+              direction={{ xs: 'column', sm: 'row' }}
+              spacing={1}
+              sx={{ alignItems: 'stretch', justifyContent: { xs: 'center', md: 'flex-start' } }}
+            >
+              {[
+                { label: 'Active 7d', value: formatNumber(pulse.active7d) },
+                { label: 'Peak day', value: formatNumber(pulse.peakDrivers) },
+                {
+                  label: 'Avg SR',
+                  value: pulse.avgSafety7d == null ? '-' : pulse.avgSafety7d.toFixed(2),
+                },
+              ].map((item, tileIndex) => (
+                <Box
+                  key={item.label}
+                  sx={{
+                    ...GLASS_INNER_PANEL_SX,
+                    ...glassCardEnterOnlySx(3 + tileIndex),
+                    flex: 1,
+                    minWidth: { xs: '100%', sm: 0 },
+                    py: 1.2,
+                    textAlign: 'center',
+                  }}
                 >
-                  {item.label}
-                </Typography>
-                <Typography variant="subtitle2" sx={{ fontWeight: 800, lineHeight: 1.2 }}>
-                  {item.value}
-                </Typography>
-              </Box>
-            ))}
-          </Stack>
+                  <Typography
+                    variant="caption"
+                    sx={{ color: 'rgba(255,255,255,0.68)', fontWeight: 700, letterSpacing: 0 }}
+                  >
+                    {item.label}
+                  </Typography>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 800, lineHeight: 1.2 }}>
+                    {item.value}
+                  </Typography>
+                </Box>
+              ))}
+            </Stack>
+          )}
 
-          {hasPulseData ? (
+          {isLoading ? (
+            <Box sx={{ ...GLASS_INNER_PANEL_SX, p: 1.5 }}>
+              <RaceLoader
+                compact
+                variant="spotlight"
+                title="Loading activity pulse..."
+                message="Matching recent laps to active drivers."
+                sx={{ maxWidth: 1 }}
+              />
+            </Box>
+          ) : hasPulseData ? (
             <Box
               sx={{
                 ...GLASS_INNER_PANEL_SX,
@@ -481,30 +497,38 @@ function CommunityPulseCard({
             </Box>
           )}
 
-          <Stack
-            direction={{ xs: 'column', sm: 'row' }}
-            spacing={1}
-            sx={{
-              alignItems: { xs: 'center', sm: 'center' },
-              justifyContent: 'space-between',
-              color: 'text.secondary',
-              textAlign: { xs: 'center', sm: 'left' },
-            }}
-          >
-            <Typography variant="caption" sx={{ fontWeight: 700 }}>
-              {formatNumber(pulse.totalLaps7d)} total laps by recently active drivers
-            </Typography>
-            <Typography variant="caption" sx={{ color: syncStatus.color, fontWeight: 800 }}>
-              {syncStatus.label} · {syncStatus.ageText}
-            </Typography>
-          </Stack>
+          {!isLoading && (
+            <Stack
+              direction={{ xs: 'column', sm: 'row' }}
+              spacing={1}
+              sx={{
+                alignItems: { xs: 'center', sm: 'center' },
+                justifyContent: 'space-between',
+                color: 'text.secondary',
+                textAlign: { xs: 'center', sm: 'left' },
+              }}
+            >
+              <Typography variant="caption" sx={{ fontWeight: 700 }}>
+                {formatNumber(pulse.totalLaps7d)} total laps by recently active drivers
+              </Typography>
+              <Typography variant="caption" sx={{ color: syncStatus.color, fontWeight: 800 }}>
+                {syncStatus.label} · {syncStatus.ageText}
+              </Typography>
+            </Stack>
+          )}
         </Stack>
       </Box>
     </Box>
   );
 }
 
-function HeroSection({ currentTrack }: { currentTrack: CurrentTrackData | null }) {
+function HeroSection({
+  currentTrack,
+  serverLoading,
+}: {
+  currentTrack: CurrentTrackData | null;
+  serverLoading: boolean;
+}) {
   const theme = useTheme();
   const isMdUp = useMediaQuery(theme.breakpoints.up('md'));
 
@@ -643,7 +667,11 @@ function HeroSection({ currentTrack }: { currentTrack: CurrentTrackData | null }
 
           <Grid size={{ xs: 12, md: 5 }}>
             <Stack spacing={2} sx={{ height: 1, alignItems: { xs: 'center', md: 'stretch' } }}>
-              <ServerJoinCard currentTrack={currentTrack} sx={{ ...glassCardMotionSx(1) }} />
+              <ServerJoinCard
+                currentTrack={currentTrack}
+                loading={serverLoading}
+                sx={{ ...glassCardMotionSx(1) }}
+              />
             </Stack>
           </Grid>
         </Grid>
@@ -760,9 +788,10 @@ function CurrentTrackLeaderboardSection({
                     {loading && (
                       <TableRow>
                         <TableCell colSpan={8} sx={{ py: 4, px: 2 }}>
-                          <EmptyState
-                            title="Loading leaderboard…"
-                            description="Pulling current-track lap times. This usually takes a second."
+                          <RaceLoader
+                            variant="timing"
+                            title="Loading current track..."
+                            message="Pulling current-track lap times."
                           />
                         </TableCell>
                       </TableRow>
@@ -801,7 +830,9 @@ function CurrentTrackLeaderboardSection({
                           } as RankDriver);
                         const license = getDriverLicense(driver, licenseMap);
                         const sr = getDriverSR(driver);
-                        const ratingV2 = ratingV2Enabled() ? ratingV2Map.get(entry.guid) : undefined;
+                        const ratingV2 = ratingV2Enabled()
+                          ? ratingV2Map.get(entry.guid)
+                          : undefined;
                         const displayLicense = ratingV2
                           ? { license: ratingV2.licenseTier, paceScore: ratingV2.licenseScore }
                           : license;
@@ -1171,9 +1202,15 @@ function DriverSearchSection({
             </Paper>
 
             {loading && (
-              <Typography color="text.secondary" sx={{ mt: 1 }}>
-                Loading drivers...
-              </Typography>
+              <Box sx={{ mt: 1.25 }}>
+                <RaceLoader
+                  compact
+                  variant="timing"
+                  title="Loading drivers..."
+                  message="Preparing the searchable driver list."
+                  sx={{ maxWidth: 1 }}
+                />
+              </Box>
             )}
             {error && (
               <Typography color="error" sx={{ mt: 1 }}>
@@ -1184,7 +1221,12 @@ function DriverSearchSection({
 
           <Grid size={{ xs: 12, md: 5 }}>
             <Stack spacing={1.25} sx={{ height: 1, alignItems: { xs: 'center', md: 'stretch' } }}>
-              <CommunityPulseCard rankData={rankData} syncStatus={syncStatus} motionSxIndex={1} />
+              <CommunityPulseCard
+                rankData={rankData}
+                syncStatus={syncStatus}
+                loading={loading}
+                motionSxIndex={1}
+              />
             </Stack>
           </Grid>
         </Grid>
@@ -1252,9 +1294,8 @@ export default function Page() {
         setMetadata(meta);
 
         const staticPayload = toCurrentTrackPayload(trackJson);
-        if (!canAttemptLiveServerStatusFetch()) {
-          setCurrentTrack(applyServerOfflineDebug(staticPayload));
-        } else {
+        setCurrentTrack(applyServerOfflineDebug(staticPayload));
+        if (canAttemptLiveServerStatusFetch()) {
           void fetchLiveServerStatusFromSupabase().then((live) => {
             if (!mounted) return;
             setCurrentTrack(pickNewerCurrentTrack(staticPayload, live));
@@ -1442,7 +1483,7 @@ export default function Page() {
       />
       <meta property="og:url" content={getSiteUrl(APP_ROUTES.home)} />
 
-      <HeroSection currentTrack={currentTrack} />
+      <HeroSection currentTrack={currentTrack} serverLoading={loading && currentTrack == null} />
       <DriverSearchSection
         drivers={drivers}
         rankData={rankData}

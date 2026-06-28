@@ -6,7 +6,6 @@ import Chip from '@mui/material/Chip';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
-import Skeleton from '@mui/material/Skeleton';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import ToggleButton from '@mui/material/ToggleButton';
@@ -735,19 +734,8 @@ export default function Page() {
               <LoadingPanel
                 title="Loading Hall of Fame…"
                 message="Loading drivers, spotlight stats, and team roster matches."
-              >
-                <Grid container spacing={2.5}>
-                  {Array.from({ length: 6 }).map((_, i) => (
-                    <Grid key={i} size={{ xs: 12, md: 6 }}>
-                      <Skeleton
-                        variant="rounded"
-                        height={220}
-                        sx={{ borderRadius: 2, bgcolor: 'rgba(255,255,255,0.06)' }}
-                      />
-                    </Grid>
-                  ))}
-                </Grid>
-              </LoadingPanel>
+                variant="spotlight"
+              />
             )}
 
             {!loading && error && <ErrorPanel error={error} />}

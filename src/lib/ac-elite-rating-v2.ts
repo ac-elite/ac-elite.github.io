@@ -1,4 +1,5 @@
 import {
+  SR_TIERS,
   getSRTier,
   safetyRating,
   LICENSE_TIERS,
@@ -130,6 +131,50 @@ export type RatingV2Breakdown = {
   excludedSessions: number;
 };
 
+export type RatingV2TierConfig = {
+  name: string;
+  minKm: number;
+  minScore: number;
+  minTracks?: number;
+};
+
+export type RatingV2SafetyTierConfig = {
+  name: string;
+  minSR: number;
+  minKm: number;
+};
+
+export type RatingV2Config = {
+  collisionWeight: number;
+  cutWeight: number;
+  penaltyWeight: number;
+  disqualificationPenalty: number;
+  racecraftFinishWeight: number;
+  racecraftCompletionWeight: number;
+  racecraftFallbackPaceWeight: number;
+  racecraftBaseline: number;
+  licenseAdjustmentScale: number;
+  licenseAdjustmentMinRaces: number;
+  licenseAdjustmentMaxGain: number;
+  licenseAdjustmentMaxLoss: number;
+  safetyAdjustmentScale: number;
+  safetyAdjustmentMinSessions: number;
+  safetyAdjustmentMaxGain: number;
+  safetyAdjustmentMaxLoss: number;
+  confidenceFullKm: number;
+  confidenceFullSessions: number;
+  confidenceKmWeight: number;
+  confidenceSessionWeight: number;
+  activityFullSessions: number;
+  activityFullTracks: number;
+  activityFullKm: number;
+  activitySessionWeight: number;
+  activityTrackWeight: number;
+  activityKmWeight: number;
+  licenseTiers: RatingV2TierConfig[];
+  safetyTiers: RatingV2SafetyTierConfig[];
+};
+
 type LicenseTierV2 = {
   name: string;
   minScore: number;
@@ -168,6 +213,50 @@ export const SR_TIERS_V2 = [
   { name: 'D2', minSR: 1.55, minKm: 100, minSessions: 1 },
   { name: 'D3', minSR: 1.4, minKm: 100, minSessions: 1 },
 ] as const;
+
+export const DEFAULT_RATING_V2_CONFIG: RatingV2Config = {
+  collisionWeight: 1,
+  cutWeight: 0.15,
+  penaltyWeight: 1.5,
+  disqualificationPenalty: 5,
+  racecraftFinishWeight: 0.78,
+  racecraftCompletionWeight: 0.22,
+  racecraftFallbackPaceWeight: 0.55,
+  racecraftBaseline: 65,
+  licenseAdjustmentScale: 0.06,
+  licenseAdjustmentMinRaces: 5,
+  licenseAdjustmentMaxGain: 0.04,
+  licenseAdjustmentMaxLoss: -0.04,
+  safetyAdjustmentScale: 0.12,
+  safetyAdjustmentMinSessions: 5,
+  safetyAdjustmentMaxGain: 0.2,
+  safetyAdjustmentMaxLoss: -0.25,
+  confidenceFullKm: 1200,
+  confidenceFullSessions: 20,
+  confidenceKmWeight: 0.7,
+  confidenceSessionWeight: 0.3,
+  activityFullSessions: 60,
+  activityFullTracks: 10,
+  activityFullKm: 6000,
+  activitySessionWeight: 50,
+  activityTrackWeight: 30,
+  activityKmWeight: 20,
+  licenseTiers: LICENSE_TIER_ORDER.map((name) => ({
+    name,
+    minKm: LICENSE_TIERS[name].minKm,
+    minScore: LICENSE_TIERS[name].minScore,
+    ...(LICENSE_TIERS[name].minTracks == null ? {} : { minTracks: LICENSE_TIERS[name].minTracks }),
+  })),
+  safetyTiers: SR_TIERS.map((tier) => ({ name: tier.name, minSR: tier.minSR, minKm: tier.minKm })),
+};
+
+export function cloneRatingV2Config(config: RatingV2Config = DEFAULT_RATING_V2_CONFIG): RatingV2Config {
+  return {
+    ...config,
+    licenseTiers: config.licenseTiers.map((tier) => ({ ...tier })),
+    safetyTiers: config.safetyTiers.map((tier) => ({ ...tier })),
+  };
+}
 
 export const RATING_V2_TRACK_LENGTHS_KM: Record<string, number> = {
   ks_barcelona_layout_gp: 4.655,
@@ -230,45 +319,78 @@ function impactSeverityPoints(impactSpeedMps: number | undefined): number {
   return 2.5;
 }
 
-function getSafetyTierV2(sr: number, km: number, sessions: number): string {
-  for (const tier of SR_TIERS_V2) {
-    if (sr >= tier.minSR && km >= tier.minKm && sessions >= tier.minSessions) return tier.name;
+function getSafetyTierV2(sr: number, km: number, config: RatingV2Config): string {
+  for (const tier of config.safetyTiers) {
+    if (sr >= tier.minSR && km >= tier.minKm) return tier.name;
   }
   return 'F';
 }
 
-function getLicenseTierV2(rating: DriverRatingV2): string {
+function getLicenseTierV2(rating: DriverRatingV2, config: RatingV2Config): string {
   if (rating.totalKm < 100) return 'Rookie';
-  for (const name of LICENSE_TIER_ORDER) {
-    const tier = LICENSE_TIERS[name];
+  for (const tier of config.licenseTiers) {
     if (
       rating.totalKm >= tier.minKm &&
       rating.licenseScore >= tier.minScore &&
       (tier.minTracks == null || rating.uniqueTracks >= tier.minTracks)
     ) {
-      return name;
+      return tier.name;
     }
   }
   return 'Bronze';
 }
 
-function recentLicenseAdjustmentPct(racecraftScore: number, confidence: number, ratedRaces: number): number {
-  if (ratedRaces < 5) return 0;
+function recentLicenseAdjustmentPct(
+  racecraftScore: number,
+  confidence: number,
+  ratedRaces: number,
+  config: RatingV2Config
+): number {
+  if (ratedRaces < config.licenseAdjustmentMinRaces) return 0;
   // Recent result data is incomplete history, so keep it as a small correction.
-  // Positive/negative range is capped at 4%.
-  return clamp(((racecraftScore - 65) / 100) * confidence * 0.06, -0.04, 0.04);
+  return clamp(
+    ((racecraftScore - config.racecraftBaseline) / 100) * confidence * config.licenseAdjustmentScale,
+    config.licenseAdjustmentMaxLoss,
+    config.licenseAdjustmentMaxGain
+  );
 }
 
 function recentSafetyAdjustment(
   legacySafetyRating: number,
   resultsSafetyRating: number,
   confidence: number,
-  ratedSessions: number
+  ratedSessions: number,
+  config: RatingV2Config
 ): number {
-  if (ratedSessions < 5) return 0;
+  if (ratedSessions < config.safetyAdjustmentMinSessions) return 0;
   // Recent results can flag direction, but must not erase the all-time KMR SR
   // baseline. Cap the results signal to a gentle +/- range.
-  return clamp((resultsSafetyRating - legacySafetyRating) * confidence * 0.12, -0.25, 0.2);
+  return clamp(
+    (resultsSafetyRating - legacySafetyRating) * confidence * config.safetyAdjustmentScale,
+    config.safetyAdjustmentMaxLoss,
+    config.safetyAdjustmentMaxGain
+  );
+}
+
+function racecraftPointsFromStat(stat: DriverSessionStatV2, config: RatingV2Config): number | null {
+  if (stat.type !== 'RACE' || stat.finishPos == null || stat.fieldSize <= 1) return null;
+  const finishQuality = clamp((stat.fieldSize - stat.finishPos) / (stat.fieldSize - 1), 0, 1);
+  return clamp(
+    (finishQuality * config.racecraftFinishWeight +
+      stat.completionRatio * config.racecraftCompletionWeight) *
+      100,
+    0,
+    100
+  );
+}
+
+function incidentPointsFromStat(stat: DriverSessionStatV2, config: RatingV2Config): number {
+  return (
+    stat.collisionPoints * config.collisionWeight +
+    stat.cuts * config.cutWeight +
+    stat.penaltyCount * config.penaltyWeight +
+    (stat.disqualified ? config.disqualificationPenalty : 0)
+  );
 }
 
 export function computeDriverSessionStatsV2(
@@ -377,7 +499,8 @@ export function computeDriverSessionStatsV2(
 export function computeDriverRatingsV2(
   rankDrivers: RankDriver[],
   sessionStats: DriverSessionStatV2[],
-  computedAt = new Date().toISOString()
+  computedAt = new Date().toISOString(),
+  config: RatingV2Config = DEFAULT_RATING_V2_CONFIG
 ): DriverRatingV2[] {
   const licenseMap = computeLicenseMap(rankDrivers);
   const maxPace = Math.max(1, ...rankDrivers.map((driver) => getDriverLicense(driver, licenseMap).paceScore));
@@ -391,7 +514,9 @@ export function computeDriverRatingsV2(
   return rankDrivers.map((driver) => {
     const stats = statsByGuid.get(driver.guid) ?? [];
     const includedStats = stats.filter((stat) => !stat.excludedReason);
-    const raceStats = includedStats.filter((stat) => stat.type === 'RACE' && stat.racecraftPoints != null);
+    const raceStats = includedStats
+      .map((stat) => ({ stat, racecraftPoints: racecraftPointsFromStat(stat, config) }))
+      .filter((entry) => entry.racecraftPoints != null);
     const totalKm = driver.kilometers ?? 0;
     const ratedKm = includedStats.reduce((sum, stat) => sum + stat.ratedKm, 0);
     const ratedSessions = includedStats.length;
@@ -404,13 +529,13 @@ export function computeDriverRatingsV2(
     const legacyLicense = getDriverLicense(driver, licenseMap).license;
     const paceNormalized = clamp((paceRaw / maxPace) * 100, 0, 100);
     const racecraftScore = raceStats.length
-      ? raceStats.reduce((sum, stat) => sum + (stat.racecraftPoints ?? 0), 0) / raceStats.length
-      : paceNormalized * 0.55;
+      ? raceStats.reduce((sum, entry) => sum + (entry.racecraftPoints ?? 0), 0) / raceStats.length
+      : paceNormalized * config.racecraftFallbackPaceWeight;
     const activityScore =
-      clamp(ratedSessions / 60, 0, 1) * 50 +
-      clamp(uniqueTracks / 10, 0, 1) * 30 +
-      clamp(totalKm / 6000, 0, 1) * 20;
-    const incidentPoints = includedStats.reduce((sum, stat) => sum + stat.safetyIncidentPoints, 0);
+      clamp(ratedSessions / config.activityFullSessions, 0, 1) * config.activitySessionWeight +
+      clamp(uniqueTracks / config.activityFullTracks, 0, 1) * config.activityTrackWeight +
+      clamp(totalKm / config.activityFullKm, 0, 1) * config.activityKmWeight;
+    const incidentPoints = includedStats.reduce((sum, stat) => sum + incidentPointsFromStat(stat, config), 0);
     const cuts = includedStats.reduce((sum, stat) => sum + stat.cuts, 0);
     const penalties = includedStats.reduce((sum, stat) => sum + stat.penaltyCount, 0);
     const disqualifications = includedStats.filter((stat) => stat.disqualified).length;
@@ -419,21 +544,27 @@ export function computeDriverRatingsV2(
     const incidentsPer100Km = ratedKm > 0 ? (incidentPoints / ratedKm) * 100 : 0;
     const cutsPer100Km = ratedKm > 0 ? (cuts / ratedKm) * 100 : 0;
     const rawSafety = ratedKm > 0 ? 1 + 8.99 / (1 + incidentsPer100Km / 2.5) : 2.5;
-    const confidence = clamp(Math.sqrt(ratedKm / 1200) * 0.7 + clamp(ratedSessions / 20, 0, 1) * 0.3, 0, 1);
+    const confidence = clamp(
+      Math.sqrt(ratedKm / config.confidenceFullKm) * config.confidenceKmWeight +
+        clamp(ratedSessions / config.confidenceFullSessions, 0, 1) * config.confidenceSessionWeight,
+      0,
+      1
+    );
     const resultsSafetyRating = clamp(2.5 + (rawSafety - 2.5) * confidence, 1, 9.99);
     const legacySafetyRating = safetyRating(driver);
     const legacySafetyTier = getSRTier(legacySafetyRating, totalKm);
-    const resultsSafetyTier = getSafetyTierV2(resultsSafetyRating, ratedKm, ratedSessions);
-    const licenseAdjustment = recentLicenseAdjustmentPct(racecraftScore, confidence, ratedRaces);
+    const resultsSafetyTier = getSafetyTierV2(resultsSafetyRating, ratedKm, config);
+    const licenseAdjustment = recentLicenseAdjustmentPct(racecraftScore, confidence, ratedRaces, config);
     const safetyAdjustment = recentSafetyAdjustment(
       legacySafetyRating,
       resultsSafetyRating,
       confidence,
-      ratedSessions
+      ratedSessions,
+      config
     );
     const licenseScore = Math.max(0, paceRaw * (1 + licenseAdjustment));
     const adjustedSafetyRating = clamp(legacySafetyRating + safetyAdjustment, 1, 9.99);
-    const adjustedSafetyTier = getSRTier(adjustedSafetyRating, totalKm);
+    const adjustedSafetyTier = getSafetyTierV2(adjustedSafetyRating, totalKm, config);
     const safetyScore = clamp(((adjustedSafetyRating - 1) / 8.99) * 100, 0, 100);
 
     const rating: DriverRatingV2 = {
@@ -487,7 +618,7 @@ export function computeDriverRatingsV2(
         excludedSessions: stats.length - includedStats.length,
       },
     };
-    rating.licenseTier = getLicenseTierV2(rating);
+    rating.licenseTier = getLicenseTierV2(rating, config);
     return rating;
   });
 }

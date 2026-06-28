@@ -9,7 +9,6 @@ import Table from '@mui/material/Table';
 import Select from '@mui/material/Select';
 import Button from '@mui/material/Button';
 import MenuItem from '@mui/material/MenuItem';
-import Skeleton from '@mui/material/Skeleton';
 import TableRow from '@mui/material/TableRow';
 import TextField from '@mui/material/TextField';
 import TableBody from '@mui/material/TableBody';
@@ -46,6 +45,7 @@ import {
 
 import { Reveal } from 'src/components/reveal';
 import { EmptyState, ErrorPanel } from 'src/components/data-state';
+import { RaceLoader } from 'src/components/race-loader';
 import { SessionPaginate } from 'src/components/sessions-table/session-paginate';
 
 const SESSIONS_PER_PAGE = 10;
@@ -141,7 +141,10 @@ export function DriverSessionsTable({
         <Paper sx={{ ...GLASS_PANEL_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(1) }}>
           <Stack
             spacing={1.5}
-            sx={{ alignItems: { xs: 'center', md: 'stretch' }, textAlign: { xs: 'center', md: 'left' } }}
+            sx={{
+              alignItems: { xs: 'center', md: 'stretch' },
+              textAlign: { xs: 'center', md: 'left' },
+            }}
           >
             <Box>
               <Typography variant="overline" sx={{ ...PANEL_OVERLINE_MUTED_SX }}>
@@ -151,8 +154,8 @@ export function DriverSessionsTable({
                 Session history
               </Typography>
               <Typography variant="caption" sx={{ display: 'block', color: 'text.secondary' }}>
-                Every listed race, qualify and practice {driverName ? `${driverName} ` : ''}took part
-                in — open one for the full classification.
+                Every listed race, qualify and practice {driverName ? `${driverName} ` : ''}took
+                part in — open one for the full classification.
               </Typography>
             </Box>
 
@@ -208,7 +211,11 @@ export function DriverSessionsTable({
                         All tracks
                       </MenuItem>
                       {trackOptions.map((t) => (
-                        <MenuItem key={t.trackName} value={t.trackName} sx={GLASS_SELECT_MENU_ITEM_SX}>
+                        <MenuItem
+                          key={t.trackName}
+                          value={t.trackName}
+                          sx={GLASS_SELECT_MENU_ITEM_SX}
+                        >
                           {resolveTrack(t.trackName, t.trackConfig).label}
                         </MenuItem>
                       ))}
@@ -234,7 +241,10 @@ export function DriverSessionsTable({
                       '& fieldset': { borderColor: 'rgba(255,255,255,0.18)' },
                       '&:hover fieldset': { borderColor: 'rgba(255,255,255,0.3)' },
                     },
-                    '& .MuiInputBase-input::placeholder': { color: 'rgba(255,255,255,0.5)', opacity: 1 },
+                    '& .MuiInputBase-input::placeholder': {
+                      color: 'rgba(255,255,255,0.5)',
+                      opacity: 1,
+                    },
                   }}
                 />
               </Stack>
@@ -246,11 +256,13 @@ export function DriverSessionsTable({
       {error && <ErrorPanel error={error} />}
 
       {!error && loading && (
-        <Skeleton
-          variant="rounded"
-          height={320}
-          sx={{ borderRadius: 2, bgcolor: 'rgba(255,255,255,0.05)' }}
-        />
+        <Paper sx={{ ...GLASS_TABLE_WRAPPER_SX, ...brandAccentBorderSx(), p: 2 }}>
+          <RaceLoader
+            variant="timing"
+            title="Loading driver sessions..."
+            message="Fetching race, qualifying, and practice history."
+          />
+        </Paper>
       )}
 
       {!error && !loading && (
@@ -291,52 +303,52 @@ export function DriverSessionsTable({
                   )}
 
                   {rows.map((row, idx) => (
-                      <TableRow
-                        key={row.id}
-                        onClick={() => {
-                          window.location.href = getResultHref(row.id);
+                    <TableRow
+                      key={row.id}
+                      onClick={() => {
+                        window.location.href = getResultHref(row.id);
+                      }}
+                      sx={{ cursor: 'pointer', ...subtleRowEnterSx(idx, { baseDelayMs: 340 }) }}
+                    >
+                      <TableCell sx={{ whiteSpace: 'nowrap' }}>
+                        {formatSessionDate(row.session_date)}
+                      </TableCell>
+                      <TableCell>
+                        <Chip size="small" label={row.type} sx={TYPE_CHIP_SX[row.type] ?? {}} />
+                      </TableCell>
+                      <TableCell sx={{ fontWeight: 700 }}>
+                        {resolveTrack(row.track_name, row.track_config).label}
+                      </TableCell>
+                      <TableCell align="right">{row.num_drivers}</TableCell>
+                      <TableCell
+                        align="right"
+                        sx={{
+                          fontVariantNumeric: 'tabular-nums',
+                          fontWeight: (row.num_incidents ?? 0) > 0 ? 700 : 400,
+                          color: (row.num_incidents ?? 0) > 0 ? '#fca5a5' : 'text.secondary',
                         }}
-                        sx={{ cursor: 'pointer', ...subtleRowEnterSx(idx, { baseDelayMs: 340 }) }}
                       >
-                        <TableCell sx={{ whiteSpace: 'nowrap' }}>
-                          {formatSessionDate(row.session_date)}
-                        </TableCell>
-                        <TableCell>
-                          <Chip size="small" label={row.type} sx={TYPE_CHIP_SX[row.type] ?? {}} />
-                        </TableCell>
-                        <TableCell sx={{ fontWeight: 700 }}>
-                          {resolveTrack(row.track_name, row.track_config).label}
-                        </TableCell>
-                        <TableCell align="right">{row.num_drivers}</TableCell>
-                        <TableCell
-                          align="right"
-                          sx={{
-                            fontVariantNumeric: 'tabular-nums',
-                            fontWeight: (row.num_incidents ?? 0) > 0 ? 700 : 400,
-                            color: (row.num_incidents ?? 0) > 0 ? '#fca5a5' : 'text.secondary',
-                          }}
-                        >
-                          {row.num_incidents ?? 0}
-                        </TableCell>
-                        <TableCell>
-                          {row.winner_guid ? (
-                            <Link
-                              href={getDriverProfileHref(row.winner_guid)}
-                              onClick={(e) => e.stopPropagation()}
-                              underline="none"
-                              color="inherit"
-                              sx={{ fontWeight: 700 }}
-                            >
-                              {row.winner_name || 'Unknown'}
-                            </Link>
-                          ) : (
-                            '—'
-                          )}
-                        </TableCell>
-                        <TableCell align="right" sx={{ fontVariantNumeric: 'tabular-nums' }}>
-                          {formatLaptime(row.best_lap_ms)}
-                        </TableCell>
-                      </TableRow>
+                        {row.num_incidents ?? 0}
+                      </TableCell>
+                      <TableCell>
+                        {row.winner_guid ? (
+                          <Link
+                            href={getDriverProfileHref(row.winner_guid)}
+                            onClick={(e) => e.stopPropagation()}
+                            underline="none"
+                            color="inherit"
+                            sx={{ fontWeight: 700 }}
+                          >
+                            {row.winner_name || 'Unknown'}
+                          </Link>
+                        ) : (
+                          '—'
+                        )}
+                      </TableCell>
+                      <TableCell align="right" sx={{ fontVariantNumeric: 'tabular-nums' }}>
+                        {formatLaptime(row.best_lap_ms)}
+                      </TableCell>
+                    </TableRow>
                   ))}
                 </TableBody>
               </Table>

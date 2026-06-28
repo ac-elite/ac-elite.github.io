@@ -8,7 +8,6 @@ import Stack from '@mui/material/Stack';
 import Table from '@mui/material/Table';
 import Button from '@mui/material/Button';
 import Collapse from '@mui/material/Collapse';
-import Skeleton from '@mui/material/Skeleton';
 import TableRow from '@mui/material/TableRow';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -57,7 +56,11 @@ import { ErrorPanel, LoadingPanel } from 'src/components/data-state';
 import { PageGridOverlay } from 'src/components/page-background/page-grid-overlay';
 import { useLicenseSafetyGuide } from 'src/components/license-safety-guide/license-safety-guide';
 
-const TYPE_LABEL: Record<string, string> = { RACE: 'Race', QUALIFY: 'Qualify', PRACTICE: 'Practice' };
+const TYPE_LABEL: Record<string, string> = {
+  RACE: 'Race',
+  QUALIFY: 'Qualify',
+  PRACTICE: 'Practice',
+};
 
 function formatSessionDate(iso: string | null): string {
   if (!iso) return '';
@@ -82,7 +85,10 @@ function formatSector(ms: number): string {
 function HeaderStat({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <Stack spacing={0.25}>
-      <Typography variant="caption" sx={{ color: 'text.secondary', textTransform: 'uppercase', letterSpacing: 0.4 }}>
+      <Typography
+        variant="caption"
+        sx={{ color: 'text.secondary', textTransform: 'uppercase', letterSpacing: 0.4 }}
+      >
         {label}
       </Typography>
       <Typography variant="body2" sx={{ fontWeight: 700 }}>
@@ -120,7 +126,11 @@ function DriverLaps({
 }) {
   const [open, setOpen] = useState(false);
   const driverBest = useMemo(
-    () => laps.reduce((m, l) => (l.lapMs > 0 && (m === null || l.lapMs < m) ? l.lapMs : m), null as number | null),
+    () =>
+      laps.reduce(
+        (m, l) => (l.lapMs > 0 && (m === null || l.lapMs < m) ? l.lapMs : m),
+        null as number | null
+      ),
     [laps]
   );
 
@@ -129,13 +139,21 @@ function DriverLaps({
       <Button
         fullWidth
         onClick={() => setOpen((v) => !v)}
-        sx={{ justifyContent: 'space-between', px: 2, py: 1.25, color: 'text.primary', textTransform: 'none', fontWeight: 700 }}
+        sx={{
+          justifyContent: 'space-between',
+          px: 2,
+          py: 1.25,
+          color: 'text.primary',
+          textTransform: 'none',
+          fontWeight: 700,
+        }}
       >
         <Typography component="span" sx={{ fontWeight: 700 }}>
           {name || 'Unknown'}
         </Typography>
         <Typography component="span" variant="body2" sx={{ color: 'text.secondary' }}>
-          {laps.length} lap{laps.length === 1 ? '' : 's'} · best {formatLaptime(driverBest)} {open ? '▲' : '▼'}
+          {laps.length} lap{laps.length === 1 ? '' : 's'} · best {formatLaptime(driverBest)}{' '}
+          {open ? '▲' : '▼'}
         </Typography>
       </Button>
       <Collapse in={open} unmountOnExit>
@@ -158,20 +176,36 @@ function DriverLaps({
                 const prev = i > 0 ? laps[i - 1] : null;
                 const gapMs = prev && prev.lapMs > 0 && l.lapMs > 0 ? l.lapMs - prev.lapMs : null;
                 return (
-                  <TableRow key={l.lap} sx={isBest ? { bgcolor: 'rgba(168,85,247,0.12)' } : undefined}>
+                  <TableRow
+                    key={l.lap}
+                    sx={isBest ? { bgcolor: 'rgba(168,85,247,0.12)' } : undefined}
+                  >
                     <TableCell>{l.lap}</TableCell>
-                    <TableCell align="right" sx={{ fontVariantNumeric: 'tabular-nums', fontWeight: isBest ? 800 : 500 }}>
+                    <TableCell
+                      align="right"
+                      sx={{ fontVariantNumeric: 'tabular-nums', fontWeight: isBest ? 800 : 500 }}
+                    >
                       {formatLaptime(l.lapMs)}
                     </TableCell>
                     <TableCell
                       align="right"
-                      sx={{ fontVariantNumeric: 'tabular-nums', color: gapMs == null ? 'text.secondary' : gapMs <= 0 ? '#86efac' : '#fca5a5' }}
+                      sx={{
+                        fontVariantNumeric: 'tabular-nums',
+                        color:
+                          gapMs == null ? 'text.secondary' : gapMs <= 0 ? '#86efac' : '#fca5a5',
+                      }}
                     >
                       {gapMs == null ? '—' : `${gapMs > 0 ? '+' : ''}${(gapMs / 1000).toFixed(3)}`}
                     </TableCell>
-                    <TableCell align="right" sx={{ fontVariantNumeric: 'tabular-nums' }}>{formatSector(l.sectors[0])}</TableCell>
-                    <TableCell align="right" sx={{ fontVariantNumeric: 'tabular-nums' }}>{formatSector(l.sectors[1])}</TableCell>
-                    <TableCell align="right" sx={{ fontVariantNumeric: 'tabular-nums' }}>{formatSector(l.sectors[2])}</TableCell>
+                    <TableCell align="right" sx={{ fontVariantNumeric: 'tabular-nums' }}>
+                      {formatSector(l.sectors[0])}
+                    </TableCell>
+                    <TableCell align="right" sx={{ fontVariantNumeric: 'tabular-nums' }}>
+                      {formatSector(l.sectors[1])}
+                    </TableCell>
+                    <TableCell align="right" sx={{ fontVariantNumeric: 'tabular-nums' }}>
+                      {formatSector(l.sectors[2])}
+                    </TableCell>
                     <TableCell align="center">{l.tyre || '—'}</TableCell>
                   </TableRow>
                 );
@@ -285,9 +319,11 @@ export default function Page() {
         <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1 }}>
           <Stack spacing={3}>
             {loading && (
-              <LoadingPanel title="Loading session…" message="Fetching classification, laps and incidents.">
-                <Skeleton variant="rounded" height={400} sx={{ borderRadius: 2, bgcolor: 'rgba(255,255,255,0.05)' }} />
-              </LoadingPanel>
+              <LoadingPanel
+                title="Loading session…"
+                message="Fetching classification, laps and incidents."
+                variant="timing"
+              />
             )}
 
             {!loading && error && <ErrorPanel error={error} />}
@@ -295,7 +331,15 @@ export default function Page() {
             {!loading && !error && session && (
               <>
                 {/* Hero header */}
-                <Paper sx={{ ...GLASS_PANEL_SX, p: 0, overflow: 'hidden', ...brandAccentBorderSx(), ...glassCardMotionSx(0) }}>
+                <Paper
+                  sx={{
+                    ...GLASS_PANEL_SX,
+                    p: 0,
+                    overflow: 'hidden',
+                    ...brandAccentBorderSx(),
+                    ...glassCardMotionSx(0),
+                  }}
+                >
                   <Box sx={{ position: 'relative' }}>
                     {heroSrc ? (
                       <Box
@@ -306,7 +350,8 @@ export default function Page() {
                           width: '100%',
                           height: { xs: 150, sm: 200 },
                           objectFit: 'cover',
-                          objectPosition: heroOffsetY === 0 ? 'center' : `center calc(50% + ${heroOffsetY}px)`,
+                          objectPosition:
+                            heroOffsetY === 0 ? 'center' : `center calc(50% + ${heroOffsetY}px)`,
                           display: 'block',
                         }}
                       />
@@ -355,13 +400,25 @@ export default function Page() {
                     {/* title block — bottom-left */}
                     <Box sx={{ position: 'absolute', left: 16, right: 16, bottom: 12 }}>
                       <Stack direction="row" spacing={1.25} alignItems="center" flexWrap="wrap">
-                        <Typography component="h1" variant="h4" fontWeight={800} sx={{ color: '#fff', lineHeight: 1.1 }}>
+                        <Typography
+                          component="h1"
+                          variant="h4"
+                          fontWeight={800}
+                          sx={{ color: '#fff', lineHeight: 1.1 }}
+                        >
                           {trackName}
                         </Typography>
-                        <Chip size="small" label={session.type} sx={TYPE_CHIP_SX[session.type] ?? {}} />
+                        <Chip
+                          size="small"
+                          label={session.type}
+                          sx={TYPE_CHIP_SX[session.type] ?? {}}
+                        />
                       </Stack>
                       {session.event_name ? (
-                        <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.78)', mt: 0.5 }}>
+                        <Typography
+                          variant="body2"
+                          sx={{ color: 'rgba(255,255,255,0.78)', mt: 0.5 }}
+                        >
                           {session.event_name}
                         </Typography>
                       ) : null}
@@ -375,7 +432,10 @@ export default function Page() {
                     useFlexGap
                     sx={{ px: 2.5, py: 2, bgcolor: 'rgba(255,255,255,0.03)' }}
                   >
-                    <HeaderStat label="Date" value={formatSessionDate(session.session_date) || '—'} />
+                    <HeaderStat
+                      label="Date"
+                      value={formatSessionDate(session.session_date) || '—'}
+                    />
                     <HeaderStat label="Drivers" value={session.num_drivers} />
                     {isRace ? <HeaderStat label="Laps" value={session.num_laps} /> : null}
                     <HeaderStat
@@ -402,11 +462,21 @@ export default function Page() {
                 </Paper>
 
                 {/* Classification */}
-                <Paper sx={{ ...GLASS_TABLE_WRAPPER_SX, ...brandAccentBorderSx(), ...glassCardMotionSx(1) }}>
+                <Paper
+                  sx={{
+                    ...GLASS_TABLE_WRAPPER_SX,
+                    ...brandAccentBorderSx(),
+                    ...glassCardMotionSx(1),
+                  }}
+                >
                   <TableContainer>
                     <Table
                       size="small"
-                      sx={{ '& .MuiTableBody-root .MuiTableRow-root:hover': { backgroundColor: 'rgba(255,255,255,0.028)' } }}
+                      sx={{
+                        '& .MuiTableBody-root .MuiTableRow-root:hover': {
+                          backgroundColor: 'rgba(255,255,255,0.028)',
+                        },
+                      }}
                     >
                       <TableHead>
                         <TableRow>
@@ -435,14 +505,29 @@ export default function Page() {
                               }}
                               sx={{
                                 cursor: 'pointer',
-                                ...(row.pos >= 1 && row.pos <= 3 ? getPodiumRowSx(row.pos as 1 | 2 | 3) : {}),
+                                ...(row.pos >= 1 && row.pos <= 3
+                                  ? getPodiumRowSx(row.pos as 1 | 2 | 3)
+                                  : {}),
                               }}
                             >
                               <TableCell>
-                                <Chip size="small" label={row.pos} sx={{ minWidth: 38, fontWeight: 700, ...getPodiumChipSx(row.pos) }} />
+                                <Chip
+                                  size="small"
+                                  label={row.pos}
+                                  sx={{
+                                    minWidth: 38,
+                                    fontWeight: 700,
+                                    ...getPodiumChipSx(row.pos),
+                                  }}
+                                />
                               </TableCell>
                               <TableCell>
-                                <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
+                                <Stack
+                                  direction="row"
+                                  spacing={1}
+                                  alignItems="center"
+                                  flexWrap="wrap"
+                                >
                                   <Typography component="span" sx={{ fontWeight: 700 }}>
                                     {row.name || 'Unknown'}
                                   </Typography>
@@ -450,7 +535,13 @@ export default function Page() {
                                     <Chip
                                       size="small"
                                       label="DSQ"
-                                      sx={{ height: 18, fontSize: 10, fontWeight: 800, bgcolor: 'rgba(239,68,68,0.18)', color: '#fca5a5' }}
+                                      sx={{
+                                        height: 18,
+                                        fontSize: 10,
+                                        fontWeight: 800,
+                                        bgcolor: 'rgba(239,68,68,0.18)',
+                                        color: '#fca5a5',
+                                      }}
                                     />
                                   ) : null}
                                 </Stack>
@@ -473,7 +564,13 @@ export default function Page() {
                                     }}
                                   />
                                 ) : (
-                                  <Typography component="span" variant="body2" sx={{ color: 'text.secondary' }}>—</Typography>
+                                  <Typography
+                                    component="span"
+                                    variant="body2"
+                                    sx={{ color: 'text.secondary' }}
+                                  >
+                                    —
+                                  </Typography>
                                 )}
                               </TableCell>
                               <TableCell>
@@ -494,20 +591,46 @@ export default function Page() {
                                     }}
                                   />
                                 ) : (
-                                  <Typography component="span" variant="body2" sx={{ color: 'text.secondary' }}>—</Typography>
+                                  <Typography
+                                    component="span"
+                                    variant="body2"
+                                    sx={{ color: 'text.secondary' }}
+                                  >
+                                    —
+                                  </Typography>
                                 )}
                               </TableCell>
-                              <TableCell sx={{ color: 'text.secondary' }}>{row.skin || row.carModel || '—'}</TableCell>
-                              <TableCell align="right" sx={{ fontVariantNumeric: 'tabular-nums' }}>{formatLaptime(row.bestLapMs)}</TableCell>
+                              <TableCell sx={{ color: 'text.secondary' }}>
+                                {row.skin || row.carModel || '—'}
+                              </TableCell>
+                              <TableCell align="right" sx={{ fontVariantNumeric: 'tabular-nums' }}>
+                                {formatLaptime(row.bestLapMs)}
+                              </TableCell>
                               {isRace ? (
-                                <TableCell align="right" sx={{ fontVariantNumeric: 'tabular-nums' }}>{formatTotalTime(row.totalTimeMs)}</TableCell>
+                                <TableCell
+                                  align="right"
+                                  sx={{ fontVariantNumeric: 'tabular-nums' }}
+                                >
+                                  {formatTotalTime(row.totalTimeMs)}
+                                </TableCell>
                               ) : null}
-                              <TableCell align="right" sx={{ fontVariantNumeric: 'tabular-nums', color: 'text.secondary' }}>
+                              <TableCell
+                                align="right"
+                                sx={{ fontVariantNumeric: 'tabular-nums', color: 'text.secondary' }}
+                              >
                                 {classificationGap(isRace, leader, row)}
                               </TableCell>
                               <TableCell align="right">{row.numLaps}</TableCell>
-                              <TableCell align="right" sx={{ color: 'text.secondary' }}>{row.gridPosition || '—'}</TableCell>
-                              <TableCell align="right" sx={{ fontWeight: incCount > 0 ? 700 : 400, color: incCount > 0 ? '#fca5a5' : 'text.secondary' }}>
+                              <TableCell align="right" sx={{ color: 'text.secondary' }}>
+                                {row.gridPosition || '—'}
+                              </TableCell>
+                              <TableCell
+                                align="right"
+                                sx={{
+                                  fontWeight: incCount > 0 ? 700 : 400,
+                                  color: incCount > 0 ? '#fca5a5' : 'text.secondary',
+                                }}
+                              >
                                 {incCount || '—'}
                               </TableCell>
                             </TableRow>
@@ -519,14 +642,23 @@ export default function Page() {
                 </Paper>
 
                 {/* Laps per driver */}
-                <Paper sx={{ ...GLASS_PANEL_SX, ...glassCardMotionSx(2), p: 0, overflow: 'hidden' }}>
+                <Paper
+                  sx={{ ...GLASS_PANEL_SX, ...glassCardMotionSx(2), p: 0, overflow: 'hidden' }}
+                >
                   <Typography variant="subtitle1" sx={{ fontWeight: 800, px: 2, pt: 2, pb: 1 }}>
                     Laps
                   </Typography>
                   {classification.map((row) => {
                     const driverLaps = lapsByGuid.get(row.guid) ?? [];
                     if (driverLaps.length === 0) return null;
-                    return <DriverLaps key={row.guid} name={row.name} laps={driverLaps} sessionBestMs={session.best_lap_ms} />;
+                    return (
+                      <DriverLaps
+                        key={row.guid}
+                        name={row.name}
+                        laps={driverLaps}
+                        sessionBestMs={session.best_lap_ms}
+                      />
+                    );
                   })}
                 </Paper>
 
@@ -555,16 +687,23 @@ export default function Page() {
                                   label={inc.type === 'CAR' ? 'Car' : 'Environment'}
                                   sx={{
                                     fontWeight: 700,
-                                    bgcolor: inc.type === 'CAR' ? 'rgba(239,68,68,0.14)' : 'rgba(148,163,184,0.14)',
+                                    bgcolor:
+                                      inc.type === 'CAR'
+                                        ? 'rgba(239,68,68,0.14)'
+                                        : 'rgba(148,163,184,0.14)',
                                     color: inc.type === 'CAR' ? '#fca5a5' : '#cbd5e1',
                                   }}
                                 />
                               </TableCell>
-                              <TableCell sx={{ fontWeight: 600 }}>{inc.name || 'Unknown'}</TableCell>
+                              <TableCell sx={{ fontWeight: 600 }}>
+                                {inc.name || 'Unknown'}
+                              </TableCell>
                               <TableCell sx={{ color: 'text.secondary' }}>
                                 {inc.type === 'CAR' ? inc.otherName || 'Unknown' : '—'}
                               </TableCell>
-                              <TableCell align="right" sx={{ fontVariantNumeric: 'tabular-nums' }}>{inc.impactSpeed.toFixed(1)}</TableCell>
+                              <TableCell align="right" sx={{ fontVariantNumeric: 'tabular-nums' }}>
+                                {inc.impactSpeed.toFixed(1)}
+                              </TableCell>
                             </TableRow>
                           ))}
                         </TableBody>
