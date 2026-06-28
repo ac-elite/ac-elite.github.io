@@ -3,7 +3,7 @@ import type { User, Session } from '@supabase/supabase-js';
 import { useMemo, useState, useEffect, useContext, useCallback, createContext } from 'react';
 
 import { getSupabaseClient, isSupabaseAuthConfigured } from 'src/lib/supabase-client';
-import { fetchWithTimeout, supabaseBaseUrl, supabaseHeaders } from 'src/centralized/supabase-rest';
+import { supabaseBaseUrl, supabaseHeaders, fetchWithTimeout } from 'src/centralized/supabase-rest';
 
 // ----------------------------------------------------------------------
 

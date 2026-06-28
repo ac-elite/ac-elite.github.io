@@ -31,9 +31,9 @@ import { brandAccentBorderSx } from 'src/lib/status-accent';
 import { GLASS_PANEL_SX, GLASS_TABLE_WRAPPER_SX } from 'src/lib/glass';
 import {
   GLASS_SELECT_SX,
+  glassFilterButtonSx,
   GLASS_SELECT_MENU_PROPS,
   GLASS_SELECT_MENU_ITEM_SX,
-  glassFilterButtonSx,
 } from 'src/lib/glass-select';
 import { DATA_PAGE_SHELL_SX, FORM_SECTION_KICKER_CAPTION_SX } from 'src/lib/page-shell';
 import {

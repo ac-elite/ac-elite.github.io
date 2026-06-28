@@ -28,7 +28,7 @@ import { getHomeHref, getLeaderboardTrackSearch } from 'src/lib/routes';
 import { BRAND_ACCENT, brandAccentBorderSx } from 'src/lib/status-accent';
 import { liveriesAssetUrl, getTeamLiveryMeta } from 'src/lib/driver-liveries';
 import { fetchPrevRankData } from 'src/lib/delta';
-import { fetchRatingV2ForDriver, fetchRatingV2Map } from 'src/lib/rating-v2-data';
+import { fetchRatingV2Map, fetchRatingV2ForDriver } from 'src/lib/rating-v2-data';
 import type { DriverRatingV2 } from 'src/lib/ac-elite-rating-v2';
 import { ratingV2Enabled } from 'src/lib/rating-mode';
 import { useWindowedDriverDeltas } from 'src/lib/trend-window/trend-window-context';

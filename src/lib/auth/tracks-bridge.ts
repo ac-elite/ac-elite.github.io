@@ -1,7 +1,7 @@
-import { setTrackCatalog, type TrackInfo } from 'src/centralized/track-info';
+import { type TrackInfo, setTrackCatalog } from 'src/centralized/track-info';
 import { supabaseTemporarilyUnavailable } from 'src/centralized/supabase-rest';
 
-import { fetchAllTracks, type TrackRow } from './tracks-db';
+import { type TrackRow, fetchAllTracks } from './tracks-db';
 
 // ----------------------------------------------------------------------
 

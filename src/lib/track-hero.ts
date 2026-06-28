@@ -1,4 +1,4 @@
-﻿import { getTrackHeroImageOffsetY, getTrackHeroImageSrc } from 'src/centralized/track-info';
+﻿import { getTrackHeroImageSrc, getTrackHeroImageOffsetY } from 'src/centralized/track-info';
 
 /** Public URL (site root) for a track hero, or null if none configured. */
 export { getTrackHeroImageSrc };

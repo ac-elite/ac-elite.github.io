@@ -170,11 +170,12 @@ export default function Page() {
   // Deduped by the catalog's canonical id where known, so e.g. `imola` and
   // `imola_` collapse onto one entry.
   const tracks = useMemo(() => {
+    // catalogVersion bumps when admin saves; recompute so the new track shows up.
+    void catalogVersion;
     const canonical = buildCanonicalLeaderboardTrackIdSet(leaderboardData);
     return Array.from(canonical).sort((a, b) =>
       getTrackDisplayName(a).localeCompare(getTrackDisplayName(b))
     );
-    // catalogVersion bumps when admin saves; recompute so the new track shows up.
   }, [leaderboardData, catalogVersion]);
 
   useEffect(() => {

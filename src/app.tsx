@@ -12,8 +12,8 @@ import { AuthProvider } from 'src/lib/auth/auth-context';
 import { refreshTrackCatalogFromDb } from 'src/lib/auth/tracks-bridge';
 import { TrendWindowProvider } from 'src/lib/trend-window/trend-window-context';
 import {
-  recordSiteVisitIfDue,
   recordSitePageStat,
+  recordSiteVisitIfDue,
   isPathExcludedFromSiteVisitCount,
 } from 'src/lib/site-visits';
 

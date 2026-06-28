@@ -1,7 +1,7 @@
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 
-import { GLASS_PANEL_SPACIOUS_SX, GLASS_INNER_PANEL_SX } from 'src/lib/glass';
+import { GLASS_INNER_PANEL_SX, GLASS_PANEL_SPACIOUS_SX } from 'src/lib/glass';
 import { glassCardMotionSx, glassCardEnterOnlySx } from 'src/lib/subtle-motion';
 import { brandAccentBorderSx } from 'src/lib/status-accent';
 

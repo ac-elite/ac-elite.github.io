@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect, useCallback, useRef } from 'react';
+import { useRef, useMemo, useState, useEffect, useCallback } from 'react';
 
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
@@ -32,13 +32,13 @@ import {
   useTracks,
   upsertTrack,
   deleteTrack,
+  type TrackRow,
+  type TrackInput,
   uploadTrackImage,
   validateImageFile,
   cleanupReplacedImage,
-  removeStorageObjectForUrl,
   ALLOWED_IMAGE_EXTENSIONS,
-  type TrackRow,
-  type TrackInput,
+  removeStorageObjectForUrl,
 } from 'src/lib/auth/tracks-db';
 import {
   GLASS_DIALOG_SX,

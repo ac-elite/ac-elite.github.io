@@ -1,4 +1,4 @@
-import { useLocation, Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 
 import Box from '@mui/material/Box';
 import Alert from '@mui/material/Alert';
@@ -13,7 +13,7 @@ import { GLASS_PANEL_SX } from 'src/lib/glass';
 import { brandAccentBorderSx } from 'src/lib/status-accent';
 import { ACTION_CONTAINED_PRIMARY_SMALL_SX } from 'src/lib/page-shell';
 
-import { useAuth, hasAtLeastRole, type AppRole } from './auth-context';
+import { useAuth, type AppRole, hasAtLeastRole } from './auth-context';
 
 // ----------------------------------------------------------------------
 

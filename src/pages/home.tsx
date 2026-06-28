@@ -53,8 +53,8 @@ import {
   subtleEnterUpSx,
   subtleRowEnterSx,
   glassCardMotionSx,
-  glassCardEnterOnlySx,
   softFloatWrapperSx,
+  glassCardEnterOnlySx,
 } from 'src/lib/subtle-motion';
 import {
   DATA_PAGE_SHELL_SX,

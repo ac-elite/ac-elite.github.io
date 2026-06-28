@@ -21,7 +21,7 @@ import {
   PANEL_OVERLINE_MUTED_SX,
   ACTION_OUTLINED_SMALL_DENSE_SX,
 } from 'src/lib/page-shell';
-import { SITE_VISIT_COUNT_GAP_MINUTES, type SitePageVisitRow } from 'src/lib/site-visits';
+import { type SitePageVisitRow, SITE_VISIT_COUNT_GAP_MINUTES } from 'src/lib/site-visits';
 
 // ----------------------------------------------------------------------
 
