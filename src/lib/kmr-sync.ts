@@ -1,9 +1,12 @@
 import { getSupabaseClient } from 'src/lib/supabase-client';
 import { supabaseReadConfigured, supabaseTemporarilyUnavailable } from 'src/centralized/supabase-rest';
 
-/** Opt out of the Supabase data source with VITE_SUPABASE_KMR_DATA=0/false/off. */
-function kmrSupabaseDisabled(): boolean {
-  const v = import.meta.env.VITE_SUPABASE_KMR_DATA?.trim().toLowerCase();
+/** Opt out of Supabase Storage-driven refreshes for the large KMR JSON blobs. */
+function kmrStorageDisabled(): boolean {
+  const v = (
+    import.meta.env.VITE_SUPABASE_KMR_STORAGE ??
+    import.meta.env.VITE_SUPABASE_KMR_DATA
+  )?.trim().toLowerCase();
   return v === '0' || v === 'false' || v === 'no' || v === 'off';
 }
 
@@ -14,7 +17,7 @@ function kmrSupabaseDisabled(): boolean {
  * Returns an unsubscribe function; no-op when Supabase reads are unavailable.
  */
 export function subscribeKmrSync(onSync: () => void): () => void {
-  if (kmrSupabaseDisabled() || !supabaseReadConfigured()) return () => {};
+  if (kmrStorageDisabled() || !supabaseReadConfigured()) return () => {};
   if (supabaseTemporarilyUnavailable()) return () => {};
   const client = getSupabaseClient();
   if (!client) return () => {};

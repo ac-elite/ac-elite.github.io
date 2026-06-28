@@ -88,7 +88,15 @@ export default function Page() {
     setSteamBusy(true);
     setError(null);
     void (async () => {
-      const result = await auth.completeSteamLogin(readSteamOpenIdParams(window.location.search));
+      let result;
+      try {
+        result = await auth.completeSteamLogin(readSteamOpenIdParams(window.location.search));
+      } catch (err) {
+        result = {
+          ok: false,
+          error: err instanceof Error ? err.message : 'Steam sign-in failed.',
+        };
+      }
       setSteamBusy(false);
       if (!result.ok) {
         setError(result.error ?? 'Steam sign-in failed.');

@@ -32,6 +32,7 @@ import {
 
 const STORAGE_KEY = 'ace-trend-window';
 const DEFAULT_WINDOW: HistoryWindowKey = '24h';
+const ALL_WINDOWS = new Set<HistoryWindowKey>(HISTORY_WINDOWS.map((w) => w.key));
 
 function isWindowKey(value: unknown): value is HistoryWindowKey {
   return typeof value === 'string' && HISTORY_WINDOWS.some((w) => w.key === value);
@@ -65,7 +66,7 @@ const TrendWindowContext = createContext<TrendWindowValue | null>(null);
 
 export function TrendWindowProvider({ children }: { children: ReactNode }) {
   const [activeWindow, setActiveWindowState] = useState<HistoryWindowKey>(readStoredWindow);
-  const [availableWindows, setAvailableWindows] = useState<Set<HistoryWindowKey>>(new Set());
+  const [availableWindows, setAvailableWindows] = useState<Set<HistoryWindowKey>>(ALL_WINDOWS);
   const [snapshot, setSnapshot] = useState<RankHistorySnapshot | null>(null);
 
   const setActiveWindow = useCallback((next: HistoryWindowKey) => {

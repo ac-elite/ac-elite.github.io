@@ -49,8 +49,8 @@ export type RankHistorySnapshot = {
   byGuid: Map<string, SlimDriver>;
 };
 
-function kmrSupabaseDisabled(): boolean {
-  const v = import.meta.env.VITE_SUPABASE_KMR_DATA?.trim().toLowerCase();
+function rankHistoryDisabled(): boolean {
+  const v = import.meta.env.VITE_SUPABASE_RANK_HISTORY?.trim().toLowerCase();
   return v === '0' || v === 'false' || v === 'no' || v === 'off';
 }
 
@@ -90,7 +90,7 @@ async function queryOneSnapshot(query: string): Promise<RankHistorySnapshot | nu
 export async function fetchRankHistorySnapshot(
   window: HistoryWindowKey
 ): Promise<RankHistorySnapshot | null> {
-  if (kmrSupabaseDisabled() || !supabaseReadConfigured()) return null;
+  if (rankHistoryDisabled() || !supabaseReadConfigured()) return null;
   const win = HISTORY_WINDOWS.find((w) => w.key === window);
   if (!win) return null;
   const target = new Date(Date.now() - win.ms).toISOString();
@@ -106,7 +106,7 @@ export async function fetchRankHistorySnapshot(
 
 /** Oldest snapshot timestamp in `rank_history`, or null when none / unavailable. */
 export async function fetchRankHistoryOldest(): Promise<string | null> {
-  if (kmrSupabaseDisabled() || !supabaseReadConfigured()) return null;
+  if (rankHistoryDisabled() || !supabaseReadConfigured()) return null;
   try {
     const res = await supabaseFetch(
       `${supabaseBaseUrl()}/rest/v1/rank_history?select=captured_at&order=captured_at.asc&limit=1`
@@ -128,8 +128,8 @@ export async function fetchRankHistoryOldest(): Promise<string | null> {
  * full day of depth, so the proven 24h comparison is never greyed out.
  */
 export function availableHistoryWindows(oldestIso: string | null): Set<HistoryWindowKey> {
+  if (!oldestIso) return new Set(HISTORY_WINDOWS.map((w) => w.key));
   const set = new Set<HistoryWindowKey>(['24h']);
-  if (!oldestIso) return set;
   const oldestMs = new Date(oldestIso).getTime();
   if (!Number.isFinite(oldestMs)) return set;
   const now = Date.now();
