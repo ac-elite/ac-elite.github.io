@@ -44,11 +44,7 @@ import {
 } from 'src/lib/ac-elite-rating-v2';
 import { glassCardMotionSx } from 'src/lib/subtle-motion';
 import { brandAccentBorderSx } from 'src/lib/status-accent';
-import {
-  GLASS_INNER_PANEL_SX,
-  GLASS_PANEL_COMPACT_SX,
-  GLASS_TABLE_CONTAINER_SX,
-} from 'src/lib/glass';
+import { GLASS_PANEL_SX, GLASS_TABLE_CONTAINER_SX } from 'src/lib/glass';
 
 import { AdminPageShell } from 'src/components/admin/admin-page-shell';
 import { RaceLoader } from 'src/components/race-loader';
@@ -355,6 +351,15 @@ const COMPARISON_RATING_COLUMNS = `${LICENSE_CHIP_WIDTH}px ${SR_CHIP_WIDTH}px`;
 const NUMERIC_CONFIG_KEYS = CONTROL_GROUPS.flatMap((group) =>
   group.controls.map((control) => control.key)
 );
+
+function playgroundPanelSx(motionIndex: number, extra: SxProps<Theme> = {}): SxProps<Theme> {
+  return [
+    GLASS_PANEL_SX,
+    brandAccentBorderSx(),
+    glassCardMotionSx(motionIndex),
+    extra,
+  ] as SxProps<Theme>;
+}
 
 function formatNumber(value: number, digits = 1): string {
   return value.toLocaleString(undefined, {
@@ -770,14 +775,16 @@ function MetricCard({
   value,
   detail,
   help,
+  motionIndex,
 }: {
   label: string;
   value: string;
   detail?: string;
   help: string;
+  motionIndex: number;
 }) {
   return (
-    <Paper sx={{ ...GLASS_INNER_PANEL_SX, p: 1.5, minHeight: 96 }}>
+    <Paper sx={playgroundPanelSx(motionIndex, { minHeight: 96, height: 1 })}>
       <Box sx={{ color: 'text.secondary', fontWeight: 700 }}>
         <LabelWithInfo label={label} help={help} />
       </Box>
@@ -1043,7 +1050,7 @@ export default function Page() {
       documentTitle="Admin - Rating Playground"
     >
       {phase === 'loading' && (
-        <Paper sx={{ ...GLASS_PANEL_COMPACT_SX, ...brandAccentBorderSx(), p: 2 }}>
+        <Paper sx={playgroundPanelSx(0)}>
           <RaceLoader
             title="Loading rating playground..."
             message="Collecting rank data, current ratings, and session stats."
@@ -1060,14 +1067,7 @@ export default function Page() {
 
       {phase === 'ready' && data && (
         <>
-          <Paper
-            sx={{
-              ...GLASS_PANEL_COMPACT_SX,
-              ...brandAccentBorderSx(),
-              ...glassCardMotionSx(1),
-              p: 2,
-            }}
-          >
+          <Paper sx={playgroundPanelSx(0)}>
             <Stack
               direction={{ xs: 'column', md: 'row' }}
               spacing={2}
@@ -1120,17 +1120,23 @@ export default function Page() {
                 detail: 'Across compared drivers',
                 help: 'Average license-score and Safety Rating movement compared with the default formula.',
               },
-            ].map(({ label, value, detail, help }) => (
+            ].map(({ label, value, detail, help }, index) => (
               <Grid key={label} size={{ xs: 12, sm: 6, md: 3 }}>
-                <MetricCard label={label} value={value} detail={detail} help={help} />
+                <MetricCard
+                  label={label}
+                  value={value}
+                  detail={detail}
+                  help={help}
+                  motionIndex={index + 1}
+                />
               </Grid>
             ))}
           </Grid>
 
           <Grid container spacing={2}>
-            {CONTROL_GROUPS.map((group) => (
+            {CONTROL_GROUPS.map((group, index) => (
               <Grid key={group.title} size={{ xs: 12, md: 6, xl: 4 }}>
-                <Paper sx={{ ...GLASS_PANEL_COMPACT_SX, p: 2, height: 1 }}>
+                <Paper sx={playgroundPanelSx(index + 5, { height: 1 })}>
                   <Stack spacing={1.6}>
                     <Box>
                       <Stack direction="row" spacing={0.75} alignItems="center">
@@ -1164,7 +1170,7 @@ export default function Page() {
 
           <Grid container spacing={2}>
             <Grid size={{ xs: 12, lg: 7 }}>
-              <Paper sx={{ ...GLASS_PANEL_COMPACT_SX, p: 2 }}>
+              <Paper sx={playgroundPanelSx(11)}>
                 <Stack spacing={1.5}>
                   <Box>
                     <Stack direction="row" spacing={0.75} alignItems="center">
@@ -1245,7 +1251,7 @@ export default function Page() {
             </Grid>
 
             <Grid size={{ xs: 12, lg: 5 }}>
-              <Paper sx={{ ...GLASS_PANEL_COMPACT_SX, p: 2 }}>
+              <Paper sx={playgroundPanelSx(12)}>
                 <Stack spacing={1.5}>
                   <Box>
                     <Stack direction="row" spacing={0.75} alignItems="center">
@@ -1331,7 +1337,7 @@ export default function Page() {
             </Grid>
           </Grid>
 
-          <Paper sx={{ ...GLASS_PANEL_COMPACT_SX, ...brandAccentBorderSx(), p: 2 }}>
+          <Paper sx={playgroundPanelSx(13)}>
             <Stack spacing={1.5}>
               <Stack
                 direction={{ xs: 'column', md: 'row' }}
