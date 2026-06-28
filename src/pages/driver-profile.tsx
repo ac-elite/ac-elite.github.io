@@ -8,7 +8,6 @@ import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import Table from '@mui/material/Table';
 import Button from '@mui/material/Button';
-import Skeleton from '@mui/material/Skeleton';
 import TableRow from '@mui/material/TableRow';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -201,25 +200,18 @@ export default function Page() {
       setLoading(true);
       setError(null);
       try {
-        const [
-          rank,
-          leaderboard,
-          prevRank,
-          meta,
-          liverySectionsRaw,
-          ratingsV2,
-          driverRatingV2,
-        ] = await Promise.all([
-          fetchJson<RankDriver[]>(DATA_FILES.rank),
-          fetchJson<Record<string, any>>(DATA_FILES.leaderboard),
-          fetchPrevRankData(),
-          fetchJson<SiteMetadata>(DATA_FILES.metadata).catch(() => ({})),
-          fetchJson<LiveryShowcaseSectionsFile>(DATA_FILES.liveryShowcaseSections).catch(
-            () => ({})
-          ),
-          fetchRatingV2Map(),
-          fetchRatingV2ForDriver(driverGuid),
-        ]);
+        const [rank, leaderboard, prevRank, meta, liverySectionsRaw, ratingsV2, driverRatingV2] =
+          await Promise.all([
+            fetchJson<RankDriver[]>(DATA_FILES.rank),
+            fetchJson<Record<string, any>>(DATA_FILES.leaderboard),
+            fetchPrevRankData(),
+            fetchJson<SiteMetadata>(DATA_FILES.metadata).catch(() => ({})),
+            fetchJson<LiveryShowcaseSectionsFile>(DATA_FILES.liveryShowcaseSections).catch(
+              () => ({})
+            ),
+            fetchRatingV2Map(),
+            fetchRatingV2ForDriver(driverGuid),
+          ]);
         if (!mounted) return;
         if (driverRatingV2) ratingsV2.set(driverRatingV2.guid, driverRatingV2);
         setRankData(rank);
@@ -299,7 +291,7 @@ export default function Page() {
   );
   const sr = useMemo(() => (driver ? getDriverSR(driver) : null), [driver]);
   const ratingV2 = useMemo(
-    () => (ratingV2Enabled() && driver ? ratingV2Map.get(driver.guid) ?? null : null),
+    () => (ratingV2Enabled() && driver ? (ratingV2Map.get(driver.guid) ?? null) : null),
     [driver, ratingV2Map]
   );
   const displayLicense = useMemo(
@@ -310,10 +302,7 @@ export default function Page() {
     [license, ratingV2]
   );
   const displaySR = useMemo(
-    () =>
-      ratingV2 && sr
-        ? { tier: ratingV2.safetyTier, sr: ratingV2.safetyRating }
-        : sr,
+    () => (ratingV2 && sr ? { tier: ratingV2.safetyTier, sr: ratingV2.safetyRating } : sr),
     [ratingV2, sr]
   );
 
@@ -451,7 +440,11 @@ export default function Page() {
     const radarMin = Math.min(40, Math.max(0, Math.floor((Math.min(...radarData) - 8) / 5) * 5));
     return {
       laps: { categories: byLaps.map((r) => r.trackName), data: byLaps.map((r) => r.laps) },
-      radar: { categories: qualifiedPaceRows.map((r) => r.trackName), data: radarData, min: radarMin },
+      radar: {
+        categories: qualifiedPaceRows.map((r) => r.trackName),
+        data: radarData,
+        min: radarMin,
+      },
       avgPercentile,
     };
   }, [driver, leaderboardData, rankData, trackRows]);
@@ -499,20 +492,8 @@ export default function Page() {
               <LoadingPanel
                 title="Loading profile…"
                 message="Resolving driver, license, SR, and per-track leaderboard rows."
-              >
-                <Stack spacing={2}>
-                  <Skeleton
-                    variant="rounded"
-                    height={340}
-                    sx={{ borderRadius: 2, bgcolor: 'rgba(255,255,255,0.06)' }}
-                  />
-                  <Skeleton
-                    variant="rounded"
-                    height={300}
-                    sx={{ borderRadius: 2, bgcolor: 'rgba(255,255,255,0.05)' }}
-                  />
-                </Stack>
-              </LoadingPanel>
+                variant="page"
+              />
             )}
 
             {!loading && error && <ErrorPanel error={error} />}
@@ -1053,8 +1034,8 @@ export default function Page() {
                             variant="caption"
                             sx={{ display: 'block', color: 'text.secondary', mb: 1 }}
                           >
-                            Qualified field you beat on each track · outer ring = fastest ·
-                            scaled to highlight differences
+                            Qualified field you beat on each track · outer ring = fastest · scaled
+                            to highlight differences
                           </Typography>
                           {performanceCharts.radar ? (
                             <Chart

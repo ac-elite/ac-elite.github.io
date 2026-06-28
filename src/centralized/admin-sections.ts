@@ -17,6 +17,7 @@ export type AdminSection = {
 export const ADMIN_SECTIONS: readonly AdminSection[] = [
   { path: APP_ROUTES.admin, label: 'Overview', iconifyName: 'solar:widget-2' },
   { path: `${APP_ROUTES.admin}/server`, label: 'Server', iconifyName: 'solar:server-square' },
+  { path: `${APP_ROUTES.admin}/rating-playground`, label: 'Rating Playground', iconifyName: 'solar:tuning-square' },
   { path: `${APP_ROUTES.admin}/tracks`, label: 'Tracks', iconifyName: 'solar:map-point-wave' },
   { path: `${APP_ROUTES.admin}/bans`, label: 'Bans', iconifyName: 'solar:user-block' },
   { path: `${APP_ROUTES.admin}/debug`, label: 'Debug', iconifyName: 'solar:bug' },

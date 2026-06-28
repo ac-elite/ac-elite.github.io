@@ -11,7 +11,6 @@ import Table from '@mui/material/Table';
 import Select from '@mui/material/Select';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
-import Skeleton from '@mui/material/Skeleton';
 import MenuItem from '@mui/material/MenuItem';
 import TableRow from '@mui/material/TableRow';
 import TableBody from '@mui/material/TableBody';
@@ -125,17 +124,18 @@ export default function Page() {
       setLoading(true);
       setError(null);
       try {
-        const [rank, leaderboard, prevRank, trackJson, meta, liveStatus, ratingsV2] = await Promise.all([
-          fetchJson<RankDriver[]>(DATA_FILES.rank),
-          fetchJson<Record<string, any>>(DATA_FILES.leaderboard),
-          fetchPrevRankData(),
-          fetchJson<CurrentTrackData>(DATA_FILES.currentTrack).catch(() => null),
-          fetchJson<SiteMetadata>(DATA_FILES.metadata).catch(() => ({})),
-          canAttemptLiveServerStatusFetch()
-            ? fetchLiveServerStatusFromSupabase()
-            : Promise.resolve(null),
-          fetchRatingV2Map(),
-        ]);
+        const [rank, leaderboard, prevRank, trackJson, meta, liveStatus, ratingsV2] =
+          await Promise.all([
+            fetchJson<RankDriver[]>(DATA_FILES.rank),
+            fetchJson<Record<string, any>>(DATA_FILES.leaderboard),
+            fetchPrevRankData(),
+            fetchJson<CurrentTrackData>(DATA_FILES.currentTrack).catch(() => null),
+            fetchJson<SiteMetadata>(DATA_FILES.metadata).catch(() => ({})),
+            canAttemptLiveServerStatusFetch()
+              ? fetchLiveServerStatusFromSupabase()
+              : Promise.resolve(null),
+            fetchRatingV2Map(),
+          ]);
         if (!mounted) return;
         setRankData(rank);
         setPrevRankData(prevRank);
@@ -179,7 +179,8 @@ export default function Page() {
 
   useEffect(() => {
     if (tracks.length === 0) return;
-    const fallbackTrack = preferredTrack && tracks.includes(preferredTrack) ? preferredTrack : tracks[0];
+    const fallbackTrack =
+      preferredTrack && tracks.includes(preferredTrack) ? preferredTrack : tracks[0];
 
     const param = searchParams.get('track');
     if (param && tracks.includes(param)) {
@@ -241,9 +242,15 @@ export default function Page() {
   return (
     <>
       <title>{`Leaderboard - ${CONFIG.appName}`}</title>
-      <meta name="description" content="AC Elite leaderboard by track. Compare lap times and find the fastest drivers." />
+      <meta
+        name="description"
+        content="AC Elite leaderboard by track. Compare lap times and find the fastest drivers."
+      />
       <meta property="og:title" content="Leaderboard - AC Elite" />
-      <meta property="og:description" content="AC Elite leaderboard by track. Compare lap times and find the fastest drivers." />
+      <meta
+        property="og:description"
+        content="AC Elite leaderboard by track. Compare lap times and find the fastest drivers."
+      />
       <meta property="og:url" content={getSiteUrl(APP_ROUTES.leaderboard)} />
 
       <Box sx={{ ...DATA_PAGE_SHELL_SX }}>
@@ -264,12 +271,11 @@ export default function Page() {
             </DataPageHeader>
 
             {loading && (
-              <LoadingPanel title="Loading leaderboard…" message="Pulling rank data and per-track lap times.">
-                <Stack spacing={2}>
-                  <Skeleton variant="rounded" height={56} sx={{ borderRadius: 2, bgcolor: 'rgba(255,255,255,0.06)' }} />
-                  <Skeleton variant="rounded" height={400} sx={{ borderRadius: 2, bgcolor: 'rgba(255,255,255,0.05)' }} />
-                </Stack>
-              </LoadingPanel>
+              <LoadingPanel
+                title="Loading leaderboard…"
+                message="Pulling rank data and per-track lap times."
+                variant="timing"
+              />
             )}
 
             {!loading && error && <ErrorPanel error={error} />}
@@ -285,7 +291,10 @@ export default function Page() {
                   }}
                 >
                   <Stack spacing={1.25} sx={{ alignItems: { xs: 'center', md: 'flex-start' } }}>
-                    <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.75)', letterSpacing: 0.3 }}>
+                    <Typography
+                      variant="caption"
+                      sx={{ color: 'rgba(255,255,255,0.75)', letterSpacing: 0.3 }}
+                    >
                       Track filter
                     </Typography>
                     <FormControl size="small" sx={{ maxWidth: 420, width: '100%' }}>
@@ -310,162 +319,194 @@ export default function Page() {
                 </Paper>
 
                 <Reveal>
-                <Paper
-                  sx={{
-                    ...GLASS_TABLE_WRAPPER_SX,
-                    ...brandAccentBorderSx(),
-                    ...glassCardMotionSx(2),
-                  }}
-                >
-                  <TableContainer>
-                    <Table
-                      size="small"
-                      sx={{
-                        '& .MuiTableBody-root .MuiTableRow-root:hover': {
-                          backgroundColor: 'rgba(255,255,255,0.028)',
-                        },
-                      }}
-                    >
-                      <TableHead>
-                        <TableRow>
-                          <TableCell>#</TableCell>
-                          <TableCell>Driver</TableCell>
-                          <TableCell>License</TableCell>
-                          <TableCell>Safety Rating</TableCell>
-                          <TableCell>Lap Time</TableCell>
-                          <TableCell align="right">Gap</TableCell>
-                          <TableCell align="right">Laps</TableCell>
-                          <TableCell align="right">Total KM</TableCell>
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        {rows.length === 0 && (
+                  <Paper
+                    sx={{
+                      ...GLASS_TABLE_WRAPPER_SX,
+                      ...brandAccentBorderSx(),
+                      ...glassCardMotionSx(2),
+                    }}
+                  >
+                    <TableContainer>
+                      <Table
+                        size="small"
+                        sx={{
+                          '& .MuiTableBody-root .MuiTableRow-root:hover': {
+                            backgroundColor: 'rgba(255,255,255,0.028)',
+                          },
+                        }}
+                      >
+                        <TableHead>
                           <TableRow>
-                            <TableCell colSpan={8} sx={{ py: 4, px: 2 }}>
-                              <EmptyState
-                                title="No times yet"
-                                description="No laps have been recorded on this track. Times will appear automatically after the next sync."
-                              />
-                            </TableCell>
+                            <TableCell>#</TableCell>
+                            <TableCell>Driver</TableCell>
+                            <TableCell>License</TableCell>
+                            <TableCell>Safety Rating</TableCell>
+                            <TableCell>Lap Time</TableCell>
+                            <TableCell align="right">Gap</TableCell>
+                            <TableCell align="right">Laps</TableCell>
+                            <TableCell align="right">Total KM</TableCell>
                           </TableRow>
-                        )}
-
-                        {pagedRows.map((entry, index) => {
-                          const absolutePos = start + index;
-                          const driver =
-                            driversByGuid.get(entry.guid) ||
-                            ({ guid: entry.guid, name: entry.name, kilometers: 0, collisions: 0 } as RankDriver);
-                          const license = getDriverLicense(driver, licenseMap);
-                          const sr = getDriverSR(driver);
-                          const ratingV2 =
-                            ratingV2Enabled() ? ratingV2Map.get(entry.guid) : undefined;
-                          const displayLicense = ratingV2
-                            ? { license: ratingV2.licenseTier, paceScore: ratingV2.licenseScore }
-                            : license;
-                          const displaySR = ratingV2
-                            ? { tier: ratingV2.safetyTier, sr: ratingV2.safetyRating }
-                            : sr;
-                          const delta = deltas.get(entry.guid);
-
-                          return (
-                            <TableRow
-                              key={`${entry.guid}-${entry.laptime}-${index}`}
-                              sx={{
-                                cursor: 'pointer',
-                                ...subtleRowEnterSx(index, { baseDelayMs: 340 }),
-                                ...(absolutePos < 3
-                                  ? getPodiumRowSx((absolutePos + 1) as 1 | 2 | 3)
-                                  : {}),
-                              }}
-                              onClick={() => {
-                                window.location.href = getDriverProfileHref(entry.guid);
-                              }}
-                            >
-                              <TableCell>
-                                <Chip
-                                  size="small"
-                                  label={absolutePos + 1}
-                                  sx={{
-                                    minWidth: 38,
-                                    fontWeight: 700,
-                                    ...getPodiumChipSx(absolutePos, true),
-                                  }}
+                        </TableHead>
+                        <TableBody>
+                          {rows.length === 0 && (
+                            <TableRow>
+                              <TableCell colSpan={8} sx={{ py: 4, px: 2 }}>
+                                <EmptyState
+                                  title="No times yet"
+                                  description="No laps have been recorded on this track. Times will appear automatically after the next sync."
                                 />
                               </TableCell>
-                              <TableCell sx={{ fontWeight: 700 }}>
-                                <Link
-                                  href={getDriverProfileHref(entry.guid)}
-                                  onClick={(e) => e.stopPropagation()}
-                                  underline="none"
-                                  color="inherit"
-                                  sx={{ fontWeight: 700 }}
-                                >
-                                  {entry.name || driver.name || 'Unknown'}
-                                </Link>
-                              </TableCell>
-                              <TableCell>
-                                <Stack direction="row" spacing={1} alignItems="center">
-                                  <Tooltip title={ratingV2 ? summarizeRatingV2(ratingV2) : ''} arrow>
-                                  <Chip
-                                    size="small"
-                                    label={displayLicense.license}
-                                    onClick={(e) => { e.stopPropagation(); openGuide('license'); }}
-                                    sx={{
-                                      minWidth: LICENSE_CHIP_WIDTH,
-                                      fontWeight: 700,
-                                      justifyContent: 'center',
-                                      cursor: 'pointer',
-                                      ...getLicenseBadgeSx(displayLicense.license),
-                                    }}
-                                  />
-                                  </Tooltip>
-                                  <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.secondary' }}>
-                                    {ratingV2
-                                      ? displayLicense.paceScore.toFixed(1)
-                                      : Math.round(displayLicense.paceScore).toLocaleString()}
-                                  </Typography>
-                                  {delta ? <DeltaChip value={Math.round(delta.deltaPace)} /> : null}
-                                </Stack>
-                              </TableCell>
-                              <TableCell>
-                                <Stack direction="row" spacing={1} alignItems="center">
-                                  <Tooltip title={ratingV2 ? summarizeRatingV2(ratingV2) : ''} arrow>
-                                  <Chip
-                                    size="small"
-                                    label={displaySR.tier}
-                                    onClick={(e) => { e.stopPropagation(); openGuide('safety'); }}
-                                    sx={{
-                                      minWidth: SR_CHIP_WIDTH,
-                                      fontWeight: 700,
-                                      justifyContent: 'center',
-                                      cursor: 'pointer',
-                                      ...getSRBadgeSx(displaySR.tier),
-                                    }}
-                                  />
-                                  </Tooltip>
-                                  <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.secondary' }}>
-                                    {displaySR.sr.toFixed(2)}
-                                  </Typography>
-                                  {delta ? <DeltaChip value={delta.deltaSR} decimals={2} kind="sr" /> : null}
-                                </Stack>
-                              </TableCell>
-                              <TableCell sx={{ fontFamily: 'monospace', fontWeight: 700 }}>
-                                {formatLaptime(entry.laptime)}
-                              </TableCell>
-                              <TableCell align="right" sx={{ fontFamily: 'monospace' }}>
-                                {typeof entry.laptime === 'number'
-                                  ? calculateGap(fastestLap, entry.laptime)
-                                  : '—'}
-                              </TableCell>
-                              <TableCell align="right">{(entry.laps || 0).toLocaleString()}</TableCell>
-                              <TableCell align="right">{(driver.kilometers || 0).toLocaleString()}</TableCell>
                             </TableRow>
-                          );
-                        })}
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
-                </Paper>
+                          )}
+
+                          {pagedRows.map((entry, index) => {
+                            const absolutePos = start + index;
+                            const driver =
+                              driversByGuid.get(entry.guid) ||
+                              ({
+                                guid: entry.guid,
+                                name: entry.name,
+                                kilometers: 0,
+                                collisions: 0,
+                              } as RankDriver);
+                            const license = getDriverLicense(driver, licenseMap);
+                            const sr = getDriverSR(driver);
+                            const ratingV2 = ratingV2Enabled()
+                              ? ratingV2Map.get(entry.guid)
+                              : undefined;
+                            const displayLicense = ratingV2
+                              ? { license: ratingV2.licenseTier, paceScore: ratingV2.licenseScore }
+                              : license;
+                            const displaySR = ratingV2
+                              ? { tier: ratingV2.safetyTier, sr: ratingV2.safetyRating }
+                              : sr;
+                            const delta = deltas.get(entry.guid);
+
+                            return (
+                              <TableRow
+                                key={`${entry.guid}-${entry.laptime}-${index}`}
+                                sx={{
+                                  cursor: 'pointer',
+                                  ...subtleRowEnterSx(index, { baseDelayMs: 340 }),
+                                  ...(absolutePos < 3
+                                    ? getPodiumRowSx((absolutePos + 1) as 1 | 2 | 3)
+                                    : {}),
+                                }}
+                                onClick={() => {
+                                  window.location.href = getDriverProfileHref(entry.guid);
+                                }}
+                              >
+                                <TableCell>
+                                  <Chip
+                                    size="small"
+                                    label={absolutePos + 1}
+                                    sx={{
+                                      minWidth: 38,
+                                      fontWeight: 700,
+                                      ...getPodiumChipSx(absolutePos, true),
+                                    }}
+                                  />
+                                </TableCell>
+                                <TableCell sx={{ fontWeight: 700 }}>
+                                  <Link
+                                    href={getDriverProfileHref(entry.guid)}
+                                    onClick={(e) => e.stopPropagation()}
+                                    underline="none"
+                                    color="inherit"
+                                    sx={{ fontWeight: 700 }}
+                                  >
+                                    {entry.name || driver.name || 'Unknown'}
+                                  </Link>
+                                </TableCell>
+                                <TableCell>
+                                  <Stack direction="row" spacing={1} alignItems="center">
+                                    <Tooltip
+                                      title={ratingV2 ? summarizeRatingV2(ratingV2) : ''}
+                                      arrow
+                                    >
+                                      <Chip
+                                        size="small"
+                                        label={displayLicense.license}
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          openGuide('license');
+                                        }}
+                                        sx={{
+                                          minWidth: LICENSE_CHIP_WIDTH,
+                                          fontWeight: 700,
+                                          justifyContent: 'center',
+                                          cursor: 'pointer',
+                                          ...getLicenseBadgeSx(displayLicense.license),
+                                        }}
+                                      />
+                                    </Tooltip>
+                                    <Typography
+                                      variant="body2"
+                                      sx={{ fontWeight: 700, color: 'text.secondary' }}
+                                    >
+                                      {ratingV2
+                                        ? displayLicense.paceScore.toFixed(1)
+                                        : Math.round(displayLicense.paceScore).toLocaleString()}
+                                    </Typography>
+                                    {delta ? (
+                                      <DeltaChip value={Math.round(delta.deltaPace)} />
+                                    ) : null}
+                                  </Stack>
+                                </TableCell>
+                                <TableCell>
+                                  <Stack direction="row" spacing={1} alignItems="center">
+                                    <Tooltip
+                                      title={ratingV2 ? summarizeRatingV2(ratingV2) : ''}
+                                      arrow
+                                    >
+                                      <Chip
+                                        size="small"
+                                        label={displaySR.tier}
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          openGuide('safety');
+                                        }}
+                                        sx={{
+                                          minWidth: SR_CHIP_WIDTH,
+                                          fontWeight: 700,
+                                          justifyContent: 'center',
+                                          cursor: 'pointer',
+                                          ...getSRBadgeSx(displaySR.tier),
+                                        }}
+                                      />
+                                    </Tooltip>
+                                    <Typography
+                                      variant="body2"
+                                      sx={{ fontWeight: 700, color: 'text.secondary' }}
+                                    >
+                                      {displaySR.sr.toFixed(2)}
+                                    </Typography>
+                                    {delta ? (
+                                      <DeltaChip value={delta.deltaSR} decimals={2} kind="sr" />
+                                    ) : null}
+                                  </Stack>
+                                </TableCell>
+                                <TableCell sx={{ fontFamily: 'monospace', fontWeight: 700 }}>
+                                  {formatLaptime(entry.laptime)}
+                                </TableCell>
+                                <TableCell align="right" sx={{ fontFamily: 'monospace' }}>
+                                  {typeof entry.laptime === 'number'
+                                    ? calculateGap(fastestLap, entry.laptime)
+                                    : '—'}
+                                </TableCell>
+                                <TableCell align="right">
+                                  {(entry.laps || 0).toLocaleString()}
+                                </TableCell>
+                                <TableCell align="right">
+                                  {(driver.kilometers || 0).toLocaleString()}
+                                </TableCell>
+                              </TableRow>
+                            );
+                          })}
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
+                  </Paper>
                 </Reveal>
 
                 {totalPages > 1 && (
@@ -482,11 +523,16 @@ export default function Page() {
                         Prev
                       </Button>
                       {Array.from({ length: totalPages }, (_, idx) => idx + 1)
-                        .filter((p) => p === 1 || p === totalPages || (p >= safePage - 1 && p <= safePage + 1))
+                        .filter(
+                          (p) =>
+                            p === 1 || p === totalPages || (p >= safePage - 1 && p <= safePage + 1)
+                        )
                         .map((p, idx, arr) => (
                           <Box key={p} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                             {idx > 0 && p - arr[idx - 1] > 1 && (
-                              <Typography sx={{ px: 0.5, color: 'rgba(255,255,255,0.65)' }}>...</Typography>
+                              <Typography sx={{ px: 0.5, color: 'rgba(255,255,255,0.65)' }}>
+                                ...
+                              </Typography>
                             )}
                             <Button
                               onClick={() => setPage(p)}

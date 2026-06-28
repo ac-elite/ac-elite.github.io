@@ -9,7 +9,6 @@ import Table from '@mui/material/Table';
 import Select from '@mui/material/Select';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
-import Skeleton from '@mui/material/Skeleton';
 import MenuItem from '@mui/material/MenuItem';
 import TableRow from '@mui/material/TableRow';
 import TableBody from '@mui/material/TableBody';
@@ -210,7 +209,10 @@ export default function Page() {
 
   const enriched = useMemo<DriverRankData[]>(() => {
     const licenseMap = computeLicenseMap(rankData);
-    const maxPaceScore = Math.max(1, ...rankData.map((d) => getDriverLicense(d, licenseMap).paceScore));
+    const maxPaceScore = Math.max(
+      1,
+      ...rankData.map((d) => getDriverLicense(d, licenseMap).paceScore)
+    );
     const useV2 = ratingV2Enabled() && ratingV2Map.size > 0;
 
     return rankData.map((driver) => {
@@ -275,9 +277,10 @@ export default function Page() {
 
   const byLicense = useMemo(
     () =>
-      (licenseTier === 'All' ? [...enriched] : enriched.filter((x) => x.license === licenseTier)).sort(
-        (a, b) => b.paceScore - a.paceScore
-      ),
+      (licenseTier === 'All'
+        ? [...enriched]
+        : enriched.filter((x) => x.license === licenseTier)
+      ).sort((a, b) => b.paceScore - a.paceScore),
     [enriched, licenseTier]
   );
 
@@ -312,17 +315,38 @@ export default function Page() {
 
   const activeData =
     tab === 'overall'
-      ? { rows: overallPaged.slice, start: overallPaged.start, page: overallPaged.page, totalPages: overallPaged.totalPages }
+      ? {
+          rows: overallPaged.slice,
+          start: overallPaged.start,
+          page: overallPaged.page,
+          totalPages: overallPaged.totalPages,
+        }
       : tab === 'license'
-        ? { rows: licensePaged.slice, start: licensePaged.start, page: licensePaged.page, totalPages: licensePaged.totalPages }
-        : { rows: safetyPaged.slice, start: safetyPaged.start, page: safetyPaged.page, totalPages: safetyPaged.totalPages };
+        ? {
+            rows: licensePaged.slice,
+            start: licensePaged.start,
+            page: licensePaged.page,
+            totalPages: licensePaged.totalPages,
+          }
+        : {
+            rows: safetyPaged.slice,
+            start: safetyPaged.start,
+            page: safetyPaged.page,
+            totalPages: safetyPaged.totalPages,
+          };
 
   return (
     <>
       <title>{`Rankings - ${CONFIG.appName}`}</title>
-      <meta name="description" content="AC Elite rankings by overall, license tier, and safety tier." />
+      <meta
+        name="description"
+        content="AC Elite rankings by overall, license tier, and safety tier."
+      />
       <meta property="og:title" content="Rankings - AC Elite" />
-      <meta property="og:description" content="AC Elite rankings by overall, license tier, and safety tier." />
+      <meta
+        property="og:description"
+        content="AC Elite rankings by overall, license tier, and safety tier."
+      />
       <meta property="og:url" content={getSiteUrl(APP_ROUTES.rankings)} />
 
       <Box sx={{ ...DATA_PAGE_SHELL_SX }}>
@@ -343,12 +367,11 @@ export default function Page() {
             </DataPageHeader>
 
             {loading && (
-              <LoadingPanel title="Loading rankings…" message="Fetching drivers, licenses, and safety tiers.">
-                <Stack spacing={2}>
-                  <Skeleton variant="rounded" height={56} sx={{ borderRadius: 2, bgcolor: 'rgba(255,255,255,0.06)' }} />
-                  <Skeleton variant="rounded" height={400} sx={{ borderRadius: 2, bgcolor: 'rgba(255,255,255,0.05)' }} />
-                </Stack>
-              </LoadingPanel>
+              <LoadingPanel
+                title="Loading rankings…"
+                message="Fetching drivers, licenses, and safety tiers."
+                variant="timing"
+              />
             )}
 
             {!loading && error && <ErrorPanel error={error} />}
@@ -363,7 +386,12 @@ export default function Page() {
                     textAlign: { xs: 'center', md: 'left' },
                   }}
                 >
-                  <Stack direction="row" gap={1} flexWrap="wrap" justifyContent={{ xs: 'center', md: 'flex-start' }}>
+                  <Stack
+                    direction="row"
+                    gap={1}
+                    flexWrap="wrap"
+                    justifyContent={{ xs: 'center', md: 'flex-start' }}
+                  >
                     {[
                       { key: 'overall', label: 'Overall' },
                       { key: 'license', label: 'By License' },
@@ -434,132 +462,158 @@ export default function Page() {
                 </Paper>
 
                 <Reveal>
-                <Paper
-                  sx={{
-                    ...GLASS_TABLE_WRAPPER_SX,
-                    ...brandAccentBorderSx(),
-                    ...glassCardMotionSx(2),
-                  }}
-                >
-                  <TableContainer>
-                    <Table
-                      size="small"
-                      sx={{
-                        '& .MuiTableBody-root .MuiTableRow-root:hover': {
-                          backgroundColor: 'rgba(255,255,255,0.028)',
-                        },
-                      }}
-                    >
-                      <TableHead>
-                        <TableRow>
-                          <TableCell>#</TableCell>
-                          <TableCell>Driver</TableCell>
-                          <TableCell>License</TableCell>
-                          <TableCell>Safety Rating</TableCell>
-                          <TableCell align="right">Total KM</TableCell>
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        {activeData.rows.length === 0 && (
+                  <Paper
+                    sx={{
+                      ...GLASS_TABLE_WRAPPER_SX,
+                      ...brandAccentBorderSx(),
+                      ...glassCardMotionSx(2),
+                    }}
+                  >
+                    <TableContainer>
+                      <Table
+                        size="small"
+                        sx={{
+                          '& .MuiTableBody-root .MuiTableRow-root:hover': {
+                            backgroundColor: 'rgba(255,255,255,0.028)',
+                          },
+                        }}
+                      >
+                        <TableHead>
                           <TableRow>
-                            <TableCell colSpan={5} sx={{ py: 4, px: 2 }}>
-                              <EmptyState
-                                title="No drivers in this ranking yet."
-                                description="Try another tab or tier filter, or check back after more drivers sync into this view."
-                              />
-                            </TableCell>
+                            <TableCell>#</TableCell>
+                            <TableCell>Driver</TableCell>
+                            <TableCell>License</TableCell>
+                            <TableCell>Safety Rating</TableCell>
+                            <TableCell align="right">Total KM</TableCell>
                           </TableRow>
-                        )}
-
-                        {activeData.rows.map((item, idx) => {
-                          const pos = activeData.start + idx + 1;
-                          const delta = deltas.get(item.driver.guid);
-                          return (
-                            <TableRow
-                              key={`${item.driver.guid}-${pos}`}
-                              onClick={() => {
-                                window.location.href = getDriverProfileHref(item.driver.guid);
-                              }}
-                              sx={{
-                                cursor: 'pointer',
-                                ...subtleRowEnterSx(idx, { baseDelayMs: 340 }),
-                                ...(pos >= 1 && pos <= 3 ? getPodiumRowSx(pos as 1 | 2 | 3) : {}),
-                              }}
-                            >
-                              <TableCell>
-                                <Chip
-                                  size="small"
-                                  label={pos}
-                                  sx={{
-                                    minWidth: 38,
-                                    fontWeight: 700,
-                                    ...getPodiumChipSx(pos),
-                                  }}
+                        </TableHead>
+                        <TableBody>
+                          {activeData.rows.length === 0 && (
+                            <TableRow>
+                              <TableCell colSpan={5} sx={{ py: 4, px: 2 }}>
+                                <EmptyState
+                                  title="No drivers in this ranking yet."
+                                  description="Try another tab or tier filter, or check back after more drivers sync into this view."
                                 />
                               </TableCell>
-                              <TableCell sx={{ fontWeight: 700 }}>
-                                <Link
-                                  href={getDriverProfileHref(item.driver.guid)}
-                                  onClick={(e) => e.stopPropagation()}
-                                  underline="none"
-                                  color="inherit"
-                                  sx={{ fontWeight: 700 }}
-                                >
-                                  {item.driver.name || 'Unknown'}
-                                </Link>
-                              </TableCell>
-                              <TableCell>
-                                <Stack direction="row" spacing={1} alignItems="center">
-                                  <Tooltip title={item.ratingV2 ? summarizeRatingV2(item.ratingV2) : ''} arrow>
-                                  <Chip
-                                    size="small"
-                                    label={item.license}
-                                    onClick={(e) => { e.stopPropagation(); openGuide('license'); }}
-                                    sx={{
-                                      minWidth: LICENSE_CHIP_WIDTH,
-                                      fontWeight: 700,
-                                      justifyContent: 'center',
-                                      cursor: 'pointer',
-                                      ...getLicenseBadgeSx(item.license),
-                                    }}
-                                  />
-                                  </Tooltip>
-                                  <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.secondary' }}>
-                                    {item.ratingV2 ? item.paceScore.toFixed(1) : Math.round(item.paceScore).toLocaleString()}
-                                  </Typography>
-                                  {delta ? <DeltaChip value={Math.round(delta.deltaPace)} /> : null}
-                                </Stack>
-                              </TableCell>
-                              <TableCell>
-                                <Stack direction="row" spacing={1} alignItems="center">
-                                  <Tooltip title={item.ratingV2 ? summarizeRatingV2(item.ratingV2) : ''} arrow>
-                                  <Chip
-                                    size="small"
-                                    label={item.srTier}
-                                    onClick={(e) => { e.stopPropagation(); openGuide('safety'); }}
-                                    sx={{
-                                      minWidth: SR_CHIP_WIDTH,
-                                      fontWeight: 700,
-                                      justifyContent: 'center',
-                                      cursor: 'pointer',
-                                      ...getSRBadgeSx(item.srTier),
-                                    }}
-                                  />
-                                  </Tooltip>
-                                  <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.secondary' }}>
-                                    {item.sr.toFixed(2)}
-                                  </Typography>
-                                  {delta ? <DeltaChip value={delta.deltaSR} decimals={2} kind="sr" /> : null}
-                                </Stack>
-                              </TableCell>
-                              <TableCell align="right">{(item.driver.kilometers || 0).toLocaleString()}</TableCell>
                             </TableRow>
-                          );
-                        })}
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
-                </Paper>
+                          )}
+
+                          {activeData.rows.map((item, idx) => {
+                            const pos = activeData.start + idx + 1;
+                            const delta = deltas.get(item.driver.guid);
+                            return (
+                              <TableRow
+                                key={`${item.driver.guid}-${pos}`}
+                                onClick={() => {
+                                  window.location.href = getDriverProfileHref(item.driver.guid);
+                                }}
+                                sx={{
+                                  cursor: 'pointer',
+                                  ...subtleRowEnterSx(idx, { baseDelayMs: 340 }),
+                                  ...(pos >= 1 && pos <= 3 ? getPodiumRowSx(pos as 1 | 2 | 3) : {}),
+                                }}
+                              >
+                                <TableCell>
+                                  <Chip
+                                    size="small"
+                                    label={pos}
+                                    sx={{
+                                      minWidth: 38,
+                                      fontWeight: 700,
+                                      ...getPodiumChipSx(pos),
+                                    }}
+                                  />
+                                </TableCell>
+                                <TableCell sx={{ fontWeight: 700 }}>
+                                  <Link
+                                    href={getDriverProfileHref(item.driver.guid)}
+                                    onClick={(e) => e.stopPropagation()}
+                                    underline="none"
+                                    color="inherit"
+                                    sx={{ fontWeight: 700 }}
+                                  >
+                                    {item.driver.name || 'Unknown'}
+                                  </Link>
+                                </TableCell>
+                                <TableCell>
+                                  <Stack direction="row" spacing={1} alignItems="center">
+                                    <Tooltip
+                                      title={item.ratingV2 ? summarizeRatingV2(item.ratingV2) : ''}
+                                      arrow
+                                    >
+                                      <Chip
+                                        size="small"
+                                        label={item.license}
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          openGuide('license');
+                                        }}
+                                        sx={{
+                                          minWidth: LICENSE_CHIP_WIDTH,
+                                          fontWeight: 700,
+                                          justifyContent: 'center',
+                                          cursor: 'pointer',
+                                          ...getLicenseBadgeSx(item.license),
+                                        }}
+                                      />
+                                    </Tooltip>
+                                    <Typography
+                                      variant="body2"
+                                      sx={{ fontWeight: 700, color: 'text.secondary' }}
+                                    >
+                                      {item.ratingV2
+                                        ? item.paceScore.toFixed(1)
+                                        : Math.round(item.paceScore).toLocaleString()}
+                                    </Typography>
+                                    {delta ? (
+                                      <DeltaChip value={Math.round(delta.deltaPace)} />
+                                    ) : null}
+                                  </Stack>
+                                </TableCell>
+                                <TableCell>
+                                  <Stack direction="row" spacing={1} alignItems="center">
+                                    <Tooltip
+                                      title={item.ratingV2 ? summarizeRatingV2(item.ratingV2) : ''}
+                                      arrow
+                                    >
+                                      <Chip
+                                        size="small"
+                                        label={item.srTier}
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          openGuide('safety');
+                                        }}
+                                        sx={{
+                                          minWidth: SR_CHIP_WIDTH,
+                                          fontWeight: 700,
+                                          justifyContent: 'center',
+                                          cursor: 'pointer',
+                                          ...getSRBadgeSx(item.srTier),
+                                        }}
+                                      />
+                                    </Tooltip>
+                                    <Typography
+                                      variant="body2"
+                                      sx={{ fontWeight: 700, color: 'text.secondary' }}
+                                    >
+                                      {item.sr.toFixed(2)}
+                                    </Typography>
+                                    {delta ? (
+                                      <DeltaChip value={delta.deltaSR} decimals={2} kind="sr" />
+                                    ) : null}
+                                  </Stack>
+                                </TableCell>
+                                <TableCell align="right">
+                                  {(item.driver.kilometers || 0).toLocaleString()}
+                                </TableCell>
+                              </TableRow>
+                            );
+                          })}
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
+                  </Paper>
                 </Reveal>
 
                 <Paginate
