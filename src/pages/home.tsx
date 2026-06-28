@@ -657,12 +657,6 @@ function HeroSection({ currentTrack }: { currentTrack: CurrentTrackData | null }
               lead: 'License & Safety Rating — work in progress',
               body: 'These calculations are still being tuned, so values and thresholds may change as we refine them.',
             },
-            {
-              icon: 'solar:info-circle-bold',
-              accent: '#7dd3fc',
-              lead: 'New — trend filter on every stats page',
-              body: 'Use the 1h / 24h / 7d / 30d switch to see how Safety Rating, license pace, distance and more have changed over the window you pick.',
-            },
           ]}
         />
       </Container>
