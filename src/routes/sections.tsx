@@ -4,6 +4,7 @@ import { lazy, Suspense } from 'react';
 import { Outlet } from 'react-router-dom';
 
 import Box from '@mui/material/Box';
+import Container from '@mui/material/Container';
 
 import { APP_ROUTES } from 'src/centralized/app-routes';
 import { DashboardLayout } from 'src/layouts/dashboard';
@@ -40,9 +41,12 @@ const renderFallback = () => (
       flex: '1 1 auto',
       alignItems: 'center',
       justifyContent: 'center',
+      width: 1,
     }}
   >
-    <RaceLoader compact title="Loading page..." message="Warming tyres and opening the next screen." />
+    <Container maxWidth="xl">
+      <RaceLoader compact title="Loading page..." message="Warming tyres and opening the next screen." />
+    </Container>
   </Box>
 );
 
