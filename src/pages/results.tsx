@@ -8,7 +8,6 @@ import Stack from '@mui/material/Stack';
 import Table from '@mui/material/Table';
 import Select from '@mui/material/Select';
 import Button from '@mui/material/Button';
-import Skeleton from '@mui/material/Skeleton';
 import MenuItem from '@mui/material/MenuItem';
 import TableRow from '@mui/material/TableRow';
 import TableBody from '@mui/material/TableBody';
@@ -133,9 +132,15 @@ export default function Page() {
   return (
     <>
       <title>{`Results - ${CONFIG.appName}`}</title>
-      <meta name="description" content="AC Elite session results: review every race, qualify and practice session." />
+      <meta
+        name="description"
+        content="AC Elite session results: review every race, qualify and practice session."
+      />
       <meta property="og:title" content="Results - AC Elite" />
-      <meta property="og:description" content="AC Elite session results: review every race, qualify and practice session." />
+      <meta
+        property="og:description"
+        content="AC Elite session results: review every race, qualify and practice session."
+      />
       <meta property="og:url" content={getSiteUrl(APP_ROUTES.results)} />
 
       <Box sx={{ ...DATA_PAGE_SHELL_SX }}>
@@ -209,7 +214,11 @@ export default function Page() {
                           All tracks
                         </MenuItem>
                         {trackOptions.map((t) => (
-                          <MenuItem key={t.trackName} value={t.trackName} sx={GLASS_SELECT_MENU_ITEM_SX}>
+                          <MenuItem
+                            key={t.trackName}
+                            value={t.trackName}
+                            sx={GLASS_SELECT_MENU_ITEM_SX}
+                          >
                             {resolveTrack(t.trackName, t.trackConfig).label}
                           </MenuItem>
                         ))}
@@ -235,7 +244,10 @@ export default function Page() {
                         '& fieldset': { borderColor: 'rgba(255,255,255,0.18)' },
                         '&:hover fieldset': { borderColor: 'rgba(255,255,255,0.3)' },
                       },
-                      '& .MuiInputBase-input::placeholder': { color: 'rgba(255,255,255,0.5)', opacity: 1 },
+                      '& .MuiInputBase-input::placeholder': {
+                        color: 'rgba(255,255,255,0.5)',
+                        opacity: 1,
+                      },
                     }}
                   />
                 </Stack>
@@ -243,12 +255,11 @@ export default function Page() {
             </Paper>
 
             {loading && (
-              <LoadingPanel title="Loading results…" message="Fetching sessions from the server.">
-                <Stack spacing={2}>
-                  <Skeleton variant="rounded" height={56} sx={{ borderRadius: 2, bgcolor: 'rgba(255,255,255,0.06)' }} />
-                  <Skeleton variant="rounded" height={400} sx={{ borderRadius: 2, bgcolor: 'rgba(255,255,255,0.05)' }} />
-                </Stack>
-              </LoadingPanel>
+              <LoadingPanel
+                title="Loading results…"
+                message="Fetching sessions from the server."
+                variant="timing"
+              />
             )}
 
             {!loading && error && <ErrorPanel error={error} />}
@@ -301,11 +312,20 @@ export default function Page() {
                               onClick={() => {
                                 window.location.href = getResultHref(row.id);
                               }}
-                              sx={{ cursor: 'pointer', ...subtleRowEnterSx(idx, { baseDelayMs: 340 }) }}
+                              sx={{
+                                cursor: 'pointer',
+                                ...subtleRowEnterSx(idx, { baseDelayMs: 340 }),
+                              }}
                             >
-                              <TableCell sx={{ whiteSpace: 'nowrap' }}>{formatSessionDate(row.session_date)}</TableCell>
+                              <TableCell sx={{ whiteSpace: 'nowrap' }}>
+                                {formatSessionDate(row.session_date)}
+                              </TableCell>
                               <TableCell>
-                                <Chip size="small" label={row.type} sx={TYPE_CHIP_SX[row.type] ?? {}} />
+                                <Chip
+                                  size="small"
+                                  label={row.type}
+                                  sx={TYPE_CHIP_SX[row.type] ?? {}}
+                                />
                               </TableCell>
                               <TableCell sx={{ fontWeight: 700 }}>
                                 {resolveTrack(row.track_name, row.track_config).label}
@@ -316,7 +336,8 @@ export default function Page() {
                                 sx={{
                                   fontVariantNumeric: 'tabular-nums',
                                   fontWeight: (row.num_incidents ?? 0) > 0 ? 700 : 400,
-                                  color: (row.num_incidents ?? 0) > 0 ? '#fca5a5' : 'text.secondary',
+                                  color:
+                                    (row.num_incidents ?? 0) > 0 ? '#fca5a5' : 'text.secondary',
                                 }}
                               >
                                 {row.num_incidents ?? 0}

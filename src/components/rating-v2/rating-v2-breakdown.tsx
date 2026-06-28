@@ -19,6 +19,17 @@ function signedSr(value: number) {
   return `${value >= 0 ? '+' : ''}${value.toFixed(2)}`;
 }
 
+const breakdownMetricSx = {
+  minWidth: { xs: '100%', sm: 180 },
+  flex: 1,
+  borderRadius: 1.25,
+  px: 1.4,
+  py: 1.25,
+  bgcolor: 'rgba(255,255,255,0.035)',
+  border: '1px solid rgba(255,255,255,0.08)',
+  boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.05)',
+} as const;
+
 export function RatingV2Badge({ rating }: { rating: DriverRatingV2 | null | undefined }) {
   if (!rating) return null;
   return (
@@ -38,44 +49,80 @@ export function RatingV2Badge({ rating }: { rating: DriverRatingV2 | null | unde
 export function RatingV2Breakdown({ rating }: { rating: DriverRatingV2 | null | undefined }) {
   if (!rating?.breakdown) return null;
   const b = rating.breakdown;
+  const incidents = b.carCollisions + b.envCollisions;
+  const recentPaceDirection =
+    b.recentLicenseAdjustmentPct === 0
+      ? 'No recent pace adjustment'
+      : b.recentLicenseAdjustmentPct > 0
+        ? 'Recent results lift pace'
+        : 'Recent results lower pace';
+  const recentSrDirection =
+    b.recentSafetyAdjustment === 0
+      ? 'no SR adjustment'
+      : b.recentSafetyAdjustment > 0
+        ? 'SR lifted'
+        : 'SR lowered';
+  const metrics = [
+    {
+      label: 'Pace score',
+      value: Math.round(rating.licenseScore).toLocaleString(),
+      detail: `Base ${Math.round(b.paceRaw).toLocaleString()} / Recent ${signedPct(b.recentLicenseAdjustmentPct)}`,
+    },
+    {
+      label: 'Safety Rating',
+      value: `${rating.safetyRating.toFixed(2)} SR`,
+      detail: `Base ${b.legacySafetyRating.toFixed(2)} / Recent ${signedSr(b.recentSafetyAdjustment)}`,
+    },
+    {
+      label: 'Recent races',
+      value: `${signedPct(b.recentLicenseAdjustmentPct)} / ${signedSr(b.recentSafetyAdjustment)} SR`,
+      detail: `${recentPaceDirection}; ${recentSrDirection}.`,
+    },
+    {
+      label: 'Confidence',
+      value: pct(b.confidence * 100),
+      detail: `${b.ratedSessions} sessions / ${Math.round(b.ratedKm).toLocaleString()} rated km`,
+    },
+  ];
 
   return (
     <Box sx={{ ...GLASS_CARD_INNER_SX, p: 2, borderRadius: 2 }}>
       <Stack spacing={1.5}>
         <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" useFlexGap>
           <RatingV2Badge rating={rating} />
-          <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700 }}>
-            KMR backbone with bounded recent-results adjustments.
-          </Typography>
+          <Box>
+            <Typography variant="subtitle2" sx={{ fontWeight: 850, lineHeight: 1.2 }}>
+              Rating breakdown
+            </Typography>
+            <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+              Long-term lap and race history is the base. Recent race results only make a small
+              correction.
+            </Typography>
+          </Box>
         </Stack>
-        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.25}>
-          {[
-            ['Base pace', Math.round(b.paceRaw).toLocaleString()],
-            ['Racecraft', pct(b.racecraft)],
-            ['Activity', pct(b.activity)],
-            ['Base SR', b.legacySafetyRating.toFixed(2)],
-            ['Recent SR', b.resultsSafetyRating.toFixed(2)],
-            ['Confidence', pct(b.confidence * 100)],
-          ].map(([label, value]) => (
-            <Box key={label} sx={{ minWidth: 110 }}>
-              <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+
+        <Stack direction={{ xs: 'column', md: 'row' }} spacing={1.25}>
+          {metrics.map(({ label, value, detail }) => (
+            <Box key={label} sx={breakdownMetricSx}>
+              <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700 }}>
                 {label}
               </Typography>
-              <Typography variant="subtitle2" sx={{ fontWeight: 800 }}>
+              <Typography variant="subtitle1" sx={{ fontWeight: 850, lineHeight: 1.25 }}>
                 {value}
+              </Typography>
+              <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.62)' }}>
+                {detail}
               </Typography>
             </Box>
           ))}
         </Stack>
+
         <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-          Applied rating adjustments: license {signedPct(b.recentLicenseAdjustmentPct)}, SR{' '}
-          {signedSr(b.recentSafetyAdjustment)}. Recent results can tune the rating, but cannot erase
-          the historical KMR backbone.
-        </Typography>
-        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-          {b.ratedSessions} rated sessions, {b.ratedRaces} races, {Math.round(b.ratedKm).toLocaleString()} rated km,
-          {` ${b.carCollisions + b.envCollisions}`} collisions, {b.cuts} cuts, {b.penalties} penalties.
-          {b.excludedSessions ? ` ${b.excludedSessions} sessions excluded for missing track length.` : ''}
+          Built from {b.ratedRaces} races across {b.uniqueTracks} tracks. Racecraft input:{' '}
+          {incidents} collisions, {b.cuts} cuts, {b.penalties} penalties.
+          {b.excludedSessions
+            ? ` ${b.excludedSessions} sessions excluded for missing track length.`
+            : ''}
         </Typography>
       </Stack>
     </Box>

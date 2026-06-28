@@ -14,7 +14,7 @@ import { GLASS_PADDING, GLASS_PANEL_SX, GLASS_CARD_INNER_HOVER_SX } from 'src/li
 import { SERVER_ENDPOINTS } from 'src/centralized/server-endpoints';
 import { formatTimeAgo } from 'src/lib/sync-utils';
 import { BRAND_ACCENT } from 'src/lib/status-accent';
-import { getTrackHeroImageOffsetY, getTrackHeroImageSrc } from 'src/lib/track-hero';
+import { getTrackHeroImageSrc, getTrackHeroImageOffsetY } from 'src/lib/track-hero';
 import { softFloatWrapperSx } from 'src/lib/subtle-motion';
 import { getTrackDisplayName, normalizeServerTrackId } from 'src/lib/ac-elite-data';
 import { useTrackCatalogVersion } from 'src/centralized/track-info';
@@ -24,6 +24,8 @@ import {
   formatSessionDurationsLine,
   sanitizeServerLobbyDisplayName,
 } from 'src/lib/server-info';
+
+import { RaceLoader } from 'src/components/race-loader';
 
 /** Content Manager deep link (same host/query as admin / workflows). */
 export const AC_ELITE_SERVER_JOIN_HREF = SERVER_ENDPOINTS.join;
@@ -83,6 +85,7 @@ function ServerInfoBlock({ label, children }: { label: string; children: ReactNo
 export type ServerJoinCardProps = {
   currentTrack: CurrentTrackPayload | null;
   joinHref?: string;
+  loading?: boolean;
   sx?: SxProps<Theme>;
 };
 
@@ -134,34 +137,40 @@ function JoinGlyphIcon() {
 export function ServerJoinCard({
   currentTrack,
   joinHref = AC_ELITE_SERVER_JOIN_HREF,
+  loading = false,
   sx,
 }: ServerJoinCardProps) {
   useTrackCatalogVersion();
-  const online = Boolean(currentTrack?.online);
+  const online = !loading && Boolean(currentTrack?.online);
   /** When offline, do not surface merged static fallback (last track / lobby) — card must read as down. */
   const rawTrack = online ? (currentTrack?.track?.trim() ?? '') : '';
   const fetchedAt = currentTrack?.fetchedAt;
   const info = online ? currentTrack?.info : undefined;
   const liveDataAvailable = Boolean(online && fetchedAt && hasLiveSessionMetrics(info));
-  const trackTitle = !online
-    ? 'Server offline'
-    : rawTrack
-      ? getTrackDisplayName(normalizeServerTrackId(rawTrack))
-      : 'No session';
+  const trackTitle = loading
+    ? 'Syncing server data'
+    : !online
+      ? 'Server offline'
+      : rawTrack
+        ? getTrackDisplayName(normalizeServerTrackId(rawTrack))
+        : 'No session';
   const updatedLine = fetchedAt ? `Updated ${formatTimeAgo(fetchedAt)}` : '—';
   const updatedTitle = formatSessionKicker(fetchedAt);
+  const resolvedUpdatedLine = loading ? 'Checking live status...' : updatedLine;
 
   const clients = typeof info?.clients === 'number' ? info.clients : null;
   const maxclients = typeof info?.maxclients === 'number' ? info.maxclients : null;
-  const slotsLabel = !online
-    ? '—'
-    : liveDataAvailable
-      ? clients != null && maxclients != null
-        ? `${clients} / ${maxclients}`
-        : clients != null
-          ? `${clients}`
-          : '-'
-      : 'Data unavailable';
+  const slotsLabel = loading
+    ? ''
+    : !online
+      ? '—'
+      : liveDataAvailable
+        ? clients != null && maxclients != null
+          ? `${clients} / ${maxclients}`
+          : clients != null
+            ? `${clients}`
+            : '-'
+        : 'Data unavailable';
   const cars = Array.isArray(info?.cars)
     ? (info.cars as unknown[]).filter((c): c is string => typeof c === 'string' && Boolean(c))
     : [];
@@ -173,11 +182,13 @@ export function ServerJoinCard({
     lobbyName: typeof info?.name === 'string' ? info.name : undefined,
   });
 
-  const phaseSummary = !online
-    ? '—'
-    : liveDataAvailable
-      ? [phase, timeLeft].filter((v) => v && v !== '-').join(' · ') || '-'
-      : 'Data unavailable';
+  const phaseSummary = loading
+    ? ''
+    : !online
+      ? '—'
+      : liveDataAvailable
+        ? [phase, timeLeft].filter((v) => v && v !== '-').join(' · ') || '-'
+        : 'Data unavailable';
 
   const rawLobbyName = typeof info?.name === 'string' ? info.name.trim() : '';
   const lobbyName = rawLobbyName ? sanitizeServerLobbyDisplayName(rawLobbyName) : '';
@@ -246,12 +257,12 @@ export function ServerJoinCard({
             </Typography>
             <Chip
               size="small"
-              label={online ? 'ONLINE' : 'OFFLINE'}
+              label={loading ? 'SYNCING' : online ? 'ONLINE' : 'OFFLINE'}
               sx={{
                 ...badgeSx,
-                bgcolor: online ? ACCENT_SOFT : 'rgba(148,163,184,0.18)',
-                color: online ? ACCENT : 'rgba(203,213,225,0.9)',
-                border: `1px solid ${online ? ACCENT_BORDER : 'rgba(148,163,184,0.35)'}`,
+                bgcolor: online || loading ? ACCENT_SOFT : 'rgba(148,163,184,0.18)',
+                color: online || loading ? ACCENT : 'rgba(203,213,225,0.9)',
+                border: `1px solid ${online || loading ? ACCENT_BORDER : 'rgba(148,163,184,0.35)'}`,
               }}
             />
           </Stack>
@@ -261,10 +272,10 @@ export function ServerJoinCard({
           </Typography>
           <Typography
             variant="caption"
-            title={updatedTitle !== '-' ? updatedTitle : undefined}
+            title={loading ? undefined : updatedTitle !== '-' ? updatedTitle : undefined}
             sx={{ color: 'rgba(255,255,255,0.56)', fontWeight: 600, letterSpacing: 0.06 }}
           >
-            {updatedLine}
+            {resolvedUpdatedLine}
           </Typography>
 
           <Typography
@@ -282,51 +293,57 @@ export function ServerJoinCard({
             }}
             title={lobbyName || undefined}
           >
-            {!online
-              ? 'No live lobby while the server is down.'
-              : lobbyName
-                ? lobbyName
-                : liveDataAvailable
-                  ? 'AC Elite official server'
-                  : 'Live data unavailable'}
+            {loading
+              ? 'Reading the latest live lobby state.'
+              : !online
+                ? 'No live lobby while the server is down.'
+                : lobbyName
+                  ? lobbyName
+                  : liveDataAvailable
+                    ? 'AC Elite official server'
+                    : 'Live data unavailable'}
           </Typography>
 
-          <Grid container spacing={0.85}>
-            <Grid size={{ xs: 6, md: 2 }} sx={{ minWidth: 0 }}>
-              <ServerInfoBlock label="Players">
-                <Typography variant="body2" sx={infoValueSx} noWrap title={slotsLabel}>
-                  {slotsLabel}
-                </Typography>
-              </ServerInfoBlock>
+          {loading ? (
+            <RaceLoader variant="status" compact title="" message="" sx={{ maxWidth: 1 }} />
+          ) : (
+            <Grid container spacing={0.85}>
+              <Grid size={{ xs: 6, md: 2 }} sx={{ minWidth: 0 }}>
+                <ServerInfoBlock label="Players">
+                  <Typography variant="body2" sx={infoValueSx} noWrap title={slotsLabel}>
+                    {slotsLabel}
+                  </Typography>
+                </ServerInfoBlock>
+              </Grid>
+              <Grid size={{ xs: 6, md: 3 }} sx={{ minWidth: 0 }}>
+                <ServerInfoBlock label="Phase">
+                  <Typography variant="body2" sx={infoValueSx} noWrap title={phaseSummary}>
+                    {phaseSummary}
+                  </Typography>
+                </ServerInfoBlock>
+              </Grid>
+              <Grid size={{ xs: 6, md: 3 }} sx={{ minWidth: 0 }}>
+                <ServerInfoBlock label="Cars">
+                  <Typography variant="body2" sx={infoValueSx} noWrap title={cars.join(', ')}>
+                    {!online
+                      ? '—'
+                      : liveDataAvailable
+                        ? cars.length
+                          ? cars.join(', ')
+                          : '-'
+                        : 'Data unavailable'}
+                  </Typography>
+                </ServerInfoBlock>
+              </Grid>
+              <Grid size={{ xs: 12, md: 4 }} sx={{ minWidth: 0 }}>
+                <ServerInfoBlock label="Schedule">
+                  <Typography variant="body2" sx={infoValueSx} noWrap title={schedule ?? '-'}>
+                    {!online ? '—' : liveDataAvailable ? (schedule ?? '-') : 'Data unavailable'}
+                  </Typography>
+                </ServerInfoBlock>
+              </Grid>
             </Grid>
-            <Grid size={{ xs: 6, md: 3 }} sx={{ minWidth: 0 }}>
-              <ServerInfoBlock label="Phase">
-                <Typography variant="body2" sx={infoValueSx} noWrap title={phaseSummary}>
-                  {phaseSummary}
-                </Typography>
-              </ServerInfoBlock>
-            </Grid>
-            <Grid size={{ xs: 6, md: 3 }} sx={{ minWidth: 0 }}>
-              <ServerInfoBlock label="Cars">
-                <Typography variant="body2" sx={infoValueSx} noWrap title={cars.join(', ')}>
-                  {!online
-                    ? '—'
-                    : liveDataAvailable
-                      ? cars.length
-                        ? cars.join(', ')
-                        : '-'
-                      : 'Data unavailable'}
-                </Typography>
-              </ServerInfoBlock>
-            </Grid>
-            <Grid size={{ xs: 12, md: 4 }} sx={{ minWidth: 0 }}>
-              <ServerInfoBlock label="Schedule">
-                <Typography variant="body2" sx={infoValueSx} noWrap title={schedule ?? '-'}>
-                  {!online ? '—' : liveDataAvailable ? (schedule ?? '-') : 'Data unavailable'}
-                </Typography>
-              </ServerInfoBlock>
-            </Grid>
-          </Grid>
+          )}
 
           <Button
             component="a"
