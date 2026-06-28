@@ -8,6 +8,7 @@ import Stack from '@mui/material/Stack';
 import Table from '@mui/material/Table';
 import Select from '@mui/material/Select';
 import Button from '@mui/material/Button';
+import Tooltip from '@mui/material/Tooltip';
 import Skeleton from '@mui/material/Skeleton';
 import MenuItem from '@mui/material/MenuItem';
 import TableRow from '@mui/material/TableRow';
@@ -26,6 +27,10 @@ import { fetchJson } from 'src/lib/fetch-json';
 import { getDriverProfileHref } from 'src/lib/routes';
 import { getSiteUrl } from 'src/centralized/site-urls';
 import { fetchPrevRankData } from 'src/lib/delta';
+import { fetchRatingV2Map } from 'src/lib/rating-v2-data';
+import type { DriverRatingV2 } from 'src/lib/ac-elite-rating-v2';
+import { summarizeRatingV2 } from 'src/lib/ac-elite-rating-v2';
+import { ratingV2Enabled } from 'src/lib/rating-mode';
 import { useWindowedDriverDeltas } from 'src/lib/trend-window/trend-window-context';
 import { getSyncHealth, type SiteMetadata, getEffectiveLastSync } from 'src/lib/sync-utils';
 import { subtleRowEnterSx, glassCardMotionSx } from 'src/lib/subtle-motion';
@@ -82,6 +87,7 @@ type DriverRankData = {
   sr: number;
   srTier: string;
   combined: number;
+  ratingV2?: DriverRatingV2;
 };
 
 function getVisiblePages(current: number, total: number) {
@@ -160,6 +166,7 @@ export default function Page() {
   const [error, setError] = useState<string | null>(null);
   const [rankData, setRankData] = useState<RankDriver[]>([]);
   const [prevRankData, setPrevRankData] = useState<RankDriver[]>([]);
+  const [ratingV2Map, setRatingV2Map] = useState<Map<string, DriverRatingV2>>(new Map());
   const [metadata, setMetadata] = useState<SiteMetadata>({});
   // Per-row SR/pace deltas follow the shared trend-window filter.
   const deltas = useWindowedDriverDeltas(rankData, prevRankData);
@@ -177,14 +184,16 @@ export default function Page() {
       setLoading(true);
       setError(null);
       try {
-        const [rank, prevRank, meta] = await Promise.all([
+        const [rank, prevRank, meta, ratingsV2] = await Promise.all([
           fetchJson<RankDriver[]>(DATA_FILES.rank),
           fetchPrevRankData(),
           fetchJson<SiteMetadata>(DATA_FILES.metadata).catch(() => ({})),
+          fetchRatingV2Map(),
         ]);
         if (!mounted) return;
         setRankData(rank);
         setPrevRankData(prevRank);
+        setRatingV2Map(ratingsV2);
         setMetadata(meta);
       } catch (e) {
         if (!mounted) return;
@@ -202,20 +211,25 @@ export default function Page() {
   const enriched = useMemo<DriverRankData[]>(() => {
     const licenseMap = computeLicenseMap(rankData);
     const maxPaceScore = Math.max(1, ...rankData.map((d) => getDriverLicense(d, licenseMap).paceScore));
+    const useV2 = ratingV2Enabled() && ratingV2Map.size > 0;
 
     return rankData.map((driver) => {
       const license = getDriverLicense(driver, licenseMap);
       const sr = getDriverSR(driver);
+      const ratingV2 = useV2 ? ratingV2Map.get(driver.guid) : undefined;
+      const paceScore = ratingV2?.licenseScore ?? license.paceScore;
+      const safetyRating = ratingV2?.safetyRating ?? sr.sr;
       return {
         driver,
-        license: license.license,
-        paceScore: license.paceScore,
-        sr: sr.sr,
-        srTier: sr.tier,
-        combined: getOverallCombinedScore(license.paceScore, sr.sr, maxPaceScore),
+        license: ratingV2?.licenseTier ?? license.license,
+        paceScore,
+        sr: safetyRating,
+        srTier: ratingV2?.safetyTier ?? sr.tier,
+        ratingV2,
+        combined: getOverallCombinedScore(paceScore, safetyRating, maxPaceScore),
       };
     });
-  }, [rankData]);
+  }, [rankData, ratingV2Map]);
 
   const licenseTiers = useMemo(() => ['All', ...LICENSE_TIER_ORDER, 'Rookie'], []);
   const safetyTiers = useMemo(() => ['All', ...SR_TIERS.map((t) => t.name), 'F'], []);
@@ -322,9 +336,9 @@ export default function Page() {
               syncHealth={syncHealth}
             >
               {rankData.length > 0 && (
-                <Box sx={{ pt: 0.5 }}>
+                <Stack spacing={1} sx={{ pt: 0.5 }}>
                   <TrendWindowStats variant="community" rankData={rankData} />
-                </Box>
+                </Stack>
               )}
             </DataPageHeader>
 
@@ -496,6 +510,7 @@ export default function Page() {
                               </TableCell>
                               <TableCell>
                                 <Stack direction="row" spacing={1} alignItems="center">
+                                  <Tooltip title={item.ratingV2 ? summarizeRatingV2(item.ratingV2) : ''} arrow>
                                   <Chip
                                     size="small"
                                     label={item.license}
@@ -508,14 +523,16 @@ export default function Page() {
                                       ...getLicenseBadgeSx(item.license),
                                     }}
                                   />
+                                  </Tooltip>
                                   <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.secondary' }}>
-                                    {Math.round(item.paceScore).toLocaleString()}
+                                    {item.ratingV2 ? item.paceScore.toFixed(1) : Math.round(item.paceScore).toLocaleString()}
                                   </Typography>
                                   {delta ? <DeltaChip value={Math.round(delta.deltaPace)} /> : null}
                                 </Stack>
                               </TableCell>
                               <TableCell>
                                 <Stack direction="row" spacing={1} alignItems="center">
+                                  <Tooltip title={item.ratingV2 ? summarizeRatingV2(item.ratingV2) : ''} arrow>
                                   <Chip
                                     size="small"
                                     label={item.srTier}
@@ -528,6 +545,7 @@ export default function Page() {
                                       ...getSRBadgeSx(item.srTier),
                                     }}
                                   />
+                                  </Tooltip>
                                   <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.secondary' }}>
                                     {item.sr.toFixed(2)}
                                   </Typography>

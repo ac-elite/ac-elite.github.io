@@ -31,6 +31,9 @@ import { getSiteUrl } from 'src/centralized/site-urls';
 import { SITE_TEAM_ROLES } from 'src/site-manual-config';
 import { ACE_SKIN_PACK_DOWNLOAD_URL } from 'src/lib/ace-skin-pack-download';
 import { type DriverDelta, fetchPrevRankData } from 'src/lib/delta';
+import { fetchRatingV2Map } from 'src/lib/rating-v2-data';
+import type { DriverRatingV2 } from 'src/lib/ac-elite-rating-v2';
+import { ratingV2Enabled } from 'src/lib/rating-mode';
 import { subscribeKmrSync } from 'src/lib/kmr-sync';
 import { useWindowedDriverDeltas } from 'src/lib/trend-window/trend-window-context';
 import { getTeamRole, type TeamRole, teamRoleToDiscordRole } from 'src/lib/team-roles';
@@ -128,6 +131,7 @@ type DriverView = {
   paceScore: number;
   safety: number;
   safetyTier: string;
+  ratingV2?: DriverRatingV2;
   teamRole: TeamRole;
 };
 
@@ -653,12 +657,6 @@ function HeroSection({ currentTrack }: { currentTrack: CurrentTrackData | null }
               lead: 'License & Safety Rating — work in progress',
               body: 'These calculations are still being tuned, so values and thresholds may change as we refine them.',
             },
-            {
-              icon: 'solar:info-circle-bold',
-              accent: '#7dd3fc',
-              lead: 'New — trend filter on every stats page',
-              body: 'Use the 1h / 24h / 7d / 30d switch to see how Safety Rating, license pace, distance and more have changed over the window you pick.',
-            },
           ]}
         />
       </Container>
@@ -678,6 +676,7 @@ function CurrentTrackLeaderboardSection({
   totalPages,
   driversByGuid,
   licenseMap,
+  ratingV2Map,
   deltas,
   syncStatus,
   onPageChange,
@@ -694,6 +693,7 @@ function CurrentTrackLeaderboardSection({
   totalPages: number;
   driversByGuid: Map<string, RankDriver>;
   licenseMap: Map<string, { license: string; paceScore: number }>;
+  ratingV2Map: Map<string, DriverRatingV2>;
   deltas: Map<string, DriverDelta>;
   syncStatus: SyncHealth;
   onPageChange: (page: number) => void;
@@ -801,6 +801,13 @@ function CurrentTrackLeaderboardSection({
                           } as RankDriver);
                         const license = getDriverLicense(driver, licenseMap);
                         const sr = getDriverSR(driver);
+                        const ratingV2 = ratingV2Enabled() ? ratingV2Map.get(entry.guid) : undefined;
+                        const displayLicense = ratingV2
+                          ? { license: ratingV2.licenseTier, paceScore: ratingV2.licenseScore }
+                          : license;
+                        const displaySR = ratingV2
+                          ? { tier: ratingV2.safetyTier, sr: ratingV2.safetyRating }
+                          : sr;
                         const delta = deltas.get(entry.guid);
 
                         return (
@@ -843,7 +850,7 @@ function CurrentTrackLeaderboardSection({
                               <Stack direction="row" spacing={1} alignItems="center">
                                 <Chip
                                   size="small"
-                                  label={license.license}
+                                  label={displayLicense.license}
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     onOpenGuide('license');
@@ -853,14 +860,16 @@ function CurrentTrackLeaderboardSection({
                                     fontWeight: 700,
                                     justifyContent: 'center',
                                     cursor: 'pointer',
-                                    ...getLicenseBadgeSx(license.license),
+                                    ...getLicenseBadgeSx(displayLicense.license),
                                   }}
                                 />
                                 <Typography
                                   variant="body2"
                                   sx={{ fontWeight: 700, color: 'text.secondary' }}
                                 >
-                                  {Math.round(license.paceScore).toLocaleString()}
+                                  {ratingV2
+                                    ? displayLicense.paceScore.toFixed(1)
+                                    : Math.round(displayLicense.paceScore).toLocaleString()}
                                 </Typography>
                                 {delta ? <DeltaChip value={Math.round(delta.deltaPace)} /> : null}
                               </Stack>
@@ -869,7 +878,7 @@ function CurrentTrackLeaderboardSection({
                               <Stack direction="row" spacing={1} alignItems="center">
                                 <Chip
                                   size="small"
-                                  label={sr.tier}
+                                  label={displaySR.tier}
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     onOpenGuide('safety');
@@ -879,14 +888,14 @@ function CurrentTrackLeaderboardSection({
                                     fontWeight: 700,
                                     justifyContent: 'center',
                                     cursor: 'pointer',
-                                    ...getSRBadgeSx(sr.tier),
+                                    ...getSRBadgeSx(displaySR.tier),
                                   }}
                                 />
                                 <Typography
                                   variant="body2"
                                   sx={{ fontWeight: 700, color: 'text.secondary' }}
                                 >
-                                  {sr.sr.toFixed(2)}
+                                  {displaySR.sr.toFixed(2)}
                                 </Typography>
                                 {delta ? (
                                   <DeltaChip value={delta.deltaSR} decimals={2} kind="sr" />
@@ -1192,6 +1201,7 @@ export default function Page() {
   const [error, setError] = useState<string | null>(null);
   const [rankData, setRankData] = useState<RankDriver[]>([]);
   const [prevRankData, setPrevRankData] = useState<RankDriver[]>([]);
+  const [ratingV2Map, setRatingV2Map] = useState<Map<string, DriverRatingV2>>(new Map());
   const [leaderboardData, setLeaderboardData] = useState<Record<string, any>>({});
   // Per-row SR/pace deltas follow the shared trend-window filter.
   const deltas = useWindowedDriverDeltas(rankData, prevRankData);
@@ -1224,18 +1234,20 @@ export default function Page() {
       setLoading(true);
       setError(null);
       try {
-        const [rank, leaderboard, meta, prevRank, trackJson] = await Promise.all([
+        const [rank, leaderboard, meta, prevRank, trackJson, ratingsV2] = await Promise.all([
           fetchJson<RankDriver[]>(DATA_FILES.rank),
           fetchJson<Record<string, any>>(DATA_FILES.leaderboard),
           fetchJson<SiteMetadata>(DATA_FILES.metadata),
           fetchPrevRankData(),
           fetchJson<CurrentTrackData>(DATA_FILES.currentTrack).catch(() => null),
+          fetchRatingV2Map(),
         ]);
 
         if (!mounted) return;
         staticCurrentTrackRef.current = trackJson;
         setRankData(rank);
         setPrevRankData(prevRank);
+        setRatingV2Map(ratingsV2);
         setLeaderboardData(leaderboard);
         setMetadata(meta);
 
@@ -1301,11 +1313,13 @@ export default function Page() {
         fetchJson<Record<string, any>>(DATA_FILES.leaderboard),
         fetchJson<SiteMetadata>(DATA_FILES.metadata),
         fetchPrevRankData(),
+        fetchRatingV2Map(),
       ])
-        .then(([rank, leaderboard, meta, prevRank]) => {
+        .then(([rank, leaderboard, meta, prevRank, ratingsV2]) => {
           if (!mounted) return;
           setRankData(rank);
           setPrevRankData(prevRank);
+          setRatingV2Map(ratingsV2);
           setLeaderboardData(leaderboard);
           setMetadata(meta);
         })
@@ -1368,6 +1382,7 @@ export default function Page() {
         km < 100
           ? { license: 'Rookie', paceScore: 0 }
           : licenseMap.get(driver.guid) || { license: 'Bronze', paceScore: 0 };
+      const ratingV2 = ratingV2Enabled() ? ratingV2Map.get(driver.guid) : undefined;
       const role = getTeamRole(driver.guid, teamRoles);
 
       let totalLaps = 0;
@@ -1401,14 +1416,15 @@ export default function Page() {
         favoriteTrack:
           favoriteTrackLaps > 0 ? `${favoriteTrack} (${favoriteTrackLaps} laps)` : 'N/A',
         favoriteTrackLaps,
-        license: licenseInfo.license,
-        paceScore: licenseInfo.paceScore,
-        safety,
-        safetyTier,
+        license: ratingV2?.licenseTier ?? licenseInfo.license,
+        paceScore: ratingV2?.licenseScore ?? licenseInfo.paceScore,
+        safety: ratingV2?.safetyRating ?? safety,
+        safetyTier: ratingV2?.safetyTier ?? safetyTier,
+        ratingV2,
         teamRole: role,
       };
     });
-  }, [rankData, teamRoles]);
+  }, [rankData, ratingV2Map, teamRoles]);
 
   const syncStatus = getSyncHealth(getEffectiveLastSync(metadata.lastSync, rankData));
 
@@ -1446,6 +1462,7 @@ export default function Page() {
         totalPages={currentTrackTotalPages}
         driversByGuid={driversByGuid}
         licenseMap={leaderboardLicenseMap}
+        ratingV2Map={ratingV2Map}
         deltas={deltas}
         syncStatus={syncStatus}
         onPageChange={setCurrentTrackPage}

@@ -29,6 +29,7 @@
     "supabase:deploy:server-status": "supabase functions deploy sync-server-status",
     "supabase:deploy:kmr-data": "supabase functions deploy sync-kmr-data",
     "supabase:deploy:results": "supabase functions deploy sync-results",
+    "supabase:deploy:ratings-v2": "supabase functions deploy sync-ratings-v2",
     "supabase:secrets:list": "supabase secrets list"
   },
   "engines": {

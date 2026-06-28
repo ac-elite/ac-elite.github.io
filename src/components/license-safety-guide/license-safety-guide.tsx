@@ -118,7 +118,7 @@ export function LicenseSafetyGuideButton({ compact = false }: LicenseSafetyGuide
         py: compact ? 0.75 : 1,
       }}
     >
-      {compact ? 'License / SR' : 'License / SR (BETA)'}
+      {compact ? 'License / SR' : 'License / SR'}
     </Button>
   );
 }

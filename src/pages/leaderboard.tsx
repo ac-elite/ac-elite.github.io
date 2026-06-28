@@ -10,6 +10,7 @@ import Stack from '@mui/material/Stack';
 import Table from '@mui/material/Table';
 import Select from '@mui/material/Select';
 import Button from '@mui/material/Button';
+import Tooltip from '@mui/material/Tooltip';
 import Skeleton from '@mui/material/Skeleton';
 import MenuItem from '@mui/material/MenuItem';
 import TableRow from '@mui/material/TableRow';
@@ -27,6 +28,10 @@ import { fetchJson } from 'src/lib/fetch-json';
 import { getDriverProfileHref } from 'src/lib/routes';
 import { getSiteUrl } from 'src/centralized/site-urls';
 import { fetchPrevRankData } from 'src/lib/delta';
+import { fetchRatingV2Map } from 'src/lib/rating-v2-data';
+import type { DriverRatingV2 } from 'src/lib/ac-elite-rating-v2';
+import { summarizeRatingV2 } from 'src/lib/ac-elite-rating-v2';
+import { ratingV2Enabled } from 'src/lib/rating-mode';
 import { useWindowedDriverDeltas } from 'src/lib/trend-window/trend-window-context';
 import { getSyncHealth, type SiteMetadata, getEffectiveLastSync } from 'src/lib/sync-utils';
 import { subtleRowEnterSx, glassCardMotionSx } from 'src/lib/subtle-motion';
@@ -105,6 +110,7 @@ export default function Page() {
   const [error, setError] = useState<string | null>(null);
   const [rankData, setRankData] = useState<RankDriver[]>([]);
   const [prevRankData, setPrevRankData] = useState<RankDriver[]>([]);
+  const [ratingV2Map, setRatingV2Map] = useState<Map<string, DriverRatingV2>>(new Map());
   const [leaderboardData, setLeaderboardData] = useState<Record<string, any>>({});
   const [metadata, setMetadata] = useState<SiteMetadata>({});
   // Per-row SR/pace deltas follow the shared trend-window filter.
@@ -119,7 +125,7 @@ export default function Page() {
       setLoading(true);
       setError(null);
       try {
-        const [rank, leaderboard, prevRank, trackJson, meta, liveStatus] = await Promise.all([
+        const [rank, leaderboard, prevRank, trackJson, meta, liveStatus, ratingsV2] = await Promise.all([
           fetchJson<RankDriver[]>(DATA_FILES.rank),
           fetchJson<Record<string, any>>(DATA_FILES.leaderboard),
           fetchPrevRankData(),
@@ -128,10 +134,12 @@ export default function Page() {
           canAttemptLiveServerStatusFetch()
             ? fetchLiveServerStatusFromSupabase()
             : Promise.resolve(null),
+          fetchRatingV2Map(),
         ]);
         if (!mounted) return;
         setRankData(rank);
         setPrevRankData(prevRank);
+        setRatingV2Map(ratingsV2);
         setLeaderboardData(leaderboard);
         setMetadata(meta);
         const canonicalSet = buildCanonicalLeaderboardTrackIdSet(leaderboard);
@@ -249,9 +257,9 @@ export default function Page() {
               syncHealth={syncHealth}
             >
               {rankData.length > 0 && (
-                <Box sx={{ pt: 0.5 }}>
+                <Stack spacing={1} sx={{ pt: 0.5 }}>
                   <TrendWindowStats variant="community" rankData={rankData} />
-                </Box>
+                </Stack>
               )}
             </DataPageHeader>
 
@@ -349,6 +357,14 @@ export default function Page() {
                             ({ guid: entry.guid, name: entry.name, kilometers: 0, collisions: 0 } as RankDriver);
                           const license = getDriverLicense(driver, licenseMap);
                           const sr = getDriverSR(driver);
+                          const ratingV2 =
+                            ratingV2Enabled() ? ratingV2Map.get(entry.guid) : undefined;
+                          const displayLicense = ratingV2
+                            ? { license: ratingV2.licenseTier, paceScore: ratingV2.licenseScore }
+                            : license;
+                          const displaySR = ratingV2
+                            ? { tier: ratingV2.safetyTier, sr: ratingV2.safetyRating }
+                            : sr;
                           const delta = deltas.get(entry.guid);
 
                           return (
@@ -389,40 +405,46 @@ export default function Page() {
                               </TableCell>
                               <TableCell>
                                 <Stack direction="row" spacing={1} alignItems="center">
+                                  <Tooltip title={ratingV2 ? summarizeRatingV2(ratingV2) : ''} arrow>
                                   <Chip
                                     size="small"
-                                    label={license.license}
+                                    label={displayLicense.license}
                                     onClick={(e) => { e.stopPropagation(); openGuide('license'); }}
                                     sx={{
                                       minWidth: LICENSE_CHIP_WIDTH,
                                       fontWeight: 700,
                                       justifyContent: 'center',
                                       cursor: 'pointer',
-                                      ...getLicenseBadgeSx(license.license),
+                                      ...getLicenseBadgeSx(displayLicense.license),
                                     }}
                                   />
+                                  </Tooltip>
                                   <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.secondary' }}>
-                                    {Math.round(license.paceScore).toLocaleString()}
+                                    {ratingV2
+                                      ? displayLicense.paceScore.toFixed(1)
+                                      : Math.round(displayLicense.paceScore).toLocaleString()}
                                   </Typography>
                                   {delta ? <DeltaChip value={Math.round(delta.deltaPace)} /> : null}
                                 </Stack>
                               </TableCell>
                               <TableCell>
                                 <Stack direction="row" spacing={1} alignItems="center">
+                                  <Tooltip title={ratingV2 ? summarizeRatingV2(ratingV2) : ''} arrow>
                                   <Chip
                                     size="small"
-                                    label={sr.tier}
+                                    label={displaySR.tier}
                                     onClick={(e) => { e.stopPropagation(); openGuide('safety'); }}
                                     sx={{
                                       minWidth: SR_CHIP_WIDTH,
                                       fontWeight: 700,
                                       justifyContent: 'center',
                                       cursor: 'pointer',
-                                      ...getSRBadgeSx(sr.tier),
+                                      ...getSRBadgeSx(displaySR.tier),
                                     }}
                                   />
+                                  </Tooltip>
                                   <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.secondary' }}>
-                                    {sr.sr.toFixed(2)}
+                                    {displaySR.sr.toFixed(2)}
                                   </Typography>
                                   {delta ? <DeltaChip value={delta.deltaSR} decimals={2} kind="sr" /> : null}
                                 </Stack>
