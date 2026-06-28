@@ -494,7 +494,7 @@ export function computeDriverRatingsV2(
 
 export function summarizeRatingV2(rating: DriverRatingV2): string {
   return [
-    `Rating v2`,
+    `Rating`,
     `License ${rating.licenseTier} (${rating.licenseScore.toFixed(1)})`,
     `SR ${rating.safetyTier} (${rating.safetyRating.toFixed(2)})`,
     `${rating.ratedSessions} rated sessions`,

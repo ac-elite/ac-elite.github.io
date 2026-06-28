@@ -258,19 +258,6 @@ export default function Page() {
             >
               {rankData.length > 0 && (
                 <Stack spacing={1} sx={{ pt: 0.5 }}>
-                  {ratingV2Enabled() && ratingV2Map.size > 0 && (
-                    <Chip
-                      size="small"
-                      label="Rating v2 active"
-                      sx={{
-                        alignSelf: { xs: 'center', md: 'flex-start' },
-                        fontWeight: 800,
-                        color: '#bfdbfe',
-                        bgcolor: 'rgba(59,130,246,0.13)',
-                        border: '1px solid rgba(96,165,250,0.36)',
-                      }}
-                    />
-                  )}
                   <TrendWindowStats variant="community" rankData={rankData} />
                 </Stack>
               )}

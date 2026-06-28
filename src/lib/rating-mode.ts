@@ -7,7 +7,7 @@ function normalizeRatingSystem(value: string | undefined): RatingSystem | null {
   return null;
 }
 
-/** Rating v2 is the official system; v1 remains available as an explicit fallback. */
+/** The current rating system is the default; legacy remains available as an explicit fallback. */
 export function getRatingSystem(): RatingSystem {
   return normalizeRatingSystem(import.meta.env.VITE_RATING_SYSTEM) ?? 'v2';
 }

@@ -24,7 +24,7 @@ export function RatingV2Badge({ rating }: { rating: DriverRatingV2 | null | unde
   return (
     <Chip
       size="small"
-      label="Rating v2"
+      label="Rating"
       sx={{
         fontWeight: 800,
         color: '#bfdbfe',
@@ -50,10 +50,10 @@ export function RatingV2Breakdown({ rating }: { rating: DriverRatingV2 | null | 
         </Stack>
         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.25}>
           {[
-            ['V1 pace', Math.round(b.paceRaw).toLocaleString()],
+            ['Base pace', Math.round(b.paceRaw).toLocaleString()],
             ['Racecraft', pct(b.racecraft)],
             ['Activity', pct(b.activity)],
-            ['V1 SR', b.legacySafetyRating.toFixed(2)],
+            ['Base SR', b.legacySafetyRating.toFixed(2)],
             ['Recent SR', b.resultsSafetyRating.toFixed(2)],
             ['Confidence', pct(b.confidence * 100)],
           ].map(([label, value]) => (
@@ -68,7 +68,7 @@ export function RatingV2Breakdown({ rating }: { rating: DriverRatingV2 | null | 
           ))}
         </Stack>
         <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-          Applied v2 adjustments: license {signedPct(b.recentLicenseAdjustmentPct)}, SR{' '}
+          Applied rating adjustments: license {signedPct(b.recentLicenseAdjustmentPct)}, SR{' '}
           {signedSr(b.recentSafetyAdjustment)}. Recent results can tune the rating, but cannot erase
           the historical KMR backbone.
         </Typography>
