@@ -36,6 +36,7 @@ export const AC_ELITE_SERVER_JOIN_HREF = SERVER_ENDPOINTS.join;
 
 const ACCENT = BRAND_ACCENT;
 const EMPTY = '-';
+const DETAILS_SLOT_MIN_HEIGHT = 146;
 const CAR_NAME_OVERRIDES: Record<string, string> = {
   tatuusfa1: 'Tatuus FA1',
 };
@@ -440,88 +441,97 @@ export function ServerJoinCard({
             borderTop: '1px solid rgba(226,242,255,0.12)',
           }}
         >
-          {loading ? (
-            <RaceLoader
-              variant="status"
-              compact
-              title="Checking server..."
-              message="Reading live lobby status."
-              sx={{ maxWidth: 1 }}
-            />
-          ) : (
-            <>
-              <Box
-                sx={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
-                  border: '1px solid rgba(226,242,255,0.12)',
-                  borderRadius: 1.35,
-                  overflow: 'hidden',
-                  background:
-                    'linear-gradient(180deg, rgba(255,255,255,0.038) 0%, rgba(255,255,255,0.012) 100%)',
-                  boxShadow: GLASS_BOXJE_RIM_SHADOW,
-                }}
-              >
-                <TelemetryCell label="Grid" value={playerValue} />
-                <TelemetryCell label="Phase" value={phaseValue} />
-                <TelemetryCell
-                  label="Car"
-                  value={carValue}
-                  title={carNames.join(', ') || cars.join(', ') || carValue}
-                />
-                <TelemetryCell label="Format" value={scheduleValue} title={scheduleValue} />
-              </Box>
-
-              <Stack spacing={0.75}>
-                <Stack
-                  direction="row"
-                  alignItems="center"
-                  justifyContent="space-between"
-                  spacing={1}
-                >
-                  <Typography
-                    variant="caption"
-                    sx={{
-                      color: 'rgba(226,232,240,0.55)',
-                      fontWeight: 800,
-                      textTransform: 'uppercase',
-                      fontSize: '0.64rem',
-                    }}
-                  >
-                    Slot load
-                  </Typography>
-                  <Typography
-                    variant="caption"
-                    sx={{ color: 'rgba(255,255,255,0.74)', fontWeight: 850 }}
-                  >
-                    {online && clients != null && maxclients != null ? `${occupancy}%` : EMPTY}
-                  </Typography>
-                </Stack>
+          <Box
+            sx={{
+              minHeight: DETAILS_SLOT_MIN_HEIGHT,
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+            }}
+          >
+            {loading ? (
+              <RaceLoader
+                variant="status"
+                compact
+                title="Checking server..."
+                message="Reading live lobby status."
+                sx={{ maxWidth: 1 }}
+              />
+            ) : (
+              <Stack spacing={1.35}>
                 <Box
-                  aria-hidden
                   sx={{
-                    height: 7,
-                    borderRadius: 999,
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+                    border: '1px solid rgba(226,242,255,0.12)',
+                    borderRadius: 1.35,
                     overflow: 'hidden',
-                    bgcolor: 'rgba(15,23,42,0.62)',
-                    border: '1px solid rgba(226,242,255,0.1)',
-                    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.08)',
+                    background:
+                      'linear-gradient(180deg, rgba(255,255,255,0.038) 0%, rgba(255,255,255,0.012) 100%)',
+                    boxShadow: GLASS_BOXJE_RIM_SHADOW,
                   }}
                 >
-                  <Box
-                    sx={{
-                      width: `${online ? occupancy : 0}%`,
-                      height: 1,
-                      borderRadius: 'inherit',
-                      background:
-                        'linear-gradient(90deg, rgba(56,189,248,0.92), rgba(147,197,253,0.82))',
-                      transition: 'width 420ms cubic-bezier(0.32, 0.72, 0, 1)',
-                    }}
+                  <TelemetryCell label="Grid" value={playerValue} />
+                  <TelemetryCell label="Phase" value={phaseValue} />
+                  <TelemetryCell
+                    label="Car"
+                    value={carValue}
+                    title={carNames.join(', ') || cars.join(', ') || carValue}
                   />
+                  <TelemetryCell label="Format" value={scheduleValue} title={scheduleValue} />
                 </Box>
+
+                <Stack spacing={0.75}>
+                  <Stack
+                    direction="row"
+                    alignItems="center"
+                    justifyContent="space-between"
+                    spacing={1}
+                  >
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        color: 'rgba(226,232,240,0.55)',
+                        fontWeight: 800,
+                        textTransform: 'uppercase',
+                        fontSize: '0.64rem',
+                      }}
+                    >
+                      Slot load
+                    </Typography>
+                    <Typography
+                      variant="caption"
+                      sx={{ color: 'rgba(255,255,255,0.74)', fontWeight: 850 }}
+                    >
+                      {online && clients != null && maxclients != null ? `${occupancy}%` : EMPTY}
+                    </Typography>
+                  </Stack>
+                  <Box
+                    aria-hidden
+                    sx={{
+                      height: 7,
+                      borderRadius: 999,
+                      overflow: 'hidden',
+                      bgcolor: 'rgba(15,23,42,0.62)',
+                      border: '1px solid rgba(226,242,255,0.1)',
+                      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.08)',
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        width: `${online ? occupancy : 0}%`,
+                        height: 1,
+                        borderRadius: 'inherit',
+                        background:
+                          'linear-gradient(90deg, rgba(56,189,248,0.92), rgba(147,197,253,0.82))',
+                        transition: 'width 420ms cubic-bezier(0.32, 0.72, 0, 1)',
+                      }}
+                    />
+                  </Box>
+                </Stack>
               </Stack>
-            </>
-          )}
+            )}
+          </Box>
 
           <Button
             component="a"
