@@ -139,6 +139,9 @@ type DriverView = {
 type CurrentTrackData = CurrentTrackPayload;
 
 const HOME_CURRENT_TRACK_PER_PAGE = 20;
+const COMMUNITY_PULSE_METRICS_HEIGHT = { xs: 174, sm: 64 };
+const COMMUNITY_PULSE_CHART_HEIGHT = { xs: 284, sm: 284 };
+const COMMUNITY_PULSE_FOOTER_MIN_HEIGHT = { xs: 44, sm: 20 };
 
 /**
  * Static Apple-style gradient keyword (white → soft ice-blue, clipped to text).
@@ -330,6 +333,14 @@ function CommunityPulseCard({
   const pulse = useMemo(() => buildCommunityPulse(rankData), [rankData]);
   const isLoading = loading && rankData.length === 0;
   const hasPulseData = pulse.buckets.some((bucket) => bucket.activeDrivers > 0);
+  const metricItems = [
+    { label: 'Active 7d', value: formatNumber(pulse.active7d) },
+    { label: 'Peak day', value: formatNumber(pulse.peakDrivers) },
+    {
+      label: 'Avg SR',
+      value: pulse.avgSafety7d == null ? '-' : pulse.avgSafety7d.toFixed(2),
+    },
+  ];
 
   return (
     <Box sx={softFloatWrapperSx({ alternatePhase: true })}>
@@ -355,20 +366,24 @@ function CommunityPulseCard({
             </Typography>
           </Box>
 
-          {!isLoading && (
+          <Box
+            sx={{
+              height: COMMUNITY_PULSE_METRICS_HEIGHT,
+              display: 'flex',
+              alignItems: 'stretch',
+            }}
+          >
             <Stack
               direction={{ xs: 'column', sm: 'row' }}
               spacing={1}
-              sx={{ alignItems: 'stretch', justifyContent: { xs: 'center', md: 'flex-start' } }}
+              sx={{
+                width: 1,
+                alignItems: 'stretch',
+                justifyContent: { xs: 'center', md: 'flex-start' },
+                visibility: isLoading ? 'hidden' : 'visible',
+              }}
             >
-              {[
-                { label: 'Active 7d', value: formatNumber(pulse.active7d) },
-                { label: 'Peak day', value: formatNumber(pulse.peakDrivers) },
-                {
-                  label: 'Avg SR',
-                  value: pulse.avgSafety7d == null ? '-' : pulse.avgSafety7d.toFixed(2),
-                },
-              ].map((item, tileIndex) => (
+              {metricItems.map((item, tileIndex) => (
                 <Box
                   key={item.label}
                   sx={{
@@ -392,130 +407,158 @@ function CommunityPulseCard({
                 </Box>
               ))}
             </Stack>
-          )}
+          </Box>
 
-          {isLoading ? (
-            <Box sx={{ ...GLASS_INNER_PANEL_SX, p: 1.5 }}>
-              <RaceLoader
-                compact
-                variant="spotlight"
-                title="Loading activity pulse..."
-                message="Matching recent laps to active drivers."
-                sx={{ maxWidth: 1 }}
-              />
-            </Box>
-          ) : hasPulseData ? (
-            <Box
-              sx={{
-                ...GLASS_INNER_PANEL_SX,
-                px: { xs: 0.5, sm: 1 },
-                py: 1.5,
-                overflow: 'hidden',
-                '& .apexcharts-bar-area': {
-                  filter: 'drop-shadow(0 7px 12px rgba(96,165,250,0.34))',
-                },
-              }}
-            >
-              <Chart
-                type="line"
-                height={238}
-                series={[
-                  {
-                    name: 'Active drivers',
-                    type: 'column',
-                    data: pulse.buckets.map((bucket) => bucket.activeDrivers),
+          <Box sx={{ height: COMMUNITY_PULSE_CHART_HEIGHT, width: 1, minWidth: 0 }}>
+            {isLoading ? (
+              <Box
+                sx={{
+                  ...GLASS_INNER_PANEL_SX,
+                  height: 1,
+                  p: 1.5,
+                  display: 'flex',
+                  alignItems: 'center',
+                }}
+              >
+                <RaceLoader
+                  compact
+                  variant="spotlight"
+                  title="Loading activity pulse..."
+                  message="Matching recent laps to active drivers."
+                  sx={{ maxWidth: 1 }}
+                />
+              </Box>
+            ) : hasPulseData ? (
+              <Box
+                sx={{
+                  ...GLASS_INNER_PANEL_SX,
+                  height: 1,
+                  width: 1,
+                  minWidth: 0,
+                  px: { xs: 0.5, sm: 1 },
+                  py: 1.5,
+                  overflow: 'hidden',
+                  '& > .MuiBox-root': {
+                    width: 1,
+                    minWidth: 0,
                   },
-                  {
-                    name: 'Avg SR',
-                    type: 'line',
-                    data: pulse.buckets.map((bucket) => bucket.avgSafety),
+                  '& .apexcharts-bar-area': {
+                    filter: 'drop-shadow(0 7px 12px rgba(96,165,250,0.34))',
                   },
-                ]}
-                options={{
-                  colors: ['#7DB3FF', '#22E07A'],
-                  fill: { opacity: [1, 1], type: ['solid', 'solid'] },
-                  grid: {
-                    padding: { top: 10, right: 4, bottom: 0, left: 0 },
-                    xaxis: { lines: { show: false } },
-                    yaxis: { lines: { show: true } },
-                  },
-                  labels: pulse.buckets.map((bucket) => bucket.label),
-                  legend: {
-                    position: 'top',
-                    horizontalAlign: 'left',
-                    offsetX: -10,
-                    markers: { size: 7 },
-                  },
-                  markers: { size: [0, 4], strokeColors: '#0b1430', strokeWidth: 2 },
-                  plotOptions: {
-                    bar: {
-                      borderRadius: 7,
-                      borderRadiusApplication: 'end',
-                      columnWidth: '62%',
-                      colors: {
-                        backgroundBarColors: ['rgba(255,255,255,0.06)'],
-                        backgroundBarOpacity: 1,
-                        backgroundBarRadius: 7,
+                }}
+              >
+                <Chart
+                  type="line"
+                  height={238}
+                  sx={{ width: 1, minWidth: 0 }}
+                  series={[
+                    {
+                      name: 'Active drivers',
+                      type: 'column',
+                      data: pulse.buckets.map((bucket) => bucket.activeDrivers),
+                    },
+                    {
+                      name: 'Avg SR',
+                      type: 'line',
+                      data: pulse.buckets.map((bucket) => bucket.avgSafety),
+                    },
+                  ]}
+                  options={{
+                    colors: ['#7DB3FF', '#22E07A'],
+                    fill: { opacity: [1, 1], type: ['solid', 'solid'] },
+                    grid: {
+                      padding: { top: 10, right: 4, bottom: 0, left: 0 },
+                      xaxis: { lines: { show: false } },
+                      yaxis: { lines: { show: true } },
+                    },
+                    labels: pulse.buckets.map((bucket) => bucket.label),
+                    legend: {
+                      position: 'top',
+                      horizontalAlign: 'left',
+                      offsetX: -10,
+                      markers: { size: 7 },
+                    },
+                    markers: { size: [0, 4], strokeColors: '#0b1430', strokeWidth: 2 },
+                    plotOptions: {
+                      bar: {
+                        borderRadius: 7,
+                        borderRadiusApplication: 'end',
+                        columnWidth: '62%',
+                        colors: {
+                          backgroundBarColors: ['rgba(255,255,255,0.06)'],
+                          backgroundBarOpacity: 1,
+                          backgroundBarRadius: 7,
+                        },
                       },
                     },
-                  },
-                  stroke: { curve: 'smooth', width: [0, 3.5], lineCap: 'round' },
-                  tooltip: {
-                    shared: true,
-                    y: [
-                      { formatter: (value: number) => `${formatNumber(value)} drivers` },
+                    stroke: { curve: 'smooth', width: [0, 3.5], lineCap: 'round' },
+                    tooltip: {
+                      shared: true,
+                      y: [
+                        { formatter: (value: number) => `${formatNumber(value)} drivers` },
+                        {
+                          formatter: (value: number) =>
+                            value == null ? 'No active drivers' : `${value.toFixed(2)} SR`,
+                        },
+                      ],
+                    },
+                    xaxis: {
+                      categories: pulse.buckets.map((bucket) => bucket.label),
+                    },
+                    yaxis: [
                       {
-                        formatter: (value: number) =>
-                          value == null ? 'No active drivers' : `${value.toFixed(2)} SR`,
+                        min: 0,
+                        labels: { formatter: (value: number) => formatNumber(Math.round(value)) },
+                      },
+                      {
+                        opposite: true,
+                        min: pulse.srAxisMin,
+                        max: pulse.srAxisMax,
+                        tickAmount: 4,
+                        labels: { formatter: (value: number) => value.toFixed(1) },
                       },
                     ],
-                  },
-                  xaxis: {
-                    categories: pulse.buckets.map((bucket) => bucket.label),
-                  },
-                  yaxis: [
-                    {
-                      min: 0,
-                      labels: { formatter: (value: number) => formatNumber(Math.round(value)) },
-                    },
-                    {
-                      opposite: true,
-                      min: pulse.srAxisMin,
-                      max: pulse.srAxisMax,
-                      tickAmount: 4,
-                      labels: { formatter: (value: number) => value.toFixed(1) },
-                    },
-                  ],
+                  }}
+                />
+              </Box>
+            ) : (
+              <Box
+                sx={{
+                  ...GLASS_INNER_PANEL_SX,
+                  height: 1,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  px: 2,
+                  py: 4,
                 }}
-              />
-            </Box>
-          ) : (
-            <Box sx={{ ...GLASS_INNER_PANEL_SX, py: 4 }}>
-              <Typography variant="body2" sx={{ color: 'text.secondary', textAlign: 'center' }}>
-                Activity pulse appears once driver sync data is available.
-              </Typography>
-            </Box>
-          )}
+              >
+                <Typography variant="body2" sx={{ color: 'text.secondary', textAlign: 'center' }}>
+                  Activity pulse appears once driver sync data is available.
+                </Typography>
+              </Box>
+            )}
+          </Box>
 
-          {!isLoading && (
-            <Stack
-              direction={{ xs: 'column', sm: 'row' }}
-              spacing={1}
-              sx={{
-                alignItems: { xs: 'center', sm: 'center' },
-                justifyContent: 'space-between',
-                color: 'text.secondary',
-                textAlign: { xs: 'center', sm: 'left' },
-              }}
-            >
-              <Typography variant="caption" sx={{ fontWeight: 700 }}>
-                {formatNumber(pulse.totalLaps7d)} total laps by recently active drivers
-              </Typography>
-              <Typography variant="caption" sx={{ color: syncStatus.color, fontWeight: 800 }}>
-                {syncStatus.label} · {syncStatus.ageText}
-              </Typography>
-            </Stack>
-          )}
+          <Stack
+            direction={{ xs: 'column', sm: 'row' }}
+            spacing={1}
+            sx={{
+              minHeight: COMMUNITY_PULSE_FOOTER_MIN_HEIGHT,
+              alignItems: { xs: 'center', sm: 'center' },
+              justifyContent: 'space-between',
+              color: 'text.secondary',
+              textAlign: { xs: 'center', sm: 'left' },
+              visibility: isLoading ? 'hidden' : 'visible',
+            }}
+          >
+            <Typography variant="caption" sx={{ fontWeight: 700 }}>
+              {formatNumber(pulse.totalLaps7d)} total laps by recently active drivers
+            </Typography>
+            <Typography variant="caption" sx={{ color: syncStatus.color, fontWeight: 800 }}>
+              {syncStatus.label} · {syncStatus.ageText}
+            </Typography>
+          </Stack>
         </Stack>
       </Box>
     </Box>
