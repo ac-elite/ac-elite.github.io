@@ -36,7 +36,8 @@ export const AC_ELITE_SERVER_JOIN_HREF = SERVER_ENDPOINTS.join;
 
 const ACCENT = BRAND_ACCENT;
 const EMPTY = '-';
-const DETAILS_SLOT_MIN_HEIGHT = 146;
+const HERO_SLOT_HEIGHT = { xs: 228, sm: 250, md: 278 };
+const DETAILS_SLOT_HEIGHT = { xs: 190, sm: 190 };
 const CAR_NAME_OVERRIDES: Record<string, string> = {
   tatuusfa1: 'Tatuus FA1',
 };
@@ -277,7 +278,7 @@ export function ServerJoinCard({
         <Box
           sx={{
             position: 'relative',
-            minHeight: { xs: 256, sm: 286, md: 318 },
+            height: HERO_SLOT_HEIGHT,
             overflow: 'hidden',
             background: 'linear-gradient(180deg, rgba(12,18,34,0.96) 0%, rgba(18,29,54,0.94) 100%)',
           }}
@@ -329,7 +330,7 @@ export function ServerJoinCard({
             sx={{
               position: 'relative',
               zIndex: 1,
-              minHeight: { xs: 256, sm: 286, md: 318 },
+              height: HERO_SLOT_HEIGHT,
               p: { xs: 2, sm: 2.35, md: 2.6 },
             }}
           >
@@ -443,10 +444,11 @@ export function ServerJoinCard({
         >
           <Box
             sx={{
-              minHeight: DETAILS_SLOT_MIN_HEIGHT,
+              height: DETAILS_SLOT_HEIGHT,
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'center',
+              overflow: 'hidden',
             }}
           >
             {loading ? (
