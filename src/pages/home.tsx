@@ -409,7 +409,7 @@ function CommunityPulseCard({
             </Stack>
           </Box>
 
-          <Box sx={{ height: COMMUNITY_PULSE_CHART_HEIGHT }}>
+          <Box sx={{ height: COMMUNITY_PULSE_CHART_HEIGHT, width: 1, minWidth: 0 }}>
             {isLoading ? (
               <Box
                 sx={{
@@ -433,11 +433,15 @@ function CommunityPulseCard({
                 sx={{
                   ...GLASS_INNER_PANEL_SX,
                   height: 1,
-                  display: 'flex',
-                  alignItems: 'center',
+                  width: 1,
+                  minWidth: 0,
                   px: { xs: 0.5, sm: 1 },
                   py: 1.5,
                   overflow: 'hidden',
+                  '& > .MuiBox-root': {
+                    width: 1,
+                    minWidth: 0,
+                  },
                   '& .apexcharts-bar-area': {
                     filter: 'drop-shadow(0 7px 12px rgba(96,165,250,0.34))',
                   },
@@ -446,6 +450,7 @@ function CommunityPulseCard({
                 <Chart
                   type="line"
                   height={238}
+                  sx={{ width: 1, minWidth: 0 }}
                   series={[
                     {
                       name: 'Active drivers',
