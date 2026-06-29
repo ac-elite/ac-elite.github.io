@@ -36,6 +36,21 @@ export const AC_ELITE_SERVER_JOIN_HREF = SERVER_ENDPOINTS.join;
 
 const ACCENT = BRAND_ACCENT;
 const EMPTY = '-';
+const CAR_NAME_OVERRIDES: Record<string, string> = {
+  tatuusfa1: 'Tatuus FA1',
+};
+const CAR_NAME_ACRONYMS = new Set([
+  'gt',
+  'gt2',
+  'gt3',
+  'gt4',
+  'dtm',
+  'fa1',
+  'f1',
+  'rsr',
+  'amg',
+  'r8',
+]);
 
 const statusCopy = {
   loading: { label: 'SYNCING', color: '#93c5fd', bg: 'rgba(147,197,253,0.15)' },
@@ -75,6 +90,27 @@ function isUsefulValue(value: string | null | undefined): value is string {
 
 function clampPercent(value: number): number {
   return Math.max(0, Math.min(100, Math.round(value)));
+}
+
+function formatCarName(raw: string): string {
+  const value = raw.trim();
+  if (!value) return EMPTY;
+
+  const override = CAR_NAME_OVERRIDES[value.toLowerCase()];
+  if (override) return override;
+
+  return value
+    .replace(/^ks_/i, '')
+    .split(/[_\s-]+/)
+    .filter(Boolean)
+    .map((part) => {
+      const lower = part.toLowerCase();
+      if (CAR_NAME_ACRONYMS.has(lower) || /^\d+[a-z]*$/i.test(part)) {
+        return part.toUpperCase();
+      }
+      return lower.charAt(0).toUpperCase() + lower.slice(1);
+    })
+    .join(' ');
 }
 
 function TelemetryCell({ label, value, title }: { label: string; value: string; title?: string }) {
@@ -194,13 +230,14 @@ export function ServerJoinCard({
   const cars = Array.isArray(info?.cars)
     ? (info.cars as unknown[]).filter((c): c is string => typeof c === 'string' && Boolean(c))
     : [];
+  const carNames = cars.map(formatCarName).filter((name) => name !== EMPTY);
   const carValue = loading
     ? EMPTY
     : !online
       ? EMPTY
       : liveDataAvailable
-        ? cars.length
-          ? `${cars.length} car${cars.length === 1 ? '' : 's'}`
+        ? carNames.length
+          ? carNames.join(', ')
           : EMPTY
         : 'No data';
 
@@ -427,7 +464,11 @@ export function ServerJoinCard({
               >
                 <TelemetryCell label="Grid" value={playerValue} />
                 <TelemetryCell label="Phase" value={phaseValue} />
-                <TelemetryCell label="Cars" value={carValue} title={cars.join(', ') || carValue} />
+                <TelemetryCell
+                  label="Car"
+                  value={carValue}
+                  title={carNames.join(', ') || cars.join(', ') || carValue}
+                />
                 <TelemetryCell label="Format" value={scheduleValue} title={scheduleValue} />
               </Box>
 
