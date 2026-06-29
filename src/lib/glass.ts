@@ -227,8 +227,7 @@ export const APP_NAV_SURFACE_SX: SystemStyleObject<Theme> = {
 };
 
 /** Sidebar nav item — resting state is transparent (sits on the nav surface). */
-export const GLASS_SIDEBAR_ITEM_HOVER_BG =
-  `linear-gradient(180deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.02) 100%), rgba(${BRAND.navBaseRgb},0.72)`;
+export const GLASS_SIDEBAR_ITEM_HOVER_BG = `linear-gradient(180deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.02) 100%), rgba(${BRAND.navBaseRgb},0.72)`;
 
 /**
  * Active sidebar item — frosted glass with a quiet brand tint rather than a
@@ -323,9 +322,20 @@ export const GLASS_DIALOG_SX: SxProps<Theme> = {
   overflow: 'hidden',
 };
 
+const GLASS_TABLE_HEAD_CELL_SX: SystemStyleObject<Theme> = {
+  backgroundColor: BRAND.navBase,
+  backgroundImage: `linear-gradient(180deg, rgb(${BRAND.navBaseRgb}) 0%, rgb(${BRAND.eliteBlueRgb}) 100%)`,
+  backgroundClip: 'padding-box',
+  boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.08), inset 0 -1px 0 rgba(148,163,184,0.26)',
+};
+
 export const GLASS_TABLE_CONTAINER_SX: SxProps<Theme> = {
   ...GLASS_CARD_INNER_SX,
   overflow: 'auto',
+  '& .MuiTableCell-head': GLASS_TABLE_HEAD_CELL_SX,
+  '& .MuiTable-stickyHeader .MuiTableCell-head': {
+    zIndex: 3,
+  },
 };
 
 export const GLASS_INLINE_CODE_SX: SxProps<Theme> = {
@@ -346,6 +356,7 @@ export const GLASS_TABLE_WRAPPER_SX: SxProps<Theme> = {
     borderRadius: 'inherit',
     overflow: 'auto',
   },
+  '& .MuiTableCell-head': GLASS_TABLE_HEAD_CELL_SX,
 };
 
 export const GLASS_TABLE_PAGINATION_SX: SxProps<Theme> = {
@@ -421,12 +432,7 @@ export function getTintedGlassInnerRowSx(accent: string): SystemStyleObject<Them
 
 /** Podium table row highlight (1 = gold, 2 = silver, 3 = bronze). */
 export function getPodiumRowSx(place: 1 | 2 | 3): SxProps<Theme> {
-  const rgb =
-    place === 1
-      ? '245,158,11'
-      : place === 2
-        ? '148,163,184'
-        : '194,101,31';
+  const rgb = place === 1 ? '245,158,11' : place === 2 ? '148,163,184' : '194,101,31';
 
   return {
     backgroundColor: `rgba(${rgb},0.045)`,

@@ -373,9 +373,7 @@ export function SiteVisitsShowcase({
                               <Table size="small" stickyHeader>
                                 <TableHead>
                                   <TableRow>
-                                    <TableCell
-                                      sx={{ fontWeight: 800, bgcolor: 'rgba(15,23,42,0.92)' }}
-                                    >
+                                    <TableCell sx={{ fontWeight: 800, bgcolor: 'rgb(15,23,42)' }}>
                                       Site area
                                     </TableCell>
                                     <TableCell
@@ -383,7 +381,7 @@ export function SiteVisitsShowcase({
                                       sx={{
                                         fontWeight: 800,
                                         width: 120,
-                                        bgcolor: 'rgba(15,23,42,0.92)',
+                                        bgcolor: 'rgb(15,23,42)',
                                       }}
                                     >
                                       Opens

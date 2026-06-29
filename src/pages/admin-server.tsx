@@ -436,14 +436,11 @@ export default function Page() {
                   sx={{
                     fontWeight: 800,
                     width: { xs: 220, sm: 240 },
-                    bgcolor: 'rgba(255,255,255,0.012)',
                   }}
                 >
                   Field
                 </TableCell>
-                <TableCell sx={{ fontWeight: 800, bgcolor: 'rgba(255,255,255,0.012)' }}>
-                  Value
-                </TableCell>
+                <TableCell sx={{ fontWeight: 800 }}>Value</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
