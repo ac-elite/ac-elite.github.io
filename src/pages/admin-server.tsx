@@ -54,11 +54,11 @@ type ScheduleEntry = {
 
 const SCHEDULE: readonly ScheduleEntry[] = [
   {
-    agendaWhen: ':00',
-    agendaSub: 'Every hour · UTC',
+    agendaWhen: ':00, :30',
+    agendaSub: 'Every 30 minutes · UTC',
     kind: 'recurring',
     workflow: 'Ranking sync (KMR)',
-    cron: '0 * * * *',
+    cron: '0,30 * * * *',
     what: 'Downloads the latest driver list and leaderboard from KMR so the website matches the league.',
     chain: 'Then: daily 24h snapshot → publish website',
   },

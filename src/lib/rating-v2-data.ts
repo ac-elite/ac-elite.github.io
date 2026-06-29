@@ -1,6 +1,12 @@
-import { supabaseFetch, supabaseBaseUrl, supabaseReadConfigured } from 'src/centralized/supabase-rest';
+import {
+  supabaseFetch,
+  supabaseBaseUrl,
+  supabaseReadConfigured,
+} from 'src/centralized/supabase-rest';
+import { DATA_FILES } from 'src/centralized/data-files';
 import { ratingV2Enabled } from 'src/lib/rating-mode';
 import type { DriverRatingV2 } from 'src/lib/ac-elite-rating-v2';
+import { fetchJson } from 'src/lib/fetch-json';
 
 type DriverRatingV2Row = {
   guid: string;
@@ -48,6 +54,15 @@ const BASE_SELECT = [
 ] as const;
 
 const DETAIL_SELECT = [...BASE_SELECT, 'breakdown'] as const;
+const RATING_V2_CACHE_MS = 5 * 60_000;
+
+type RatingV2Snapshot = {
+  generatedAt?: string;
+  ratings?: Array<Partial<DriverRatingV2> & Pick<DriverRatingV2, 'guid'>>;
+};
+
+let ratingV2MapCache: { value: Map<string, DriverRatingV2>; expiresAt: number } | null = null;
+let ratingV2MapPromise: Promise<Map<string, DriverRatingV2>> | null = null;
 
 function mapRow(row: DriverRatingV2Row): DriverRatingV2 {
   return {
@@ -74,9 +89,53 @@ function mapRow(row: DriverRatingV2Row): DriverRatingV2 {
   };
 }
 
-export async function fetchRatingV2Map(): Promise<Map<string, DriverRatingV2>> {
+function cloneRatingMap(map: Map<string, DriverRatingV2>): Map<string, DriverRatingV2> {
+  return new Map(map);
+}
+
+function snapshotToMap(snapshot: RatingV2Snapshot): Map<string, DriverRatingV2> {
   const map = new Map<string, DriverRatingV2>();
-  if (!ratingV2Enabled() || !supabaseReadConfigured()) return map;
+  const rows = Array.isArray(snapshot.ratings) ? snapshot.ratings : [];
+  for (const rating of rows) {
+    if (!rating?.guid) continue;
+    map.set(rating.guid, {
+      guid: rating.guid,
+      name: rating.name ?? '',
+      licenseTier: rating.licenseTier ?? 'Rookie',
+      licenseScore: rating.licenseScore ?? 0,
+      paceScore: rating.paceScore ?? 0,
+      racecraftScore: rating.racecraftScore ?? 0,
+      activityScore: rating.activityScore ?? 0,
+      safetyTier: rating.safetyTier ?? 'F',
+      safetyRating: rating.safetyRating ?? 1,
+      safetyScore: rating.safetyScore ?? 0,
+      confidence: rating.confidence ?? 0,
+      ratedSessions: rating.ratedSessions ?? 0,
+      ratedRaces: rating.ratedRaces ?? 0,
+      ratedKm: rating.ratedKm ?? 0,
+      totalKm: rating.totalKm ?? 0,
+      uniqueTracks: rating.uniqueTracks ?? 0,
+      incidentsPer100Km: rating.incidentsPer100Km ?? 0,
+      cutsPer100Km: rating.cutsPer100Km ?? 0,
+      ...(rating.breakdown ? { breakdown: rating.breakdown } : {}),
+      computedAt: rating.computedAt ?? snapshot.generatedAt ?? '',
+    });
+  }
+  return map;
+}
+
+async function fetchStaticRatingV2Map(): Promise<Map<string, DriverRatingV2> | null> {
+  try {
+    const snapshot = await fetchJson<RatingV2Snapshot>(DATA_FILES.ratingV2);
+    return snapshotToMap(snapshot);
+  } catch {
+    return null;
+  }
+}
+
+async function fetchSupabaseRatingV2Map(): Promise<Map<string, DriverRatingV2>> {
+  const map = new Map<string, DriverRatingV2>();
+  if (!supabaseReadConfigured()) return map;
 
   try {
     for (let from = 0; ; from += 1000) {
@@ -85,12 +144,15 @@ export async function fetchRatingV2Map(): Promise<Map<string, DriverRatingV2>> {
         select: BASE_SELECT.join(','),
         order: 'license_score.desc',
       });
-      const res = await supabaseFetch(`${supabaseBaseUrl()}/rest/v1/driver_ratings_v2?${params.toString()}`, {
-        headers: {
-          'Range-Unit': 'items',
-          Range: `${from}-${to}`,
-        },
-      });
+      const res = await supabaseFetch(
+        `${supabaseBaseUrl()}/rest/v1/driver_ratings_v2?${params.toString()}`,
+        {
+          headers: {
+            'Range-Unit': 'items',
+            Range: `${from}-${to}`,
+          },
+        }
+      );
       if (!res.ok) break;
       const rows = (await res.json()) as DriverRatingV2Row[];
       for (const row of rows) map.set(row.guid, mapRow(row));
@@ -103,22 +165,53 @@ export async function fetchRatingV2Map(): Promise<Map<string, DriverRatingV2>> {
   return map;
 }
 
-export async function fetchRatingV2ForDriver(guid: string): Promise<DriverRatingV2 | null> {
-  if (!guid || !ratingV2Enabled() || !supabaseReadConfigured()) return null;
+export async function fetchRatingV2Map(): Promise<Map<string, DriverRatingV2>> {
+  if (!ratingV2Enabled()) return new Map();
+  if (ratingV2MapCache && Date.now() < ratingV2MapCache.expiresAt) {
+    return cloneRatingMap(ratingV2MapCache.value);
+  }
 
-  const params = new URLSearchParams({
-    select: DETAIL_SELECT.join(','),
-    guid: `eq.${guid}`,
-    limit: '1',
-  });
+  if (!ratingV2MapPromise) {
+    ratingV2MapPromise = (async () => {
+      const staticMap = await fetchStaticRatingV2Map();
+      const map = staticMap ?? (await fetchSupabaseRatingV2Map());
+      ratingV2MapCache = { value: map, expiresAt: Date.now() + RATING_V2_CACHE_MS };
+      return map;
+    })().finally(() => {
+      ratingV2MapPromise = null;
+    });
+  }
 
   try {
-    const res = await supabaseFetch(`${supabaseBaseUrl()}/rest/v1/driver_ratings_v2?${params.toString()}`);
-    if (!res.ok) return null;
-    const rows = (await res.json()) as DriverRatingV2Row[];
-    return rows[0] ? mapRow(rows[0]) : null;
+    return cloneRatingMap(await ratingV2MapPromise);
   } catch {
-    return null;
+    return new Map();
   }
 }
 
+export async function fetchRatingV2ForDriver(guid: string): Promise<DriverRatingV2 | null> {
+  if (!guid || !ratingV2Enabled()) return null;
+
+  if (supabaseReadConfigured()) {
+    const params = new URLSearchParams({
+      select: DETAIL_SELECT.join(','),
+      guid: `eq.${guid}`,
+      limit: '1',
+    });
+
+    try {
+      const res = await supabaseFetch(
+        `${supabaseBaseUrl()}/rest/v1/driver_ratings_v2?${params.toString()}`
+      );
+      if (res.ok) {
+        const rows = (await res.json()) as DriverRatingV2Row[];
+        if (rows[0]) return mapRow(rows[0]);
+      }
+    } catch {
+      // Fall through to the public snapshot below.
+    }
+  }
+
+  const staticMap = await fetchStaticRatingV2Map();
+  return staticMap?.get(guid) ?? null;
+}

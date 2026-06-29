@@ -12,7 +12,7 @@ on:
   # Temporary public stats source until Cloudflare/R2 is in place.
   # Keep KMR rank/leaderboard fresh without using Supabase Storage as the CDN.
   schedule:
-    - cron: "0,30 * * * *"
+    - cron: '0,30 * * * *'
 
   # Allow manual trigger
   workflow_dispatch:
@@ -34,7 +34,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: "24"
+          node-version: '24'
 
       - name: Install dependencies
         run: npm install basic-ftp
@@ -199,6 +199,117 @@ jobs:
           }
 
           syncData();
+          EOF
+
+      - name: Export rating v2 snapshot
+        env:
+          SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+        run: |
+          node << 'EOF'
+          const fs = require('fs');
+          const path = require('path');
+
+          async function main() {
+            const dataDir = path.join(process.cwd(), 'public', 'data');
+            const finalPath = path.join(dataDir, 'rating-v2.json');
+            const minExportIntervalMs = 60 * 60 * 1000;
+            const forceExport = process.env.GITHUB_EVENT_NAME === 'workflow_dispatch';
+
+            if (!forceExport && fs.existsSync(finalPath)) {
+              try {
+                const existing = JSON.parse(fs.readFileSync(finalPath, 'utf8'));
+                const generatedAt = Date.parse(existing.generatedAt || '');
+                if (Number.isFinite(generatedAt) && Date.now() - generatedAt < minExportIntervalMs) {
+                  console.log('rating-v2.json is still fresh; skipping Supabase export.');
+                  return;
+                }
+              } catch {
+                console.log('rating-v2.json exists but could not be read; refreshing snapshot.');
+              }
+            }
+
+            const supabaseUrl = (process.env.SUPABASE_URL || '').trim().replace(/\/$/, '');
+            const supabaseKey = (process.env.SUPABASE_ANON_KEY || '').trim();
+            if (!supabaseUrl || !supabaseKey) {
+              console.log('Supabase read secrets missing; skipping rating-v2.json export.');
+              return;
+            }
+
+            const select = [
+              'guid',
+              'name',
+              'license_tier',
+              'license_score',
+              'safety_tier',
+              'safety_rating',
+              'confidence',
+              'rated_sessions',
+              'rated_km',
+              'computed_at',
+            ];
+
+            function supabaseHeaders(extra = {}) {
+              const headers = {
+                apikey: supabaseKey,
+                'Content-Type': 'application/json',
+                ...extra,
+              };
+              if (!supabaseKey.startsWith('sb_')) headers.Authorization = `Bearer ${supabaseKey}`;
+              return headers;
+            }
+
+            function mapRating(row) {
+              return {
+                guid: row.guid,
+                name: row.name || '',
+                licenseTier: row.license_tier,
+                licenseScore: row.license_score,
+                safetyTier: row.safety_tier,
+                safetyRating: row.safety_rating,
+                confidence: row.confidence,
+                ratedSessions: row.rated_sessions,
+                ratedKm: row.rated_km,
+                computedAt: row.computed_at,
+              };
+            }
+
+            async function fetchPage(from) {
+              const to = from + 999;
+              const params = new URLSearchParams({
+                select: select.join(','),
+                order: 'license_score.desc',
+              });
+              const res = await fetch(`${supabaseUrl}/rest/v1/driver_ratings_v2?${params.toString()}`, {
+                headers: supabaseHeaders({
+                  'Range-Unit': 'items',
+                  Range: `${from}-${to}`,
+                }),
+              });
+              if (!res.ok) {
+                throw new Error(`driver_ratings_v2 export failed: ${res.status} ${res.statusText}`);
+              }
+              return res.json();
+            }
+
+            const ratings = [];
+            for (let from = 0; ; from += 1000) {
+              const rows = await fetchPage(from);
+              ratings.push(...rows.map(mapRating));
+              if (rows.length < 1000) break;
+            }
+
+            fs.mkdirSync(dataDir, { recursive: true });
+            const tempPath = `${finalPath}.tmp`;
+            fs.writeFileSync(tempPath, JSON.stringify({ generatedAt: new Date().toISOString(), ratings }));
+            JSON.parse(fs.readFileSync(tempPath, 'utf8'));
+            fs.renameSync(tempPath, finalPath);
+            console.log(`Exported ${ratings.length} rating v2 rows to public/data/rating-v2.json`);
+          }
+
+          main().catch((error) => {
+            console.log(`Rating v2 snapshot export skipped: ${error.message}`);
+          });
           EOF
 
       - name: Commit and push changes

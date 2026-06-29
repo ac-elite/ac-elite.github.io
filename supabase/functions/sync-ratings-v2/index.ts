@@ -204,7 +204,11 @@ function forceRequested(req: Request): boolean {
 async function fetchSourceState(supabase: ReturnType<typeof createClient>): Promise<SourceState> {
   const [{ data: kmr }, { data: results }] = await Promise.all([
     supabase.from('kmr_sync').select('synced_at,status,rank_count').eq('id', 1).maybeSingle(),
-    supabase.from('results_sync').select('synced_at,status,session_count').eq('id', 1).maybeSingle(),
+    supabase
+      .from('results_sync')
+      .select('synced_at,status,session_count')
+      .eq('id', 1)
+      .maybeSingle(),
   ]);
   const kmrRow = (kmr ?? {}) as KmrSyncRow;
   const resultsRow = (results ?? {}) as ResultsSyncRow;
@@ -226,7 +230,9 @@ async function fetchSourceState(supabase: ReturnType<typeof createClient>): Prom
   };
 }
 
-async function fetchLastSync(supabase: ReturnType<typeof createClient>): Promise<RatingSyncRow | null> {
+async function fetchLastSync(
+  supabase: ReturnType<typeof createClient>
+): Promise<RatingSyncRow | null> {
   const { data, error } = await supabase
     .from('rating_sync_v2')
     .select('synced_at,source_signature,status')
@@ -240,7 +246,9 @@ async function writeSyncStatus(
   supabase: ReturnType<typeof createClient>,
   payload: Record<string, unknown>
 ): Promise<void> {
-  await supabase.from('rating_sync_v2').upsert({ id: 1, checked_at: new Date().toISOString(), ...payload }, { onConflict: 'id' });
+  await supabase
+    .from('rating_sync_v2')
+    .upsert({ id: 1, checked_at: new Date().toISOString(), ...payload }, { onConflict: 'id' });
 }
 
 function skipReason(
@@ -307,7 +315,11 @@ function licenseTier(r: {
   return 'Bronze';
 }
 
-function recentLicenseAdjustmentPct(racecraftScore: number, confidence: number, ratedRaces: number): number {
+function recentLicenseAdjustmentPct(
+  racecraftScore: number,
+  confidence: number,
+  ratedRaces: number
+): number {
   if (ratedRaces < 5) return 0;
   return clamp(((racecraftScore - 65) / 100) * confidence * 0.06, -0.04, 0.04);
 }
@@ -355,7 +367,9 @@ function computeSessionStats(sessions: SessionRow[], computedAt: string): Sessio
       const field = activeGuids.size;
       const finishPos = classRow?.pos ?? null;
       const finishQuality =
-        session.type === 'RACE' && finishPos != null && field > 1 ? (field - finishPos) / (field - 1) : null;
+        session.type === 'RACE' && finishPos != null && field > 1
+          ? (field - finishPos) / (field - 1)
+          : null;
       const cuts = driverLaps.reduce((sum, lap) => sum + (lap.cuts ?? 0), 0);
       const stat: SessionStat = {
         session_id: session.id,
@@ -379,7 +393,9 @@ function computeSessionStats(sessions: SessionRow[], computedAt: string): Sessio
         collision_points: 0,
         safety_incident_points: 0,
         racecraft_points:
-          finishQuality == null ? null : clamp((finishQuality * 0.78 + completion * 0.22) * 100, 0, 100),
+          finishQuality == null
+            ? null
+            : clamp((finishQuality * 0.78 + completion * 0.22) * 100, 0, 100),
         excluded_reason: excluded,
         computed_at: computedAt,
       };
@@ -407,7 +423,10 @@ function computeSessionStats(sessions: SessionRow[], computedAt: string): Sessio
 
     for (const stat of byGuid.values()) {
       stat.safety_incident_points =
-        stat.collision_points + stat.cuts * 0.15 + stat.penalty_count * 1.5 + (stat.disqualified ? 5 : 0);
+        stat.collision_points +
+        stat.cuts * 0.15 +
+        stat.penalty_count * 1.5 +
+        (stat.disqualified ? 5 : 0);
     }
   }
 
@@ -416,7 +435,10 @@ function computeSessionStats(sessions: SessionRow[], computedAt: string): Sessio
 
 function computeRatings(rank: RankDriver[], stats: SessionStat[], computedAt: string) {
   const licenseMap = computeLicenseMap(rank);
-  const maxPace = Math.max(1, ...rank.map((driver) => getDriverLicense(driver, licenseMap).paceScore));
+  const maxPace = Math.max(
+    1,
+    ...rank.map((driver) => getDriverLicense(driver, licenseMap).paceScore)
+  );
   const statsByGuid = new Map<string, SessionStat[]>();
   for (const stat of stats) {
     const list = statsByGuid.get(stat.guid) ?? [];
@@ -427,7 +449,9 @@ function computeRatings(rank: RankDriver[], stats: SessionStat[], computedAt: st
   return rank.map((driver) => {
     const driverStats = statsByGuid.get(driver.guid) ?? [];
     const included = driverStats.filter((stat) => !stat.excluded_reason);
-    const raceStats = included.filter((stat) => stat.type === 'RACE' && stat.racecraft_points != null);
+    const raceStats = included.filter(
+      (stat) => stat.type === 'RACE' && stat.racecraft_points != null
+    );
     const totalKm = num(driver.kilometers);
     const ratedKm = included.reduce((sum, stat) => sum + stat.rated_km, 0);
     const paceRaw = getDriverLicense(driver, licenseMap).paceScore;
@@ -449,7 +473,11 @@ function computeRatings(rank: RankDriver[], stats: SessionStat[], computedAt: st
     const incidentsPer100 = ratedKm > 0 ? (incidentPoints / ratedKm) * 100 : 0;
     const cutsPer100 = ratedKm > 0 ? (cuts / ratedKm) * 100 : 0;
     const rawSafety = ratedKm > 0 ? 1 + 8.99 / (1 + incidentsPer100 / 2.5) : 2.5;
-    const confidence = clamp(Math.sqrt(ratedKm / 1200) * 0.7 + clamp(included.length / 20, 0, 1) * 0.3, 0, 1);
+    const confidence = clamp(
+      Math.sqrt(ratedKm / 1200) * 0.7 + clamp(included.length / 20, 0, 1) * 0.3,
+      0,
+      1
+    );
     const resultsSafetyRating = clamp(2.5 + (rawSafety - 2.5) * confidence, 1, 9.99);
     const legacySafetyRating = safetyRating(driver);
     const legacySafetyTier = getSRTier(legacySafetyRating, totalKm);
@@ -610,13 +638,15 @@ async function fetchAllSessions(supabase: ReturnType<typeof createClient>): Prom
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS });
-  if (req.method !== 'POST' && req.method !== 'GET') return new Response('Method Not Allowed', { status: 405, headers: CORS });
+  if (req.method !== 'POST' && req.method !== 'GET')
+    return new Response('Method Not Allowed', { status: 405, headers: CORS });
 
   const cronSecret = Deno.env.get('CRON_SECRET');
   if (!cronSecret) return json({ error: 'CRON_SECRET not configured' }, 500);
   const auth = req.headers.get('Authorization');
   const bearer = auth?.startsWith('Bearer ') ? auth.slice(7).trim() : '';
-  if (bearer !== cronSecret && req.headers.get('x-cron-secret') !== cronSecret) return json({ error: 'unauthorized' }, 401);
+  if (bearer !== cronSecret && req.headers.get('x-cron-secret') !== cronSecret)
+    return json({ error: 'unauthorized' }, 401);
 
   const supabaseUrl = Deno.env.get('SUPABASE_URL');
   const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
@@ -625,7 +655,7 @@ Deno.serve(async (req) => {
   const supabase = createClient(supabaseUrl, serviceKey, {
     auth: { persistSession: false, autoRefreshToken: false },
   });
-  const minIntervalMinutes = envInt('RATING_V2_MIN_INTERVAL_MINUTES', 360, 0, 1440);
+  const minIntervalMinutes = envInt('RATING_V2_MIN_INTERVAL_MINUTES', 60, 0, 1440);
   const forced = forceRequested(req);
 
   try {
@@ -654,8 +684,11 @@ Deno.serve(async (req) => {
     });
 
     const computedAt = new Date().toISOString();
-    const { data: rankBlob, error: rankError } = await supabase.storage.from(BUCKET).download('rank.json');
-    if (rankError || !rankBlob) throw new Error(`rank download failed: ${rankError?.message ?? 'missing blob'}`);
+    const { data: rankBlob, error: rankError } = await supabase.storage
+      .from(BUCKET)
+      .download('rank.json');
+    if (rankError || !rankBlob)
+      throw new Error(`rank download failed: ${rankError?.message ?? 'missing blob'}`);
     const rank = JSON.parse(await rankBlob.text()) as RankDriver[];
     if (!Array.isArray(rank)) return json({ error: 'rank.json is not an array' }, 502);
 
@@ -667,7 +700,9 @@ Deno.serve(async (req) => {
     if (resetError) throw new Error(`rating v2 reset failed: ${resetError.message}`);
 
     for (let i = 0; i < stats.length; i += 1000) {
-      const { error } = await supabase.from('driver_session_stats_v2').insert(stats.slice(i, i + 1000));
+      const { error } = await supabase
+        .from('driver_session_stats_v2')
+        .insert(stats.slice(i, i + 1000));
       if (error) throw new Error(`session stat insert failed: ${error.message}`);
     }
 
