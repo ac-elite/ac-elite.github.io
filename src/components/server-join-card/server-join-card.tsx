@@ -1,16 +1,21 @@
-import type { ReactNode } from 'react';
-import type { AcServerInfo } from 'src/lib/server-info';
-import type { Theme, SxProps } from '@mui/material/styles';
-import type { CurrentTrackPayload } from 'src/lib/server-status';
+import { Icon } from '@iconify/react';
 
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
-import Grid from '@mui/material/Grid';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 
-import { GLASS_PADDING, GLASS_PANEL_SX, GLASS_CARD_INNER_HOVER_SX } from 'src/lib/glass';
+import type { AcServerInfo } from 'src/lib/server-info';
+import type { Theme, SxProps } from '@mui/material/styles';
+import type { CurrentTrackPayload } from 'src/lib/server-status';
+
+import {
+  GLASS_PADDING,
+  GLASS_PANEL_SX,
+  GLASS_BOXJE_RIM_SHADOW,
+  GLASS_BOXJE_RIM_SHADOW_HOVER,
+} from 'src/lib/glass';
 import { SERVER_ENDPOINTS } from 'src/centralized/server-endpoints';
 import { formatTimeAgo } from 'src/lib/sync-utils';
 import { BRAND_ACCENT } from 'src/lib/status-accent';
@@ -27,69 +32,17 @@ import {
 
 import { RaceLoader } from 'src/components/race-loader';
 
-/** Content Manager deep link (same host/query as admin / workflows). */
 export const AC_ELITE_SERVER_JOIN_HREF = SERVER_ENDPOINTS.join;
 
-/** Zelfde accent als `brandAccentBorderSx()` / glass panels (geen lime LFM-kleur). */
 const ACCENT = BRAND_ACCENT;
-const ACCENT_SOFT = 'rgba(147, 197, 253, 0.14)';
-const ACCENT_BORDER = 'rgba(147, 197, 253, 0.42)';
-const ACCENT_BORDER_STRONG = 'rgba(147, 197, 253, 0.58)';
-const HERO_BODY_BG = 'rgba(8,14,28,0.82)';
+const EMPTY = '-';
 
-const badgeSx = {
-  height: 'clamp(18px, 5vw, 20px)',
-  fontSize: 'clamp(0.58rem, 0.52rem + 0.24vw, 0.64rem)',
-  fontWeight: 800,
-  borderRadius: 1,
-  '& .MuiChip-label': { px: 0.8 },
+const statusCopy = {
+  loading: { label: 'SYNCING', color: '#93c5fd', bg: 'rgba(147,197,253,0.15)' },
+  online: { label: 'ONLINE', color: '#7dd3fc', bg: 'rgba(14,165,233,0.14)' },
+  offline: { label: 'OFFLINE', color: 'rgba(226,232,240,0.84)', bg: 'rgba(148,163,184,0.16)' },
 } as const;
 
-const infoBlockSx = {
-  ...GLASS_CARD_INNER_HOVER_SX,
-  borderRadius: 1.1,
-  px: { xs: 1, md: 0.75 },
-  /** Equal top/bottom padding; inner Stack uses fixed gap + lineHeight so content looks balanced. */
-  py: { xs: 1.5, md: 1.15 },
-  display: 'flex',
-  flexDirection: 'column',
-  justifyContent: 'center',
-  minWidth: 0,
-  cursor: 'default',
-} as const;
-
-const infoLabelSx = {
-  color: 'rgba(255,255,255,0.55)',
-  lineHeight: 1.2,
-} as const;
-
-const infoValueSx = {
-  fontWeight: 800,
-  lineHeight: 1.25,
-  fontSize: { xs: 'clamp(0.75rem, 0.66rem + 0.42vw, 0.875rem)', md: '0.8125rem' },
-} as const;
-
-function ServerInfoBlock({ label, children }: { label: string; children: ReactNode }) {
-  return (
-    <Box sx={infoBlockSx}>
-      <Stack spacing={0.55} sx={{ width: '100%' }}>
-        <Typography variant="caption" sx={infoLabelSx}>
-          {label}
-        </Typography>
-        {children}
-      </Stack>
-    </Box>
-  );
-}
-
-export type ServerJoinCardProps = {
-  currentTrack: CurrentTrackPayload | null;
-  joinHref?: string;
-  loading?: boolean;
-  sx?: SxProps<Theme>;
-};
-
-/** Minstens één veld uit /INFO dat we echt kunnen tonen (lege `{}` telt niet mee). */
 function hasLiveSessionMetrics(info: AcServerInfo | null | undefined): boolean {
   if (!info || typeof info !== 'object') return false;
   if (typeof info.clients === 'number' && Number.isFinite(info.clients)) return true;
@@ -100,9 +53,9 @@ function hasLiveSessionMetrics(info: AcServerInfo | null | undefined): boolean {
 }
 
 function formatSessionKicker(iso?: string): string {
-  if (!iso) return '-';
+  if (!iso) return EMPTY;
   const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return '-';
+  if (Number.isNaN(d.getTime())) return EMPTY;
   return d
     .toLocaleString('en-GB', {
       weekday: 'short',
@@ -115,24 +68,69 @@ function formatSessionKicker(iso?: string): string {
     .toUpperCase();
 }
 
-/** Minimal "arrow into bracket" join mark (no extra icon package). */
-function JoinGlyphIcon() {
+function isUsefulValue(value: string | null | undefined): value is string {
+  if (!value) return false;
+  return value !== '-' && value !== '—' && value !== 'â€”';
+}
+
+function clampPercent(value: number): number {
+  return Math.max(0, Math.min(100, Math.round(value)));
+}
+
+function TelemetryCell({ label, value, title }: { label: string; value: string; title?: string }) {
   return (
     <Box
-      component="svg"
-      viewBox="0 0 24 24"
-      aria-hidden
       sx={{
-        width: 'clamp(17px, 4.5vw, 20px)',
-        height: 'clamp(17px, 4.5vw, 20px)',
-        display: 'block',
-        color: ACCENT,
+        minWidth: 0,
+        py: 1.05,
+        px: { xs: 1, sm: 1.15 },
+        borderRight: '1px solid rgba(226,242,255,0.1)',
+        borderBottom: '1px solid rgba(226,242,255,0.1)',
+        '&:nth-of-type(2n)': {
+          borderRight: 'none',
+        },
+        '&:nth-of-type(n+3)': {
+          borderBottom: 'none',
+        },
       }}
     >
-      <path fill="currentColor" d="M14 4h6v16h-6v-2h4V6h-4V4zM4 12l6 5v-3h6v-4h-6V9L4 12z" />
+      <Typography
+        variant="caption"
+        sx={{
+          display: 'block',
+          color: 'rgba(226,232,240,0.54)',
+          fontWeight: 800,
+          lineHeight: 1.15,
+          textTransform: 'uppercase',
+          fontSize: '0.64rem',
+        }}
+      >
+        {label}
+      </Typography>
+      <Typography
+        variant="body2"
+        title={title ?? value}
+        noWrap
+        sx={{
+          mt: 0.45,
+          color: '#fff',
+          fontWeight: 900,
+          lineHeight: 1.2,
+          fontSize: 'clamp(0.78rem, 0.69rem + 0.34vw, 0.92rem)',
+        }}
+      >
+        {value}
+      </Typography>
     </Box>
   );
 }
+
+export type ServerJoinCardProps = {
+  currentTrack: CurrentTrackPayload | null;
+  joinHref?: string;
+  loading?: boolean;
+  sx?: SxProps<Theme>;
+};
 
 export function ServerJoinCard({
   currentTrack,
@@ -141,208 +139,347 @@ export function ServerJoinCard({
   sx,
 }: ServerJoinCardProps) {
   useTrackCatalogVersion();
+
   const online = !loading && Boolean(currentTrack?.online);
-  /** When offline, do not surface merged static fallback (last track / lobby) — card must read as down. */
   const rawTrack = online ? (currentTrack?.track?.trim() ?? '') : '';
   const fetchedAt = currentTrack?.fetchedAt;
   const info = online ? currentTrack?.info : undefined;
   const liveDataAvailable = Boolean(online && fetchedAt && hasLiveSessionMetrics(info));
+
+  const heroSrc = rawTrack ? getTrackHeroImageSrc(rawTrack) : null;
+  const heroOffsetY = rawTrack ? getTrackHeroImageOffsetY(rawTrack) : 0;
+
   const trackTitle = loading
-    ? 'Syncing server data'
+    ? 'Checking server'
     : !online
       ? 'Server offline'
       : rawTrack
         ? getTrackDisplayName(normalizeServerTrackId(rawTrack))
-        : 'No session';
-  const updatedLine = fetchedAt ? `Updated ${formatTimeAgo(fetchedAt)}` : '—';
+        : 'Session pending';
+  const updatedLine = loading
+    ? 'Reading live status'
+    : fetchedAt
+      ? `Updated ${formatTimeAgo(fetchedAt)}`
+      : 'Awaiting timing';
   const updatedTitle = formatSessionKicker(fetchedAt);
-  const resolvedUpdatedLine = loading ? 'Checking live status...' : updatedLine;
 
   const clients = typeof info?.clients === 'number' ? info.clients : null;
   const maxclients = typeof info?.maxclients === 'number' ? info.maxclients : null;
-  const slotsLabel = loading
-    ? ''
+  const occupancy =
+    clients != null && maxclients != null && maxclients > 0
+      ? clampPercent((clients / maxclients) * 100)
+      : 0;
+  const playerValue = loading
+    ? EMPTY
     : !online
-      ? '—'
+      ? EMPTY
       : liveDataAvailable
         ? clients != null && maxclients != null
-          ? `${clients} / ${maxclients}`
+          ? `${clients}/${maxclients}`
           : clients != null
             ? `${clients}`
-            : '-'
-        : 'Data unavailable';
-  const cars = Array.isArray(info?.cars)
-    ? (info.cars as unknown[]).filter((c): c is string => typeof c === 'string' && Boolean(c))
-    : [];
+            : EMPTY
+        : 'No data';
 
   const phase = acCurrentSessionLabel(info);
   const timeLeft = formatTimeLeftSeconds(info?.timeleft);
+  const phaseValue = loading
+    ? EMPTY
+    : !online
+      ? EMPTY
+      : liveDataAvailable
+        ? [phase, timeLeft].filter(isUsefulValue).join(' / ') || EMPTY
+        : 'No data';
+
+  const cars = Array.isArray(info?.cars)
+    ? (info.cars as unknown[]).filter((c): c is string => typeof c === 'string' && Boolean(c))
+    : [];
+  const carValue = loading
+    ? EMPTY
+    : !online
+      ? EMPTY
+      : liveDataAvailable
+        ? cars.length
+          ? `${cars.length} car${cars.length === 1 ? '' : 's'}`
+          : EMPTY
+        : 'No data';
+
   const schedule = formatSessionDurationsLine(info?.sessiontypes, info?.durations, info?.timed, {
     inverted: typeof info?.inverted === 'number' ? info.inverted : undefined,
     lobbyName: typeof info?.name === 'string' ? info.name : undefined,
   });
-
-  const phaseSummary = loading
-    ? ''
+  const scheduleValue = loading
+    ? EMPTY
     : !online
-      ? '—'
+      ? EMPTY
       : liveDataAvailable
-        ? [phase, timeLeft].filter((v) => v && v !== '-').join(' · ') || '-'
-        : 'Data unavailable';
+        ? (schedule ?? EMPTY)
+        : 'No data';
 
   const rawLobbyName = typeof info?.name === 'string' ? info.name.trim() : '';
   const lobbyName = rawLobbyName ? sanitizeServerLobbyDisplayName(rawLobbyName) : '';
+  const statusTone = loading ? statusCopy.loading : online ? statusCopy.online : statusCopy.offline;
 
-  const heroSrc = rawTrack ? getTrackHeroImageSrc(rawTrack) : null;
-  const heroOffsetY = rawTrack ? getTrackHeroImageOffsetY(rawTrack) : 0;
   return (
     <Box sx={softFloatWrapperSx()}>
-      <Box sx={[GLASS_PANEL_SX, { width: '100%', p: 0, overflow: 'hidden' }, sx] as SxProps<Theme>}>
-        <Box sx={{ position: 'relative', lineHeight: 0, overflow: 'hidden' }}>
+      <Box
+        sx={
+          [
+            GLASS_PANEL_SX,
+            {
+              width: '100%',
+              p: 0,
+              overflow: 'hidden',
+              borderColor: online ? 'rgba(125,211,252,0.2)' : 'rgba(226,242,255,0.11)',
+            },
+            sx,
+          ] as SxProps<Theme>
+        }
+      >
+        <Box
+          sx={{
+            position: 'relative',
+            minHeight: { xs: 256, sm: 286, md: 318 },
+            overflow: 'hidden',
+            background: 'linear-gradient(180deg, rgba(12,18,34,0.96) 0%, rgba(18,29,54,0.94) 100%)',
+          }}
+        >
           {heroSrc ? (
             <Box
               component="img"
               src={heroSrc}
               alt=""
-              width={800}
-              height={450}
+              width={900}
+              height={560}
               sx={{
+                position: 'absolute',
+                inset: 0,
                 width: '100%',
-                height: { xs: 'clamp(118px, 34vw, 148px)', sm: 168 },
+                height: '100%',
                 objectFit: 'cover',
                 objectPosition:
                   heroOffsetY === 0 ? 'center' : `center calc(50% + ${heroOffsetY}px)`,
-                display: 'block',
+                filter: online ? 'saturate(1.08) contrast(1.03)' : 'saturate(0.55) contrast(0.92)',
+                transform: 'scale(1.012)',
               }}
             />
           ) : (
             <Box
               aria-hidden
               sx={{
-                width: '100%',
-                height: { xs: 'clamp(118px, 34vw, 148px)', sm: 168 },
+                position: 'absolute',
+                inset: 0,
                 background:
-                  'radial-gradient(circle at 85% 10%, rgba(147, 197, 253, 0.12), transparent 45%), linear-gradient(180deg, rgba(16,20,32,0.92) 0%, rgba(10,14,24,0.95) 100%), repeating-linear-gradient(0deg, rgba(148,163,184,0.08) 0px, rgba(148,163,184,0.08) 1px, transparent 1px, transparent 28px), repeating-linear-gradient(90deg, rgba(148,163,184,0.08) 0px, rgba(148,163,184,0.08) 1px, transparent 1px, transparent 28px)',
+                  'linear-gradient(135deg, rgba(147,197,253,0.12) 0%, rgba(147,197,253,0.025) 34%, rgba(8,13,25,0.12) 68%), repeating-linear-gradient(135deg, rgba(226,242,255,0.055) 0 1px, transparent 1px 44px)',
               }}
             />
           )}
+
           <Box
             aria-hidden
             sx={{
-              pointerEvents: 'none',
               position: 'absolute',
               inset: 0,
               background:
-                'linear-gradient(180deg, rgba(6,10,20,0.06) 0%, rgba(7,12,24,0.5) 52%, rgba(8,14,28,0.82) 86%, rgba(8,14,28,0.82) 100%)',
+                'linear-gradient(180deg, rgba(6,10,20,0.18) 0%, rgba(6,10,20,0.22) 30%, rgba(7,12,24,0.78) 76%, rgba(7,12,24,0.94) 100%), linear-gradient(90deg, rgba(7,12,24,0.92) 0%, rgba(7,12,24,0.55) 46%, rgba(7,12,24,0.16) 100%)',
             }}
           />
+
+          <Stack
+            spacing={2.1}
+            justifyContent="space-between"
+            sx={{
+              position: 'relative',
+              zIndex: 1,
+              minHeight: { xs: 256, sm: 286, md: 318 },
+              p: { xs: 2, sm: 2.35, md: 2.6 },
+            }}
+          >
+            <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={1.2}>
+              <Stack direction="row" alignItems="center" spacing={0.9} sx={{ minWidth: 0 }}>
+                <Box
+                  aria-hidden
+                  sx={{
+                    width: 8,
+                    height: 8,
+                    borderRadius: '50%',
+                    bgcolor: statusTone.color,
+                    boxShadow: `0 0 0 4px ${statusTone.bg}`,
+                    flexShrink: 0,
+                  }}
+                />
+                <Typography
+                  variant="caption"
+                  noWrap
+                  sx={{
+                    color: 'rgba(226,232,240,0.78)',
+                    fontWeight: 900,
+                    lineHeight: 1,
+                    textTransform: 'uppercase',
+                    fontSize: '0.68rem',
+                  }}
+                >
+                  AC Elite server
+                </Typography>
+              </Stack>
+
+              <Chip
+                size="small"
+                label={statusTone.label}
+                sx={{
+                  height: 23,
+                  borderRadius: 1,
+                  bgcolor: statusTone.bg,
+                  color: statusTone.color,
+                  border: `1px solid ${online || loading ? 'rgba(186,230,253,0.36)' : 'rgba(226,232,240,0.22)'}`,
+                  fontWeight: 900,
+                  fontSize: '0.64rem',
+                  '& .MuiChip-label': { px: 0.85 },
+                }}
+              />
+            </Stack>
+
+            <Stack spacing={1.2} sx={{ maxWidth: 430 }}>
+              <Typography
+                variant="caption"
+                title={loading ? undefined : updatedTitle !== EMPTY ? updatedTitle : undefined}
+                sx={{
+                  color: ACCENT,
+                  fontWeight: 900,
+                  lineHeight: 1,
+                  textTransform: 'uppercase',
+                  fontSize: '0.68rem',
+                }}
+              >
+                {updatedLine}
+              </Typography>
+              <Typography
+                variant="h3"
+                sx={{
+                  fontWeight: 950,
+                  lineHeight: 0.98,
+                  fontSize: {
+                    xs: 'clamp(1.65rem, 7vw, 2.35rem)',
+                    md: 'clamp(1.9rem, 2.5vw, 2.55rem)',
+                  },
+                  maxWidth: 1,
+                  textWrap: 'balance',
+                  textShadow: '0 12px 28px rgba(0,0,0,0.52)',
+                }}
+              >
+                {trackTitle}
+              </Typography>
+              <Typography
+                variant="body2"
+                title={lobbyName || undefined}
+                sx={{
+                  color: 'rgba(255,255,255,0.78)',
+                  fontWeight: 750,
+                  lineHeight: 1.35,
+                  minHeight: 38,
+                  display: '-webkit-box',
+                  WebkitLineClamp: 2,
+                  WebkitBoxOrient: 'vertical',
+                  overflow: 'hidden',
+                  maxWidth: 390,
+                }}
+              >
+                {loading
+                  ? 'Collecting lobby state.'
+                  : !online
+                    ? 'No active lobby while the server is down.'
+                    : lobbyName || 'Official AC Elite lobby'}
+              </Typography>
+            </Stack>
+          </Stack>
         </Box>
 
         <Stack
-          spacing={1.75}
+          spacing={1.35}
           sx={{
-            /** Same gutter as {@link GLASS_PANEL_SX} / Race Intelligence — one token for all glass cards. */
             p: GLASS_PADDING.panel,
-            backgroundColor: heroSrc ? HERO_BODY_BG : 'rgba(8,14,28,0.34)',
-            backdropFilter: heroSrc ? 'blur(20px) saturate(170%)' : undefined,
-            WebkitBackdropFilter: heroSrc ? 'blur(20px) saturate(170%)' : undefined,
+            pt: { xs: 1.65, sm: 1.85 },
+            background: 'linear-gradient(180deg, rgba(23,33,59,0.94) 0%, rgba(18,28,52,0.98) 100%)',
+            borderTop: '1px solid rgba(226,242,255,0.12)',
           }}
         >
-          <Stack direction="row" justifyContent="space-between" alignItems="center">
-            <Typography
-              variant="caption"
-              sx={{ color: 'rgba(255,255,255,0.72)', fontWeight: 700, letterSpacing: 0.5 }}
-            >
-              AC ELITE SERVER
-            </Typography>
-            <Chip
-              size="small"
-              label={loading ? 'SYNCING' : online ? 'ONLINE' : 'OFFLINE'}
-              sx={{
-                ...badgeSx,
-                bgcolor: online || loading ? ACCENT_SOFT : 'rgba(148,163,184,0.18)',
-                color: online || loading ? ACCENT : 'rgba(203,213,225,0.9)',
-                border: `1px solid ${online || loading ? ACCENT_BORDER : 'rgba(148,163,184,0.35)'}`,
-              }}
-            />
-          </Stack>
-
-          <Typography variant="h6" sx={{ fontWeight: 800, lineHeight: 1.15 }}>
-            {trackTitle}
-          </Typography>
-          <Typography
-            variant="caption"
-            title={loading ? undefined : updatedTitle !== '-' ? updatedTitle : undefined}
-            sx={{ color: 'rgba(255,255,255,0.56)', fontWeight: 600, letterSpacing: 0.06 }}
-          >
-            {resolvedUpdatedLine}
-          </Typography>
-
-          <Typography
-            variant="body2"
-            sx={{
-              display: '-webkit-box',
-              WebkitLineClamp: 2,
-              WebkitBoxOrient: 'vertical',
-              overflow: 'hidden',
-              color: 'rgba(255,255,255,0.88)',
-              fontWeight: 700,
-              fontSize: 'clamp(0.8125rem, 0.7rem + 0.5vw, 0.9375rem)',
-              lineHeight: 1.35,
-              minHeight: 'clamp(32px, 9vw, 38px)',
-            }}
-            title={lobbyName || undefined}
-          >
-            {loading
-              ? 'Reading the latest live lobby state.'
-              : !online
-                ? 'No live lobby while the server is down.'
-                : lobbyName
-                  ? lobbyName
-                  : liveDataAvailable
-                    ? 'AC Elite official server'
-                    : 'Live data unavailable'}
-          </Typography>
-
           {loading ? (
-            <RaceLoader variant="status" compact title="" message="" sx={{ maxWidth: 1 }} />
+            <RaceLoader
+              variant="status"
+              compact
+              title="Checking server..."
+              message="Reading live lobby status."
+              sx={{ maxWidth: 1 }}
+            />
           ) : (
-            <Grid container spacing={0.85}>
-              <Grid size={{ xs: 6, md: 2 }} sx={{ minWidth: 0 }}>
-                <ServerInfoBlock label="Players">
-                  <Typography variant="body2" sx={infoValueSx} noWrap title={slotsLabel}>
-                    {slotsLabel}
+            <>
+              <Box
+                sx={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+                  border: '1px solid rgba(226,242,255,0.12)',
+                  borderRadius: 1.35,
+                  overflow: 'hidden',
+                  background:
+                    'linear-gradient(180deg, rgba(255,255,255,0.038) 0%, rgba(255,255,255,0.012) 100%)',
+                  boxShadow: GLASS_BOXJE_RIM_SHADOW,
+                }}
+              >
+                <TelemetryCell label="Grid" value={playerValue} />
+                <TelemetryCell label="Phase" value={phaseValue} />
+                <TelemetryCell label="Cars" value={carValue} title={cars.join(', ') || carValue} />
+                <TelemetryCell label="Format" value={scheduleValue} title={scheduleValue} />
+              </Box>
+
+              <Stack spacing={0.75}>
+                <Stack
+                  direction="row"
+                  alignItems="center"
+                  justifyContent="space-between"
+                  spacing={1}
+                >
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      color: 'rgba(226,232,240,0.55)',
+                      fontWeight: 800,
+                      textTransform: 'uppercase',
+                      fontSize: '0.64rem',
+                    }}
+                  >
+                    Slot load
                   </Typography>
-                </ServerInfoBlock>
-              </Grid>
-              <Grid size={{ xs: 6, md: 3 }} sx={{ minWidth: 0 }}>
-                <ServerInfoBlock label="Phase">
-                  <Typography variant="body2" sx={infoValueSx} noWrap title={phaseSummary}>
-                    {phaseSummary}
+                  <Typography
+                    variant="caption"
+                    sx={{ color: 'rgba(255,255,255,0.74)', fontWeight: 850 }}
+                  >
+                    {online && clients != null && maxclients != null ? `${occupancy}%` : EMPTY}
                   </Typography>
-                </ServerInfoBlock>
-              </Grid>
-              <Grid size={{ xs: 6, md: 3 }} sx={{ minWidth: 0 }}>
-                <ServerInfoBlock label="Cars">
-                  <Typography variant="body2" sx={infoValueSx} noWrap title={cars.join(', ')}>
-                    {!online
-                      ? '—'
-                      : liveDataAvailable
-                        ? cars.length
-                          ? cars.join(', ')
-                          : '-'
-                        : 'Data unavailable'}
-                  </Typography>
-                </ServerInfoBlock>
-              </Grid>
-              <Grid size={{ xs: 12, md: 4 }} sx={{ minWidth: 0 }}>
-                <ServerInfoBlock label="Schedule">
-                  <Typography variant="body2" sx={infoValueSx} noWrap title={schedule ?? '-'}>
-                    {!online ? '—' : liveDataAvailable ? (schedule ?? '-') : 'Data unavailable'}
-                  </Typography>
-                </ServerInfoBlock>
-              </Grid>
-            </Grid>
+                </Stack>
+                <Box
+                  aria-hidden
+                  sx={{
+                    height: 7,
+                    borderRadius: 999,
+                    overflow: 'hidden',
+                    bgcolor: 'rgba(15,23,42,0.62)',
+                    border: '1px solid rgba(226,242,255,0.1)',
+                    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.08)',
+                  }}
+                >
+                  <Box
+                    sx={{
+                      width: `${online ? occupancy : 0}%`,
+                      height: 1,
+                      borderRadius: 'inherit',
+                      background:
+                        'linear-gradient(90deg, rgba(56,189,248,0.92), rgba(147,197,253,0.82))',
+                      transition: 'width 420ms cubic-bezier(0.32, 0.72, 0, 1)',
+                    }}
+                  />
+                </Box>
+              </Stack>
+            </>
           )}
 
           <Button
@@ -350,33 +487,25 @@ export function ServerJoinCard({
             href={joinHref}
             target="_blank"
             rel="noreferrer"
-            variant="outlined"
-            color="primary"
+            variant="contained"
             fullWidth
-            size="small"
             aria-label="Join official server in Content Manager"
-            startIcon={<JoinGlyphIcon />}
+            startIcon={<Icon icon="solar:login-3-bold" width={20} height={20} />}
             sx={{
-              minHeight: 'clamp(34px, 9vw, 40px)',
+              minHeight: { xs: 42, sm: 46 },
               borderRadius: 1.35,
-              border: `1px solid ${ACCENT_BORDER_STRONG}`,
+              color: '#fff',
+              fontWeight: 950,
+              textShadow: '0 1px 0 rgba(15,23,42,0.38)',
               background:
-                'radial-gradient(120% 120% at 18% -30%, rgba(255,255,255,0.15), rgba(255,255,255,0.03) 40%, transparent 64%),' +
-                `linear-gradient(180deg, ${ACCENT_SOFT} 0%, rgba(59,130,246,0.07) 100%)`,
-              color: ACCENT,
-              fontWeight: 800,
-              backdropFilter: 'blur(18px) saturate(170%)',
-              WebkitBackdropFilter: 'blur(18px) saturate(170%)',
-              boxShadow:
-                'inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -1px 0 rgba(255,255,255,0.032)',
-              '& .MuiButton-startIcon': { mr: 0.75 },
+                'linear-gradient(180deg, rgba(96,165,250,0.66) 0%, rgba(37,99,235,0.58) 100%)',
+              border: '1px solid rgba(219,234,254,0.26)',
+              boxShadow: `${GLASS_BOXJE_RIM_SHADOW}, 0 16px 30px -18px rgba(59,130,246,0.86)`,
+              '& .MuiButton-startIcon': { mr: 0.85 },
               '&:hover': {
-                borderColor: 'rgba(191, 225, 255, 0.74)',
                 background:
-                  'radial-gradient(120% 120% at 18% -30%, rgba(255,255,255,0.22), rgba(255,255,255,0.045) 40%, transparent 64%),' +
-                  'linear-gradient(180deg, rgba(147,197,253,0.22) 0%, rgba(59,130,246,0.1) 100%)',
-                boxShadow:
-                  'inset 0 1px 0 rgba(255,255,255,0.22), inset 0 -1px 0 rgba(255,255,255,0.04)',
+                  'linear-gradient(180deg, rgba(125,211,252,0.72) 0%, rgba(59,130,246,0.62) 100%)',
+                boxShadow: `${GLASS_BOXJE_RIM_SHADOW_HOVER}, 0 18px 34px -18px rgba(59,130,246,0.96)`,
               },
             }}
           >
