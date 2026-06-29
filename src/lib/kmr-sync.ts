@@ -1,13 +1,15 @@
 import { getSupabaseClient } from 'src/lib/supabase-client';
-import { supabaseReadConfigured, supabaseTemporarilyUnavailable } from 'src/centralized/supabase-rest';
+import {
+  supabaseReadConfigured,
+  supabaseTemporarilyUnavailable,
+} from 'src/centralized/supabase-rest';
 
-/** Opt out of Supabase Storage-driven refreshes for the large KMR JSON blobs. */
-function kmrStorageDisabled(): boolean {
-  const v = (
-    import.meta.env.VITE_SUPABASE_KMR_STORAGE ??
-    import.meta.env.VITE_SUPABASE_KMR_DATA
-  )?.trim().toLowerCase();
-  return v === '0' || v === 'false' || v === 'no' || v === 'off';
+/** Opt in to Supabase Storage-driven refreshes for the large KMR JSON blobs. */
+function kmrStorageEnabled(): boolean {
+  const v = (import.meta.env.VITE_SUPABASE_KMR_STORAGE ?? import.meta.env.VITE_SUPABASE_KMR_DATA)
+    ?.trim()
+    .toLowerCase();
+  return v === '1' || v === 'true' || v === 'yes' || v === 'on';
 }
 
 /**
@@ -17,7 +19,7 @@ function kmrStorageDisabled(): boolean {
  * Returns an unsubscribe function; no-op when Supabase reads are unavailable.
  */
 export function subscribeKmrSync(onSync: () => void): () => void {
-  if (kmrStorageDisabled() || !supabaseReadConfigured()) return () => {};
+  if (!kmrStorageEnabled() || !supabaseReadConfigured()) return () => {};
   if (supabaseTemporarilyUnavailable()) return () => {};
   const client = getSupabaseClient();
   if (!client) return () => {};
@@ -46,13 +48,9 @@ export function subscribeKmrSync(onSync: () => void): () => void {
 
   const channel = client
     .channel('kmr-sync-live')
-    .on(
-      'postgres_changes',
-      { event: '*', schema: 'public', table: 'kmr_sync' },
-      () => {
-        triggerSync();
-      }
-    )
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'kmr_sync' }, () => {
+      triggerSync();
+    })
     .subscribe();
   return () => {
     if (hasDocument) document.removeEventListener('visibilitychange', onVisibilityChange);

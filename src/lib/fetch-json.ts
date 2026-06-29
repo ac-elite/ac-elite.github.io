@@ -31,17 +31,16 @@ let kmrVersionCache: { value: string | null; expiresAt: number } = {
 };
 let kmrVersionPromise: Promise<string | null> | null = null;
 
-/** Opt out of Supabase Storage for the large KMR JSON blobs. */
-function kmrStorageDisabled(): boolean {
-  const v = (
-    import.meta.env.VITE_SUPABASE_KMR_STORAGE ??
-    import.meta.env.VITE_SUPABASE_KMR_DATA
-  )?.trim().toLowerCase();
-  return v === '0' || v === 'false' || v === 'no' || v === 'off';
+/** Opt in to Supabase Storage for the large KMR JSON blobs. */
+function kmrStorageEnabled(): boolean {
+  const v = (import.meta.env.VITE_SUPABASE_KMR_STORAGE ?? import.meta.env.VITE_SUPABASE_KMR_DATA)
+    ?.trim()
+    .toLowerCase();
+  return v === '1' || v === 'true' || v === 'yes' || v === 'on';
 }
 
 function supabaseStorageUrl(objectName: string): string | null {
-  if (kmrStorageDisabled() || !supabaseReadConfigured()) return null;
+  if (!kmrStorageEnabled() || !supabaseReadConfigured()) return null;
   return `${supabaseBaseUrl()}/storage/v1/object/public/${KMR_BUCKET}/${objectName}`;
 }
 
@@ -64,7 +63,8 @@ async function fetchKmrStorageVersion(): Promise<string | null> {
         supabase: true,
         timeoutMs: SUPABASE_STORAGE_TIMEOUT_MS,
       });
-      const version = typeof meta.lastSync === 'string' && meta.lastSync.trim() ? meta.lastSync : null;
+      const version =
+        typeof meta.lastSync === 'string' && meta.lastSync.trim() ? meta.lastSync : null;
       kmrVersionCache = { value: version, expiresAt: Date.now() + KMR_VERSION_CACHE_MS };
       return version;
     } catch {
@@ -95,7 +95,9 @@ async function fetchJsonAt<T>(
   // up to an hour. Unlike `no-store`, unchanged files can still answer `304` (~300 B).
   const init: RequestInit = { cache: options.cache ?? 'no-cache' };
   const res = options.supabase
-    ? await supabaseFetch(requestUrl, init, { timeoutMs: options.timeoutMs ?? SUPABASE_STORAGE_TIMEOUT_MS })
+    ? await supabaseFetch(requestUrl, init, {
+        timeoutMs: options.timeoutMs ?? SUPABASE_STORAGE_TIMEOUT_MS,
+      })
     : await fetch(requestUrl, init);
   if (!res.ok) throw new Error(`Failed to fetch ${requestUrl}: ${res.status} ${res.statusText}`);
   return (await res.json()) as T;
