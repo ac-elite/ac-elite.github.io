@@ -3691,8 +3691,8 @@
  {
   "guid": "76561198037237397",
   "name": "Friedrich Hartmann",
-  "points": 1189.5819999999999,
-  "kilometers": 10513.9,
+  "points": 1189.582,
+  "kilometers": 10518.1,
   "collisions": 447,
   "leaderboard": {
    "mugello_": {
@@ -3822,7 +3822,7 @@
     }
    }
   },
-  "last_seen": 1784829699572,
+  "last_seen": 1785260795219,
   "wins": 29,
   "podiums": 102,
   "poles": 9,
@@ -12855,6 +12855,42 @@
   "infr": 4
  },
  {
+  "guid": "76561198975381349",
+  "name": "Oliver Bell",
+  "points": 204.69,
+  "kilometers": 1728.1,
+  "collisions": 11,
+  "leaderboard": {
+   "ks_zandvoort_": {
+    "tatuusfa1": {
+     "laptime": 95735,
+     "laps": 61,
+     "ts": 1756766499322
+    }
+   },
+   "monza_": {
+    "tatuusfa1": {
+     "laptime": 111900,
+     "laps": 80,
+     "ts": 1756998311348
+    }
+   },
+   "ks_vallelunga_extended_circuit": {
+    "tatuusfa1": {
+     "laptime": 96007,
+     "laps": 1,
+     "ts": 1785251445596
+    }
+   }
+  },
+  "last_seen": 1785251872190,
+  "wins": 4,
+  "podiums": 13,
+  "poles": 2,
+  "flaps": 1,
+  "infr": 3
+ },
+ {
   "guid": "76561198870830103",
   "name": "keulers13",
   "points": 204.61,
@@ -13130,35 +13166,6 @@
   "poles": 1,
   "flaps": 2,
   "infr": 5
- },
- {
-  "guid": "76561198975381349",
-  "name": "Oliver Bell",
-  "points": 202.453,
-  "kilometers": 1715.1,
-  "collisions": 9,
-  "leaderboard": {
-   "ks_zandvoort_": {
-    "tatuusfa1": {
-     "laptime": 95735,
-     "laps": 61,
-     "ts": 1756766499322
-    }
-   },
-   "monza_": {
-    "tatuusfa1": {
-     "laptime": 111900,
-     "laps": 80,
-     "ts": 1756998311348
-    }
-   }
-  },
-  "last_seen": 1785251225807,
-  "wins": 4,
-  "podiums": 13,
-  "poles": 2,
-  "flaps": 1,
-  "infr": 3
  },
  {
   "guid": "76561198877219488",
