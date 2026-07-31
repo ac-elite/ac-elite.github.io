@@ -2,8 +2,8 @@
  {
   "guid": "76561198025621442",
   "name": "DIEnamic",
-  "points": 16849.045000000002,
-  "kilometers": 73330.2,
+  "points": 16854.085,
+  "kilometers": 73388.4,
   "collisions": 2943,
   "leaderboard": {
    "ks_zandvoort_": {
@@ -121,12 +121,12 @@
    "ks_vallelunga_extended_circuit": {
     "tatuusfa1": {
      "laptime": 92360,
-     "laps": 450,
-     "ts": 1785435717077
+     "laps": 462,
+     "ts": 1785509978350
     }
    }
   },
-  "last_seen": 1785435803062,
+  "last_seen": 1785509981804,
   "wins": 651,
   "podiums": 1338,
   "poles": 77,
@@ -5207,7 +5207,7 @@
  {
   "guid": "76561198877133702",
   "name": "NavJaxx",
-  "points": 734.7149999999999,
+  "points": 734.715,
   "kilometers": 3190.6,
   "collisions": 116,
   "leaderboard": {
@@ -5282,7 +5282,7 @@
     }
    }
   },
-  "last_seen": 1785435782677,
+  "last_seen": 1785509981804,
   "wins": 27,
   "podiums": 38,
   "poles": 14,
@@ -166125,6 +166125,21 @@
   "leaderboard": {
   },
   "last_seen": 1777502423149,
+  "wins": 0,
+  "podiums": 0,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 0
+ },
+ {
+  "guid": "76561199888997489",
+  "name": "Yaneya",
+  "points": 49.944,
+  "kilometers": 0,
+  "collisions": 0,
+  "leaderboard": {
+  },
+  "last_seen": 1785489566504,
   "wins": 0,
   "podiums": 0,
   "poles": 0,
@@ -406410,28 +406425,6 @@
   "infr": 4
  },
  {
-  "guid": "76561199815189795",
-  "name": "David Obregón",
-  "points": 21.354,
-  "kilometers": 83.9,
-  "collisions": 9,
-  "leaderboard": {
-   "ks_vallelunga_classic_circuit": {
-    "tatuusfa1": {
-     "laptime": 73041,
-     "laps": 3,
-     "ts": 1767131321084
-    }
-   }
-  },
-  "last_seen": 1767131577318,
-  "wins": 0,
-  "podiums": 0,
-  "poles": 0,
-  "flaps": 0,
-  "infr": 1
- },
- {
   "guid": "76561198874489046",
   "name": "ManoBolas",
   "points": 21.35,
@@ -406720,6 +406713,28 @@
   "poles": 0,
   "flaps": 0,
   "infr": 2
+ },
+ {
+  "guid": "76561199815189795",
+  "name": "David Obregón",
+  "points": 21.192,
+  "kilometers": 74.5,
+  "collisions": 10,
+  "leaderboard": {
+   "ks_vallelunga_classic_circuit": {
+    "tatuusfa1": {
+     "laptime": 73041,
+     "laps": 3,
+     "ts": 1767131321084
+    }
+   }
+  },
+  "last_seen": 1785500813568,
+  "wins": 0,
+  "podiums": 0,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 1
  },
  {
   "guid": "76561199247721536",
