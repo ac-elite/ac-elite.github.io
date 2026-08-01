@@ -2,9 +2,9 @@
  {
   "guid": "76561198025621442",
   "name": "DIEnamic",
-  "points": 17053.743000000002,
-  "kilometers": 74242.9,
-  "collisions": 2979,
+  "points": 17067.103,
+  "kilometers": 74330.1,
+  "collisions": 2982,
   "leaderboard": {
    "ks_zandvoort_": {
     "tatuusfa1": {
@@ -121,14 +121,14 @@
    "ks_vallelunga_extended_circuit": {
     "tatuusfa1": {
      "laptime": 92360,
-     "laps": 640,
-     "ts": 1785605776771
+     "laps": 660,
+     "ts": 1785612950835
     }
    }
   },
-  "last_seen": 1785606649030,
-  "wins": 661,
-  "podiums": 1353,
+  "last_seen": 1785613002162,
+  "wins": 662,
+  "podiums": 1355,
   "poles": 77,
   "flaps": 264,
   "infr": 28
@@ -1543,8 +1543,8 @@
  {
   "guid": "76561198845443064",
   "name": "Peter Paris",
-  "points": 2455.25,
-  "kilometers": 13968.9,
+  "points": 2455.79,
+  "kilometers": 13981.4,
   "collisions": 720,
   "leaderboard": {
    "ks_zandvoort_": {
@@ -1661,13 +1661,13 @@
    },
    "ks_vallelunga_extended_circuit": {
     "tatuusfa1": {
-     "laptime": 92827,
-     "laps": 79,
-     "ts": 1785530906620
+     "laptime": 92555,
+     "laps": 81,
+     "ts": 1785612828380
     }
    }
   },
-  "last_seen": 1785530967432,
+  "last_seen": 1785613002161,
   "wins": 68,
   "podiums": 194,
   "poles": 10,
@@ -3705,8 +3705,8 @@
  {
   "guid": "76561198037237397",
   "name": "Friedrich Hartmann",
-  "points": 1190.4850000000001,
-  "kilometers": 10530.6,
+  "points": 1194.067,
+  "kilometers": 10572.1,
   "collisions": 447,
   "leaderboard": {
    "mugello_": {
@@ -3824,8 +3824,8 @@
    "ks_vallelunga_extended_circuit": {
     "tatuusfa1": {
      "laptime": 92809,
-     "laps": 116,
-     "ts": 1785430008391
+     "laps": 125,
+     "ts": 1785608085118
     }
    },
    "monza_": {
@@ -3836,7 +3836,7 @@
     }
    }
   },
-  "last_seen": 1785441823946,
+  "last_seen": 1785608111775,
   "wins": 29,
   "podiums": 102,
   "poles": 9,
@@ -3938,9 +3938,9 @@
  {
   "guid": "76561198868504121",
   "name": "Dre Mano",
-  "points": 1053.45,
-  "kilometers": 13931.1,
-  "collisions": 972,
+  "points": 1055.842,
+  "kilometers": 13961.6,
+  "collisions": 975,
   "leaderboard": {
    "ks_zandvoort_": {
     "tatuusfa1": {
@@ -4071,12 +4071,12 @@
    "ks_vallelunga_extended_circuit": {
     "tatuusfa1": {
      "laptime": 92622,
-     "laps": 39,
-     "ts": 1785605784071
+     "laps": 46,
+     "ts": 1785607444786
     }
    }
   },
-  "last_seen": 1785606649030,
+  "last_seen": 1785607473935,
   "wins": 53,
   "podiums": 119,
   "poles": 24,
@@ -4918,9 +4918,9 @@
  {
   "guid": "76561198877133702",
   "name": "NavJaxx",
-  "points": 783.817,
-  "kilometers": 3519,
-  "collisions": 132,
+  "points": 797.958,
+  "kilometers": 3593.7,
+  "collisions": 133,
   "leaderboard": {
    "mugello_": {
     "tatuusfa1": {
@@ -4988,16 +4988,16 @@
    "ks_vallelunga_extended_circuit": {
     "tatuusfa1": {
      "laptime": 91972,
-     "laps": 129,
-     "ts": 1785605776940
+     "laps": 145,
+     "ts": 1785608452650
     }
    }
   },
-  "last_seen": 1785606649030,
-  "wins": 28,
-  "podiums": 44,
+  "last_seen": 1785608657515,
+  "wins": 29,
+  "podiums": 46,
   "poles": 15,
-  "flaps": 21,
+  "flaps": 23,
   "infr": 10
  },
  {
@@ -42221,7 +42221,7 @@
   "guid": "76561198334468046",
   "name": "Aleksandar Djordjevic",
   "points": 73.19,
-  "kilometers": 367.4,
+  "kilometers": 370.7,
   "collisions": 38,
   "leaderboard": {
    "mugello_": {
@@ -42253,7 +42253,7 @@
     }
    }
   },
-  "last_seen": 1773778298541,
+  "last_seen": 1785608085401,
   "wins": 0,
   "podiums": 1,
   "poles": 0,
@@ -162700,6 +162700,21 @@
   "infr": 0
  },
  {
+  "guid": "76561197972951472",
+  "name": "Bruno Fabiano",
+  "points": 49.999,
+  "kilometers": 0.1,
+  "collisions": 1,
+  "leaderboard": {
+  },
+  "last_seen": 1785609013346,
+  "wins": 0,
+  "podiums": 0,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 0
+ },
+ {
   "guid": "76561199821128897",
   "name": "Tudor_007",
   "points": 49.998,
@@ -169004,6 +169019,21 @@
   "leaderboard": {
   },
   "last_seen": 1785159656519,
+  "wins": 0,
+  "podiums": 0,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 0
+ },
+ {
+  "guid": "76561199816320037",
+  "name": "hugocondeot",
+  "points": 49.918,
+  "kilometers": 0,
+  "collisions": 0,
+  "leaderboard": {
+  },
+  "last_seen": 1785608432437,
   "wins": 0,
   "podiums": 0,
   "poles": 0,
