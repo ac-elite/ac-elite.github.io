@@ -2,8 +2,8 @@
  {
   "guid": "76561198025621442",
   "name": "DIEnamic",
-  "points": 17355.659,
-  "kilometers": 76036.1,
+  "points": 17369.633,
+  "kilometers": 76120,
   "collisions": 3004,
   "leaderboard": {
    "ks_zandvoort_": {
@@ -23,8 +23,8 @@
    "mugello_": {
     "tatuusfa1": {
      "laptime": 105693,
-     "laps": 1021,
-     "ts": 1786811291909
+     "laps": 1035,
+     "ts": 1786813913528
     }
    },
    "ks_barcelona_layout_gp": {
@@ -126,11 +126,11 @@
     }
    }
   },
-  "last_seen": 1786811329279,
-  "wins": 685,
-  "podiums": 1385,
+  "last_seen": 1786814577984,
+  "wins": 687,
+  "podiums": 1387,
   "poles": 78,
-  "flaps": 277,
+  "flaps": 279,
   "infr": 28
  },
  {
@@ -11572,6 +11572,84 @@
   "infr": 1
  },
  {
+  "guid": "76561198159459171",
+  "name": "Mike B.",
+  "points": 235.173,
+  "kilometers": 1082,
+  "collisions": 38,
+  "leaderboard": {
+   "ks_zandvoort_": {
+    "tatuusfa1": {
+     "laptime": 98866,
+     "laps": 6,
+     "ts": 1756523388733
+    }
+   },
+   "monza_": {
+    "tatuusfa1": {
+     "laptime": 112797,
+     "laps": 22,
+     "ts": 1757126082048
+    }
+   },
+   "imola_": {
+    "tatuusfa1": {
+     "laptime": 106410,
+     "laps": 2,
+     "ts": 1760928516700
+    }
+   },
+   "spa_": {
+    "tatuusfa1": {
+     "laptime": 140147,
+     "laps": 17,
+     "ts": 1761965407569
+    }
+   },
+   "ks_vallelunga_classic_circuit": {
+    "tatuusfa1": {
+     "laptime": 70974,
+     "laps": 34,
+     "ts": 1767450347043
+    }
+   },
+   "ks_brands_hatch_gp": {
+    "tatuusfa1": {
+     "laptime": 83617,
+     "laps": 5,
+     "ts": 1779025371292
+    }
+   },
+   "ks_laguna_seca_": {
+    "tatuusfa1": {
+     "laptime": 80954,
+     "laps": 25,
+     "ts": 1781796829127
+    }
+   },
+   "ks_vallelunga_extended_circuit": {
+    "tatuusfa1": {
+     "laptime": 95135,
+     "laps": 8,
+     "ts": 1785689811855
+    }
+   },
+   "mugello_": {
+    "tatuusfa1": {
+     "laptime": 106433,
+     "laps": 18,
+     "ts": 1786812723694
+    }
+   }
+  },
+  "last_seen": 1786812831319,
+  "wins": 5,
+  "podiums": 15,
+  "poles": 1,
+  "flaps": 2,
+  "infr": 5
+ },
+ {
   "guid": "76561198961093555",
   "name": "Erik Johansson",
   "points": 232.96699999999998,
@@ -11826,84 +11904,6 @@
   "poles": 5,
   "flaps": 6,
   "infr": 1
- },
- {
-  "guid": "76561198159459171",
-  "name": "Mike B.",
-  "points": 226.12699999999998,
-  "kilometers": 1016.4,
-  "collisions": 37,
-  "leaderboard": {
-   "ks_zandvoort_": {
-    "tatuusfa1": {
-     "laptime": 98866,
-     "laps": 6,
-     "ts": 1756523388733
-    }
-   },
-   "monza_": {
-    "tatuusfa1": {
-     "laptime": 112797,
-     "laps": 22,
-     "ts": 1757126082048
-    }
-   },
-   "imola_": {
-    "tatuusfa1": {
-     "laptime": 106410,
-     "laps": 2,
-     "ts": 1760928516700
-    }
-   },
-   "spa_": {
-    "tatuusfa1": {
-     "laptime": 140147,
-     "laps": 17,
-     "ts": 1761965407569
-    }
-   },
-   "ks_vallelunga_classic_circuit": {
-    "tatuusfa1": {
-     "laptime": 70974,
-     "laps": 34,
-     "ts": 1767450347043
-    }
-   },
-   "ks_brands_hatch_gp": {
-    "tatuusfa1": {
-     "laptime": 83617,
-     "laps": 5,
-     "ts": 1779025371292
-    }
-   },
-   "ks_laguna_seca_": {
-    "tatuusfa1": {
-     "laptime": 80954,
-     "laps": 25,
-     "ts": 1781796829127
-    }
-   },
-   "ks_vallelunga_extended_circuit": {
-    "tatuusfa1": {
-     "laptime": 95135,
-     "laps": 8,
-     "ts": 1785689811855
-    }
-   },
-   "mugello_": {
-    "tatuusfa1": {
-     "laptime": 107008,
-     "laps": 8,
-     "ts": 1786811175446
-    }
-   }
-  },
-  "last_seen": 1786811329279,
-  "wins": 5,
-  "podiums": 14,
-  "poles": 1,
-  "flaps": 2,
-  "infr": 5
  },
  {
   "guid": "76561198324624644",
@@ -122762,6 +122762,28 @@
    }
   },
   "last_seen": 1777084126343,
+  "wins": 0,
+  "podiums": 0,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 0
+ },
+ {
+  "guid": "76561198041502116",
+  "name": "Juli333",
+  "points": 53.620000000000005,
+  "kilometers": 17.8,
+  "collisions": 0,
+  "leaderboard": {
+   "mugello_": {
+    "tatuusfa1": {
+     "laptime": 110495,
+     "laps": 1,
+     "ts": 1786812920421
+    }
+   }
+  },
+  "last_seen": 1786813210048,
   "wins": 0,
   "podiums": 0,
   "poles": 0,
