@@ -3712,9 +3712,9 @@
  {
   "guid": "76561198037237397",
   "name": "Friedrich Hartmann",
-  "points": 1196.662,
-  "kilometers": 10675.5,
-  "collisions": 459,
+  "points": 1196.556,
+  "kilometers": 10699.1,
+  "collisions": 460,
   "leaderboard": {
    "mugello_": {
     "tatuusfa1": {
@@ -3782,8 +3782,8 @@
    "ks_zandvoort_": {
     "tatuusfa1": {
      "laptime": 95557,
-     "laps": 180,
-     "ts": 1787052011287
+     "laps": 181,
+     "ts": 1787052428901
     }
    },
    "magione_": {
@@ -3843,7 +3843,7 @@
     }
    }
   },
-  "last_seen": 1787052225924,
+  "last_seen": 1787067389499,
   "wins": 29,
   "podiums": 103,
   "poles": 9,
@@ -23348,6 +23348,35 @@
   "infr": 12
  },
  {
+  "guid": "76561198260620054",
+  "name": "Berna",
+  "points": 107.181,
+  "kilometers": 210.7,
+  "collisions": 21,
+  "leaderboard": {
+   "imola_": {
+    "tatuusfa1": {
+     "laptime": 106470,
+     "laps": 38,
+     "ts": 1785875159727
+    }
+   },
+   "ks_zandvoort_": {
+    "tatuusfa1": {
+     "laptime": 105661,
+     "laps": 1,
+     "ts": 1787063834063
+    }
+   }
+  },
+  "last_seen": 1787063850846,
+  "wins": 3,
+  "podiums": 5,
+  "poles": 0,
+  "flaps": 2,
+  "infr": 1
+ },
+ {
   "guid": "76561198063516089",
   "name": "dave",
   "points": 107.04599999999999,
@@ -24204,28 +24233,6 @@
   "podiums": 1,
   "poles": 0,
   "flaps": 0,
-  "infr": 1
- },
- {
-  "guid": "76561198260620054",
-  "name": "Berna",
-  "points": 104.461,
-  "kilometers": 202.1,
-  "collisions": 21,
-  "leaderboard": {
-   "imola_": {
-    "tatuusfa1": {
-     "laptime": 106470,
-     "laps": 38,
-     "ts": 1785875159727
-    }
-   }
-  },
-  "last_seen": 1785875219887,
-  "wins": 3,
-  "podiums": 5,
-  "poles": 0,
-  "flaps": 2,
   "infr": 1
  },
  {
