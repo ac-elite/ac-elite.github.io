@@ -2,7 +2,7 @@
  {
   "guid": "76561198025621442",
   "name": "DIEnamic",
-  "points": 17505.036,
+  "points": 17504.736,
   "kilometers": 76974,
   "collisions": 3018,
   "leaderboard": {
@@ -126,7 +126,7 @@
     }
    }
   },
-  "last_seen": 1787165099655,
+  "last_seen": 1787165146126,
   "wins": 693,
   "podiums": 1400,
   "poles": 78,
@@ -20519,35 +20519,6 @@
   "infr": 0
  },
  {
-  "guid": "76561198260620054",
-  "name": "Berna",
-  "points": 119.85000000000001,
-  "kilometers": 312.7,
-  "collisions": 31,
-  "leaderboard": {
-   "imola_": {
-    "tatuusfa1": {
-     "laptime": 106470,
-     "laps": 38,
-     "ts": 1785875159727
-    }
-   },
-   "ks_zandvoort_": {
-    "tatuusfa1": {
-     "laptime": 97713,
-     "laps": 12,
-     "ts": 1787164674696
-    }
-   }
-  },
-  "last_seen": 1787165099655,
-  "wins": 3,
-  "podiums": 7,
-  "poles": 0,
-  "flaps": 2,
-  "infr": 1
- },
- {
   "guid": "76561199576064822",
   "name": "Santuzzolo",
   "points": 119.764,
@@ -20639,6 +20610,35 @@
   "poles": 0,
   "flaps": 0,
   "infr": 3
+ },
+ {
+  "guid": "76561198260620054",
+  "name": "Berna",
+  "points": 119.55,
+  "kilometers": 312.7,
+  "collisions": 31,
+  "leaderboard": {
+   "imola_": {
+    "tatuusfa1": {
+     "laptime": 106470,
+     "laps": 38,
+     "ts": 1785875159727
+    }
+   },
+   "ks_zandvoort_": {
+    "tatuusfa1": {
+     "laptime": 97713,
+     "laps": 12,
+     "ts": 1787164674696
+    }
+   }
+  },
+  "last_seen": 1787165146126,
+  "wins": 3,
+  "podiums": 7,
+  "poles": 0,
+  "flaps": 2,
+  "infr": 1
  },
  {
   "guid": "76561198337729949",
