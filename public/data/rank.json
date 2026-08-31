@@ -20088,6 +20088,42 @@
   "infr": 1
  },
  {
+  "guid": "76561198765215876",
+  "name": "scooby25",
+  "points": 125.693,
+  "kilometers": 790.6,
+  "collisions": 25,
+  "leaderboard": {
+   "mugello_": {
+    "tatuusfa1": {
+     "laptime": 106498,
+     "laps": 33,
+     "ts": 1786834579479
+    }
+   },
+   "ks_zandvoort_": {
+    "tatuusfa1": {
+     "laptime": 95318,
+     "laps": 43,
+     "ts": 1787535449268
+    }
+   },
+   "ks_barcelona_layout_gp": {
+    "tatuusfa1": {
+     "laptime": 104349,
+     "laps": 23,
+     "ts": 1788129988047
+    }
+   }
+  },
+  "last_seen": 1788130166574,
+  "wins": 3,
+  "podiums": 5,
+  "poles": 2,
+  "flaps": 3,
+  "infr": 2
+ },
+ {
   "guid": "76561198344543740",
   "name": "The Dr1ver",
   "points": 125.09800000000001,
@@ -20595,42 +20631,6 @@
   "poles": 0,
   "flaps": 0,
   "infr": 1
- },
- {
-  "guid": "76561198765215876",
-  "name": "scooby25",
-  "points": 121.144,
-  "kilometers": 746.3,
-  "collisions": 25,
-  "leaderboard": {
-   "mugello_": {
-    "tatuusfa1": {
-     "laptime": 106498,
-     "laps": 33,
-     "ts": 1786834579479
-    }
-   },
-   "ks_zandvoort_": {
-    "tatuusfa1": {
-     "laptime": 95318,
-     "laps": 43,
-     "ts": 1787535449268
-    }
-   },
-   "ks_barcelona_layout_gp": {
-    "tatuusfa1": {
-     "laptime": 104349,
-     "laps": 19,
-     "ts": 1788087464761
-    }
-   }
-  },
-  "last_seen": 1788087507343,
-  "wins": 2,
-  "podiums": 4,
-  "poles": 2,
-  "flaps": 2,
-  "infr": 2
  },
  {
   "guid": "76561199379657737",
@@ -64729,28 +64729,6 @@
   "infr": 0
  },
  {
-  "guid": "76561199430125205",
-  "name": "Tiggr",
-  "points": 63.9,
-  "kilometers": 37.2,
-  "collisions": 0,
-  "leaderboard": {
-   "ks_barcelona_layout_gp": {
-    "tatuusfa1": {
-     "laptime": 110532,
-     "laps": 5,
-     "ts": 1788112228311
-    }
-   }
-  },
-  "last_seen": 1788112259388,
-  "wins": 0,
-  "podiums": 0,
-  "poles": 0,
-  "flaps": 0,
-  "infr": 0
- },
- {
   "guid": "76561199062309143",
   "name": "babo12",
   "points": 63.877,
@@ -65748,6 +65726,28 @@
    }
   },
   "last_seen": 1777150297542,
+  "wins": 0,
+  "podiums": 0,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 0
+ },
+ {
+  "guid": "76561199430125205",
+  "name": "Tiggr",
+  "points": 63.568999999999996,
+  "kilometers": 43.9,
+  "collisions": 1,
+  "leaderboard": {
+   "ks_barcelona_layout_gp": {
+    "tatuusfa1": {
+     "laptime": 110532,
+     "laps": 5,
+     "ts": 1788112228311
+    }
+   }
+  },
+  "last_seen": 1788112665089,
   "wins": 0,
   "podiums": 0,
   "poles": 0,
@@ -185875,6 +185875,21 @@
   "leaderboard": {
   },
   "last_seen": 1763838036033,
+  "wins": 0,
+  "podiums": 0,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 0
+ },
+ {
+  "guid": "76561198757629473",
+  "name": "KettleChips",
+  "points": 49.684,
+  "kilometers": 8.7,
+  "collisions": 0,
+  "leaderboard": {
+  },
+  "last_seen": 1788129468315,
   "wins": 0,
   "podiums": 0,
   "poles": 0,
