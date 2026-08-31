@@ -19824,6 +19824,42 @@
   "infr": 0
  },
  {
+  "guid": "76561198765215876",
+  "name": "scooby25",
+  "points": 126.953,
+  "kilometers": 813.8,
+  "collisions": 25,
+  "leaderboard": {
+   "mugello_": {
+    "tatuusfa1": {
+     "laptime": 106498,
+     "laps": 33,
+     "ts": 1786834579479
+    }
+   },
+   "ks_zandvoort_": {
+    "tatuusfa1": {
+     "laptime": 95318,
+     "laps": 43,
+     "ts": 1787535449268
+    }
+   },
+   "ks_barcelona_layout_gp": {
+    "tatuusfa1": {
+     "laptime": 104330,
+     "laps": 26,
+     "ts": 1788130770452
+    }
+   }
+  },
+  "last_seen": 1788130824006,
+  "wins": 3,
+  "podiums": 5,
+  "poles": 2,
+  "flaps": 3,
+  "infr": 2
+ },
+ {
   "guid": "76561198279709383",
   "name": "raedu",
   "points": 126.81299999999999,
@@ -20086,42 +20122,6 @@
   "poles": 0,
   "flaps": 1,
   "infr": 1
- },
- {
-  "guid": "76561198765215876",
-  "name": "scooby25",
-  "points": 125.693,
-  "kilometers": 790.6,
-  "collisions": 25,
-  "leaderboard": {
-   "mugello_": {
-    "tatuusfa1": {
-     "laptime": 106498,
-     "laps": 33,
-     "ts": 1786834579479
-    }
-   },
-   "ks_zandvoort_": {
-    "tatuusfa1": {
-     "laptime": 95318,
-     "laps": 43,
-     "ts": 1787535449268
-    }
-   },
-   "ks_barcelona_layout_gp": {
-    "tatuusfa1": {
-     "laptime": 104349,
-     "laps": 23,
-     "ts": 1788129988047
-    }
-   }
-  },
-  "last_seen": 1788130166574,
-  "wins": 3,
-  "podiums": 5,
-  "poles": 2,
-  "flaps": 3,
-  "infr": 2
  },
  {
   "guid": "76561198344543740",
@@ -161952,28 +161952,6 @@
   "infr": 0
  },
  {
-  "guid": "76561198059514199",
-  "name": "Ramon",
-  "points": 50.331,
-  "kilometers": 54,
-  "collisions": 20,
-  "leaderboard": {
-   "ks_zandvoort_": {
-    "tatuusfa1": {
-     "laptime": 99295,
-     "laps": 4,
-     "ts": 1787440075459
-    }
-   }
-  },
-  "last_seen": 1787442924817,
-  "wins": 0,
-  "podiums": 0,
-  "poles": 0,
-  "flaps": 0,
-  "infr": 0
- },
- {
   "guid": "76561199109078597",
   "name": "__TheBigD__",
   "points": 50.327,
@@ -162447,6 +162425,28 @@
   "poles": 0,
   "flaps": 0,
   "infr": 2
+ },
+ {
+  "guid": "76561198059514199",
+  "name": "Ramon",
+  "points": 50.242000000000004,
+  "kilometers": 65.4,
+  "collisions": 22,
+  "leaderboard": {
+   "ks_zandvoort_": {
+    "tatuusfa1": {
+     "laptime": 99295,
+     "laps": 4,
+     "ts": 1787440075459
+    }
+   }
+  },
+  "last_seen": 1788130841452,
+  "wins": 0,
+  "podiums": 0,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 0
  },
  {
   "guid": "76561198875099421",
@@ -262606,12 +262606,12 @@
  {
   "guid": "76561198143303113",
   "name": "adoo",
-  "points": 42.638000000000005,
+  "points": 42.638,
   "kilometers": 0.1,
   "collisions": 3,
   "leaderboard": {
   },
-  "last_seen": 1765063945464,
+  "last_seen": 1788136555394,
   "wins": 0,
   "podiums": 0,
   "poles": 0,
