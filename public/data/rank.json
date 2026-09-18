@@ -22119,6 +22119,42 @@
   "infr": 1
  },
  {
+  "guid": "76561197987974506",
+  "name": "Janinho",
+  "points": 115.824,
+  "kilometers": 245.1,
+  "collisions": 13,
+  "leaderboard": {
+   "ks_brands_hatch_gp": {
+    "tatuusfa1": {
+     "laptime": 87285,
+     "laps": 9,
+     "ts": 1765230180079
+    }
+   },
+   "ks_red_bull_ring_layout_gp": {
+    "tatuusfa1": {
+     "laptime": 92098,
+     "laps": 15,
+     "ts": 1778336177685
+    }
+   },
+   "ks_laguna_seca_": {
+    "tatuusfa1": {
+     "laptime": 84055,
+     "laps": 23,
+     "ts": 1789659437225
+    }
+   }
+  },
+  "last_seen": 1789659444812,
+  "wins": 1,
+  "podiums": 1,
+  "poles": 1,
+  "flaps": 1,
+  "infr": 0
+ },
+ {
   "guid": "76561199262276470",
   "name": "Dr Spaceman",
   "points": 115.668,
@@ -23462,42 +23498,6 @@
   "poles": 0,
   "flaps": 0,
   "infr": 3
- },
- {
-  "guid": "76561197987974506",
-  "name": "Janinho",
-  "points": 110.604,
-  "kilometers": 219.9,
-  "collisions": 13,
-  "leaderboard": {
-   "ks_brands_hatch_gp": {
-    "tatuusfa1": {
-     "laptime": 87285,
-     "laps": 9,
-     "ts": 1765230180079
-    }
-   },
-   "ks_red_bull_ring_layout_gp": {
-    "tatuusfa1": {
-     "laptime": 92098,
-     "laps": 15,
-     "ts": 1778336177685
-    }
-   },
-   "ks_laguna_seca_": {
-    "tatuusfa1": {
-     "laptime": 84253,
-     "laps": 17,
-     "ts": 1789658564573
-    }
-   }
-  },
-  "last_seen": 1789658752966,
-  "wins": 1,
-  "podiums": 1,
-  "poles": 1,
-  "flaps": 1,
-  "infr": 0
  },
  {
   "guid": "76561199237475660",
@@ -271653,28 +271653,6 @@
   "infr": 0
  },
  {
-  "guid": "76561198160608281",
-  "name": "PepsiPL",
-  "points": 42.036,
-  "kilometers": 95.4,
-  "collisions": 38,
-  "leaderboard": {
-   "ks_zandvoort_": {
-    "tatuusfa1": {
-     "laptime": 100884,
-     "laps": 8,
-     "ts": 1763221829864
-    }
-   }
-  },
-  "last_seen": 1763221942214,
-  "wins": 0,
-  "podiums": 0,
-  "poles": 0,
-  "flaps": 0,
-  "infr": 2
- },
- {
   "guid": "76561198322948970",
   "name": "ElonCracked",
   "points": 42.036,
@@ -279897,6 +279875,28 @@
   "poles": 0,
   "flaps": 0,
   "infr": 1
+ },
+ {
+  "guid": "76561198160608281",
+  "name": "PepsiPL",
+  "points": 40.556000000000004,
+  "kilometers": 96,
+  "collisions": 47,
+  "leaderboard": {
+   "ks_zandvoort_": {
+    "tatuusfa1": {
+     "laptime": 100884,
+     "laps": 8,
+     "ts": 1763221829864
+    }
+   }
+  },
+  "last_seen": 1789660658034,
+  "wins": 0,
+  "podiums": 0,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 2
  },
  {
   "guid": "76561198268860196",
