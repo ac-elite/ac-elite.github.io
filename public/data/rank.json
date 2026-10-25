@@ -5849,8 +5849,8 @@
  {
   "guid": "76561198084420751",
   "name": "Dutchy1964",
-  "points": 681.149,
-  "kilometers": 3295.1,
+  "points": 686.183,
+  "kilometers": 3325.6,
   "collisions": 60,
   "leaderboard": {
    "monza_": {
@@ -5890,9 +5890,9 @@
    },
    "imola_": {
     "tatuusfa1": {
-     "laptime": 104701,
-     "laps": 14,
-     "ts": 1792788465084
+     "laptime": 104441,
+     "laps": 18,
+     "ts": 1792871590025
     }
    },
    "spa_": {
@@ -5917,7 +5917,7 @@
     }
    }
   },
-  "last_seen": 1792871051276,
+  "last_seen": 1792871758190,
   "wins": 13,
   "podiums": 45,
   "poles": 3,
@@ -196900,6 +196900,21 @@
   "leaderboard": {
   },
   "last_seen": 1789493270624,
+  "wins": 0,
+  "podiums": 0,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 0
+ },
+ {
+  "guid": "76561199471728917",
+  "name": "Gizmo",
+  "points": 49.631,
+  "kilometers": 10,
+  "collisions": 0,
+  "leaderboard": {
+  },
+  "last_seen": 1792895341093,
   "wins": 0,
   "podiums": 0,
   "poles": 0,
@@ -413081,35 +413096,6 @@
   "infr": 3
  },
  {
-  "guid": "76561198352862708",
-  "name": "nugget",
-  "points": 25.483999999999998,
-  "kilometers": 167.9,
-  "collisions": 16,
-  "leaderboard": {
-   "ks_red_bull_ring_layout_gp": {
-    "tatuusfa1": {
-     "laptime": 93291,
-     "laps": 7,
-     "ts": 1783044353505
-    }
-   },
-   "imola_": {
-    "tatuusfa1": {
-     "laptime": 107319,
-     "laps": 5,
-     "ts": 1792542058006
-    }
-   }
-  },
-  "last_seen": 1792542116228,
-  "wins": 0,
-  "podiums": 0,
-  "poles": 0,
-  "flaps": 0,
-  "infr": 4
- },
- {
   "guid": "76561198078800049",
   "name": "Ender_Legend",
   "points": 25.483,
@@ -414356,6 +414342,35 @@
   "poles": 0,
   "flaps": 0,
   "infr": 3
+ },
+ {
+  "guid": "76561198352862708",
+  "name": "nugget",
+  "points": 25.184,
+  "kilometers": 172.8,
+  "collisions": 16,
+  "leaderboard": {
+   "ks_red_bull_ring_layout_gp": {
+    "tatuusfa1": {
+     "laptime": 93291,
+     "laps": 7,
+     "ts": 1783044353505
+    }
+   },
+   "imola_": {
+    "tatuusfa1": {
+     "laptime": 107319,
+     "laps": 5,
+     "ts": 1792542058006
+    }
+   }
+  },
+  "last_seen": 1792895341093,
+  "wins": 0,
+  "podiums": 0,
+  "poles": 0,
+  "flaps": 0,
+  "infr": 4
  },
  {
   "guid": "76561198861204749",
